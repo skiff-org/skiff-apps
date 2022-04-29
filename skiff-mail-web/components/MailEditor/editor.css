@@ -1,0 +1,84 @@
+.__prosemirror-dev-tools__ > div {
+  z-index: 99999999;
+}
+
+.ProseMirror .is-empty::before {
+  color: var(--text-disabled);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror img {
+  max-width: 100px;
+  max-height: 100px;
+  border: solid 1px transparent;
+  margin: 0px 5px;
+}
+
+.ProseMirror img:hover {
+ cursor: pointer;
+}
+
+.ProseMirror img.ProseMirror-selectednode {
+  border-color:white;
+}
+
+
+.ProseMirror blockquote {
+  padding: 0px;
+  margin: 0px;
+  border-left: 2px solid var(--accent-dark-blue-primary);
+  padding-left: 12px;
+}
+
+.ProseMirror-focused {
+  border: none;
+  outline: none;
+}
+
+.ProseMirror ol,
+.ProseMirror ul {
+  padding-left: 20px;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: var(--text-disabled);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.toolbar-dropdown > .optionMenu {
+  background-color: var(--bg-emphasis) !important;
+}
+
+.ProseMirror code {
+  padding: 0px 4px;
+  border: 1px solid var(--border-secondary);
+  border-radius: 4px;
+  color: var(--skiff-code-mark-color);
+  background: var(--skiff-code-mark-bg);
+}
+
+
+.ProseMirror ol ol ol ol ol,
+.ProseMirror ol ol ol ol ol ol ol ol,
+.ProseMirror ol ol {
+  list-style-type: lower-alpha;
+}
+
+.ProseMirror ol ol ol ol ol ol,
+.ProseMirror ol ol ol ol ol ol ol ol ol,
+.ProseMirror ol ol ol {
+  list-style-type: upper-roman;
+}
+
+.ProseMirror ol,
+.ProseMirror ol ol ol ol ol ol ol ,
+.ProseMirror ol ol ol ol ol ol ol ol ol ol,
+.ProseMirror ol ol ol ol {
+  list-style-type: decimal;
+}

@@ -1,0 +1,20 @@
+:root{
+    --toolbar-height: 57px;
+}
+
+.toolbar-root {
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    flex: 1;
+    width: 100%;
+    border-top: 1px solid var(--border-secondary);
+    background: var(--bg-l3-solid) !important;
+    padding-bottom: constant(safe-area-inset-bottom); /* compatible with IOS < 11.2*/
+    padding-bottom: env(safe-area-inset-bottom); /* compatible with IOS > = 11.2*/
+}
+
+.toolbar-button {
+    min-width: auto;
+    color: var(--text-primary) !important;
+}

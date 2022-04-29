@@ -1,0 +1,2 @@
+export const THREAD_HEADER_HEIGHT_LABELS = 150;
+export const THREAD_HEADER_HEIGHT = 55;

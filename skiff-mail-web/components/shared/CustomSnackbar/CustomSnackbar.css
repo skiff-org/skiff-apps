@@ -1,0 +1,33 @@
+.snackbarRoot {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--bg-emphasis);
+  box-shadow: var(--dropdown-shadow);
+  width: 300px;
+  backdrop-filter: blur(72px);
+  -webkit-backdrop-filter: blur(72px);
+}
+
+/* notistack snackbars turn into mobile at 600px screen width or less */
+@media (max-width: 600px) {
+  /* we let notistack handle mobile sizing, where it expands the snackbars to full screen width  */
+  .snackbarRoot {
+    width: initial;
+  }
+}
+
+.snackbarText {
+  display: flex;
+  flex-direction: column;
+  margin-left: 4px;
+  /* allows this flex box to shrink to a width smaller than its contents */
+  min-width: 0;
+}
+
+.snackbarActions {
+  display: flex;
+  margin-left: auto;
+  gap: 24px;
+}
