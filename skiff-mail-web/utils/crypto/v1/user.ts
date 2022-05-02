@@ -1,10 +1,10 @@
 // eslint-disable-next-line max-classes-per-file
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from 'uuid';
 
-import { PublicData, SignatureContext } from "../../../generated/graphql";
-import { User } from "../../../models/user";
-import { getStorageKey, SkemailStorageTypes } from "../../storageUtils";
-import { createJSONWrapperDatagram } from "./lib/datagramClasses";
+import { PublicData, SignatureContext } from '../../../generated/graphql';
+import { User } from '../../../models/user';
+import { getStorageKey, SkemailStorageTypes } from '../../storageUtils';
+import { createJSONWrapperDatagram } from './lib/datagramClasses';
 import {
   createDetachedSignatureAsymmetric,
   decryptSymmetric,
@@ -13,11 +13,11 @@ import {
   generateSymmetricKey,
   stringDecryptAsymmetric,
   stringEncryptAsymmetric,
-  verifyDetachedSignatureAsymmetric,
-} from "./utils";
+  verifyDetachedSignatureAsymmetric
+} from './utils';
 
 export type UserID = string;
-export const USER_NOT_FOUND = "A user";
+export const USER_NOT_FOUND = 'A user';
 type PublicKey = {
   key: string;
   signature: string;
@@ -67,9 +67,9 @@ export const EMPTY_DOCUMENT_DATA: PrivateDocumentData = {
   documentData: {},
   verifiedKeys: {
     keys: {},
-    lastVerifiedDate: "",
+    lastVerifiedDate: ''
   },
-  recoveryBrowserShare: "",
+  recoveryBrowserShare: ''
 };
 
 /**
@@ -120,18 +120,16 @@ export async function validateKeyPairs(userObj: any): Promise<boolean> {
 /**
  * PrivateUserDataDatagram stores a user's end-to-end encrypted user data.
  */
-export const PrivateUserDataDatagram =
-  createJSONWrapperDatagram<PrivateUserData>(
-    "ddl://skiff/PrivateUserDataDatagram"
-  );
+export const PrivateUserDataDatagram = createJSONWrapperDatagram<PrivateUserData>(
+  'ddl://skiff/PrivateUserDataDatagram'
+);
 
 /**
  * PrivateDocumentDataDatagram stores a user's end-to-end encrypted document data.
  */
-export const PrivateDocumentDataDatagram =
-  createJSONWrapperDatagram<PrivateDocumentData>(
-    "ddl://skiff/PrivateDocumentDataDatagram"
-  );
+export const PrivateDocumentDataDatagram = createJSONWrapperDatagram<PrivateDocumentData>(
+  'ddl://skiff/PrivateDocumentDataDatagram'
+);
 
 /**
  * SessionCacheData stores cached session data, used to perform auto-login
@@ -143,10 +141,9 @@ export interface SessionCacheData {
 /**
  * SessionCacheDataDatagram stores a user's full userObj
  */
-export const SessionCacheDataDatagram =
-  createJSONWrapperDatagram<SessionCacheData>(
-    "ddl://skiff/SessionCaceDataDatagram"
-  );
+export const SessionCacheDataDatagram = createJSONWrapperDatagram<SessionCacheData>(
+  'ddl://skiff/SessionCaceDataDatagram'
+);
 
 /**
  * Encrypt a user's `privateUserData`.
@@ -154,16 +151,9 @@ export const SessionCacheDataDatagram =
  * @param {string} passwordDerivedSecret - Password-derived secret for encryption.
  * @returns {string} Encrypted private user data.
  */
-export function encryptPrivateUserData(
-  privateUserData: PrivateUserData,
-  passwordDerivedSecret: string
-): string {
+export function encryptPrivateUserData(privateUserData: PrivateUserData, passwordDerivedSecret: string): string {
   // Encrypt the private user data and return it
-  return encryptSymmetric(
-    privateUserData,
-    passwordDerivedSecret,
-    PrivateUserDataDatagram
-  );
+  return encryptSymmetric(privateUserData, passwordDerivedSecret, PrivateUserDataDatagram);
 }
 
 /**
@@ -192,16 +182,9 @@ export async function encryptPrivateUserDataRecovery(
  * @param {string} passwordDerivedSecret - Password-derived secret for encryption.
  * @returns {PrivateUserData} Decrypted private user data.
  */
-export function decryptPrivateUserData(
-  encryptedUserData: string,
-  passwordDerivedSecret: string
-): PrivateUserData {
+export function decryptPrivateUserData(encryptedUserData: string, passwordDerivedSecret: string): PrivateUserData {
   // Decrypt the private user data with the passwordDerivedSecret
-  return decryptSymmetric(
-    encryptedUserData,
-    passwordDerivedSecret,
-    PrivateUserDataDatagram
-  );
+  return decryptSymmetric(encryptedUserData, passwordDerivedSecret, PrivateUserDataDatagram);
 }
 
 /**
@@ -232,18 +215,13 @@ export async function decryptPrivateUserDataRecovery(
  * @param {string} salt - Salt for use in creating passwor derived secret.
  * @returns {Promise<User>} - User objcet.
  */
-export async function generateInitialUserObject(
-  username: string,
-  _masterSecret: string,
-  _salt: string
-): Promise<User> {
+export async function generateInitialUserObject(username: string, _masterSecret: string, _salt: string): Promise<User> {
   // This includes the public+private keypair and an empty documents map.
-  const { publicKey, privateKey, signingPublicKey, signingPrivateKey } =
-    generatePublicPrivateKeyPair();
+  const { publicKey, privateKey, signingPublicKey, signingPrivateKey } = generatePublicPrivateKeyPair();
   const privateUserData: PrivateUserData = {
     privateKey,
     signingPrivateKey,
-    documentKey: generateSymmetricKey(),
+    documentKey: generateSymmetricKey()
   };
 
   const publicKeySignature = await createDetachedSignatureAsymmetric(
@@ -255,7 +233,7 @@ export async function generateInitialUserObject(
   // a signing public key type that just has a key field
   const publicKeyObj: PublicKey = {
     key: publicKey,
-    signature: publicKeySignature,
+    signature: publicKeySignature
   };
 
   const user: User = {
@@ -263,8 +241,8 @@ export async function generateInitialUserObject(
     publicKey: publicKeyObj,
     signingPublicKey,
     privateUserData,
-    userID: "", // set in login
-    publicData: {},
+    userID: '', // set in login
+    publicData: {}
   };
 
   return user;
@@ -307,21 +285,12 @@ export function removeSigningPublicKeyFromVerifiedKeys(
  * @param {User} userObj - user object
  * @param {string} cacheKey - session cache key
  */
-export function writeSessionCacheData(
-  sessionCacheData: SessionCacheData,
-  cacheKey: string
-) {
-  console.log("Write cache", cacheKey);
-  const encryptedUserObj = encryptSymmetric(
-    sessionCacheData,
-    cacheKey,
-    SessionCacheDataDatagram
-  );
+export function writeSessionCacheData(sessionCacheData: SessionCacheData, cacheKey: string) {
+  console.log('Write cache', cacheKey);
+  const encryptedUserObj = encryptSymmetric(sessionCacheData, cacheKey, SessionCacheDataDatagram);
 
-  localStorage.setItem(
-    getStorageKey(SkemailStorageTypes.SESSION_CACHE),
-    encryptedUserObj
-  );
+  // TODO - resolve compatibility with editor
+  localStorage.setItem(getStorageKey(SkemailStorageTypes.SESSION_CACHE), encryptedUserObj);
 }
 
 /**
@@ -330,14 +299,7 @@ export function writeSessionCacheData(
  * @param {string} sessionCache - encrypted sessioncache from local storage
  * @returns {User} - decrypted user
  */
-export function decryptSessionCacheData(
-  encryptedSessionCacheData: string,
-  cacheKey: string
-): SessionCacheData | null {
-  console.log("Decrypt cache", encryptedSessionCacheData, cacheKey);
-  return decryptSymmetric(
-    encryptedSessionCacheData,
-    cacheKey,
-    SessionCacheDataDatagram
-  );
+export function decryptSessionCacheData(encryptedSessionCacheData: string, cacheKey: string): SessionCacheData | null {
+  console.log('Decrypt cache', encryptedSessionCacheData, cacheKey);
+  return decryptSymmetric(encryptedSessionCacheData, cacheKey, SessionCacheDataDatagram);
 }
