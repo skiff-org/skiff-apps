@@ -1,0 +1,51 @@
+{
+  "root": "apps/skemail-web",
+  "sourceRoot": "apps/skemail-web",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/next:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "root": "apps/skemail-web",
+        "outputPath": "dist/apps/skemail-web"
+      },
+      "configurations": {
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/next:server",
+      "options": {
+        "buildTarget": "skemail-web:build",
+        "dev": true
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "skemail-web:build:production",
+          "dev": false
+        }
+      }
+    },
+    "export": {
+      "executor": "@nrwl/next:export",
+      "options": {
+        "buildTarget": "skemail-web:build:production"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": ["jest --config ./apps/skemail-web/jest.config.ts"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": ["eslint --config apps/skemail-web/.eslintrc.json --ext=.ts,.tsx --fix ./apps/skemail-web/"]
+      }
+    }
+  },
+  "tags": []
+}

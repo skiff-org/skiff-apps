@@ -1,0 +1,41 @@
+.searchResultHeaderRow {
+  cursor: default;
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.searchResultRow {
+  cursor: pointer;
+  box-sizing: border-box;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.searchResultRow:last-of-type {
+ padding: 44px 0px;
+}
+
+.searchResultRow * {
+  cursor: pointer;
+}
+
+.searchResultContent {
+  flex: 1;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.searchResultContent span.outerText:first-child {
+  color: white !important;
+}
+
+.searchResultIcon {
+  padding: 0px 8px;
+  pointer-events: none;
+}
