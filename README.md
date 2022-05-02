@@ -1,4 +1,4 @@
-# Skiff-Mail
+# Skiff Mail
 Private, end-to-end encrypted, wallet native mail. Sign up for a free Skiff Mail account at [skiff.org](https://skiff.org).
 
 
