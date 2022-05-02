@@ -289,7 +289,6 @@ export function writeSessionCacheData(sessionCacheData: SessionCacheData, cacheK
   console.log('Write cache', cacheKey);
   const encryptedUserObj = encryptSymmetric(sessionCacheData, cacheKey, SessionCacheDataDatagram);
 
-  // TODO - resolve compatibility with editor
   localStorage.setItem(getStorageKey(SkemailStorageTypes.SESSION_CACHE), encryptedUserObj);
 }
 

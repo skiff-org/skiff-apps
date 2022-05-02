@@ -97,7 +97,7 @@ export const MailboxHeader = ({
           <Typography
             className={TOP_TOOLBAR}
             color='link'
-            level={1} // TODO: select all click
+            level={1}
             onClick={mobileMultiItemsActive ? setSelectAll : showMultiItemSelect}
           >
             {mobileMultiItemsActive ? 'Select all' : 'Edit'}
