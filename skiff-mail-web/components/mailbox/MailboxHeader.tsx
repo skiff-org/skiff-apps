@@ -1,20 +1,20 @@
-import { Icon, IconButton, Typography } from '@skiff-org/skiff-ui';
-import Head from 'next/head';
-import { useCallback } from 'react';
-import { BrowserView, isMobile, MobileView } from 'react-device-detect';
-import { useDispatch } from 'react-redux';
-import styled from 'styled-components';
+import { Icon, IconButton, Typography } from "@skiff-org/skiff-ui";
+import Head from "next/head";
+import { useCallback } from "react";
+import { BrowserView, isMobile, MobileView } from "react-device-detect";
+import { useDispatch } from "react-redux";
+import styled from "styled-components";
 
-import { useRequiredCurrentUserData } from '../../apollo/currentUser';
-import { useRouterLabelContext } from '../../context/RouterLabelContext';
-import { useGetNumUnreadQuery } from '../../generated/graphql';
-import { useAppSelector } from '../../hooks/redux/useAppSelector';
-import { MailboxThreadInfo } from '../../models/thread';
-import { skemailMobileDrawerReducer } from '../../redux/reducers/mobileDrawerReducer';
-import { skemailMobileMenuReducer } from '../../redux/reducers/mobileMenuReducer';
-import { TOP_TOOLBAR } from '../shared/BottomToolbars';
-import { MailboxView } from './Mailbox.types';
-import { MailboxActions } from './MailboxActions/MailboxActions';
+import { useRequiredCurrentUserData } from "../../apollo/currentUser";
+import { useRouterLabelContext } from "../../context/RouterLabelContext";
+import { useGetNumUnreadQuery } from "../../generated/graphql";
+import { useAppSelector } from "../../hooks/redux/useAppSelector";
+import { MailboxThreadInfo } from "../../models/thread";
+import { skemailMobileDrawerReducer } from "../../redux/reducers/mobileDrawerReducer";
+import { skemailMobileMenuReducer } from "../../redux/reducers/mobileMenuReducer";
+import { TOP_TOOLBAR } from "../shared/BottomToolbars";
+import { MailboxView } from "./Mailbox.types";
+import { MailboxActions } from "./MailboxActions/MailboxActions";
 
 interface Props {
   threads: MailboxThreadInfo[];
@@ -36,7 +36,7 @@ const HeaderButtons = styled.div`
 `;
 
 const Header = styled.div`
-  padding: ${isMobile ? '0px' : '8px'} 12px;
+  padding: ${isMobile ? "0px" : "8px"} 12px;
 `;
 
 const UnreadText = styled.span`
@@ -51,13 +51,15 @@ export const MailboxHeader = ({
   setSelectAll,
   setClearAll,
   onRefresh,
-  onClick
+  onClick,
 }: Props) => {
   const { value: label, name: labelName } = useRouterLabelContext();
   const { data } = useGetNumUnreadQuery({ variables: { label: label } });
   const numUnread = data?.unread ?? 0;
   const user = useRequiredCurrentUserData();
-  const mobileMultiItemsActive = useAppSelector((state) => state.mobileDrawer.multipleItemSelector);
+  const mobileMultiItemsActive = useAppSelector(
+    (state) => state.mobileDrawer.multipleItemSelector
+  );
 
   const dispatch = useDispatch();
 
@@ -74,7 +76,8 @@ export const MailboxHeader = ({
     <>
       <Head>
         <title>
-          {labelName} {numUnread > 0 ? `(${numUnread})` : undefined} – {user.username}
+          {labelName} {numUnread > 0 ? `(${numUnread})` : undefined} – 
+          {user.username}
         </title>
       </Head>
       <MobileView>
@@ -86,28 +89,35 @@ export const MailboxHeader = ({
                 // Set Mobile menu active to reopen it
                 dispatch(skemailMobileMenuReducer.actions.openMenu(true));
               }}
-              size='large'
+              size="large"
             />
           )}
           {mobileMultiItemsActive && (
-            <Typography className={TOP_TOOLBAR} color='link' level={1} onClick={hideMultiItemSelect}>
+            <Typography
+              className={TOP_TOOLBAR}
+              color="link"
+              level={1}
+              onClick={hideMultiItemSelect}
+            >
               Cancel
             </Typography>
           )}
           <Typography
             className={TOP_TOOLBAR}
-            color='link'
-            level={1} // TODO: select all click
-            onClick={mobileMultiItemsActive ? setSelectAll : showMultiItemSelect}
+            color="link"
+            level={1}
+            onClick={
+              mobileMultiItemsActive ? setSelectAll : showMultiItemSelect
+            }
           >
-            {mobileMultiItemsActive ? 'Select all' : 'Edit'}
+            {mobileMultiItemsActive ? "Select all" : "Edit"}
           </Typography>
         </HeaderButtons>
       </MobileView>
       <Header onClick={onClick}>
-        <Typography level={0} type='heading'>
+        <Typography level={0} type="heading">
           {labelName}
-          <UnreadText>{numUnread > 0 ? ` (${numUnread})` : ''}</UnreadText>
+          <UnreadText>{numUnread > 0 ? ` (${numUnread})` : ""}</UnreadText>
         </Typography>
         <BrowserView>
           <MailboxActions
