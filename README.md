@@ -15,14 +15,15 @@ This library, along with Skiff UI, implements reusable, powerful design componen
 ### Fast, instant search
 This repository contains an implementation of Skiff's search indexing library, which was documented in [this blog post](https://skiff.org/blog/private-search).
 
-<img width="1200" alt="Skiff Mail – Search" src="https://user-images.githubusercontent.com/1927690/166390204-f24625c4-4195-4a9d-a916-a25061e7abd4.png">
+<img width="800" alt="Skiff Mail – Search" src="https://user-images.githubusercontent.com/1927690/166390204-f24625c4-4195-4a9d-a916-a25061e7abd4.png">
 
 ### Documentation and whitepaper
 Skiff Mail's technical model is documented in [Skiff's whitepaper](https://skiff.org/whitepaper).
 
 ### Mobile friendly
 Skiff Mail is designed to be highly compatible with native and web mobile clients. Android and iOS links coming soon!
-<img width="1200" alt="Skiff Mail – iPhone" src="https://user-images.githubusercontent.com/1927690/166390238-fe78fedd-41c6-48ee-a4c5-efcb3f1cfa78.png">
+
+<img width="800" alt="Skiff Mail – iPhone" src="https://user-images.githubusercontent.com/1927690/166390238-fe78fedd-41c6-48ee-a4c5-efcb3f1cfa78.png">
 
 ## Using Skiff Mail
 
