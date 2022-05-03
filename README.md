@@ -7,7 +7,7 @@ Private, end-to-end encrypted, wallet native mail. Sign up for a free Skiff Mail
 
 ## Welcome to Skiff Mail!
 
-Skiff Mail empowers freer and more effective communication through private, end-to-end encrypted email. All messages sent between Skiff users are end-to-end encrypted. Additionally, Skiff never stores unencrypted access to messages sent or received from external mail providers.
+Skiff Mail empowers free and more effective communication through private, end-to-end encrypted email. All messages sent between Skiff users are end-to-end encrypted. Additionally, Skiff never stores unencrypted access to messages sent or received from external mail providers.
 
 ### Reusable components and UI
 This library, along with Skiff UI, implements reusable, powerful design components for the Skiff product ecosystem.
