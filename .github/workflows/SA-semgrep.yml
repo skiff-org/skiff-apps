@@ -1,0 +1,28 @@
+name: Semgrep
+on: [pull_request, push]
+jobs:
+  semgrep:
+    name: Scan
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    steps:
+      - uses: actions/checkout@v3
+
+      # Select rules for your scan with one of these two options.
+      # Option 1: set hard-coded rulesets
+      - run: semgrep scan --sarif --output=semgrep.sarif
+        env:
+          SEMGREP_RULES: >- # more at semgrep.dev/r
+            p/security-audit
+            p/secrets
+      # Option 2: scan with rules set in Semgrep App's rule board
+      # - run: semgrep scan --sarif --output=semgrep.sarif --config=policy
+      #   env:
+      #     SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      - name: Upload SARIF file for GitHub Advanced Security Dashboard
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: semgrep.sarif
+        if: always()
