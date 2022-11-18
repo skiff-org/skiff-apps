@@ -1,0 +1,114 @@
+import { Avatar, Icon, IconButton, Tooltip, Typography } from 'nightwatch-ui';
+import React, { useEffect, useState } from 'react';
+import { abbreviateWalletAddress, TitleActionSection } from 'skiff-front-utils';
+import styled from 'styled-components';
+import isEthereumAddress from 'validator/lib/isEthereumAddress';
+
+import { getENSNameFromEthAddr } from '../../../../utils/metamaskUtils';
+
+const ENSAliasRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const ENSAliasEmails = styled.div`
+  display: flex;
+  gap: 12px;
+  align-items: center;
+`;
+
+interface ENSAliasProps {
+  walletAliases: string[];
+}
+
+interface ENSAliasInfo {
+  walletAlias: string;
+  mailDomain: string;
+}
+
+interface ENSAliasDict {
+  [ensName: string]: ENSAliasInfo;
+}
+
+/**
+ * Component for rendering the interface for ENS aliases.
+ */
+export const ENSAlias: React.FC<ENSAliasProps> = ({ walletAliases }) => {
+  const [ensAliases, setENSAliases] = useState<ENSAliasDict>({});
+
+  useEffect(() => {
+    const getENSAliases = async () => {
+      const ensEmailAliases = {} as ENSAliasDict;
+      await Promise.all(
+        walletAliases.map(async (email) => {
+          const [alias, mailDomain] = email.split('@');
+          if (isEthereumAddress(alias)) {
+            const ensName = await getENSNameFromEthAddr(alias);
+            if (!ensName) return;
+            if (!(ensName in ensEmailAliases)) {
+              ensEmailAliases[ensName] = { walletAlias: alias, mailDomain };
+            }
+          }
+        })
+      );
+      setENSAliases(ensEmailAliases);
+    };
+
+    void getENSAliases();
+  }, [walletAliases]);
+
+  const viewOnENS = (ensName: string) => {
+    if (ensName.length && window) {
+      window.open(`https://app.ens.domains/name/${ensName}/details`, '_blank');
+    }
+  };
+
+  const openENS = () => {
+    if (window) window.open('https://app.ens.domains/', '_blank');
+  };
+
+  return (
+    <>
+      <TitleActionSection
+        actions={[
+          {
+            onClick: openENS,
+            label: 'Add ENS',
+            type: 'button'
+          }
+        ]}
+        subtitle='Send and receive email from your ENS name.'
+        title='ENS aliases'
+      />
+      {!!Object.keys(ensAliases).length &&
+        Object.entries(ensAliases).map(([ensAlias, ensAliasInfo]) => {
+          const { walletAlias, mailDomain } = ensAliasInfo;
+          return (
+            <ENSAliasRow key={ensAlias}>
+              <ENSAliasEmails>
+                <Avatar label={ensAlias} />
+                <div>
+                  <Typography type='paragraph'>{ensAlias}</Typography>
+                  <Tooltip direction='top' label={`${walletAlias}@${mailDomain}`}>
+                    <span>
+                      <Typography color='secondary' type='paragraph'>
+                        {`${abbreviateWalletAddress(walletAlias)}@${mailDomain}`}
+                      </Typography>
+                    </span>
+                  </Tooltip>
+                </div>
+              </ENSAliasEmails>
+              <IconButton
+                color='secondary'
+                icon={Icon.ExternalLink}
+                onClick={() => viewOnENS(ensAlias)}
+                tooltip='View on ENS'
+              />
+            </ENSAliasRow>
+          );
+        })}
+    </>
+  );
+};

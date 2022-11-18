@@ -1,0 +1,10 @@
+export const THREAD_CONTAINER_ID = 'threadElement';
+export const MAIL_LIST_CONTAINER_ID = 'mailListElement';
+export const BOTTOM_NAVIGATION_CONTAINER = 'bottomNavigationContainer';
+export const THREAD_BODY_ID = 'threadBody';
+export const PINCH_TO_ZOOM_CONTAINER = 'pinchToZoomContainer';
+export const PINCH_TO_ZOOM_CONTENT = 'pinchToZoomContent';
+export const THREAD_HEADER_ID = 'threadHeaderId';
+export const THREAD_HEADER_CONTAINER_ID = 'threadHeaderContainerId';
+export const THREAD_HEADER_BACKGROUND_ID = 'threadHeaderBackgroundId';
+export const BOTTOM_NAVIGATION_HEIGHT = 56;

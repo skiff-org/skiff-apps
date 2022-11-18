@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "allowJs": true,
+    "module": "esnext",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": true,
+    "isolatedModules": true,
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@skiff-org/skiff-ui": ["skiff-ui/src/"],
+      "@skiff-org/skiff-ui/*": ["skiff-ui/src/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "next-env.d.ts", "**/*.json"],
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "../../libs/skiff-crypto" },
+    { "path": "../../libs/skiff-front-search" },
+    { "path": "../../libs/skiff-front-utils" },
+    { "path": "../../libs/skiff-graphql" },
+    { "path": "../../libs/skiff-mail-graphql" },
+    { "path": "../../libs/skiff-utils" }
+  ]
+}

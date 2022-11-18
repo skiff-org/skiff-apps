@@ -1,0 +1,37 @@
+{
+  "extends": ["../../.eslintrc.js", "next", "next/core-web-vitals"],
+  "ignorePatterns": ["!**/*"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "parserOptions": {
+        "project": ["apps/skemail-web/tsconfig(.*)?.json"],
+        "ecmaFeatures": {
+          "jsx": true
+        }
+      },
+      "rules": {
+        "@next/next/no-html-link-for-pages": ["error", "apps/skemail-web/pages"]
+      }
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {}
+    },
+    {
+      "files": ["*.js", "*.jsx"],
+      "rules": {}
+    }
+  ],
+  "env": {
+    "jest": true
+  },
+  "rules": {
+    "react/self-closing-comp": "error",
+    "react/jsx-sort-props": "warn",
+    "react/jsx-indent": ["warn", 2],
+    "react/jsx-newline": ["warn", { "prevent": true }],
+    "react/jsx-props-no-multi-spaces": "warn",
+    "react/jsx-key": "warn"
+  }
+}

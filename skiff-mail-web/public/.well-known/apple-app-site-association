@@ -1,0 +1,22 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "comment": "Universal link for skiff mobile app - includes all paths other than the ones that start with /mail | this should not have effect on prod only on dev when testing",
+        "appID": "52QYHTS68C.com.skiff.mobile",
+        "paths": [
+          "NOT /mail/*",
+          "*"
+        ]
+      },
+      {
+        "comment": "Universal link for skemail app - includes all paths that start with /mail | this should not have effect on prod only on dev when testing",
+        "appID": "52QYHTS68C.com.skiff.mailmobile",
+        "paths": [
+          "/mail/*"
+        ]
+      }
+    ]
+  }
+}

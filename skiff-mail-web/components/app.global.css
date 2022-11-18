@@ -1,0 +1,191 @@
+/* DISPLAY */
+/* Display Regular */
+@font-face {
+  font-family: 'Skiff Sans Display';
+  src: url('../public/fonts/Skiff-Sans-Display-380.woff2') format('woff2');
+  font-weight: 380;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Display Regular italic */
+@font-face {
+  font-family: 'Skiff Sans Display';
+  src: url('../public/fonts/Skiff-Sans-Display-380Italic.woff2') format('woff2');
+  font-weight: 380;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Display Medium */
+@font-face {
+  font-family: 'Skiff Sans Display';
+  src: url('../public/fonts/Skiff-Sans-Display-470.woff2') format('woff2');
+  font-weight: 470;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Display Medium italic */
+@font-face {
+  font-family: 'Skiff Sans Display';
+  src: url('../public/fonts/Skiff-Sans-Display-470Italic.woff2') format('woff2');
+  font-weight: 470;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Display Bold */
+@font-face {
+  font-family: 'Skiff Sans Display';
+  src: url('../public/fonts/Skiff-Sans-Display-560.woff2') format('woff2');
+  font-weight: 560;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Display Bold italic */
+@font-face {
+  font-family: 'Skiff Sans Display';
+  src: url('../public/fonts/Skiff-Sans-Display-560Italic.woff2') format('woff2');
+  font-weight: 560;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* TEXT */
+/* Text Regular */
+@font-face {
+  font-family: 'Skiff Sans Text';
+  src: url('../public/fonts/Skiff-Sans-Text-380.woff2') format('woff2');
+  font-weight: 380;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Text Regular italic */
+@font-face {
+  font-family: 'Skiff Sans Text';
+  src: url('../public/fonts/Skiff-Sans-Text-380Italic.woff2') format('woff2');
+  font-weight: 380;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Text Medium */
+@font-face {
+  font-family: 'Skiff Sans Text';
+  src: url('../public/fonts/Skiff-Sans-Text-470.woff2') format('woff2');
+  font-weight: 470;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Text Medium italic */
+@font-face {
+  font-family: 'Skiff Sans Text';
+  src: url('../public/fonts/Skiff-Sans-Text-470Italic.woff2') format('woff2');
+  font-weight: 470;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Text Bold */
+@font-face {
+  font-family: 'Skiff Sans Text';
+  src: url('../public/fonts/Skiff-Sans-Text-560.woff2') format('woff2');
+  font-weight: 560;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Text Bold italic */
+@font-face {
+  font-family: 'Skiff Sans Text';
+  src: url('../public/fonts/Skiff-Sans-Text-560Italic.woff2') format('woff2');
+  font-weight: 560;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* MONO */
+/* Mono Regular */
+@font-face {
+  font-family: 'Skiff Mono';
+  src: url('../public/fonts/Skiff-Mono-Regular.woff2') format('woff2');
+  font-weight: 380;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Mono Regular italic */
+@font-face {
+  font-family: 'Skiff Mono';
+  src: url('../public/fonts/Skiff-Mono-RegularItalic.woff2') format('woff2');
+  font-weight: 380;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Mono Medium */
+@font-face {
+  font-family: 'Skiff Mono';
+  src: url('../public/fonts/Skiff-Mono-Medium.woff2') format('woff2');
+  font-weight: 470;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Mono Medium italic */
+@font-face {
+  font-family: 'Skiff Mono';
+  src: url('../public/fonts/Skiff-Mono-MediumItalic.woff2') format('woff2');
+  font-weight: 470;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Mono Bold */
+@font-face {
+  font-family: 'Skiff Mono';
+  src: url('../public/fonts/Skiff-Mono-Bold.woff2') format('woff2');
+  font-weight: 470;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Mono Bold italic */
+@font-face {
+  font-family: 'Skiff Mono';
+  src: url('../public/fonts/Skiff-Mono-BoldItalic.woff2') format('woff2');
+  font-weight: 560;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Mobile Safe Area */
+body {
+  overflow: hidden; /* Fix scroll issues on mobile */
+  background: var(--bg-l2-solid);
+}
+
+a {
+  color: var(--text-link);
+}
+
+/* Remove blue box feedback when clicking */
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* SCROLLBAR */
+/* https://www.w3schools.com/howto/howto_css_custom_scrollbar.asp */
+
+.MuiSkeleton-root {
+  transform: none !important;
+}
+
+/* https://benfrain.com/how-to-get-the-value-of-phone-notches-environment-variables-env-in-javascript-from-css/ */
+:root {
+  --sat: env(safe-area-inset-top);
+  --sar: env(safe-area-inset-right);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+}

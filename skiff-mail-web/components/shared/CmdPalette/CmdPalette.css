@@ -1,0 +1,32 @@
+.searchResultHeaderRow {
+  cursor: default;
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.searchResultRow {
+  box-sizing: border-box;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding-bottom: 10px;
+}
+
+.searchResultRow * {
+  cursor: pointer;
+}
+
+.searchResultContent {
+  flex: 1;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.searchResultContent span.outerText:first-child {
+  color: white !important;
+}
