@@ -2,13 +2,14 @@
 const { v4 } = require('uuid');
 const { InjectManifest } = require('workbox-webpack-plugin');
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true'
+  enabled: process.env.OPEN_ANALYZE === 'true'
 });
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  poweredByHeader: false,
   typescript: {
     ignoreBuildErrors: true
   },
@@ -48,15 +49,6 @@ const nextConfig = {
           {
             key: 'Content-Type',
             value: 'application/json'
-          }
-        ]
-      },
-      {
-        source: '/custom-sw.js',
-        headers: [
-          {
-            key: 'Service-Worker-Allowed',
-            value: 'http://localhost:4200/'
           }
         ]
       },
@@ -117,6 +109,23 @@ const nextConfig = {
       ...config.resolve.fallback,
       canvas: false
     };
+    if (process.env.NODE_ENV === "production") {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            editor: {
+              test: /prosemirror|tiptap/
+            },
+            calendar: {
+              test: /tzdb|date-picker/
+            }
+          }
+        }
+      };
+    }
+
     if (!isServer) {
       // either don't resolve modules or use browser-compatible versions of them
       config.resolve.fallback = {
@@ -139,11 +148,17 @@ const nextConfig = {
           '/mail/_next/static/chunks/pages/oauth/[provider]/[action]':
             '/mail/_next/static/chunks/pages/oauth/%5Bprovider%5D/%5Baction%5D'
         },
-        exclude: [/^build-manifest\.json$/i, /^react-loadable-manifest\.json$/i, /\/_error\.js$/i, /\.js\.map$/i],
+        exclude: [
+          /^build-manifest\.json$/i,
+          /^react-loadable-manifest\.json$/i,
+          /\/_error\.js$/i,
+          /\.js\.map$/i,
+          /[^\n]+/ // Part of emergency sw
+        ],
         maximumFileSizeToCacheInBytes: 999999999,
-        swSrc: './cache-worker/sw.ts',
-        swDest: '../public/sw.js',
-        additionalManifestEntries: [{ url: '/mail', revision: v4() }]
+        swSrc: './cache-worker/emergencysw.ts', // Falling back to emergency sw since its now redundant
+        swDest: '../public/sw.js'
+        // additionalManifestEntries: [{ url: '/mail', revision: v4() }] Part of emergency sw
       })
     );
     // Generate Bundle Stats for CI
@@ -152,7 +167,7 @@ const nextConfig = {
         analyzerMode: 'disabled',
         generateStatsFile: true
       })
-    )
+    );
     return config;
   }
 };

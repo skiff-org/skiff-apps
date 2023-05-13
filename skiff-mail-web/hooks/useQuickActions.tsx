@@ -13,7 +13,6 @@ import { markAllThreadsAsRead } from '../utils/mailboxUtils';
 import { SearchAction, SearchItemType } from '../utils/searchWorkerUtils';
 
 import { useDrafts } from './useDrafts';
-import useLocalSetting, { ThreadDisplayFormat } from './useLocalSetting';
 
 // The number of actions to show if  query length is less than MIN_SPECIFIED_QUERY_LENGTH
 export const UNSPECIFIED_ACTION_CAP = 3;
@@ -32,7 +31,6 @@ const createAction = (
 });
 
 export const useQuickActions = (query: string): Array<SearchAction> => {
-  const [, setThreadFormat] = useLocalSetting('threadFormat');
   const [filteredActions, setFilteredActions] = useState<Array<SearchAction>>([]);
   const { composeNewDraft } = useDrafts();
   const dispatch = useDispatch();
@@ -59,21 +57,9 @@ export const useQuickActions = (query: string): Array<SearchAction> => {
     [dispatch]
   );
 
-  const changeToFullAction = createAction(
-    'Change to full view',
-    () => setThreadFormat(ThreadDisplayFormat.Full),
-    { icon: Icon.FullView },
-    '⌘+1'
-  );
-  const changeToSplitAction = createAction(
-    'Change to split view',
-    () => setThreadFormat(ThreadDisplayFormat.Right),
-    { icon: Icon.SplitView },
-    '⌘+2'
-  );
   const markInboxReadAction = createAction(
     'Mark inbox as read',
-    () => markAllReadClick(),
+    () => void markAllReadClick(),
     { icon: Icon.EnvelopeRead },
     undefined // no shortcut
   );
@@ -114,16 +100,7 @@ export const useQuickActions = (query: string): Array<SearchAction> => {
       { icon: Icon.QuestionCircle },
       '?'
     );
-    return [
-      composeAction,
-      addLabelAction,
-      addFolderAction,
-      changeToFullAction,
-      changeToSplitAction,
-      markInboxReadAction,
-      importMailAction,
-      openShortcutsAction
-    ];
+    return [composeAction, addLabelAction, addFolderAction, markInboxReadAction, importMailAction, openShortcutsAction];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openCompose, addLabel, importMail, addFolder, openShortcuts]);
 

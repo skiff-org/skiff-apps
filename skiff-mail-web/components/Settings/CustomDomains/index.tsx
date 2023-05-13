@@ -1,25 +1,30 @@
 import { Icon } from 'nightwatch-ui';
-import { Setting, SETTINGS_LABELS, SettingType, SettingValue, useToast } from 'skiff-front-utils';
-import { useGetCurrentUserCustomDomainsQuery } from 'skiff-mail-graphql';
+import React, { Suspense, useState } from 'react';
+import { useGetCurrentUserCustomDomainsQuery } from 'skiff-front-graphql';
+import { Setting, SETTINGS_LABELS, SettingType, SettingValue, PLAN_CHANGE_POLL_INTERVAL } from 'skiff-front-utils';
 import { insertIf } from 'skiff-utils';
 
-import ManageCustomDomains from './Manage/ManageCustomDomains';
+import { usePollForPurchasedDomain } from '../../../hooks/usePollForPurchasedDomain';
+
 import SetupCustomDomain from './SetupCustomDomain';
 
+const ManageCustomDomains = React.lazy(() => import('./Manage/ManageCustomDomains'));
+
 export const useCustomDomainsSettings = (): Setting[] => {
-  const { enqueueToast } = useToast();
+  // whether we're polling for a newly purchased Skiff Domain
+  const [isPolling, setIsPolling] = useState(false);
 
-  const { data, error, loading, refetch } = useGetCurrentUserCustomDomainsQuery();
-
-  if (error) {
-    console.error(`Failed to retrieve user's custom domains`, error);
-    enqueueToast({
-      body: 'Error loading custom domains.',
-      icon: Icon.Warning
-    });
-  }
-
+  const { data, loading, refetch, startPolling, stopPolling } = useGetCurrentUserCustomDomainsQuery();
   const customDomains = data?.getCurrentUserCustomDomains.domains;
+
+  // poll for a newly purchased Skiff Domain after Stripe checkout
+  usePollForPurchasedDomain({
+    isPolling,
+    customDomains,
+    setIsPolling,
+    startPolling: () => void startPolling(PLAN_CHANGE_POLL_INTERVAL),
+    stopPolling: () => void stopPolling()
+  });
 
   return [
     {
@@ -29,23 +34,27 @@ export const useCustomDomainsSettings = (): Setting[] => {
         <SetupCustomDomain
           existingCustomDomains={customDomains ?? []}
           key='custom-domain-setup'
+          numExistingCustomDomains={customDomains?.length ?? 0}
           refetchCustomDomains={() => void refetch()}
         />
       ),
       label: SETTINGS_LABELS[SettingValue.CustomDomainSetup],
-      icon: Icon.ArrowRight,
-      color: 'green'
+      icon: Icon.At,
+      color: 'red'
     },
-    ...insertIf(!!customDomains?.length, {
+    ...insertIf(!!customDomains?.length || isPolling, {
       type: SettingType.Custom,
       value: SettingValue.CustomDomainManage,
       component: (
-        <ManageCustomDomains
-          customDomains={customDomains}
-          key='manage-custom-domains'
-          loading={loading}
-          refetchCustomDomains={() => void refetch()}
-        />
+        <Suspense fallback={<></>}>
+          <ManageCustomDomains
+            customDomains={customDomains}
+            isPolling={isPolling}
+            key='manage-custom-domains'
+            loading={loading}
+            refetchCustomDomains={() => void refetch()}
+          />
+        </Suspense>
       ),
       label: SETTINGS_LABELS[SettingValue.CustomDomainManage],
       icon: Icon.At,

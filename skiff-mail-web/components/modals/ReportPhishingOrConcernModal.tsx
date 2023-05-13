@@ -1,15 +1,13 @@
-import { ButtonGroupItem, Dialog, DialogTypes, Icon, InputField } from 'nightwatch-ui';
+import { ButtonGroup, ButtonGroupItem, Dialog, DialogTypes, Layout, TextArea, Typography } from 'nightwatch-ui';
 import { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
-import { useToast } from 'skiff-front-utils';
+import { useApplyLabelsMutation, useGetThreadFromIdLazyQuery, useUploadSpamReportMutation } from 'skiff-front-graphql';
+import { useToast, Checkbox } from 'skiff-front-utils';
 import { SystemLabels } from 'skiff-graphql';
-import { useApplyLabelsMutation, useSendFeedbackMutation } from 'skiff-mail-graphql';
 import styled from 'styled-components';
 
-import { useRequiredCurrentUserData } from '../../apollo/currentUser';
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
-import { useCurrentUserEmailAliases } from '../../hooks/useCurrentUserEmailAliases';
 import { useThreadActions } from '../../hooks/useThreadActions';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import {
@@ -18,16 +16,25 @@ import {
   ReportPhishingOrConcernType
 } from '../../redux/reducers/modalTypes';
 import { updateThreadsWithModifiedLabels } from '../../utils/cache/cache';
+import { getRawMime } from '../../utils/eml';
 
 const InputContainer = styled.div`
   margin-top: 12px;
   width: 100%;
 `;
 
+const EMLCheckbox = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 4px 0 8px 0;
+`;
+
 export const ReportPhishingOrConcernModal = () => {
   const { openModal } = useAppSelector((state) => state.modal);
 
   const [concernResponse, setConcernResponse] = useState<string>('');
+  const [includeEML, setIncludeEML] = useState(true);
 
   const dispatch = useDispatch();
   const onClose = () => {
@@ -55,45 +62,16 @@ export const ReportPhishingOrConcernModal = () => {
     return '';
   };
 
-  const isThreadSpam = systemLabels.includes(SystemLabels.Spam);
+  const isThreadSpam = systemLabels?.includes(SystemLabels.Spam);
 
-  const getDescription = (): string | undefined => {
-    if (isReportPhishing) {
-      return `Reporting this conversation${
-        !isThreadSpam ? ' moves it to spam and ' : ' '
-      }shares the sender information with the Skiff Security Team.`;
-    }
-    if (isReportConcern) {
-      return (
-        `Reporting this conversation${
-          !isThreadSpam ? ' moves it to spam and ' : ' '
-        }shares the sender information with the Skiff Security Team ` +
-        'which will help prevent similar emails from reaching your inbox.'
-      );
-    }
-    return '';
-  };
+  const getDescription = (): string | undefined =>
+    `Reporting this conversation${
+      !isThreadSpam ? ' moves it to spam and ' : ' '
+    } optionally shares the email with the Skiff Security Team.`;
 
-  const user = useRequiredCurrentUserData();
-  // TODO (EMAIL-471): Let users choose which alias to use, defaulting to first one for now
-  const emailAliases = useCurrentUserEmailAliases();
-  const emailAlias = emailAliases?.[0] || user?.username;
-
-  const [sendFeedbackMutation] = useSendFeedbackMutation({
-    variables: {
-      request: {
-        feedback: `${
-          isReportPhishing ? 'Report Phishing' : 'Report a Concern'
-        } - Thread ID: ${threadID}\nEmail ID: ${emailID}\nSkiff email address of reporting user: ${emailAlias}\nEmail from: ${fromAddress}${
-          concernResponse && '\n\n' + concernResponse
-        }`,
-        zendeskUploadTokens: [],
-        isMobile,
-        origin: 'Skemail'
-      }
-    }
-  });
+  const [uploadSpamReportMutation] = useUploadSpamReportMutation();
   const [applyLabels] = useApplyLabelsMutation();
+  const [getThreadFromID] = useGetThreadFromIdLazyQuery();
 
   const moveThread = async (systemLabel: SystemLabels) => {
     await applyLabels({
@@ -113,9 +91,43 @@ export const ReportPhishingOrConcernModal = () => {
     setActiveThreadID(undefined);
   };
 
+  // Upload EML of reported email to S3
+  const uploadReportToS3 = async () => {
+    // Fetch the email given the thread ID.
+    // We need the email object to get the raw mime
+    const threadData = await getThreadFromID({ variables: { threadID } });
+    const email = threadData.data?.userThread?.emails.find((e) => e.id === emailID);
+
+    if (!email) {
+      console.error('email to report not found');
+      return;
+    }
+
+    const { encryptedRawMimeUrl, decryptedSessionKey } = email;
+    let rawMime: string | undefined = undefined;
+    if (!encryptedRawMimeUrl || !decryptedSessionKey) {
+      console.error('missing encryptedRawMimeUrl or decryptedSessionKey fields');
+      // if we can't get the raw mime of the email, still report and log infromation on backend
+    } else {
+      rawMime = await getRawMime(encryptedRawMimeUrl, decryptedSessionKey);
+    }
+
+    await uploadSpamReportMutation({
+      variables: {
+        request: {
+          emailID: emailID,
+          rawMime: rawMime,
+          threadID: threadID,
+          fromAddress: fromAddress
+        }
+      }
+    });
+  };
+
   const onReportClick = async () => {
     try {
       onClose();
+
       // Move thread to spam if it is not already in spam. Otherwise set
       // the active thread ID to undefined to close the reported thread.
       if (!isThreadSpam) {
@@ -123,33 +135,35 @@ export const ReportPhishingOrConcernModal = () => {
       } else {
         setActiveThreadID(undefined);
       }
-      await sendFeedbackMutation();
+
+      if (includeEML) {
+        await uploadReportToS3();
+      }
+
       enqueueToast({
+        title: 'Message reported',
         body: `Conversation reported${isReportPhishing ? ' as phishing' : ''}${
           !isThreadSpam ? ' and moved to Spam' : ''
-        }.`,
-        icon: Icon.Spam
+        }.`
       });
     } catch (error) {
       console.error(error);
       enqueueToast({
-        body: `Could not report conversation${isReportPhishing ? ' as phishing' : ''}. Please try again.`,
-        icon: Icon.Warning
+        title: 'Failed to report',
+        body: `Could not report conversation${isReportPhishing ? ' as phishing' : ''}. Please try again.`
       });
     }
   };
 
   const reportConcernField = (
     <InputContainer>
-      <InputField
+      <TextArea
         autoFocus={isMobile}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
           const newResponse = e.target.value;
           setConcernResponse(newResponse);
         }}
-        placeholder='Please provide as much detail as possible on your concerns regarding this email.'
-        size='large'
-        textArea
+        placeholder='Provide as much detail as possible'
         value={concernResponse}
       />
     </InputContainer>
@@ -157,6 +171,7 @@ export const ReportPhishingOrConcernModal = () => {
 
   return (
     <Dialog
+      customContent
       description={getDescription()}
       inputField={isReportConcern ? reportConcernField : undefined}
       onClose={onClose}
@@ -164,12 +179,25 @@ export const ReportPhishingOrConcernModal = () => {
       title={getTitle()}
       type={DialogTypes.Confirm}
     >
-      <ButtonGroupItem
-        key={`report-${isReportPhishing ? 'phishing' : 'concern'}`}
-        label='Report'
-        onClick={onReportClick}
-      />
-      <ButtonGroupItem key={`cancel-${isReportPhishing ? 'phishing' : 'concern'}`} label='Cancel' onClick={onClose} />
+      <EMLCheckbox>
+        <Checkbox
+          checked={includeEML}
+          onClick={() => {
+            setIncludeEML((currIncludeEMLState) => !currIncludeEMLState);
+          }}
+        />
+        <Typography>Include email contents</Typography>
+      </EMLCheckbox>
+      <ButtonGroup layout={isMobile ? Layout.STACKED : Layout.INLINE}>
+        <ButtonGroupItem
+          key={`report-${isReportPhishing ? 'phishing' : 'concern'}`}
+          label='Report'
+          onClick={() => void onReportClick()}
+        />
+        <ButtonGroupItem key={`cancel-${isReportPhishing ? 'phishing' : 'concern'}`} label='Cancel' onClick={onClose} />
+      </ButtonGroup>
     </Dialog>
   );
 };
+
+export default ReportPhishingOrConcernModal;

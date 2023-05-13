@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAddExternalEmailMutation } from 'skiff-mail-graphql';
+import { useAddExternalEmailMutation } from 'skiff-front-graphql';
 
 /**
  * Returns

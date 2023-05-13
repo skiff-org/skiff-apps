@@ -1,8 +1,5 @@
-import jwt_decode from 'jwt-decode';
 import srp from 'secure-remote-password/client';
 import { createKeyFromSecret, createSRPKey, createPasswordDerivedSecret } from 'skiff-crypto';
-import { DecodedJWT } from 'skiff-front-utils';
-import { LoginSrpRequest, PublicKeyWithSignature } from 'skiff-graphql';
 import {
   LoginSrpStep1Document,
   LoginSrpStep1Mutation,
@@ -14,8 +11,9 @@ import {
   decryptPrivateUserData,
   EMPTY_DOCUMENT_DATA,
   writeSessionCacheData
-} from 'skiff-mail-graphql';
-import { models } from 'skiff-mail-graphql';
+} from 'skiff-front-graphql';
+import { models } from 'skiff-front-graphql';
+import { LoginSrpRequest, PublicKeyWithSignature } from 'skiff-graphql';
 import { assertExists } from 'skiff-utils';
 
 import client from '../apollo/client';
@@ -39,24 +37,6 @@ const LoginErrors = {
   LINK_EXPIRED: 'Email verification link expired. Contact support@skiff.org for support.',
   GENERIC_FAILURE: 'Login failed. Contact support@skiff.org for support.'
 };
-
-/**
- * Returns true if JWT has expired.
- * @param {string} curJwt - JWT to check.
- * @returns {boolean} True/false depending on whether JWT is expired or not.
- */
-export function jwtHasExpired(curJwt: string) {
-  try {
-    const decodedJWT = jwt_decode<DecodedJWT>(curJwt);
-    const curTimeSeconds = new Date().getTime() / 1000;
-    if (decodedJWT.exp < curTimeSeconds) {
-      return true;
-    }
-    return false;
-  } catch (error) {
-    return false;
-  }
-}
 
 /**
  * Calls the login srp step 1 and returns the request for step 2
@@ -84,7 +64,7 @@ export async function getLoginSrpRequest(username: string, password: string, tok
   assertExists(salt);
   assertExists(serverEphemeralPublic);
   const masterSecret = await createKeyFromSecret(password, salt);
-  const privateKey = await createSRPKey(masterSecret, salt);
+  const privateKey = createSRPKey(masterSecret, salt);
   const clientSession = srp.deriveSession(clientEphemeral.secret, serverEphemeralPublic, salt, username, privateKey);
 
   const loginSrpRequest: LoginSrpRequest = {
@@ -122,7 +102,7 @@ export async function authenticateServerSRP(newUsername: string, newPassword: st
   assertExists(serverEphemeralPublic);
   // Derive shared session key
   const masterSecret = await createKeyFromSecret(newPassword, salt);
-  const privateKey = await createSRPKey(masterSecret, salt);
+  const privateKey = createSRPKey(masterSecret, salt);
   const clientSession = srp.deriveSession(clientEphemeral.secret, serverEphemeralPublic, salt, newUsername, privateKey);
 
   // Step 2: Sent clientSession.proof to server

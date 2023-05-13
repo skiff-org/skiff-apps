@@ -1,10 +1,10 @@
-import { Typography, Icon, IconButton, Icons } from 'nightwatch-ui';
+import { Typography, Icon, IconButton, Icons, Size, ThemeMode, TypographyWeight, TypographySize } from 'nightwatch-ui';
 import { useCallback } from 'react';
 import { UserAvatar, useToast, copyToClipboardWebAndMobile } from 'skiff-front-utils';
 import { DisplayPictureData } from 'skiff-graphql';
+import { isSkiffAddress } from 'skiff-utils';
 import styled from 'styled-components';
 
-import { isSkiffAddress } from '../../utils/userUtils';
 const Container = styled.div`
   display: flex;
   justify-content: flex-start;
@@ -26,7 +26,7 @@ const AlignRight = styled.div`
   margin-left: auto;
 `;
 
-const Background = styled.div`
+const Background = styled.div<{ $forceTheme?: ThemeMode }>`
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -34,20 +34,26 @@ const Background = styled.div`
   transform: translate(50%, 50%);
   bottom: 0;
   right: 0;
-  background-color: var(--bg-l3-solid);
+  background-color: ${(props) => (props.$forceTheme === ThemeMode.DARK ? '#242424' : 'var(--bg-l3-solid)')};
+
   z-index: 99;
 `;
 
-const ShieldContainer = styled.div<{ $disabled: boolean }>`
+const ShieldContainer = styled.div<{ $disabled: boolean; $forceTheme?: ThemeMode }>`
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background-color: ${(props) => (!props.$disabled ? '#30a55033' : 'rgba(0,0,0,0.06)')};
+  background-color: ${(props) =>
+    !props.$disabled
+      ? '#30a55033'
+      : props.$forceTheme === ThemeMode.DARK
+      ? 'rgba(255,255,255,0.06)'
+      : 'rgba(0,0,0,0.06)'};
   display: flex;
   align-items: center;
   justify-content: center;
   position: absolute;
-  border: 1px solid var(--bg-l3-solid);
+  border: 1px solid ${(props) => (props.$forceTheme === ThemeMode.DARK ? '#242424' : 'var(--bg-l3-solid)')};
   transform: translate(50%, 50%);
   bottom: 0;
   right: 0;
@@ -57,18 +63,19 @@ const ShieldContainer = styled.div<{ $disabled: boolean }>`
 interface SenderInfoProps {
   emailAlias: string;
   displayName: string;
-  displayPicturData: DisplayPictureData;
+  displayPictureData: DisplayPictureData;
+  forceTheme?: ThemeMode;
 }
 
-export const SenderInfo = ({ emailAlias, displayName, displayPicturData }: SenderInfoProps) => {
+export const SenderInfo = ({ emailAlias, displayName, displayPictureData, forceTheme }: SenderInfoProps) => {
   const { enqueueToast } = useToast();
   const isSecured = isSkiffAddress(emailAlias);
 
   const copyToClipboard = useCallback(() => {
     copyToClipboardWebAndMobile(emailAlias);
     enqueueToast({
-      body: `Email alias copied.`,
-      icon: Icon.Copy
+      title: 'Email alias copied',
+      body: `${emailAlias} is now in your clipboard.`
     });
   }, [emailAlias, enqueueToast]);
 
@@ -76,35 +83,38 @@ export const SenderInfo = ({ emailAlias, displayName, displayPicturData }: Sende
     <Container>
       <AvatarContainer>
         <UserAvatar
-          displayPictureData={displayPicturData}
+          displayPictureData={displayPictureData}
+          forceTheme={forceTheme}
           label={displayName}
           style={{ width: '30px', height: '30px' }}
         />
         {isSecured && (
           <>
-            <Background />
-            <ShieldContainer $disabled={false}>
-              <Icons color='green' icon={Icon.ShieldCheck} size='xsmall' />
+            <Background $forceTheme={forceTheme} />
+            <ShieldContainer $disabled={false} $forceTheme={forceTheme}>
+              <Icons color='green' forceTheme={forceTheme} icon={Icon.ShieldCheck} size={Size.X_SMALL} />
             </ShieldContainer>
           </>
         )}
         {!isSecured && (
           <>
-            <Background />
-            <ShieldContainer $disabled={true}>
-              <Icons disabled icon={Icon.Lock} size='xsmall' />
+            <Background $forceTheme={forceTheme} />
+            <ShieldContainer $disabled={true} $forceTheme={forceTheme}>
+              <Icons disabled forceTheme={forceTheme} icon={Icon.Lock} size={Size.X_SMALL} />
             </ShieldContainer>
           </>
         )}
       </AvatarContainer>
       <NameContainer>
-        <Typography type='heading'>{displayName}</Typography>
-        <Typography color='disabled' level={3}>
+        <Typography forceTheme={forceTheme} weight={TypographyWeight.BOLD}>
+          {displayName}
+        </Typography>
+        <Typography color='disabled' forceTheme={forceTheme} size={TypographySize.SMALL}>
           {emailAlias}
         </Typography>
       </NameContainer>
       <AlignRight>
-        <IconButton color='disabled' icon={Icon.Copy} onClick={copyToClipboard} />
+        <IconButton forceTheme={forceTheme} icon={Icon.Copy} iconColor='disabled' onClick={copyToClipboard} />
       </AlignRight>
     </Container>
   );

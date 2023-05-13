@@ -1,26 +1,34 @@
-import { ClickType, eventOfClickType } from '@skiff-org/skiff-ui';
 import dayjs from 'dayjs';
-import { Chip, Icon, IconProps, Icons, KeyCodeSequence, Typography } from 'nightwatch-ui';
-import React, { useState } from 'react';
+import {
+  Chip,
+  ClickType,
+  eventOfClickType,
+  getThemedColor,
+  Icon,
+  IconProps,
+  Icons,
+  KeyCodeSequence,
+  Size,
+  ThemeMode,
+  Typography,
+  TypographyWeight
+} from 'nightwatch-ui';
+import React from 'react';
+import { useUserLabelsQuery } from 'skiff-front-graphql';
 import { UserLabelVariant } from 'skiff-graphql';
-import { useUserLabelsQuery } from 'skiff-mail-graphql';
-import { upperCaseFirstLetter } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { NO_SUBJECT_TEXT } from '../../../constants/mailbox.constants';
 import {
   DATE_TEXT_RIGHT,
+  GAP_BETWEEN_UNREAD_INDICATOR_AND_DATE_TEXT,
   MAX_DATE_WIDTH,
-  UNREAD_INDICATOR_DIAMETER,
-  GAP_BETWEEN_UNREAD_INDICATOR_AND_DATE_TEXT
+  UNREAD_INDICATOR_DIAMETER
 } from '../../../constants/search.constants';
 import {
-  FilterByType,
   getFilterPrefix,
   getRowHeightFromSearchItem,
   SearchCategoryType,
-  SearchFilter,
-  SearchFilterType,
   SearchItem,
   SearchItemType
 } from '../../../utils/searchWorkerUtils';
@@ -29,12 +37,10 @@ import { UnreadIndicator } from '../../mailbox/MessageCell/MessageCell.styles';
 import FilterChip from '../FilterChip';
 
 import { AttachmentSearchResult } from './AttachmentSearchResult';
-import { CELL_HOVER_SWITCH_ANIMATION_DURATION } from './constants';
-import { SEARCH_ITEM_DEFAULT_TYPOGRAPHY_LEVEL } from './constants';
+import { SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE } from './constants';
 import { ContactSearchResult } from './ContactSearchResult';
 import { Highlight } from './Highlight';
-import { InactiveFilterChip } from './InactiveFilterChip';
-import { BackgroundActiveMask, BackgroundHoverMask } from './SearchResultMasks';
+import { BackgroundActiveMask } from './SearchResultMasks';
 import { UserLabelSearchResult } from './UserLabelSearchResult';
 
 export type SearchResultProps = {
@@ -45,7 +51,7 @@ export type SearchResultProps = {
   showContent: boolean;
   style?: React.CSSProperties;
   onClick?: (newTab: boolean) => void;
-  applyFilter: (filter: SearchFilter) => void;
+  onHover: () => void;
 };
 
 // No need for as much padding-top for first header
@@ -61,13 +67,18 @@ const SearchResultHeaderRow = styled.div<{ isFirstRow?: boolean }>`
 `;
 
 const SearchResultRow = styled.div`
+  border-radius: 12px;
+  cursor: pointer;
+`;
+
+const SearchResultContainer = styled.div`
+  padding: 10px;
   box-sizing: border-box;
-  border-radius: 8px;
   display: flex;
+  width: 100%;
+  gap: 12px;
+  box-sizing: border-box;
   align-items: center;
-  & * {
-    cursor: pointer;
-  }
 `;
 
 const SearchResultContentArea = styled.div<{ isAction?: boolean }>`
@@ -78,9 +89,6 @@ const SearchResultContentArea = styled.div<{ isAction?: boolean }>`
   min-width: 0;
   ${(props) => props.isAction && `justify-content: center;`}
   pointer-events: none;
-  & span.outerText:first-child {
-    color: white !important;
-  }
   padding-left: ${(props) => (props.isAction ? `0px` : `8px`)};
 `;
 
@@ -107,8 +115,20 @@ const SearchLabels = styled.div`
 `;
 
 const StartElement = styled.div`
-  padding-left: 8px;
-  padding-right: 4px;
+  box-sizing: border-box;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+
+  width: 36px;
+  height: 36px;
+
+  background: ${getThemedColor('var(--cta-secondary-hover)', ThemeMode.DARK)};
+  border: 1px solid ${getThemedColor('var(--border-tertiary)', ThemeMode.DARK)};
+
+  border-radius: 8px;
   pointer-events: none;
 `;
 
@@ -123,6 +143,10 @@ const SkemailMetaDataArea = styled.div`
 const EmailContentArea = styled.div`
   max-width: calc(100% - ${DATE_TEXT_RIGHT});
 `;
+
+export const renderRowBackground = (active: boolean, rowHeight: number) => (
+  <>{active && <BackgroundActiveMask rowHeight={rowHeight} />}</>
+);
 
 function SearchResultContent(props: { emailBody: string; query: string; sender?: string; read?: boolean }) {
   const { emailBody, query, sender, read } = props;
@@ -147,30 +171,11 @@ const renderStartElement = (item: SearchItem) => {
     return (
       <StartElement>
         {/* Safe to spread props since IconProps is clearly defined */}
-        <Icons themeMode='dark' {...item.iconProps} size='small' />
+        <Icons color='secondary' forceTheme={ThemeMode.DARK} {...item.iconProps} size={Size.X_MEDIUM} />
       </StartElement>
     );
   }
 };
-
-export const renderRowBackground = (active: boolean, hover: boolean, rowHeight: number) => (
-  <>
-    {active && (
-      <BackgroundActiveMask
-        layoutId='highlight-active-background'
-        rowHeight={rowHeight}
-        transition={{ duration: CELL_HOVER_SWITCH_ANIMATION_DURATION }}
-      />
-    )}
-    {hover && !active && (
-      <BackgroundHoverMask
-        layoutId='highlight-hover-background'
-        rowHeight={rowHeight}
-        transition={{ duration: CELL_HOVER_SWITCH_ANIMATION_DURATION }}
-      />
-    )}
-  </>
-);
 
 export default function SearchResult({
   active,
@@ -180,12 +185,11 @@ export default function SearchResult({
   style,
   showContent,
   onClick,
-  applyFilter
+  onHover
 }: SearchResultProps) {
   const { itemType, subject } = item;
   const { data: userLabelData } = useUserLabelsQuery();
   const userLabels = userLabelData?.userLabels ?? [];
-  const [hover, setHover] = useState(false);
 
   const onSearchResultClick: React.MouseEventHandler<HTMLDivElement> = (event) => {
     if (!onClick) return;
@@ -199,16 +203,23 @@ export default function SearchResult({
   if (itemType === SearchItemType.Header) {
     return (
       <SearchResultHeaderRow isFirstRow={isFirstRow} style={style} tabIndex={-1}>
-        <Typography color='secondary' level={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_LEVEL} themeMode='dark' type='label'>
+        <Typography
+          color='disabled'
+          forceTheme={ThemeMode.DARK}
+          mono
+          size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}
+          uppercase
+          weight={TypographyWeight.MEDIUM}
+        >
           {subject}
         </Typography>
         {item.showAllOptions && onClick && (
           <Typography
             color='link'
-            level={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_LEVEL}
+            forceTheme={ThemeMode.DARK}
             onClick={() => onClick(false)}
-            themeMode='dark'
-            type='label'
+            size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}
+            weight={TypographyWeight.MEDIUM}
           >
             {item.onClickText}
           </Typography>
@@ -219,50 +230,17 @@ export default function SearchResult({
     if (item.filter) {
       const filterPrefix = getFilterPrefix(item.filter.filterType);
       return (
-        <SearchResultRow
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
-          onMouseUp={onSearchResultClick}
-          style={style}
-          tabIndex={-1}
-        >
-          {renderRowBackground(active, hover, getRowHeightFromSearchItem(item))}
+        <SearchResultRow onMouseEnter={onHover} onMouseUp={onSearchResultClick} style={style} tabIndex={-1}>
           <SelectableChips>
             <FilterChip noBorder prefix={filterPrefix} searchFilter={item} userLabels={userLabels} />
-            {item.query && <Typography themeMode='dark'>{item.query}</Typography>}
+            {item.query && <Typography forceTheme={ThemeMode.DARK}>{item.query}</Typography>}
           </SelectableChips>
         </SearchResultRow>
       );
     }
-  } else if (itemType === SearchItemType.FilterRow) {
-    return (
-      <SearchResultRow style={style}>
-        <SelectableChips>
-          {item.filters.map((filter) => (
-            <Chip
-              color='white'
-              key={filter.subject}
-              label={filter.subject}
-              noBorder
-              onClick={() => applyFilter(filter)}
-              size='small'
-              themeMode='dark'
-              typographyType='label'
-            />
-          ))}
-        </SelectableChips>
-      </SearchResultRow>
-    );
   } else if (itemType === SearchItemType.Query) {
     return (
-      <SearchResultRow
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-        onMouseUp={onSearchResultClick}
-        style={style}
-        tabIndex={-1}
-      >
-        {renderRowBackground(active, hover, getRowHeightFromSearchItem(item))}
+      <SearchResultRow onMouseEnter={onHover} onMouseUp={onSearchResultClick} style={style} tabIndex={-1}>
         {
           <SelectableChips>
             {item.filters.map((filter) => {
@@ -278,7 +256,7 @@ export default function SearchResult({
               );
             })}
             {!!query.length && <Highlight query={query} text={subject} />}
-            {!query.length && <Typography themeMode='dark'>{subject}</Typography>}
+            {!query.length && <Typography forceTheme={ThemeMode.DARK}>{subject}</Typography>}
           </SelectableChips>
         }
       </SearchResultRow>
@@ -289,13 +267,9 @@ export default function SearchResult({
       if (info.categoryType === SearchCategoryType.Contact) {
         return (
           <ContactSearchResult
-            active={active}
             contact={{ name: info.displayName, address: info.address }}
-            hover={hover}
             onMouseUp={onSearchResultClick}
             query={query}
-            rowHeight={getRowHeightFromSearchItem(item)}
-            setHover={setHover}
             style={style}
             subject={item.subject}
           />
@@ -305,13 +279,9 @@ export default function SearchResult({
       if (info.categoryType === SearchCategoryType.Attachments) {
         return (
           <AttachmentSearchResult
-            active={active}
             attachment={info}
-            hover={hover}
             onMouseUp={onSearchResultClick}
             query={query}
-            rowHeight={getRowHeightFromSearchItem(item)}
-            setHover={setHover}
             style={style}
             subject={item.subject}
           />
@@ -320,126 +290,108 @@ export default function SearchResult({
       if (info.categoryType === SearchCategoryType.Labels || info.categoryType === SearchCategoryType.Folders) {
         return (
           <UserLabelSearchResult
-            active={active}
-            hover={hover}
             label={info}
             onMouseUp={onSearchResultClick}
             query={query}
-            rowHeight={getRowHeightFromSearchItem(item)}
-            setHover={setHover}
             style={style}
             subject={item.subject}
           />
         );
       }
-    } else {
-      const searchCategoryChips = Object.values(FilterByType);
-      return (
-        <SearchResultRow style={style}>
-          <SelectableChips>
-            {searchCategoryChips.map((filterType) => (
-              <InactiveFilterChip
-                applyFilter={applyFilter}
-                filter={{
-                  itemType: SearchItemType.Filter,
-                  subject: upperCaseFirstLetter(filterType),
-                  filter: { filterType: SearchFilterType.Category, filterValue: filterType }
-                }}
-                key={filterType}
-              />
-            ))}
-          </SelectableChips>
-        </SearchResultRow>
-      );
     }
   }
   return (
-    <SearchResultRow
-      data-test='search-row-results'
-      id={item.subject}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onMouseUp={onSearchResultClick}
-      role='button'
-      style={style}
-      tabIndex={-1}
-    >
-      {renderRowBackground(active, hover, getRowHeightFromSearchItem(item))}
-      {renderStartElement(item)}
-      <SearchResultContentArea
-        data-test={`search-result-${subject}`}
-        isAction={item.itemType === SearchItemType.Action}
+    <>
+      <SearchResultRow
+        data-test='search-row-results'
+        id={item.subject}
+        onMouseEnter={onHover}
+        onMouseUp={onSearchResultClick}
+        role='button'
+        style={style}
+        tabIndex={-1}
       >
-        <SearchLabels>
-          {/* no need to highlight queries for emails without subjects */}
-          {!(itemType === SearchItemType.Skemail && !subject) ? (
-            <Highlight
-              query={query}
-              read={itemType === SearchItemType.Skemail ? item.read : undefined}
-              size='small'
-              text={subject}
-            />
-          ) : (
-            <Typography
-              color={item.read === false ? 'primary' : 'secondary'}
-              level={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_LEVEL}
-              themeMode='dark'
-              type={item.read === false ? 'label' : 'paragraph'}
-            >
-              {NO_SUBJECT_TEXT}
-            </Typography>
-          )}
-          {itemType === SearchItemType.Skemail &&
-            item.userLabels.map((userLabel) => {
-              const currentLabel = userLabels.find(
-                (label) => label.labelName.toLowerCase() === userLabel.toLowerCase()
-              );
-              const labelOrFolderColor = currentLabel?.color;
-              const labelOrFolderIcon = currentLabel?.variant === UserLabelVariant.Folder ? Icon.Folder : Icon.Tag;
-              return (
-                <Chip
-                  color='white'
-                  key={userLabel}
-                  label={userLabel}
-                  noBorder
+        {renderRowBackground(active, getRowHeightFromSearchItem(item))}
+        <SearchResultContainer>
+          {renderStartElement(item)}
+          <SearchResultContentArea
+            data-test={`search-result-${subject}`}
+            isAction={item.itemType === SearchItemType.Action}
+          >
+            <SearchLabels>
+              {/* no need to highlight queries for emails without subjects */}
+              {!(itemType === SearchItemType.Skemail && !subject) ? (
+                <Highlight
+                  customColor='white'
+                  isAction={item.itemType === SearchItemType.Action}
+                  query={query}
+                  read={itemType === SearchItemType.Skemail ? item.read : undefined}
                   size='small'
-                  startIcon={
-                    <Icons
-                      color={labelOrFolderColor as IconProps['color']}
-                      icon={labelOrFolderIcon}
-                      size='small'
-                      themeMode='dark'
-                    />
-                  }
-                  themeMode='dark'
+                  text={subject}
                 />
-              );
-            })}
-        </SearchLabels>
-        {showContent && itemType === SearchItemType.Skemail && (
-          <SearchResultContent
-            emailBody={item.content}
-            query={query}
-            read={item.read}
-            sender={item.from.name || item.from.address}
-          />
-        )}
-        {/* Render date and read status for Skemail search results */}
-        {itemType === SearchItemType.Skemail && (
-          <SkemailMetaDataArea>
-            <UnreadIndicator $cellTransition={false} $read={item.read} $themeMode='dark' />
-            <Typography color='secondary' level={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_LEVEL} themeMode='dark'>
-              {dayjs(item.createdAt).format('MMM D')}
-            </Typography>
-          </SkemailMetaDataArea>
-        )}
-        {/* Render cmd tooltip for quick action results */}
-        {itemType === SearchItemType.Action && item.cmdTooltip && (
-          <CmdHint color='primary'>
-            <KeyCodeSequence shortcut={item.cmdTooltip} size='medium' />
-          </CmdHint>
-        )}
-      </SearchResultContentArea>
-    </SearchResultRow>
+              ) : (
+                <Typography
+                  color={item.read === false ? 'primary' : 'secondary'}
+                  forceTheme={ThemeMode.DARK}
+                  size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}
+                  weight={item.read === false ? TypographyWeight.MEDIUM : TypographyWeight.REGULAR}
+                >
+                  {NO_SUBJECT_TEXT}
+                </Typography>
+              )}
+              {itemType === SearchItemType.Skemail &&
+                item.userLabels.map((userLabel) => {
+                  const currentLabel = userLabels.find(
+                    (label) => label.labelName.toLowerCase() === userLabel.toLowerCase()
+                  );
+                  const labelOrFolderColor = currentLabel?.color;
+                  const labelOrFolderIcon = currentLabel?.variant === UserLabelVariant.Folder ? Icon.Folder : Icon.Tag;
+                  return (
+                    <Chip
+                      color='white'
+                      forceTheme={ThemeMode.DARK}
+                      key={userLabel}
+                      label={userLabel}
+                      noBorder
+                      size={Size.SMALL}
+                      startIcon={
+                        <Icons
+                          color={labelOrFolderColor as IconProps['color']}
+                          forceTheme={ThemeMode.DARK}
+                          icon={labelOrFolderIcon}
+                          size={Size.SMALL}
+                        />
+                      }
+                    />
+                  );
+                })}
+            </SearchLabels>
+            {showContent && itemType === SearchItemType.Skemail && (
+              <SearchResultContent
+                emailBody={item.content}
+                query={query}
+                read={item.read}
+                sender={item.from.name || item.from.address}
+              />
+            )}
+            {/* Render date and read status for Skemail search results */}
+            {itemType === SearchItemType.Skemail && (
+              <SkemailMetaDataArea>
+                <UnreadIndicator $cellTransition={false} $forceTheme={ThemeMode.DARK} $read={item.read} />
+                <Typography color='secondary' forceTheme={ThemeMode.DARK} size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}>
+                  {dayjs(item.createdAt).format('MMM D')}
+                </Typography>
+              </SkemailMetaDataArea>
+            )}
+            {/* Render cmd tooltip for quick action results */}
+            {itemType === SearchItemType.Action && item.cmdTooltip && (
+              <CmdHint>
+                <KeyCodeSequence shortcut={item.cmdTooltip} size={Size.LARGE} />
+              </CmdHint>
+            )}
+          </SearchResultContentArea>
+        </SearchResultContainer>
+      </SearchResultRow>
+    </>
   );
 }

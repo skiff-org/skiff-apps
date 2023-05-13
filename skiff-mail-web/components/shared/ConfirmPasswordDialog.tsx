@@ -1,9 +1,10 @@
+import { startAuthentication } from '@simplewebauthn/browser';
+import { PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/typescript-types';
 import React, { useState } from 'react';
-import { ConfirmPasswordModalBase } from 'skiff-front-utils';
+import { useLoginSrpStep2Mutation } from 'skiff-front-graphql';
+import { ConfirmPasswordModalBase, useRequiredCurrentUserData } from 'skiff-front-utils';
 import { LoginMutationStatus, LoginSrpRequest } from 'skiff-graphql';
-import { useLoginSrpStep2Mutation } from 'skiff-mail-graphql';
 
-import { useRequiredCurrentUserData } from '../../apollo/currentUser';
 import { getLoginSrpRequest } from '../../utils/loginUtils';
 
 interface ConfirmPasswordDialogProps {
@@ -46,6 +47,16 @@ function ConfirmPasswordDialog(props: ConfirmPasswordDialogProps) {
       if (status === LoginMutationStatus.TokenNeeded) {
         setShowTokenMFAModal(true);
         return;
+      } else if (
+        status === LoginMutationStatus.WebauthnTokenNeeded &&
+        response.data?.loginSrp.webAuthnChallengeResponse
+      ) {
+        const challenge = JSON.parse(
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+          response.data.loginSrp.webAuthnChallengeResponse.options
+        ) as PublicKeyCredentialCreationOptionsJSON;
+        const completedAuthInfo = await startAuthentication(challenge);
+        loginSrpRequest.verifyWebAuthnData = completedAuthInfo;
       } else if (status !== LoginMutationStatus.Authenticated) {
         setErrorMsg(authenticationErrMessage);
         return;

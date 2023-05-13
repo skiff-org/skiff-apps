@@ -1,4 +1,4 @@
-import { Button, Drawer, Icon } from 'nightwatch-ui';
+import { Drawer, Icon, IconText, Size, ThemeMode } from 'nightwatch-ui';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
 import { DrawerOption, DrawerOptions } from 'skiff-front-utils';
@@ -11,7 +11,7 @@ import { skemailMobileDrawerReducer } from '../../redux/reducers/mobileDrawerRed
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { ModalType } from '../../redux/reducers/modalTypes';
 import { useGetCachedThreads } from '../../utils/cache/cache';
-import { isFolder, isLabelActive, isUserLabel, UserLabel, UserLabelFolder } from '../../utils/label';
+import { isFolder, isLabelActive, isPlainLabel, UserLabelPlain, UserLabelFolder } from '../../utils/label';
 import { DropdownFooter } from '../labels/Dropdown.styles';
 import { FolderLabelDropdownItem, PlainLabelDropdownItem } from '../labels/LabelDropdownItem';
 
@@ -34,59 +34,74 @@ const ApplyUserLabelDrawer: FC<ApplyLabelDrawerProps> = ({ threadID, currentSyst
 
   const threadFragments = useGetCachedThreads(threadIDs);
 
-  const { existingLabels, availableLabels } = useAvailableUserLabels(isMoveToFolder ? isFolder : isUserLabel);
+  const { existingLabels, availableLabels } = useAvailableUserLabels(isMoveToFolder ? isFolder : isPlainLabel);
   const userLabels = [...existingLabels, ...availableLabels];
 
   if (!show) return null;
-
   return (
     <Drawer hideDrawer={hideDrawer} show={!!show} title={isMoveToFolder ? 'Move to folder' : 'Add labels'}>
       <DrawerOptions>
-        {userLabels.map((label) => {
-          return (
-            <DrawerOption key={`drawer-option-${label.value}`}>
-              {isMoveToFolder ? (
-                <FolderLabelDropdownItem
-                  active={isLabelActive(label, threadFragments)}
-                  key={label.value}
-                  label={label as UserLabelFolder}
-                  moveThreads={async () => {
-                    await moveThreads(threadIDs, label as UserLabelFolder, currentSystemLabels);
-                    hideDrawer();
-                  }}
-                />
-              ) : (
-                <PlainLabelDropdownItem
-                  active={isLabelActive(label, threadFragments)}
-                  applyUserLabel={async (labelToAdd: UserLabel) => applyUserLabel(threadIDs, [labelToAdd])}
-                  key={label.value}
-                  label={label as UserLabel}
-                  removeUserLabel={async (labelToRemove: UserLabel) => removeUserLabel(threadIDs, [labelToRemove])}
-                />
-              )}
-            </DrawerOption>
-          );
-        })}
+        {userLabels
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((label) => {
+            return (
+              <DrawerOption key={`drawer-option-${label.value}`}>
+                {isMoveToFolder ? (
+                  <FolderLabelDropdownItem
+                    active={isLabelActive(label, threadFragments)}
+                    key={label.value}
+                    label={label as UserLabelFolder}
+                    onClick={async () => {
+                      await moveThreads(threadIDs, label as UserLabelFolder, currentSystemLabels);
+                      hideDrawer();
+                    }}
+                  />
+                ) : (
+                  <PlainLabelDropdownItem
+                    active={isLabelActive(label, threadFragments)}
+                    key={label.value}
+                    label={label as UserLabelPlain}
+                    onClick={async () => {
+                      if (!isPlainLabel(label)) return;
+                      if (isLabelActive(label, threadFragments)) {
+                        await removeUserLabel(threadIDs, [label]);
+                      } else {
+                        const { rejectedForDelinquency } = await applyUserLabel(threadIDs, [label]);
+                        if (rejectedForDelinquency) {
+                          if (!!hideDrawer) {
+                            hideDrawer();
+                          }
+                        }
+                      }
+                    }}
+                  />
+                )}
+              </DrawerOption>
+            );
+          })}
         <DropdownFooter>
-          <Button
-            fullWidth
+          <IconText
+            disableHover
+            forceTheme={ThemeMode.DARK}
+            label={`Create new ${isMoveToFolder ? 'folder' : 'label'}`}
             onClick={(e) => {
-              e.stopPropagation(); // necessary so the click doesn't propogate to the incoming modal (which may trigger 'handleClickOutside')
+              e?.stopPropagation(); // necessary so the click doesn't propagate to the incoming modal (which may trigger 'handleClickOutside')
               dispatch(
                 skemailModalReducer.actions.setOpenModal({
                   type: ModalType.CreateOrEditLabelOrFolder,
                   threadIDs,
-                  folder: isMoveToFolder
+                  folder: isMoveToFolder,
+                  onClose: () => {
+                    // open the label drawer again
+                    dispatch(skemailMobileDrawerReducer.actions.setShowApplyLabelDrawer(UserLabelVariant.Plain));
+                  }
                 })
               );
               hideDrawer(); // hide the drawer after the modal is opened to enable focus
             }}
-            size='large'
+            size={Size.LARGE}
             startIcon={Icon.Plus}
-            type='navigation'
-          >
-            {`Create new ${isMoveToFolder ? 'folder' : 'label'}`}
-          </Button>
+          />
         </DropdownFooter>
       </DrawerOptions>
     </Drawer>

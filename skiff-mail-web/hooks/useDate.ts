@@ -1,21 +1,22 @@
 import dayjs from 'dayjs';
-
-import useLocalSetting from './useLocalSetting';
+import { useUserPreference } from 'skiff-front-utils';
+import { StorageTypes } from 'skiff-utils';
 
 export const useLocalHourFormat = () => {
-  const [hourFormat] = useLocalSetting('hourFormat');
+  const [hourFormat] = useUserPreference(StorageTypes.HOUR_FORMAT);
   return hourFormat === '12' ? 'h:mm A' : 'HH:mm';
 };
 
 export function useDate() {
-  const [dateFormat] = useLocalSetting('dateFormat');
+  const [dateFormat] = useUserPreference(StorageTypes.DATE_FORMAT);
   const hourFormat = useLocalHourFormat();
 
   const getMonthAndDay = (date: Date) => {
+    const isThisYear = dayjs(date).year() === dayjs().year();
     if (dateFormat === 'DD/MM/YYYY') {
-      return dayjs(date).format('D MMM');
+      return dayjs(date).format(`${isThisYear ? 'D MMM' : 'DD/MM/YY'}`);
     } else {
-      return dayjs(date).format('MMM D');
+      return dayjs(date).format(`${isThisYear ? 'MMM D' : 'MM/DD/YY'}`);
     }
   };
 

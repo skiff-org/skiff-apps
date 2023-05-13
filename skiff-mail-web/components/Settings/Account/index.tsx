@@ -2,31 +2,23 @@ import { Icon } from 'nightwatch-ui';
 import React, { useCallback, useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
-import { Setting, SETTINGS_LABELS, SettingType, SettingValue } from 'skiff-front-utils';
-import { useGetUserEmailAndWalletQuery } from 'skiff-mail-graphql';
+import { Setting, SETTINGS_LABELS, SettingType, SettingValue, useRequiredCurrentUserData } from 'skiff-front-utils';
 import { insertIf } from 'skiff-utils';
 
-import { useRequiredCurrentUserData } from '../../../apollo/currentUser';
 import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { ModalType } from '../../../redux/reducers/modalTypes';
 
 import AddEmail from './AddEmail/AddEmail';
-import ChangeEmail from './ChangeEmail/ChangeEmail';
-import DeleteAccountDialog from './DeleteAccount/DeleteAccount';
+import DeleteAccount from './DeleteAccount/DeleteAccount';
+import DeleteRecoveryEmail from './DeleteRecoveryEmail/DeleteRecoveryEmail';
 import EditProfileSettings from './EditProfileSettings/EditProfileSettings';
 
 export const useAccountSettings: () => Setting[] = () => {
   const dispatch = useDispatch();
-  const { userID } = useRequiredCurrentUserData();
+
   // Fetch email from server because Apollo object might not be up-to-date
-  const { data } = useGetUserEmailAndWalletQuery({
-    variables: {
-      request: {
-        userID
-      }
-    }
-  });
-  const hasEmail = !!data?.user?.email;
+  const { recoveryEmail, unverifiedRecoveryEmail } = useRequiredCurrentUserData();
+  const hasRecoveryEmail = !!recoveryEmail;
 
   const openLogoutModal = useCallback(
     (e?: React.MouseEvent) => {
@@ -46,27 +38,27 @@ export const useAccountSettings: () => Setting[] = () => {
         icon: Icon.AlignCenter,
         color: 'green'
       }),
-      ...insertIf<Setting>(hasEmail, {
-        value: SettingValue.ChangeEmail,
+      ...insertIf<Setting>(hasRecoveryEmail, {
+        value: SettingValue.DeleteRecoveryEmail,
         type: SettingType.Custom,
-        component: <ChangeEmail key='change-email' />,
-        label: SETTINGS_LABELS[SettingValue.ChangeEmail],
+        component: <DeleteRecoveryEmail key='delete-recovery-email' />,
+        label: SETTINGS_LABELS[SettingValue.DeleteRecoveryEmail],
         icon: Icon.Envelope,
-        color: 'green',
-        dataTest: 'change-email'
+        color: 'pink',
+        dataTest: 'delete-recovery-email'
       }),
-      ...insertIf<Setting>(!hasEmail, {
+      ...insertIf<Setting>(!hasRecoveryEmail, {
         value: SettingValue.AddEmail,
         type: SettingType.Custom,
-        component: <AddEmail key='add-email' />,
+        component: <AddEmail key='add-email' unverifiedRecoveryEmail={unverifiedRecoveryEmail} />,
         label: SETTINGS_LABELS[SettingValue.AddEmail],
         icon: Icon.Envelope,
-        color: 'pink'
+        color: 'green'
       }),
       {
         value: SettingValue.DeleteAccount,
         type: SettingType.Custom,
-        component: <DeleteAccountDialog key='delete-account' />,
+        component: <DeleteAccount key='delete-account' />,
         label: SETTINGS_LABELS[SettingValue.DeleteAccount],
         icon: Icon.Trash,
         color: 'red'
@@ -80,7 +72,7 @@ export const useAccountSettings: () => Setting[] = () => {
         color: 'yellow'
       })
     ],
-    [openLogoutModal, hasEmail]
+    [hasRecoveryEmail, unverifiedRecoveryEmail, openLogoutModal]
   );
 
   return settings;

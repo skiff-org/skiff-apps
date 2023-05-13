@@ -1,51 +1,58 @@
-import { Icon, Banner } from 'nightwatch-ui';
-import { useEffect } from 'react';
-import { isIOS, isTablet } from 'react-device-detect';
+import { Icon } from 'nightwatch-ui';
+import { useCallback, useEffect } from 'react';
+import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import {
+  BannerTypes,
   DEFAULT_WORKSPACE_EVENT_VERSION,
-  IPHONE_MAIL_APP_URL,
-  MAIL_ATTRIBUTION_PARAM,
-  SKIFF_PUBLIC_WEBSITE_DOWNLOAD,
-  isWalletEnabled
+  ThemedBanner,
+  MAX_SKEMAIL_MOBILE_BANNER_APPEARANCES,
+  useLocalSetting,
+  MAIL_MOBILE_APP_DOWNLOAD_LINK,
+  SKIFF_PUBLIC_WEBSITE_DOWNLOAD
 } from 'skiff-front-utils';
-import { isMobileWebView } from 'skiff-front-utils';
 import { WorkspaceEventType } from 'skiff-graphql';
+import { StorageTypes } from 'skiff-utils';
 
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
-import useLocalSetting from '../../hooks/useLocalSetting';
-import { BannerTypes, skemailModalReducer } from '../../redux/reducers/modalReducer';
+import useHideBannerForTreatmentCohort from '../../hooks/useHideBannerForTreatmentCohort';
+import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { ModalType } from '../../redux/reducers/modalTypes';
 import { storeWorkspaceEvent } from '../../utils/userUtils';
-
-const MAX_BANNER_APPEARANCES = 1;
-
-const DOWNLOAD_URL = SKIFF_PUBLIC_WEBSITE_DOWNLOAD + MAIL_ATTRIBUTION_PARAM;
 
 const MobileBanner = () => {
   const dispatch = useDispatch();
   const [skemailMobileBannerAppearances, setSkemailMobileBannerAppearances] = useLocalSetting(
-    'skemailMobileBannerAppearances'
+    StorageTypes.SKEMAIL_MOBILE_BANNER_APPEARANCES
   );
+  // hide banner if the user:
+  // 1. did not complete the download during onboarding
+  // 2. was in an experimental treatment cohort and is not selected for banner exposure
+  const hideBannerForTreatmentCohort = useHideBannerForTreatmentCohort();
 
   const bannersOpen = useAppSelector((state) => state.modal.bannersOpen);
-  const mobileBannerOpen = bannersOpen.some((banner) => banner === BannerTypes.Mobile);
+  const isMobileBannerOpen = bannersOpen.includes(BannerTypes.Mobile);
+  const isDelinquencyBannerOpen = bannersOpen.includes(BannerTypes.Delinquency);
+
+  const closeMobileBanner = useCallback(() => {
+    dispatch(skemailModalReducer.actions.closeBanner(BannerTypes.Mobile));
+  }, [dispatch]);
+
+  const openMobileBanner = useCallback(() => {
+    dispatch(skemailModalReducer.actions.openBanner(BannerTypes.Mobile));
+  }, [dispatch]);
 
   useEffect(() => {
-    if (skemailMobileBannerAppearances >= MAX_BANNER_APPEARANCES) {
-      void dispatch(skemailModalReducer.actions.closeBanner(BannerTypes.Mobile));
-    }
-  }, [skemailMobileBannerAppearances, dispatch]);
-
-  useEffect(() => {
-    // If on mobile website, and no wallet enabled, redirect to mobile app
-    if (isMobileWebView() && window.location.hostname !== 'localhost' && !isWalletEnabled()) {
-      // don't redirect on tablet
-      if (isIOS && !isTablet) {
-        window.location.replace(IPHONE_MAIL_APP_URL);
-      }
-    }
-  }, []);
+    if (skemailMobileBannerAppearances >= MAX_SKEMAIL_MOBILE_BANNER_APPEARANCES) closeMobileBanner();
+    else if (!isDelinquencyBannerOpen && !isMobileBannerOpen && !hideBannerForTreatmentCohort) openMobileBanner();
+  }, [
+    skemailMobileBannerAppearances,
+    closeMobileBanner,
+    isDelinquencyBannerOpen,
+    isMobileBannerOpen,
+    openMobileBanner,
+    hideBannerForTreatmentCohort
+  ]);
 
   // hide on mobile or desktop
   if (window.ReactNativeWebView) {
@@ -53,49 +60,53 @@ const MobileBanner = () => {
   }
 
   // hide banner if user hits close button
-  if (!mobileBannerOpen) {
+  if (!isMobileBannerOpen) {
     return null;
   }
 
   // hide banner on reload after max number of appearance
-  if (skemailMobileBannerAppearances >= MAX_BANNER_APPEARANCES) {
+  if (skemailMobileBannerAppearances >= MAX_SKEMAIL_MOBILE_BANNER_APPEARANCES) {
     return null;
   }
 
   const closeBanner = () => {
-    storeWorkspaceEvent(WorkspaceEventType.CloseSkemailBanner, '', DEFAULT_WORKSPACE_EVENT_VERSION);
+    void storeWorkspaceEvent(WorkspaceEventType.CloseSkemailBanner, '', DEFAULT_WORKSPACE_EVENT_VERSION);
     setSkemailMobileBannerAppearances(skemailMobileBannerAppearances + 1);
-    dispatch(skemailModalReducer.actions.closeBanner(BannerTypes.Mobile));
+    closeMobileBanner();
   };
 
   const openQrCodeModal = (link: string) =>
     dispatch(
       skemailModalReducer.actions.setOpenModal({
         type: ModalType.QrCode,
-        title: 'Get the Skiff app',
+        title: 'Get the Skiff Mail app',
         description: 'Available on iOS, Android, and macOS',
         link,
         buttonProps: {
           label: 'View all downloads',
-          onClick: () => window.open(DOWNLOAD_URL, '_blank')
+          onClick: () => window.open(SKIFF_PUBLIC_WEBSITE_DOWNLOAD, '_blank')
         }
       })
     );
 
-  const openQrCode = () => {
-    storeWorkspaceEvent(WorkspaceEventType.OpenSkemailIphoneAppFromBanner, '', DEFAULT_WORKSPACE_EVENT_VERSION);
-    openQrCodeModal(DOWNLOAD_URL);
+  const onBannerClick = () => {
+    void storeWorkspaceEvent(WorkspaceEventType.OpenSkemailIphoneAppFromBanner, '', DEFAULT_WORKSPACE_EVENT_VERSION);
+    if (isMobile) {
+      window.open(MAIL_MOBILE_APP_DOWNLOAD_LINK, '_blank', 'noreferrer noopener');
+    } else {
+      openQrCodeModal(MAIL_MOBILE_APP_DOWNLOAD_LINK);
+    }
   };
 
   const mobileBannerCTAs = [
     {
       label: 'Download mobile app',
-      onClick: openQrCode
+      onClick: onBannerClick
     }
   ];
 
   return (
-    <Banner
+    <ThemedBanner
       color='green'
       ctas={mobileBannerCTAs}
       icon={Icon.Mobile}

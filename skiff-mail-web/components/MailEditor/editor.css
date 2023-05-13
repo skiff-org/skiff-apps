@@ -21,6 +21,14 @@
 .ProseMirror p {
   padding: 0px;
   margin: 0px;
+  font-weight: 380;
+  font-size: 15px;
+  line-height: 130%;
+  letter-spacing: 0em;
+}
+
+.ProseMirror strong {
+  font-weight: 520;
 }
 
 .ProseMirror blockquote {
@@ -37,7 +45,7 @@
 
 .ProseMirror ol,
 .ProseMirror ul {
-  padding-left: 20px;
+  padding-left: 30px;
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
@@ -49,7 +57,7 @@
 }
 
 .toolbar-dropdown > .optionMenu {
-  background-color: var(--bg-emphasis) !important;
+  background: var(--bg-emphasis) !important;
 }
 
 .ProseMirror code {
@@ -59,7 +67,7 @@
   padding: 0px 4px;
   box-shadow: var(--inset-empty);
   border-radius: 4px;
-  background: var(--bg-l0-solid);
+  background: var(--bg-overlay-tertiary);
 }
 
 .ProseMirror ol ol ol ol ol,

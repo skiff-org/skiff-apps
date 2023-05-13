@@ -1,16 +1,18 @@
 import { Editor, getSchema } from '@tiptap/react';
+import DOMPurify from 'dompurify';
 import { DOMParser as PMDomParser, DOMSerializer, Node, Schema } from 'prosemirror-model';
+import { proxyAttributes, restoreAttributes } from 'skiff-front-utils';
 
-import { MailboxEmailInfo } from '../../../models/email';
+import { MailboxEmailInfo, ThreadViewEmailInfo } from '../../../models/email';
 import { sanitizeSignature } from '../../../utils/signatureUtils';
 import { buildEditorExtensions } from '../Extensions';
 
 export const PmNodeToHtml = (doc: Node, schema: Schema) => {
   const htmlFragment = DOMSerializer.fromSchema(schema).serializeFragment(doc.content);
-  const detachedDocument = document.implementation.createHTMLDocument();
-  const div = detachedDocument.createElement('div');
-  div.appendChild(htmlFragment);
-  return div.innerHTML;
+  const dom = document.implementation.createHTMLDocument();
+  dom.body.appendChild(htmlFragment);
+  restoreAttributes(dom);
+  return dom.body.innerHTML;
 };
 
 export const fromEditorToHtml = (editor: Editor) => {
@@ -37,26 +39,33 @@ export const convertHtmlToTextContent = (html: string) => {
 };
 
 /** Helper for getting the HTML content of an email, defaulting to text if not set */
-export const getEmailBody = (email: MailboxEmailInfo) =>
+export const getEmailBody = (email: ThreadViewEmailInfo) =>
   email.decryptedHtml || email.decryptedTextAsHtml || email.decryptedText || '';
 
 export const createReplyInitialContent = (email: MailboxEmailInfo, signature?: string) => {
   // User signature
   const signatureHtml = !!signature ? sanitizeSignature(signature) : '';
   // Details of email being replied to
-  const dateAndName = `On ${(email.createdAt as Date).toUTCString()}${email.from.name ? `, ${email.from.name}` : ''}`;
+  const dateAndName = `On ${email.createdAt.toUTCString()}${email.from.name ? `, ${email.from.name}` : ''}`;
   const emailAddress = `${email.from.address} wrote:`;
   const sender = email.from.name || email.from.address;
   const body = getEmailBody(email);
-
-  return `
+  const { dom } = proxyAttributes(new DOMParser().parseFromString(body, 'text/html'), false);
+  return DOMPurify.sanitize(`
+    <p></p>
     <p></p>
     <blockquote class="skiff_quote" data-skiff-sender="${sender}" data-skiff-mail="true">
         <p>${dateAndName}</p>
         <p>${emailAddress}</p>
         <p></p>
-        ${body}
+        ${dom.body.innerHTML}
     </blockquote>
     ${signatureHtml}
-    `;
+    `);
+};
+
+export const createForwardContent = (email: MailboxEmailInfo) => {
+  const body = getEmailBody(email);
+  const { dom } = proxyAttributes(new DOMParser().parseFromString(body, 'text/html'), false);
+  return dom.body.innerHTML;
 };

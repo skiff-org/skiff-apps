@@ -47,16 +47,6 @@ export const ShortcutItems: Array<ShortcutItemsSection> = [
         icon: Icon.EnvelopeRead,
         name: 'Open thread details',
         shortcuts: ['enter']
-      },
-      {
-        icon: Icon.FullView,
-        name: 'Full view',
-        shortcuts: ['⌘+1']
-      },
-      {
-        icon: Icon.SplitView,
-        name: 'Split view',
-        shortcuts: ['⌘+2']
       }
     ]
   },

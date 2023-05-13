@@ -1,4 +1,4 @@
-import { Icons, Typography, KeyCodeSequence } from 'nightwatch-ui';
+import { Icon, Icons, KeyCodeSequence, ThemeMode, Typography, TypographyWeight } from 'nightwatch-ui';
 import styled from 'styled-components';
 
 import { ShortcutItems } from './constants';
@@ -28,7 +28,7 @@ export const ShortcutsList = () => {
   // renders the header of a section
   const renderHeaderRow = (header) => (
     <Row isHeader={true}>
-      <Typography color='secondary' themeMode='dark' type='label'>
+      <Typography color='secondary' forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
         {header}
       </Typography>
     </Row>
@@ -38,8 +38,8 @@ export const ShortcutsList = () => {
   const renderShortcutRow = ({ icon, name, shortcuts }) => (
     <Row isHeader={false}>
       <RowHeader>
-        {icon && <Icons color='secondary' icon={icon} themeMode='dark' />}
-        <Typography themeMode='dark'>{name}</Typography>
+        {icon && <Icons color='secondary' forceTheme={ThemeMode.DARK} icon={icon as Icon} />}
+        <Typography forceTheme={ThemeMode.DARK}>{name}</Typography>
       </RowHeader>
       <KeyCodesContainer>
         {shortcuts.map((shortcut, i) => {
@@ -49,7 +49,7 @@ export const ShortcutsList = () => {
             <KeyCodesContainer key={shortcut}>
               <KeyCodeSequence shortcut={shortcut} />
               {!isLastShortcut && (
-                <Typography color='secondary' themeMode='dark'>
+                <Typography color='secondary' forceTheme={ThemeMode.DARK}>
                   or
                 </Typography>
               )}

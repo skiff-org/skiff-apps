@@ -7,14 +7,26 @@
         "appID": "52QYHTS68C.com.skiff.mobile",
         "paths": [
           "NOT /mail/*",
-          "*"
+          "NOT /folder/*",
+          "/file/*"
         ]
       },
       {
-        "comment": "Universal link for skemail app - includes all paths that start with /mail | this should not have effect on prod only on dev when testing",
+        "comment": "Universal link for Skiff Drive app",
+        "appID": "52QYHTS68C.com.skiff.drivemobile",
+        "paths": [
+          "NOT /mail/*",
+          "NOT /file/*",
+          "/folder/*"
+        ]
+      },
+      {
+        "comment": "Universal link for Skiff Mail app - includes all paths",
         "appID": "52QYHTS68C.com.skiff.mailmobile",
         "paths": [
-          "/mail/*"
+          "NOT /folder/*",
+          "NOT /file/*",
+          "*"
         ]
       }
     ]

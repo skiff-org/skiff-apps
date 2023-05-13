@@ -1,53 +1,84 @@
 import { ApolloQueryResult, ApolloError } from '@apollo/client';
+import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
 import { Editor } from '@tiptap/react';
 import dayjs from 'dayjs';
-import { Icon, IconButton, InputField, Typography, Drawer } from 'nightwatch-ui';
+import { Typography, Drawer } from 'nightwatch-ui';
 import { Node } from 'prosemirror-model';
-import { default as React, Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  default as React,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { isMobile, isAndroid } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
-import { convertFileListToArray, FileTypes, MIMETypes, useTheme, useToast } from 'skiff-front-utils';
-import { useIosBackdropEffect } from 'skiff-front-utils';
-import { AddressObject, getPaywallErrorCode, SendEmailRequest } from 'skiff-graphql';
 import {
   EmailFragment,
   EmailFragmentDoc,
   GetUserProfileDataQuery,
   useDecryptionServicePublicKeyQuery,
-  useGetUserContactListQuery,
   useSendMessageMutation,
   useSendReplyMessageMutation,
-  useUnsendMessageMutation
-} from 'skiff-mail-graphql';
-import { AttachmentPair, encryptMessage } from 'skiff-mail-graphql';
+  useUnsendMessageMutation,
+  useGetOrganizationQuery,
+  AttachmentPair,
+  encryptMessage,
+  useSubscriptionPlan
+} from 'skiff-front-graphql';
+import {
+  convertFileListToArray,
+  FileTypes,
+  MIMETypes,
+  useDefaultEmailAlias,
+  useTheme,
+  useToast,
+  useRequiredCurrentUserData,
+  isPaidTierExclusiveEmailAddress,
+  contactToAddressObject,
+  useGetAllContactsWithOrgMembers,
+  isMobileApp
+} from 'skiff-front-utils';
+import { useUserPreference } from 'skiff-front-utils';
+import { useAsyncHcaptcha, useIosBackdropEffect, useCurrentUserEmailAliases } from 'skiff-front-utils';
+import {
+  AddressObject,
+  getPaywallErrorCode,
+  SendEmailRequest,
+  getTierNameFromSubscriptionPlan,
+  PermissionLevel
+} from 'skiff-graphql';
+import { getMaxUsersPerWorkspace, StorageTypes } from 'skiff-utils';
 import styled from 'styled-components';
 import { v4 } from 'uuid';
 
 import client from '../../apollo/client';
-import { useRequiredCurrentUserData } from '../../apollo/currentUser';
 import { MOBILE_MAIL_BODY_ID } from '../../constants/mailbox.constants';
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
-import { useCurrentUserEmailAliases } from '../../hooks/useCurrentUserEmailAliases';
-import { useDefaultEmailAlias } from '../../hooks/useDefaultEmailAlias';
+import { useCurrentLabel } from '../../hooks/useCurrentLabel';
 import { MailDraftAttributes, useDrafts } from '../../hooks/useDrafts';
-import useLocalSetting from '../../hooks/useLocalSetting';
 import { usePaywall } from '../../hooks/usePaywall';
+import { usePlanDelinquency } from '../../hooks/usePlanDelinquency';
 import { useThreadActions } from '../../hooks/useThreadActions';
 import { useUserSignature } from '../../hooks/useUserSignature';
 import { MailboxEmailInfo } from '../../models/email';
 import { skemailDraftsReducer } from '../../redux/reducers/draftsReducer';
 import { skemailMobileDrawerReducer } from '../../redux/reducers/mobileDrawerReducer';
-import { skemailModalReducer } from '../../redux/reducers/modalReducer';
+import { ComposeExpandTypes, skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { ModalType } from '../../redux/reducers/modalTypes';
 import { AppDispatch, RootState } from '../../redux/store/reduxStore';
 import { getMailFooter } from '../../utils/composeUtils';
 import { getThreadSenders } from '../../utils/mailboxUtils';
-import { getUserProfileFromID } from '../../utils/userUtils';
+import { getUserProfileFromID, resolveAndSetENSDisplayName } from '../../utils/userUtils';
 import {
   Attachments,
   AttachmentStates,
   createAttachmentHeaders,
-  isAllHasContent,
+  allAttachmentsHaveContent,
   prepareInlineAttachments,
   uploadFilesAsInlineAttachments,
   useAttachments,
@@ -57,30 +88,25 @@ import { MailEditor } from '../MailEditor';
 import { EditorExtensionsOptions } from '../MailEditor/Extensions';
 import { Image } from '../MailEditor/Image';
 import { createImagesFromFiles } from '../MailEditor/Image/utils';
-import {
-  convertHtmlToTextContent,
-  fromEditorToHtml,
-  isLinkEnabled,
-  setEditor,
-  toggleLink
-} from '../MailEditor/mailEditorUtils';
+import { convertHtmlToTextContent, fromEditorToHtml, setEditor, toggleLink } from '../MailEditor/mailEditorUtils';
 import { Placeholder } from '../MailEditor/Placeholder';
 import { MESSAGE_MAX_SIZE_IN_BYTES } from '../MailEditor/Plugins/MessageSizePlugin';
 
-import AddressField from './AddressAndSubjectFields/AddressField';
 import FromAddressField from './AddressAndSubjectFields/FromAddressField';
 import RecipientField from './AddressAndSubjectFields/RecipientField';
+import SubjectField from './AddressAndSubjectFields/SubjectField';
 import { EmailFieldTypes } from './Compose.constants';
 import ComposeHeader from './ComposeHeader';
-import ComposeHotKeys from './ComposeHotKeys';
+import ComposeHotKeys from './HotKeys/ComposeHotKeys';
 import MobileAttachments from './MobileAttachments';
 import MobileButtonBar from './MobileButtonBar';
 import useComposeActions from './useComposeActions';
-const ComposeContainer = styled.div<{ isMobile: boolean }>`
-  display: ${(props) => (props.isMobile ? 'grid' : 'flex')};
+
+const ComposeContainer = styled.div`
+  display: flex;
   flex-direction: column;
+  height: ${isMobile ? '100%' : 'calc(100% - 50px)'};
   color: var(--text-primary);
-  ${(props) => (props.isMobile ? '' : 'min-height:  430px;')};
 `;
 
 const BottomBar = styled.div`
@@ -88,8 +114,7 @@ const BottomBar = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  border-top: 1px solid var(--border-secondary);
-  padding: 12px 0px 0px 0px;
+  border-top: 1px solid var(--border-tertiary);
   box-sizing: border-box;
   grid-row: 1;
 `;
@@ -101,11 +126,8 @@ const MobileComposeContentContainer = styled(
     return <div className={className}>{children}</div>;
   }
 )`
-  height: calc(85vh - ${isAndroid ? window.statusBarHeight : 0}px);
-  overflow: auto;
-  width: 100vw;
-  margin-left: -12px;
-  padding: 0px 12px;
+  height: calc(85vh - ${isMobileApp() && isAndroid ? window.statusBarHeight ?? 0 : 0}px);
+  width: 100%;
   box-sizing: border-box;
 `;
 
@@ -113,18 +135,22 @@ const ButtonContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  height: 36px;
-  gap: 12px;
-  justify-content: flex-start;
-  padding-bottom: 24px;
-  padding-top: 12px;
+  box-sizing: border-box;
+  padding: 16px;
+  gap: 8px;
 `;
 
 const FieldButton = styled.div`
+  flex-shrink: 0;
   &:hover * {
     color: var(--text-primary) !important;
   }
+`;
+
+const ComposeAttachmentContainer = styled.div`
+  height: 100%;
 `;
 
 export const ComposeDataTest = {
@@ -132,23 +158,42 @@ export const ComposeDataTest = {
   ccField: 'cc-field',
   bccField: 'bcc-field',
   subjectField: 'subject-field',
+  recipientField: 'recipient-field',
   showCcButton: 'show-cc-button',
   showBccButton: 'show-bcc-button',
-  closeCcButton: 'close-cc-button',
-  closeBccButton: 'close-bcc-button',
   attachmentsInput: 'attachments-input',
   insertImage: 'insert-image',
   sendButton: 'send-button'
 };
 
 const Compose: React.FC = () => {
+  const user = useRequiredCurrentUserData();
   const emailAliases = useCurrentUserEmailAliases();
+
+  const { hcaptchaElement, requestHcaptchaToken } = useAsyncHcaptcha(true);
+  const {
+    loading: activeSubscriptionLoading,
+    data: { activeSubscription }
+  } = useSubscriptionPlan();
+  const { data: activeOrg } = useGetOrganizationQuery({
+    variables: { id: user.rootOrgID }
+  });
+  const [hcaptchaToken, setHcaptchaToken] = useState<string>('');
+
+  const isCurrentUserOrgAdmin =
+    activeOrg?.organization.everyoneTeam.rootDocument?.currentUserPermissionLevel === PermissionLevel.Admin;
 
   const contentRef = useRef<HTMLDivElement>(null);
   if (contentRef.current) contentRef.current.focus();
 
-  const [defaultEmailAlias, setDefaultUserEmail] = useDefaultEmailAlias();
+  const [defaultEmailAlias] = useDefaultEmailAlias(user.userID, (newValue: string) => {
+    void resolveAndSetENSDisplayName(newValue, user);
+  });
+  const { activeAliasInbox } = useCurrentLabel();
+
   const { composeNewDraft, saveCurrentDraft, flushSaveCurrentDraft } = useDrafts();
+
+  const { isUserPaidUp, downgradeProgress, openPlanDelinquencyModal } = usePlanDelinquency();
 
   const mailFormDirty = useRef<boolean>(false);
   const currentDraftID = useAppSelector((state) => state.draft.currentDraftID);
@@ -162,12 +207,9 @@ const Compose: React.FC = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const subjectFieldRef = useRef<HTMLInputElement>(null);
-  const subjectInputRef = useRef<HTMLInputElement>(null);
   const mailEditorRef = useRef<Editor>(null);
   const editor: Editor | null = mailEditorRef.current;
 
-  const user = useRequiredCurrentUserData();
   const userSignature = useUserSignature();
   const dispatch = useDispatch<AppDispatch>();
   const mailDraftDataRef = useRef<MailDraftAttributes | null>(null);
@@ -177,10 +219,25 @@ const Compose: React.FC = () => {
     dispatch(skemailMobileDrawerReducer.actions.setShowComposeMoreOptionsDrawer(showMoreOptions));
   };
 
+  useEffect(() => {
+    // get a token to send later
+    const getHcaptchaToken = async () => {
+      try {
+        const token = await requestHcaptchaToken();
+        setHcaptchaToken(token);
+      } catch (error) {
+        console.error('Failed to get hcaptcha token', error);
+      }
+    };
+    if (!hcaptchaToken) {
+      void getHcaptchaToken();
+    }
+  }, [hcaptchaToken, requestHcaptchaToken]);
+
   // redux selectors
   const {
     composeOpen: isOpen,
-    isComposeCollapsed: isCollapsed,
+    composeCollapseState,
     populateComposeContent
   } = useSelector((state: RootState) => state.modal);
 
@@ -196,28 +253,23 @@ const Compose: React.FC = () => {
     replyThread
   } = populateComposeContent;
 
-  const [fromEmail, setFromEmail] = useState(populatedFromAddress || defaultEmailAlias);
+  const [fromEmail, setFromEmail] = useState(populatedFromAddress || activeAliasInbox || defaultEmailAlias);
   const [customDomainAlias, setCustomDomainAlias] = useState('');
 
   // update the from email to be the default email alias
-  // if there is not already a preset populated from address
+  // if there is not already a preset populated `from` address
+  // or if the current `from` address is no longer valid
   useEffect(() => {
-    if (!fromEmail) setFromEmail(customDomainAlias || defaultEmailAlias);
-  }, [customDomainAlias, defaultEmailAlias]);
+    if (!fromEmail || emailAliases?.indexOf(fromEmail) === -1) {
+      setFromEmail(activeAliasInbox || customDomainAlias || defaultEmailAlias);
+    }
+  }, [customDomainAlias, emailAliases, fromEmail, activeAliasInbox, defaultEmailAlias]);
 
-  // Get contact list
-  const { data } = useGetUserContactListQuery({
-    variables: {
-      request: {
-        userID: user.userID
-      }
-    },
-    fetchPolicy: 'cache-and-network'
-  });
+  const { contactsWithOrgMembers, refetch: refetchContacts } = useGetAllContactsWithOrgMembers();
 
-  const contactList = data?.user?.contactList ?? [];
+  const contactList = contactsWithOrgMembers.map(contactToAddressObject) ?? [];
 
-  const [securedBySkiffSigDisabled] = useLocalSetting('securedBySkiffSigDisabled');
+  const [securedBySkiffSigDisabled] = useUserPreference(StorageTypes.SECURED_BY_SKIFF_SIG_DISABLED);
   const initialHtmlContent = useMemo(
     () => populatedMessage || getMailFooter(userSignature, !!securedBySkiffSigDisabled),
     [populatedMessage, userSignature, securedBySkiffSigDisabled]
@@ -267,10 +319,11 @@ const Compose: React.FC = () => {
   const [focusedField, setFocusedField] = useState<EmailFieldTypes | null>(initialFocus);
 
   const [isEditorDirty, setIsEditorDirty] = useState<boolean>(false);
+  const [isEditorReady, setIsEditorReady] = useState(false);
 
   useEffect(() => {
-    // Becouse we always render compose and just show it base on isOpen
-    // Everytime we reopen compose we want to reset compoes dirty to false
+    // Because we always render compose and just show it base on isOpen
+    // Every time we reopen compose we want to reset compose dirty to false
     setIsEditorDirty(false);
     mailFormDirty.current = false;
   }, [isOpen]);
@@ -309,15 +362,17 @@ const Compose: React.FC = () => {
 
   // When the initial content change, set editor - helps when there is a minimize mail while clicking reply on any thread mail
   useEffect(() => {
-    if (mailEditorRef.current) {
-      setEditor(mailEditorRef.current, initialHtmlContent, true);
+    if (mailEditorRef.current && isEditorReady) {
+      // On expand or open compose, load the current draft, or the initial html content as a fallback.
+      const editorContent = mailDraftDataRef.current?.text ?? initialHtmlContent;
+      setEditor(mailEditorRef.current, editorContent, true);
     }
-  }, [initialHtmlContent]);
+  }, [initialHtmlContent, isEditorReady]);
 
   // Using memo for readability - create on mount once
   const mailEditorExtensionsOptions: EditorExtensionsOptions = useMemo(
     () => ({
-      disableBlockquoteToggle: true,
+      disableBlockquoteToggle: false,
       isMobileApp: isMobile,
       threadSenders: replyThread ? getThreadSenders(replyThread) : [],
       theme,
@@ -395,7 +450,7 @@ const Compose: React.FC = () => {
   const closeComposeWithDraftSnack = () => {
     closeCompose();
     if (composeIsDirty) {
-      enqueueToast({ body: 'Draft saved', icon: Icon.Check });
+      enqueueToast({ title: 'Draft saved', body: 'Message moved to drafts.' });
     }
   };
 
@@ -447,20 +502,32 @@ const Compose: React.FC = () => {
   };
 
   const send = async (scheduleSendAt?: Date) => {
+    // block sending if user is using a paid-tier specific address (e.g. custom domain or short alias)
+    // for which they are no longer paying, or if they are a non-admin member of a workspace with too many members
+    const isFromAddressPaidTierExclusive =
+      !activeSubscriptionLoading && isPaidTierExclusiveEmailAddress(fromEmail, emailAliases, activeSubscription);
+    const isNonAdminExcessUser =
+      !isCurrentUserOrgAdmin &&
+      downgradeProgress?.workspaceUsers &&
+      downgradeProgress.workspaceUsers > getMaxUsersPerWorkspace(getTierNameFromSubscriptionPlan(activeSubscription));
+    const shouldBlockSend = !isUserPaidUp && (isFromAddressPaidTierExclusive || isNonAdminExcessUser);
+    if (shouldBlockSend) {
+      return openPlanDelinquencyModal(isFromAddressPaidTierExclusive ? fromEmail : undefined);
+    }
+
     if (!editor) {
       console.error('No editor instance');
       enqueueToast({
-        body: 'Failed to send message: Editor instance missing',
-        icon: Icon.Close,
-        actions: [{ label: 'Dismiss', onClick: (key) => closeToast(key) }]
+        title: 'Failed to send message',
+        body: 'The editor instance is missing.'
       });
       return;
     }
 
     if (toAddresses.length === 0 && ccAddresses.length === 0 && bccAddresses.length === 0) {
       enqueueToast({
-        body: 'Failed to send message: Missing recipient address',
-        icon: Icon.At
+        title: 'Failed to send message',
+        body: 'Missing recipient address.'
       });
       return;
     }
@@ -468,15 +535,13 @@ const Compose: React.FC = () => {
     if (!decryptionServicePublicKey.data?.decryptionServicePublicKey) {
       console.error('Could not get external service public key.');
       enqueueToast({
-        body: 'Failed to send message: External service public key error',
-        icon: Icon.Close,
-        actions: [{ label: 'Dismiss', onClick: (key) => closeToast(key) }]
+        title: 'Failed to send message',
+        body: 'External service public key error.'
       });
       return;
     }
 
     const { inlineAttachments, messageWithInlineAttachments } = await prepareInlineAttachments(editor);
-
     const allAttachments = [...inlineAttachments, ...attachments.filter((attach) => !attach.inline)];
 
     /**
@@ -490,10 +555,10 @@ const Compose: React.FC = () => {
       closeCompose();
     }
 
-    if (!isAllHasContent(allAttachments)) {
+    if (!allAttachmentsHaveContent(allAttachments)) {
       enqueueToast({
-        body: 'Some of the attached files are not uploaded',
-        icon: Icon.Warning
+        title: 'Attached files not uploaded',
+        body: 'Some of the attached files were not sucessfully uploaded.'
       });
       return;
     }
@@ -503,7 +568,8 @@ const Compose: React.FC = () => {
         const { contentDisposition, checksum, contentID } = await createAttachmentHeaders({
           fileName: name,
           content,
-          attachmentType: inline ? 'inline' : 'attachment'
+          attachmentType: inline ? 'inline' : 'attachment',
+          contentID: id ? `<${id}@skiff.town>` : undefined
         });
 
         return {
@@ -520,11 +586,6 @@ const Compose: React.FC = () => {
       })
     );
 
-    // Update the default email alias to the latest from email used
-    if (fromEmail) {
-      await setDefaultUserEmail(fromEmail);
-    }
-
     // get user profile data, force network
     // if user is disabled, this will fail
     let profileResponse: ApolloQueryResult<GetUserProfileDataQuery> | undefined;
@@ -536,21 +597,22 @@ const Compose: React.FC = () => {
     } catch (error) {
       console.warn('Could not fetch profile data');
       enqueueToast({
-        body: 'Failed to send message: Could not fetch profile data',
-        icon: Icon.Close,
-        actions: [{ label: 'Dismiss', onClick: (key) => closeToast(key) }]
+        title: 'Failed to send message',
+        body: 'Could not fetch profile data.'
       });
       void discardDraft(true);
       return;
     }
 
     const fromEmailWithCustomDomain = fromEmail;
+    const captchaToken = hcaptchaToken;
 
     const {
       encryptedSubject,
       encryptedText,
       encryptedHtml,
       encryptedTextAsHtml,
+      encryptedTextSnippet,
       encryptedAttachments,
       toAddressesWithEncryptedKeys,
       ccAddressesWithEncryptedKeys,
@@ -588,14 +650,16 @@ const Compose: React.FC = () => {
       encryptedHtml,
       encryptedTextAsHtml,
       externalEncryptedSessionKey,
+      encryptedTextSnippet,
       rawSubject: subject,
-      scheduleSendAt
+      scheduleSendAt,
+      captchaToken
     };
 
     let messageAndThreadID: { messageID: string; threadID: string } | undefined | null;
 
     try {
-      // TODO: Add spinner to toast once we have it in skiff-ui]
+      // TODO: Add spinner to toast once we have it in nightwatch-ui]
       if (replyEmailID) {
         const { data } = await sendReply({
           variables: {
@@ -626,8 +690,10 @@ const Compose: React.FC = () => {
       }
 
       enqueueToast({
-        body: scheduleSendAt ? `Scheduled for ${dayjs(scheduleSendAt).format('ddd MMM D [at] h:mma')}` : 'Message Sent',
-        icon: Icon.Check,
+        title: scheduleSendAt
+          ? `Scheduled for ${dayjs(scheduleSendAt).format('ddd MMM D [at] h:mma')}`
+          : 'Message sent',
+        body: 'Your email is being sent.',
         duration: 5000,
         actions: [
           {
@@ -645,7 +711,7 @@ const Compose: React.FC = () => {
                 });
 
                 // read the result of the mutation from the cache, so that it will go though the typePolicy and decrypt the values
-                const emailFromCache = await client.cache.readFragment<EmailFragment>({
+                const emailFromCache = client.cache.readFragment<EmailFragment>({
                   id: client.cache.identify({
                     __typename: 'Email',
                     id: emailData?.data?.unsendMessage?.id
@@ -668,6 +734,9 @@ const Compose: React.FC = () => {
 
       removeAllAttachments();
       void discardDraft(true);
+
+      // Refetch contacts
+      void refetchContacts();
     } catch (err: any) {
       const paywallErrorCode = getPaywallErrorCode((err as ApolloError).graphQLErrors);
       if (paywallErrorCode) {
@@ -675,9 +744,8 @@ const Compose: React.FC = () => {
       } else {
         console.error(err);
         enqueueToast({
-          body: (err as Error).message || 'Failed to send message',
-          icon: Icon.Close,
-          actions: [{ label: 'Dismiss', onClick: (key) => closeToast(key) }]
+          title: 'Failed to send message',
+          body: (err as Error).message
         });
       }
     }
@@ -699,9 +767,9 @@ const Compose: React.FC = () => {
     },
     insertImage,
     discardDraft,
-    isLinkEnabled: () => editor && isLinkEnabled(editor),
     messageSizeExceeded,
-    openAttachmentSelect
+    openAttachmentSelect,
+    editor
   });
 
   /**
@@ -716,6 +784,12 @@ const Compose: React.FC = () => {
     }
   }, [editor, isEditorDirty]);
 
+  useEffect(() => {
+    if ([ComposeExpandTypes.FullExpanded, ComposeExpandTypes.Expanded].includes(composeCollapseState)) {
+      setFocusedField(EmailFieldTypes.TO);
+    }
+  }, [composeCollapseState]);
+
   const ccAndBccButtons = useMemo(
     () => (
       <>
@@ -724,12 +798,10 @@ const Compose: React.FC = () => {
             <Typography
               color='secondary'
               dataTest={ComposeDataTest.showCcButton}
-              level={3}
               onClick={() => {
-                setShowCc(true);
                 setFocusedField(EmailFieldTypes.CC);
+                setShowCc(true);
               }}
-              style={{ flexShrink: 0 }}
             >
               CC
             </Typography>
@@ -740,12 +812,10 @@ const Compose: React.FC = () => {
             <Typography
               color='secondary'
               dataTest={ComposeDataTest.showBccButton}
-              level={3}
               onClick={() => {
-                setShowBcc(true);
                 setFocusedField(EmailFieldTypes.BCC);
+                setShowBcc(true);
               }}
-              style={{ flexShrink: 0 }}
             >
               BCC
             </Typography>
@@ -756,9 +826,9 @@ const Compose: React.FC = () => {
     [showBcc, showCc]
   );
 
-  const onFiledBlur = useCallback(() => setFocusedField(null), []);
+  const onFieldBlur = useCallback(() => setFocusedField(null), []);
 
-  const onFiledFocus = useCallback((field: EmailFieldTypes) => setFocusedField(field), []);
+  const onFieldFocus = useCallback((field: EmailFieldTypes) => setFocusedField(field), []);
 
   const recipientFieldSetAddresses = isComposeDirtyCheck(setToAddresses);
 
@@ -782,90 +852,6 @@ const Compose: React.FC = () => {
   const renderAddressAndSubjectFields = () => {
     return (
       <>
-        <RecipientField
-          additionalButtons={ccAndBccButtons}
-          addresses={toAddresses}
-          contactList={contactList}
-          dataTest={ComposeDataTest.toField}
-          field={EmailFieldTypes.TO}
-          focusedField={focusedField}
-          onBlur={onFiledBlur}
-          onDrop={moveAddressChip}
-          onFocus={onFiledFocus}
-          setAddresses={recipientFieldSetAddresses}
-        />
-        {showCc && (
-          <RecipientField
-            additionalButtons={
-              <IconButton
-                color='secondary'
-                dataTest={ComposeDataTest.closeCcButton}
-                icon={Icon.Close}
-                onClick={() => {
-                  setShowCc(false);
-                  isComposeDirtyCheck(setCcAddresses)([]);
-                }}
-                size='small'
-              />
-            }
-            addresses={ccAddresses}
-            contactList={contactList}
-            dataTest={ComposeDataTest.ccField}
-            field={EmailFieldTypes.CC}
-            focusedField={focusedField}
-            onBlur={onFiledBlur}
-            onDrop={moveAddressChip}
-            onFocus={onFiledFocus}
-            setAddresses={isComposeDirtyCheck(setCcAddresses)}
-          />
-        )}
-        {showBcc && (
-          <RecipientField
-            additionalButtons={
-              <IconButton
-                color='secondary'
-                dataTest={ComposeDataTest.closeBccButton}
-                icon={Icon.Close}
-                onClick={() => {
-                  setShowBcc(false);
-                  isComposeDirtyCheck(setBccAddresses)([]);
-                }}
-                size='small'
-              />
-            }
-            addresses={bccAddresses}
-            contactList={contactList}
-            dataTest={ComposeDataTest.bccField}
-            field={EmailFieldTypes.BCC}
-            focusedField={focusedField}
-            onBlur={onFiledBlur}
-            onDrop={moveAddressChip}
-            onFocus={onFiledFocus}
-            setAddresses={isComposeDirtyCheck(setBccAddresses)}
-          />
-        )}
-        <AddressField
-          dataTest={ComposeDataTest.subjectField}
-          field={EmailFieldTypes.SUBJECT}
-          focusedField={focusedField}
-        >
-          <InputField
-            autoFocus={focusedField === EmailFieldTypes.SUBJECT}
-            innerRef={subjectFieldRef}
-            onBlur={onFiledBlur}
-            onChange={(e) => isComposeDirtyCheck(setSubject)(e.target.value)}
-            onFocus={() => setFocusedField(EmailFieldTypes.SUBJECT)}
-            onKeyDown={(e: React.KeyboardEvent) => {
-              // Remove focus from field when Escape is pressed
-              if (e.key === 'Escape') subjectInputRef.current?.blur();
-            }}
-            placeholder='Add a subject'
-            size='medium'
-            style={{ padding: '8px 0px' }}
-            type='unfilled'
-            value={subject}
-          />
-        </AddressField>
         {!!emailAliases.length && (
           <FromAddressField
             emailAliases={emailAliases}
@@ -876,23 +862,82 @@ const Compose: React.FC = () => {
             userEmail={fromEmail ?? ''}
           />
         )}
+        <RecipientField
+          additionalButtons={(!showCc || !showBcc) && ccAndBccButtons}
+          addresses={toAddresses}
+          contactList={contactList}
+          dataTest={ComposeDataTest.toField}
+          field={EmailFieldTypes.TO}
+          focusedField={focusedField}
+          onDrop={moveAddressChip}
+          onFocus={onFieldFocus}
+          setAddresses={recipientFieldSetAddresses}
+        />
+        {showCc && (
+          <RecipientField
+            addresses={ccAddresses}
+            contactList={contactList}
+            dataTest={ComposeDataTest.ccField}
+            field={EmailFieldTypes.CC}
+            focusedField={focusedField}
+            onBlur={() => {
+              if (ccAddresses.length === 0) {
+                setShowCc(false);
+                onFieldBlur();
+              }
+            }}
+            onDrop={moveAddressChip}
+            onFocus={onFieldFocus}
+            setAddresses={isComposeDirtyCheck(setCcAddresses)}
+          />
+        )}
+        {showBcc && (
+          <RecipientField
+            addresses={bccAddresses}
+            contactList={contactList}
+            dataTest={ComposeDataTest.bccField}
+            field={EmailFieldTypes.BCC}
+            focusedField={focusedField}
+            onBlur={() => {
+              if (bccAddresses.length === 0) {
+                setShowBcc(false);
+                onFieldBlur();
+              }
+            }}
+            onDrop={moveAddressChip}
+            onFocus={onFieldFocus}
+            setAddresses={isComposeDirtyCheck(setBccAddresses)}
+          />
+        )}
+        <SubjectField
+          dataTest={ComposeDataTest.subjectField}
+          focusedField={focusedField}
+          onBlur={onFieldBlur}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            const newSubject = e.target.value;
+            isComposeDirtyCheck(setSubject)(newSubject);
+          }}
+          setFocusedField={setFocusedField}
+          subject={subject}
+        />
       </>
     );
   };
 
   const content = (
-    <div ref={contentRef}>
+    <ComposeAttachmentContainer ref={contentRef}>
       {!isSending && (
-        <ComposeContainer isMobile={isMobile}>
+        <ComposeContainer>
           {renderAddressAndSubjectFields()}
           {
             <MailEditor
               editorRef={mailEditorRef}
               extensionsOptions={mailEditorExtensionsOptions}
+              focusedField={focusedField}
               hasAttachments={attachments.length > 0}
               initialHtmlContent={mailDraftDataRef.current?.text ?? initialHtmlContent}
               mobileToolbarButtons={mobileActionBarButtons}
-              onBlur={onFiledBlur}
+              onBlur={onFieldBlur}
               onChange={onMailEditorChange}
               onCreate={mailEditorOnCreate}
               onDrop={(event) => {
@@ -900,8 +945,9 @@ const Compose: React.FC = () => {
                 uploadFilesAsInlineAttachments(event.dataTransfer.files, editor.view, uploadAttachments);
                 event.preventDefault();
               }}
-              onFocus={() => onFiledFocus(EmailFieldTypes.BODY)}
+              onFocus={() => onFieldFocus(EmailFieldTypes.BODY)}
               setIsEditorDirty={setIsEditorDirty}
+              setIsEditorReady={setIsEditorReady}
             />
           }
           {!isMobile && (
@@ -909,7 +955,6 @@ const Compose: React.FC = () => {
               <Attachments
                 attachmentSizeExceeded={attachments.length ? attachmentsSize > MESSAGE_MAX_SIZE_IN_BYTES : false}
                 attachments={attachments}
-                attachmentsSize={attachmentsSize}
                 onDelete={(id) => {
                   removeAttachment(id);
                 }}
@@ -918,7 +963,9 @@ const Compose: React.FC = () => {
                   void uploadAttachments(filesArray);
                 }}
               />
-              <ButtonContainer>{desktopBottomBarButtons}</ButtonContainer>
+              <ButtonContainer>
+                <FloatingDelayGroup delay={{ open: 200, close: 200 }}>{desktopBottomBarButtons}</FloatingDelayGroup>
+              </ButtonContainer>
             </BottomBar>
           )}
         </ComposeContainer>
@@ -938,7 +985,7 @@ const Compose: React.FC = () => {
       <input
         accept={MIMETypes[FileTypes.Image].join(',')}
         multiple
-        onChange={async () => {
+        onChange={() => {
           if (!imageInputRef.current?.files || !editor?.view) return;
           const imagesFiles = convertFileListToArray(imageInputRef.current?.files);
           void createImagesFromFiles(imagesFiles, editor.view);
@@ -955,15 +1002,17 @@ const Compose: React.FC = () => {
           removeAttachment={removeAttachment}
         />
       )}
-    </div>
+    </ComposeAttachmentContainer>
   );
 
   // On mobile display content in drawer
   if (isMobile) {
     return (
       <>
+        {hcaptchaElement}
         <Drawer
           extraSpacer={false}
+          forceTheme={theme}
           hideDrawer={() => {
             dispatch(skemailModalReducer.actions.closeCompose());
           }}
@@ -985,10 +1034,15 @@ const Compose: React.FC = () => {
     );
   }
 
-  const composeHeader = <>{!isSending && <ComposeHeader onClose={closeComposeWithDraftSnack} text='New message' />}</>;
+  const composeHeader = (
+    <>
+      {hcaptchaElement}
+      {!isSending && <ComposeHeader onClose={closeComposeWithDraftSnack} text='New message' />}
+    </>
+  );
 
   // Render only header on collapsed
-  if (isCollapsed) {
+  if (composeCollapseState === ComposeExpandTypes.Collapsed) {
     return composeHeader;
   }
 
@@ -1005,7 +1059,6 @@ const Compose: React.FC = () => {
       setFocusedField={setFocusedField}
       setShowBcc={setShowBcc}
       setShowCc={setShowCc}
-      subjectFieldRef={subjectFieldRef}
     >
       {composeHeader}
       {content}

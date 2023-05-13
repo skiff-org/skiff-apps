@@ -3,12 +3,11 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
-import { getEnvironment, setDatadogUser, isDatadogRUMEnabled, getEditorBasePath } from 'skiff-front-utils';
-import { isMobileApp } from 'skiff-front-utils';
+import { useCurrentUserQuery } from 'skiff-front-graphql';
+import { getEnvironment, getEditorBasePath } from 'skiff-front-utils';
+import { isMobileApp, useCurrentUserData } from 'skiff-front-utils';
 import { SystemLabels } from 'skiff-graphql';
-import { useCurrentUserQuery } from 'skiff-mail-graphql';
 
-import { useCurrentUserData } from '../apollo/currentUser';
 import { ALLOWED_UNAUTHENTICATED_ROUTES } from '../constants/route.constants';
 import { skemailDraftsReducer } from '../redux/reducers/draftsReducer';
 import { getUserDrafts } from '../utils/draftUtils';
@@ -55,12 +54,6 @@ const useFetchCurrentUser = () => {
       }
       // Redirect to inbox if authenticated
     } else if (isLoggedIn && ALLOWED_UNAUTHENTICATED_ROUTES.has(router.pathname)) {
-      if (!(typeof window === 'undefined')) {
-        // Browser only
-        if (isDatadogRUMEnabled()) {
-          void setDatadogUser(user.userID);
-        }
-      }
       // after logging to google we redirected with code query param, in this case keep him so we can use it later
       if (router.query.code) {
         void navigateToSystemLabel(SystemLabels.Inbox, router.query);

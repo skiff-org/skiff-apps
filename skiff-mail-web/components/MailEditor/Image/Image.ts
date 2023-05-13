@@ -43,22 +43,50 @@ export default Image.extend({
   },
   addAttributes: () => ({
     src: { default: null },
+    dataRawSrc: { default: null },
     alt: { default: 'image' },
     title: { default: 'image' },
     contentType: { default: '' },
-    size: { default: 0 }
+    height: { default: 0 },
+    width: { default: 0 }
   }),
   parseHTML() {
     return [
       {
         tag: 'img',
-        priority: 100
+        priority: 100,
+        getAttrs(dom: Node | string) {
+          if (dom instanceof HTMLElement) {
+            return {
+              dataRawSrc: dom.getAttribute('data-raw-src')
+            };
+          }
+          return null;
+        }
       }
     ];
   },
   renderHTML({ node }) {
-    const { src, alt, title } = node.attrs;
-    return ['img', { alt, title, style: imgStyling, src }];
+    const { src, dataRawSrc, alt, title, width, height } = node.attrs as {
+      src: string | null | undefined;
+      dataRawSrc: string | null | undefined;
+      alt: string | null | undefined;
+      title: string | null | undefined;
+      width: number | string | undefined;
+      height: number | string | undefined;
+    };
+    return [
+      'img',
+      {
+        alt,
+        title,
+        style: imgStyling,
+        src: src,
+        'data-raw-src': dataRawSrc,
+        height: height ? height.toString() : undefined,
+        width: width ? width.toString() : undefined
+      }
+    ];
   },
   draggable: true,
   selectable: true,

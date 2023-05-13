@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
+import { isSwipeHorizontal } from 'skiff-front-utils';
 import styled from 'styled-components';
-
-import { isSwipeHorizontal } from '../../../utils/swipe';
 
 import { SWIPE_TRANSITION_DURATION } from './constants';
 import { waitFor } from './utils';
@@ -40,6 +39,8 @@ type Props = {
   onSwipePassThreshold?: (progress: number) => void; // CB when the user pass the completeThreshold
   onSwipeComplete: (progress: number) => void; // CB when the user pass the completeThreshold & thouch end, progress will be nagative when swipe to the right
   [x: string]: any; // Any other prop will be pass to the main container
+  leftSwipeIsArchiveOrTrash: boolean;
+  rightSwipeIsArchiveOrTrash: boolean;
 };
 
 export const Swipeable = ({
@@ -51,6 +52,8 @@ export const Swipeable = ({
   completeThreshold,
   onSwipePassThreshold,
   onSwipeComplete,
+  leftSwipeIsArchiveOrTrash,
+  rightSwipeIsArchiveOrTrash,
   ...rest
 }: Props) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -85,9 +88,14 @@ export const Swipeable = ({
   const handleTouchEnd = async () => {
     if (Math.abs(dis) > completeThreshold) {
       onSwipeComplete(dis);
-      if (dis < 0) {
+      if (dis < 0 && leftSwipeIsArchiveOrTrash) {
         // In case of swipe to the left (Archive) complete the swipe -66.66% and wait for the animation
         swipe('-66.66%', true);
+        await waitFor(SWIPE_TRANSITION_DURATION);
+        return;
+      } else if (dis > 0 && rightSwipeIsArchiveOrTrash) {
+        // In case of right to the left (Archive) complete the swipe 33.33% and wait for the animation
+        swipe('33.33%', true);
         await waitFor(SWIPE_TRANSITION_DURATION);
         return;
       }

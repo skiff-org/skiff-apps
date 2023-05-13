@@ -1,25 +1,28 @@
-import { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useGetCreditsQuery } from 'skiff-front-graphql';
 import {
   ANDROID_DOWNLOAD_BASE_CREDITS_PROMPT,
   ANDROID_MAIL_APP_URL,
   CreditManagement,
   CreditPromptProps,
-  getCreditCentsForInfoType,
+  DESKTOP_DOWNLOAD_BASE_CREDITS_PROMPT,
   GITHUB_APP_URL,
+  IMPORT_MAIL_BASE_CREDITS_PROMPT,
   INVITE_BASE_CREDITS_PROMPT,
   IOS_DOWNLOAD_BASE_CREDITS_PROMPT,
   IPHONE_MAIL_APP_URL,
-  MAC_DOWNLOAD_BASE_CREDITS_PROMPT
+  SettingValue,
+  TabPage,
+  getCreditCentsForInfoType,
+  isMobileApp,
+  useRequiredCurrentUserData
 } from 'skiff-front-utils';
 import { CreditInfo, EntityType } from 'skiff-graphql';
-import { useGetCreditsQuery } from 'skiff-mail-graphql';
-import { MAX_CREDIT_FOR_REFERRALS } from 'skiff-utils';
+import { MAX_CREDIT_FOR_REFERRALS, insertIf } from 'skiff-utils';
 
-import { useRequiredCurrentUserData } from '../../../apollo/currentUser';
 import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { ModalType } from '../../../redux/reducers/modalTypes';
-import SkemailApplyCreditsModal from '../../modals/SkemailApplyCreditsModal';
+import { useSettings } from '../useSettings';
 
 /**
  * This component is a wrapper around the CreditManagement component
@@ -27,14 +30,19 @@ import SkemailApplyCreditsModal from '../../modals/SkemailApplyCreditsModal';
  */
 const SkemailCreditManagement: React.FC = () => {
   const { userID } = useRequiredCurrentUserData();
-  const [applyModalOpen, setApplyModalOpen] = useState(false);
+  const { openSettings } = useSettings();
 
   // Redux
   const dispatch = useDispatch();
   const openReferUsersModal = () => dispatch(skemailModalReducer.actions.setOpenModal({ type: ModalType.InviteUsers }));
+  const openImportTab = () => openSettings({ tab: TabPage.Import, setting: SettingValue.ImportMail });
 
   // Fetch users credit info
-  const { data, loading } = useGetCreditsQuery({
+  const {
+    data,
+    loading,
+    refetch: refetchCredits
+  } = useGetCreditsQuery({
     variables: {
       request: {
         entityID: userID,
@@ -44,7 +52,9 @@ const SkemailCreditManagement: React.FC = () => {
           CreditInfo.CreditsFromReferrals,
           CreditInfo.CreditsFromIosApp,
           CreditInfo.CreditsFromAndroidApp,
-          CreditInfo.CreditsFromMacApp
+          CreditInfo.CreditsFromMacApp,
+          CreditInfo.CreditsFromGmailImport,
+          CreditInfo.CreditsFromOutlookImport
         ]
       }
     }
@@ -74,6 +84,17 @@ const SkemailCreditManagement: React.FC = () => {
   const centsEarnedFromMacApp = getCreditCentsForInfoType(creditInfo, CreditInfo.CreditsFromMacApp) ?? 0;
   const earnedMacCredit = centsEarnedFromMacApp > 0;
 
+  // Gmail import
+  const centsEarnedFromGmailImport = getCreditCentsForInfoType(creditInfo, CreditInfo.CreditsFromGmailImport) ?? 0;
+  const earnedGmailImportCredit = centsEarnedFromGmailImport > 0;
+
+  // Outlook import
+  const centsEarnedFromOutlookImport = getCreditCentsForInfoType(creditInfo, CreditInfo.CreditsFromOutlookImport) ?? 0;
+  const earnedOutlookImportCredit = centsEarnedFromOutlookImport > 0;
+
+  //General mail import
+  const earnedMailImportCredit = earnedGmailImportCredit || earnedOutlookImportCredit;
+
   const creditPrompts: CreditPromptProps[] = [
     // Invite friends
     {
@@ -82,24 +103,34 @@ const SkemailCreditManagement: React.FC = () => {
       onActionClick: openReferUsersModal
     },
     // Download iOS app
-    {
+    ...insertIf(!isMobileApp() || earnedIosCredit, {
       ...IOS_DOWNLOAD_BASE_CREDITS_PROMPT,
       complete: earnedIosCredit,
       onActionClick: () => window.open(IPHONE_MAIL_APP_URL, '_blank')
-    },
+    }),
     // Download Android app
-    {
+    ...insertIf(!isMobileApp() || earnedAndroidCredit, {
       ...ANDROID_DOWNLOAD_BASE_CREDITS_PROMPT,
       complete: earnedAndroidCredit,
       onActionClick: () => window.open(ANDROID_MAIL_APP_URL, '_blank')
-    },
-    // Download Mac app
-    {
-      ...MAC_DOWNLOAD_BASE_CREDITS_PROMPT,
+    }),
+    // Download Desktop app
+    ...insertIf(earnedMacCredit, {
+      ...DESKTOP_DOWNLOAD_BASE_CREDITS_PROMPT,
       complete: earnedMacCredit,
-      onActionClick: () => window.open(GITHUB_APP_URL, '_blank')
-    }
+      onActionClick: () => window.open(GITHUB_APP_URL(), '_blank')
+    }),
+    // Import mail (technically possible to be rewarded for both outlook and gmail, but we present as a single action encompassing both)
+    ...insertIf(!isMobileApp() || earnedMailImportCredit, {
+      ...IMPORT_MAIL_BASE_CREDITS_PROMPT,
+      complete: earnedMailImportCredit,
+      onActionClick: openImportTab
+    })
   ];
+
+  const openPlansTab = () => {
+    openSettings({ tab: TabPage.Plans });
+  };
 
   return (
     <>
@@ -107,10 +138,9 @@ const SkemailCreditManagement: React.FC = () => {
         creditPrompts={creditPrompts}
         currentCreditCents={currentCreditCents}
         loading={loading}
-        openApplyCreditsModal={() => setApplyModalOpen(true)}
+        openPlansTab={openPlansTab}
+        refetchCredits={refetchCredits}
       />
-      {/* Render this modal here and not in Layout so that it doesn't close the Settings modal when opened */}
-      <SkemailApplyCreditsModal closeModal={() => setApplyModalOpen(false)} open={applyModalOpen} />
     </>
   );
 };

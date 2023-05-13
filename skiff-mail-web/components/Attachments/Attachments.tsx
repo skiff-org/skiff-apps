@@ -1,37 +1,73 @@
-import { Icon, IconButton, Icons, Typography, CustomCircularProgress } from 'nightwatch-ui';
+import {
+  CustomCircularProgress,
+  Icon,
+  Icons,
+  IconText,
+  Size,
+  Typography,
+  TypographySize,
+  TypographyWeight
+} from 'nightwatch-ui';
 import { FC } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
-import { getIconFromMIMEType, readableFileSize } from 'skiff-front-utils';
+import { getIconFromMIMEType } from 'skiff-front-utils';
+import { bytesToHumanReadable } from 'skiff-utils';
 import styled, { css } from 'styled-components';
 
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { ModalType } from '../../redux/reducers/modalTypes';
-import { MESSAGE_MAX_SIZE_IN_MB } from '../MailEditor/Plugins/MessageSizePlugin';
 
 import { AttachmentStates, ClientAttachment } from './types';
 import { inProgress, isFailedAttachment } from './typeUtils';
 
-const AttachmentsContainer = styled.div`
+const AttachmentsContainer = styled.div<{ $fitHeight: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 8px;
 
-  max-height: 200px;
-  overflow-y: auto;
-  padding: 0px 50px 0px 0px;
+  // set max height of 200px if fitHeight is false
+  ${({ $fitHeight }) => !$fitHeight && 'max-height: 200px;'}
 
+  overflow-y: auto;
+  padding: 12px 16px;
   ${isMobile &&
   css`
     overflow: hidden;
-    padding: 0 0 env(safe-area-inset-bottom, 0px);
-  `}
+    padding: 0 16px env(safe-area-inset-bottom, 0px);
+  `};
 `;
 
-const TopBar = styled.div`
+const TopSection = styled.div<{ $showBorder: boolean }>`
   display: flex;
   align-items: center;
+  border-top: ${({ $showBorder }) => ($showBorder ? '1px solid var(--border-tertiary)' : 'none')};
+  padding-top: ${({ $showBorder }) => ($showBorder ? '12px' : '0px')};
   gap: 4px;
+`;
+
+const CombinedActionContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const EndActionSection = styled.div<{ $failed: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-direction: column;
+  background: ${({ $failed }) => `var(${$failed ? '--bg-overlay-destructive' : '--bg-overlay-tertiary'})`};
+  border: 1px solid ${({ $failed }) => `var(${$failed ? '--border-destructive' : '--border-tertiary'})`};
+  border-radius: 0px 8px 8px 0px;
+  width: 30px;
+  height: 30px;
+  border-left: 1px solid transparent;
+  box-sizing: border-box;
+`;
+
+const MarginLeft = styled.div`
+  margin-left: 4px;
 `;
 
 const AttachmentsList = styled.div`
@@ -47,6 +83,10 @@ const AttachmentsList = styled.div`
   `}
 `;
 
+const Dropshadow = styled.div`
+  filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.1)) drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.06));
+`;
+
 export const AttachmentsDataTest = {
   attachmentContainer: 'attachment-container'
 };
@@ -58,58 +98,42 @@ interface AttachmentContainerProps {
 
 const AttachmentContainer = styled.div`
   display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  box-sizing: border-box;
   gap: 8px;
-  display: flex;
-  align-items: flex-start;
-  padding: 4px;
+  user-select: none;
 
+  // set background to destructive if failed otherwise bg overlay tertiary
+  background: ${(props: AttachmentContainerProps) =>
+    `var(${props.failed ? '--bg-overlay-destructive' : '--bg-overlay-tertiary'})`};
   border: 1px solid
-    ${(props: AttachmentContainerProps) => `var(${props.failed ? '--border-destructive' : '--border-secondary'})`};
-  border-radius: 8px;
+    ${(props: AttachmentContainerProps) => `var(${props.failed ? '--border-destructive' : '--border-tertiary'})`};
+  border-radius: 8px 0px 0px 8px;
+
   width: fit-content;
   box-sizing: border-box;
 
   transition: background-color 150ms;
 
   cursor: pointer;
-  :hover {
-    background-color: var(--bg-cell-hover);
-  }
 
   ${isMobile &&
   css`
-    justify-content: space-between;
+    /* justify-content: space-between; */
     width: 100%;
   `}
 `;
 
-const IconTextContainer = styled.div`
-  display: flex;
-  gap: 16px;
-  align-items: center;
-`;
-
 const TextContainer = styled.div`
   display: flex;
-  max-width: ${isMobile ? '220px' : '100px'};
-  flex-direction: column;
-`;
-
-const IconContainer = styled.div`
-  background: red;
-  width: 46px;
-  height: 46px;
-  justify-content: center;
-  background: var(--bg-field-hover);
-  border-radius: 4px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  gap: 8px;
+  align-items: baseline;
+  max-width: ${isMobile ? '220px' : '100%'};
 `;
 
 interface AttachmentsProps {
   attachments: ClientAttachment[];
-  attachmentsSize?: number;
   attachmentSizeExceeded?: boolean;
   onDelete?: (id: string) => void;
   onDownload?: (id: string) => void;
@@ -120,7 +144,6 @@ interface AttachmentsProps {
 
 const Attachments: FC<AttachmentsProps> = ({
   attachments,
-  attachmentsSize,
   attachmentSizeExceeded,
   onDelete,
   onDownload,
@@ -128,7 +151,7 @@ const Attachments: FC<AttachmentsProps> = ({
   isDownloadingAttachments = false,
   onDrop
 }) => {
-  const filteredAttachments = attachments.filter((attachment) => !attachment.inline);
+  const filteredAttachments = attachments.filter((attachment) => !attachment.inline || !attachment.contentID);
 
   const dispatch = useDispatch();
 
@@ -149,102 +172,109 @@ const Attachments: FC<AttachmentsProps> = ({
     { success: 0, error: 0, uploading: 0 }
   );
 
+  const notInCompose = !!onDownload;
   return (
-    <AttachmentsContainer onDrop={onDrop}>
-      <TopBar>
-        {filteredAttachments.length > 0 && !attachmentSizeExceeded && (
-          <Typography color='secondary'>
-            {filteredAttachments.length === 1
-              ? '1 attachment'
-              : `${filteredAttachments.length} attachments ${
-                  attachmentsCount.error !== 0 || attachmentsCount.uploading !== 0
-                    ? `(${attachmentsCount.uploading} Uploading, ${attachmentsCount.error} Failed)`
-                    : ''
-                }`}
-          </Typography>
-        )}
-        {attachmentSizeExceeded && attachmentsSize && (
-          <Typography color='destructive'>Cannot upload files larger than {MESSAGE_MAX_SIZE_IN_MB}MB</Typography>
-        )}
-        {filteredAttachments.length > 0 && onDownloadAll && !isMobile && (
-          <IconButton
+    <AttachmentsContainer $fitHeight={notInCompose} onDrop={onDrop}>
+      <TopSection $showBorder={notInCompose && !isMobile}>
+        {filteredAttachments.length > 1 && !attachmentSizeExceeded && !isMobile && (
+          <IconText
             color='secondary'
             disabled={isDownloadingAttachments}
-            icon={Icon.Download}
-            onClick={onDownloadAll}
-            tooltip={isDownloadingAttachments ? 'Downloading...' : 'Download all'}
+            endIcon={onDownloadAll ? Icon.Download : undefined}
+            label={`${filteredAttachments.length} attachments ${
+              attachmentsCount.uploading > 0 ? `(${attachmentsCount.uploading} uploading)` : ''
+            } ${attachmentsCount.error > 0 && !attachmentsCount.uploading ? `(${attachmentsCount.error} failed)` : ''}`}
+            onClick={onDownloadAll ? onDownloadAll : undefined}
+            tooltip={onDownloadAll ? (isDownloadingAttachments ? 'Downloading...' : 'Download all') : undefined}
+            weight={TypographyWeight.REGULAR}
           />
         )}
-      </TopBar>
+      </TopSection>
       <AttachmentsList>
         {!attachmentSizeExceeded &&
           filteredAttachments.map((attachment, index) => {
             // if in progress show percent -> 10 MB / 15 MB
             const uploadSize = inProgress(attachment)
-              ? `${readableFileSize(attachment.size * (attachment.progress / 100))} / ${readableFileSize(
+              ? `${bytesToHumanReadable(attachment.size * (attachment.progress / 100))} / ${bytesToHumanReadable(
                   attachment.size
                 )}`
-              : readableFileSize(attachment.size);
+              : bytesToHumanReadable(attachment.size);
+            const attachmentFailed = isFailedAttachment(attachment);
+
+            // abbreviate attachmentname if it's too long to fit in the container.
+            // abbreviation is in the middle of the text.
+            const attachmentName =
+              attachment.name.length > 20
+                ? `${attachment.name.slice(0, 10)}...${attachment.name.slice(-10)}`
+                : attachment.name;
 
             return (
-              <AttachmentContainer
-                buttonsWidth={35 * numberOfPassedActions}
-                data-test={AttachmentsDataTest.attachmentContainer}
-                failed={isFailedAttachment(attachment)}
-                key={index}
-                onClick={() => {
-                  dispatch(
-                    skemailModalReducer.actions.setOpenModal({
-                      type: ModalType.AttachmentPreview,
-                      attachments,
-                      /**
-                       * The AttachmentsPreview contains also the inline attachments at the start,
-                       * The Attachment component only shows the non-inline attachment -> filteredAttachments
-                       * We nee to "pad" the index with the amount of inline attachments to open the preview in the correct one
-                       */
-                      initialAttachmentIndex: index + (attachments.length - filteredAttachments.length)
-                    })
-                  );
-                }}
-              >
-                <IconTextContainer>
-                  <IconContainer>
-                    <Icons icon={getIconFromMIMEType(attachment.contentType)} size='large' />
-                  </IconContainer>
+              <CombinedActionContainer key={attachment.id}>
+                <AttachmentContainer
+                  buttonsWidth={35 * numberOfPassedActions}
+                  data-test={AttachmentsDataTest.attachmentContainer}
+                  failed={isFailedAttachment(attachment)}
+                  key={index}
+                  onClick={() => {
+                    dispatch(
+                      skemailModalReducer.actions.setOpenModal({
+                        type: ModalType.AttachmentPreview,
+                        attachments,
+                        /**
+                         * The AttachmentsPreview contains also the inline attachments at the start,
+                         * The Attachment component only shows the non-inline attachment -> filteredAttachments
+                         * We nee to "pad" the index with the amount of inline attachments to open the preview in the correct one
+                         */
+                        initialAttachmentIndex: index + (attachments.length - filteredAttachments.length)
+                      })
+                    );
+                  }}
+                >
+                  <Dropshadow>
+                    <Icons
+                      color={attachmentFailed ? 'destructive' : 'link'}
+                      icon={attachmentFailed ? Icon.Warning : getIconFromMIMEType(attachment.contentType)}
+                      size={Size.MEDIUM}
+                    />
+                  </Dropshadow>
                   <TextContainer>
-                    <Typography>{attachment.name}</Typography>
-                    <Typography color='secondary'>
-                      {isFailedAttachment(attachment) ? attachment.error : `${uploadSize} ${attachment.contentType}`}
+                    <Typography
+                      color={attachmentFailed ? 'destructive' : 'secondary'}
+                      minWidth={isMobile ? '240px' : undefined}
+                    >
+                      {attachmentName}
+                    </Typography>
+                    <Typography color='disabled' minWidth='fit-content' mono size={TypographySize.SMALL} uppercase>
+                      {attachmentFailed ? attachment.error : `${uploadSize}`}
                     </Typography>
                   </TextContainer>
-                </IconTextContainer>
-                {attachment.state === AttachmentStates.LocalUploading ? (
-                  <CustomCircularProgress dataTest='attachment-upload-loader' progress={attachment.progress} />
-                ) : (
-                  <>
-                    {onDownload && !isMobile && (
-                      <IconButton
-                        icon={Icon.Download}
-                        onClick={(e) => {
-                          e.stopPropagation(); // Stop propagation to not open the attachment preview
-                          onDownload(attachment.id);
-                        }}
-                        tooltip='Download'
+                  {attachment.state === AttachmentStates.LocalUploading && (
+                    <MarginLeft>
+                      <CustomCircularProgress
+                        color='disabled'
+                        dataTest='attachment-upload-loader'
+                        progress={attachment.progress}
+                        size={Size.SMALL}
                       />
-                    )}
-                    {onDelete && (
-                      <IconButton
-                        icon={Icon.Trash}
-                        onClick={(e) => {
-                          e.stopPropagation(); // Stop propagation to not open the attachment preview
-                          onDelete(attachment.id);
-                        }}
-                        tooltip='Remove'
-                      />
-                    )}
-                  </>
+                    </MarginLeft>
+                  )}
+                </AttachmentContainer>
+                {attachment.state !== AttachmentStates.LocalUploading && (
+                  <EndActionSection
+                    $failed={isFailedAttachment(attachment)}
+                    onClick={() => {
+                      if (!!onDownload) {
+                        onDownload(attachment.id);
+                      } else if (!!onDelete) {
+                        onDelete(attachment.id);
+                      }
+                    }}
+                  >
+                    {onDownload && <Icons color='secondary' icon={Icon.Download} size={Size.SMALL} />}
+                    {onDelete && <Icons color='secondary' icon={Icon.Close} size={Size.SMALL} />}
+                  </EndActionSection>
                 )}
-              </AttachmentContainer>
+              </CombinedActionContainer>
             );
           })}
       </AttachmentsList>

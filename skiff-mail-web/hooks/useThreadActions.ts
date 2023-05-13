@@ -1,42 +1,54 @@
-import { isString, lowerCase, sortedUniqBy, uniq } from 'lodash';
-import { Icon } from 'nightwatch-ui';
+import { saveAs } from 'file-saver';
+import isString from 'lodash/isString';
+import lowerCase from 'lodash/lowerCase';
+import sortedUniqBy from 'lodash/sortedUniqBy';
+import uniq from 'lodash/uniq';
 import { useDispatch } from 'react-redux';
-import { useToast } from 'skiff-front-utils';
-import { SystemLabels } from 'skiff-graphql';
-import { UserLabel } from 'skiff-graphql';
 import {
   ApplyLabelsMutation,
   RemoveLabelsMutation,
   ThreadFragment,
-  ThreadFragmentDoc,
+  ThreadWithoutContentFragmentDoc,
   UnsendMessageDocument,
   UnsendMessageMutation,
   UnsendMessageMutationVariables,
   useApplyLabelsMutation,
   useDeleteThreadMutation,
-  useRemoveLabelsMutation
-} from 'skiff-mail-graphql';
+  useRemoveLabelsMutation,
+  useSubscriptionPlan
+} from 'skiff-front-graphql';
+import { useToast } from 'skiff-front-utils';
+import { getTierNameFromSubscriptionPlan, SystemLabels } from 'skiff-graphql';
+import { UserLabel } from 'skiff-graphql';
+import { filterExists, getMaxNumLabelsOrFolders } from 'skiff-utils';
 
 import client from '../apollo/client';
+import { ThreadNavigationIDs } from '../components/Thread/Thread.types';
+import { MailboxThreadInfo } from '../models/thread';
 import { skemailMailboxReducer } from '../redux/reducers/mailboxReducer';
 import {
   modifyLabelsOptimizedResponseHandler as modifyLabelsOptimizedResponseHandler,
   removeThreadsFromCache,
   updateThreadsWithModifiedLabels
 } from '../utils/cache/cache';
+import { getRawMime } from '../utils/eml';
 import {
   isFolder,
   ModifyLabelsActions,
   SystemLabel,
   UserLabelFolder,
   userLabelToGraphQL,
-  UserLabel as ReactUserLabel
+  UserLabelPlain as ReactUserLabel,
+  HiddenLabel,
+  LabelType,
+  ApplyLabelOrFolderResponse
 } from '../utils/label';
 import { getSearchParams, replaceURL, updateURL } from '../utils/locationUtils';
 
 import { useAppSelector } from './redux/useAppSelector';
 import { useCurrentLabel } from './useCurrentLabel';
 import { useDrafts } from './useDrafts';
+import { usePlanDelinquency } from './usePlanDelinquency';
 
 /**
  * Thread Actions
@@ -48,6 +60,14 @@ export function useThreadActions(ignoreActive?: boolean) {
   const [applyLabels, { error: applyLabelError }] = useApplyLabelsMutation();
   const [deleteThread] = useDeleteThreadMutation();
   const [removeLabels, { error: removeLabelError }] = useRemoveLabelsMutation();
+  const { isUserPaidUp, downgradeProgress, openPlanDelinquencyModal } = usePlanDelinquency();
+  const {
+    loading: activeSubscriptionLoading,
+    data: { activeSubscription }
+  } = useSubscriptionPlan();
+  const canEnforceDelinquency = !isUserPaidUp && !activeSubscriptionLoading;
+  const userTier = getTierNameFromSubscriptionPlan(activeSubscription);
+  const maxNumLabelsOrFolders = getMaxNumLabelsOrFolders(userTier);
   const { enqueueToast } = useToast();
   const dispatch = useDispatch();
   const unselectThreads = (threadIDs: string[]) =>
@@ -56,7 +76,8 @@ export function useThreadActions(ignoreActive?: boolean) {
   // While these are conditional hooks that technically could break
   // will never happen because ignoreActive will never change
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const currentLabel = ignoreActive ? undefined : useCurrentLabel();
+  const { label: storedLabel } = useCurrentLabel();
+  const currentLabel = ignoreActive ? undefined : storedLabel;
   const isUserLabel = !!currentLabel && !Object.values<string>(SystemLabels).includes(currentLabel);
   // no need to append hash to system label mailbox url's
   // hashes used for disambiguating between user label urls via e.g. /label#[userLabelHash]
@@ -66,7 +87,7 @@ export function useThreadActions(ignoreActive?: boolean) {
     : // eslint-disable-next-line react-hooks/rules-of-hooks
       useAppSelector((state) => state.mailbox.activeThread);
 
-  const setActiveThreadID = (thread?: { threadID: string; emailID?: string }) => {
+  const setActiveThreadID = (thread?: ThreadNavigationIDs) => {
     const threadID = isString(thread?.threadID) ? thread?.threadID : undefined;
     const emailID = isString(thread?.emailID) ? thread?.emailID : undefined;
     let query = getSearchParams();
@@ -94,13 +115,13 @@ export function useThreadActions(ignoreActive?: boolean) {
   ): ApplyLabelsMutation | RemoveLabelsMutation | undefined => {
     const cacheIDs = threadsIDs.map((threadID) => client.cache.identify({ threadID, __typename: 'UserThread' }));
     const cachedItems = cacheIDs.map((id) =>
-      client.cache.readFragment({ id, fragment: ThreadFragmentDoc, fragmentName: 'Thread' })
+      client.cache.readFragment({ id, fragment: ThreadWithoutContentFragmentDoc, fragmentName: 'ThreadWithoutContent' })
     );
 
     return handler(cachedItems as unknown as ThreadFragment[]);
   };
 
-  const deleteThreads = async (threadIDs: string[], hideToast = false) => {
+  const deleteThreads = async (threadIDs: string[], hideToast = false, clearActiveThreadID = true) => {
     try {
       await deleteThread({
         variables: {
@@ -124,26 +145,31 @@ export function useThreadActions(ignoreActive?: boolean) {
       // Unselect threads if selected
       dispatch(skemailMailboxReducer.actions.removeSelectedThreadID(threadIDs));
       // Clear active thread if it was  trashed
-      if (activeThreadID && threadIDs.includes(activeThreadID)) {
+      if (activeThreadID && threadIDs.includes(activeThreadID) && clearActiveThreadID) {
         setActiveThreadID(undefined);
       }
       if (!hideToast) {
         const notificationSubject = `${threadIDs.length > 1 ? `${threadIDs.length} threads` : 'Thread'}`;
         enqueueToast({
-          body: `${notificationSubject} permanently deleted`,
-          icon: Icon.Trash
+          title: `Permanently deleted`,
+          body: `${notificationSubject} removed from the trash forever.`
         });
       }
     } catch (e) {
       console.error(e);
       enqueueToast({
-        body: 'Failed to remove threads',
-        icon: Icon.Warning
+        title: 'Failed to remove thread',
+        body: 'Could delete thread from the inbox.'
       });
     }
   };
 
-  const trashThreads = async (threadIDs: string[], isDrafts: boolean, hideToast = false) => {
+  const trashThreads = async (
+    threadIDs: string[],
+    isDrafts: boolean,
+    hideToast = false,
+    clearActiveThreadID = true
+  ) => {
     if (isDrafts) {
       threadIDs.forEach((draftID) => {
         void deleteDraft(draftID);
@@ -168,7 +194,7 @@ export function useThreadActions(ignoreActive?: boolean) {
         },
         optimisticResponse: optimisticResponseWithCacheThreads(threadIDs, optimisticResponseHandler),
         update: (cache, response) =>
-          void updateThreadsWithModifiedLabels({
+          updateThreadsWithModifiedLabels({
             cache,
             updatedThreads: response.data?.applyLabels?.updatedThreads,
             errors: response.errors
@@ -176,15 +202,15 @@ export function useThreadActions(ignoreActive?: boolean) {
       }).catch((e) => {
         console.error(e);
         enqueueToast({
-          body: 'Failed to remove thread',
-          icon: Icon.Warning
+          title: 'Failed to remove thread',
+          body: 'Could delete thread from the inbox.'
         });
       });
     }
     // Unselect threads if selected
     unselectThreads(threadIDs);
     // Clear active thread if it was trashed
-    if (activeThreadID && threadIDs.includes(activeThreadID)) {
+    if (activeThreadID && threadIDs.includes(activeThreadID) && clearActiveThreadID) {
       setActiveThreadID(undefined);
     }
     // TODO: set `trashedAt` field when it's available so that we permanently delete after 30 days
@@ -196,13 +222,13 @@ export function useThreadActions(ignoreActive?: boolean) {
       }`;
       const notificationPredicate = `${isDrafts ? 'deleted' : 'moved to trash'}`;
       enqueueToast({
-        body: `${notificationSubject} ${notificationPredicate}`,
-        icon: Icon.Trash
+        title: `${notificationSubject} ${notificationPredicate}`,
+        body: `${notificationSubject} removed from inbox`
       });
     }
   };
 
-  const archiveThreads = async (threadIDs: string[], hideToast = false) => {
+  const archiveThreads = async (threadIDs: string[], hideToast = false, clearActiveThreadID = true) => {
     const onArchiveUserLabelMerger = (cachedLabels: UserLabel[]) => cachedLabels;
 
     const onArchiveSystemLabelMerger = (cachedLabels: SystemLabels[]) => cachedLabels.concat([SystemLabels.Archive]);
@@ -231,19 +257,19 @@ export function useThreadActions(ignoreActive?: boolean) {
     // Unselect threads if selected
     unselectThreads(threadIDs);
     // Clear active thread if it was trashed
-    if (activeThreadID && threadIDs.includes(activeThreadID)) {
+    if (activeThreadID && threadIDs.includes(activeThreadID) && clearActiveThreadID) {
       setActiveThreadID(undefined);
     }
     if (!hideToast) {
       const notificationSubject = `${threadIDs.length > 1 ? 'Threads' : 'Thread'}`;
       enqueueToast({
-        body: `${notificationSubject} archived`,
-        icon: Icon.Archive
+        title: `Archived`,
+        body: `${notificationSubject} removed from inbox.`
       });
     }
   };
 
-  const removeThreadFromFolder = async (threadIDs: string[]) => {
+  const removeThreadFromFolder = (threadIDs: string[]) => {
     // Unselect thread if selected
     unselectThreads(threadIDs);
     // Clear active thread if it was moved
@@ -275,7 +301,7 @@ export function useThreadActions(ignoreActive?: boolean) {
       },
       optimisticResponse: optimisticResponseWithCacheThreads(threadIDs, optimisticResponseHandler),
       update: (cache, response) => {
-        return void updateThreadsWithModifiedLabels({
+        updateThreadsWithModifiedLabels({
           cache,
           updatedThreads: response.data?.removeLabels?.updatedThreads,
           errors: response.errors
@@ -285,16 +311,28 @@ export function useThreadActions(ignoreActive?: boolean) {
 
     if (removeLabelError) {
       enqueueToast({
+        title: 'Failed to update labels',
         body:
           labelsToRemove.length >= 2
             ? 'Could not remove labels from thread'
-            : `Could not remove ${labelsToRemove[0].name} label from thread`,
-        icon: Icon.Warning
+            : `Could not remove ${labelsToRemove[0]?.name ?? ''} label from thread`
       });
     }
   };
 
-  const applyUserLabel = async (threadIDs: string[], labelsToAdd: ReactUserLabel[]) => {
+  const applyUserLabel = async (
+    threadIDs: string[],
+    labelsToAdd: ReactUserLabel[]
+  ): Promise<ApplyLabelOrFolderResponse> => {
+    // don't allow user to apply labels if they have more than their plan allows
+    if (
+      canEnforceDelinquency &&
+      downgradeProgress?.userLabels &&
+      downgradeProgress.userLabels > maxNumLabelsOrFolders
+    ) {
+      openPlanDelinquencyModal();
+      return { rejectedForDelinquency: true };
+    }
     // removing duplications of labels (rare edge case)
     const userLabelMerger = (cachedLabels: UserLabel[]) =>
       sortedUniqBy(
@@ -322,7 +360,7 @@ export function useThreadActions(ignoreActive?: boolean) {
       optimisticResponse: optimisticResponseWithCacheThreads(threadIDs, optimisticResponseHandler),
 
       update: (cache, response) =>
-        void updateThreadsWithModifiedLabels({
+        updateThreadsWithModifiedLabels({
           cache,
           updatedThreads: response.data?.applyLabels?.updatedThreads,
           errors: response.errors
@@ -331,28 +369,42 @@ export function useThreadActions(ignoreActive?: boolean) {
 
     if (applyLabelError) {
       enqueueToast({
+        title: 'Failed to update labels',
         body:
           labelsToAdd.length >= 2
             ? 'Could not apply labels to thread'
-            : `Could not apply ${labelsToAdd[0].name} label to thread`,
-        icon: Icon.Warning
+            : `Could not apply ${labelsToAdd[0]?.name ?? ''} label to thread`
       });
     }
+    return {};
   };
 
   const moveThreads = async (
     threadIDs: string[],
-    label: SystemLabel | UserLabelFolder,
-    currentSystemLabels: string[] // array of strings representing the current system labels
-  ) => {
+    label: SystemLabel | UserLabelFolder | HiddenLabel,
+    currentSystemLabels: string[], // array of strings representing the current system labels
+    clearActiveThreadID = true
+  ): Promise<ApplyLabelOrFolderResponse> => {
+    // don't allow user to move thread to a custom folder if they have more than their plan allows
+    const isUserFolder = label.type === LabelType.USER;
+    if (
+      isUserFolder &&
+      canEnforceDelinquency &&
+      downgradeProgress?.userFolders &&
+      downgradeProgress.userFolders > maxNumLabelsOrFolders
+    ) {
+      openPlanDelinquencyModal();
+      return { rejectedForDelinquency: true };
+    }
     const isDrafts = currentSystemLabels.includes(SystemLabels.Drafts);
-    await removeThreadFromFolder(threadIDs);
+    removeThreadFromFolder(threadIDs);
 
     if (label.value === SystemLabels.Trash) {
-      return trashThreads(threadIDs, isDrafts);
+      void trashThreads(threadIDs, isDrafts);
+      return {};
     }
     // Only allow dragging drafts to trash
-    if (isDrafts) return;
+    if (isDrafts) return {};
 
     const userLabelToAdd = isFolder(label) ? [label.value] : undefined;
     const userLabelToAddOptimistic = isFolder(label) ? [userLabelToGraphQL(label)] : [];
@@ -380,7 +432,7 @@ export function useThreadActions(ignoreActive?: boolean) {
       },
       optimisticResponse: optimisticResponseWithCacheThreads(threadIDs, optimisticResponseHandler),
       update: (cache, response) =>
-        void updateThreadsWithModifiedLabels({
+        updateThreadsWithModifiedLabels({
           cache,
           updatedThreads: response.data?.applyLabels?.updatedThreads,
           errors: response.errors
@@ -388,7 +440,7 @@ export function useThreadActions(ignoreActive?: boolean) {
     });
 
     // Clear active thread if it was moved
-    if (activeThreadID && threadIDs.includes(activeThreadID)) {
+    if (activeThreadID && threadIDs.includes(activeThreadID) && clearActiveThreadID) {
       setActiveThreadID(undefined);
     }
 
@@ -396,18 +448,19 @@ export function useThreadActions(ignoreActive?: boolean) {
 
     if (applyLabelError) {
       enqueueToast({
-        body: `Could not move ${lowerCase(notificationSubject)} to ${label.name}. Please try again`,
-        icon: Icon.Warning
+        title: 'Move failed',
+        body: `Could not move ${lowerCase(notificationSubject)} to ${label.name}. Please try again`
       });
     } else {
       // Unselect threads if selected
       unselectThreads(threadIDs);
       const body = `${notificationSubject} moved to ${label.name}`;
       enqueueToast({
-        body,
-        icon: isFolder(label) ? Icon.Folder : label.icon
+        title: 'Email moved',
+        body
       });
     }
+    return {};
   };
 
   const unscheduleSend = async (threadID: string, scheduleMessageID: string, hideToast = false) => {
@@ -434,10 +487,36 @@ export function useThreadActions(ignoreActive?: boolean) {
     }
     if (!hideToast) {
       enqueueToast({
-        body: `Email unscheduled and returned to drafts.`,
-        icon: Icon.FileEmpty
+        title: 'Email unscheduled',
+        body: `Message returned to drafts.`
       });
     }
+  };
+
+  const downloadThreads = async (selectedThreadIDs: string[], allThreads: MailboxThreadInfo[]) => {
+    const threads = allThreads.filter((thread) => selectedThreadIDs.includes(thread.threadID));
+    const allEmailsFlatMap = threads.flatMap((thread) => thread.emails);
+    const allThreadURLs = allEmailsFlatMap
+      .map((email) => {
+        const { encryptedRawMimeUrl: url, decryptedSessionKey } = email;
+        if (!url || !decryptedSessionKey) {
+          return undefined;
+        }
+        return { date: email.createdAt, url, decryptedSessionKey };
+      })
+      .filter(filterExists);
+    // create zip and download all URLs
+    const { default: JSZIP } = await import('jszip');
+    const zip = new JSZIP();
+    const promises = allThreadURLs.map(async (urlData) => {
+      const { url, decryptedSessionKey, date } = urlData;
+      const rawMime = await getRawMime(url, decryptedSessionKey);
+      if (!rawMime) return;
+      zip.file(`${date.getTime()}.eml`, rawMime);
+    });
+    await Promise.all(promises);
+    const blob = await zip.generateAsync({ type: 'blob' });
+    saveAs(blob, 'Skiff Mail - export.zip');
   };
 
   return {
@@ -445,6 +524,7 @@ export function useThreadActions(ignoreActive?: boolean) {
     removeUserLabel,
     trashThreads,
     moveThreads,
+    downloadThreads,
     activeThreadID,
     activeEmailID,
     setActiveThreadID,

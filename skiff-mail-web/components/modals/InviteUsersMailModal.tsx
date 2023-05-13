@@ -1,25 +1,28 @@
-import { Icon } from 'nightwatch-ui';
 import { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { DEFAULT_WORKSPACE_EVENT_VERSION, InviteUsersModal, useToast } from 'skiff-front-utils';
-import { RequestStatus, WorkspaceEventType } from 'skiff-graphql';
 import {
   ReferUserDocument,
   ReferUserMutation,
   ReferUserMutationVariables,
-  useGetUserContactListQuery
-} from 'skiff-mail-graphql';
-import { POLL_INTERVAL_IN_MS } from 'skiff-utils';
-import { EmailType } from 'skiff-utils';
+  useGetAllCurrentUserContactsQuery
+} from 'skiff-front-graphql';
+import {
+  DEFAULT_WORKSPACE_EVENT_VERSION,
+  InviteUsersModal,
+  useToast,
+  useRequiredCurrentUserData,
+  contactToAddressObject
+} from 'skiff-front-utils';
+import { RequestStatus, WorkspaceEventType } from 'skiff-graphql';
+import { EmailType, isSkiffAddress } from 'skiff-utils';
 
 import client from '../../apollo/client';
-import { useRequiredCurrentUserData } from '../../apollo/currentUser';
 import { EditorAppRoutes, PROD_BASE_URL, QueryParam } from '../../constants/route.constants';
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
 import { useDisplayPictureDataFromAddress } from '../../hooks/useDisplayPictureDataFromAddress';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { ModalType } from '../../redux/reducers/modalTypes';
-import { isSkiffAddress, storeWorkspaceEvent } from '../../utils/userUtils';
+import { storeWorkspaceEvent } from '../../utils/userUtils';
 
 export const InviteUsersMailModal = () => {
   const { openModal } = useAppSelector((state) => state.modal);
@@ -31,22 +34,23 @@ export const InviteUsersMailModal = () => {
   };
   const isOpen = openModal?.type === ModalType.InviteUsers;
 
-  const { userID, username } = useRequiredCurrentUserData();
-  const { data } = useGetUserContactListQuery({
-    variables: {
-      request: {
-        userID
-      }
-    },
-    pollInterval: POLL_INTERVAL_IN_MS
+  const { username } = useRequiredCurrentUserData();
+
+  const { data: contactsData } = useGetAllCurrentUserContactsQuery({
+    onError: (error) => {
+      console.error(`Failed to retrieve User's contact list`, JSON.stringify(error, null, 2));
+    }
   });
 
+  const contactList = contactsData?.allContacts?.map(contactToAddressObject) ?? [];
+
   // contact list that does not include skiff users
-  const contactsList = useMemo(() => {
-    const allContacts = data?.user?.contactList || [];
-    const nonSkiffContacts = allContacts.filter(({ address }) => !isSkiffAddress(address, []));
+  const contactListWithoutSkiffUsers = useMemo(() => {
+    const nonSkiffContacts = contactList.filter(({ address }) => !isSkiffAddress(address, []));
     return nonSkiffContacts;
-  }, [data]);
+    // Use length rather than array to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contactList.length]);
 
   const referralLink = `${PROD_BASE_URL}${EditorAppRoutes.SIGNUP}?${QueryParam.MAIL}&${
     QueryParam.REFERRAL
@@ -68,20 +72,20 @@ export const InviteUsersMailModal = () => {
     if (status === RequestStatus.Success) {
       void storeWorkspaceEvent(WorkspaceEventType.DashboardInviteSent, '', DEFAULT_WORKSPACE_EVENT_VERSION);
       enqueueToast({
-        body: `Invite sent to ${email}`,
-        icon: Icon.Check
+        title: `Invite sent`,
+        body: `${email} invited to Skiff.`
       });
     } else {
       enqueueToast({
-        body: `Failed to send invite to ${email}, please try again later`,
-        icon: Icon.Warning
+        title: 'Failed to send invite',
+        body: `Invite not sent to ${email}, please try again later`
       });
     }
   };
 
   return (
     <InviteUsersModal
-      contactsList={contactsList}
+      contactsList={contactListWithoutSkiffUsers}
       isOpen={isOpen}
       onClose={onClose}
       referralLink={referralLink}
@@ -90,3 +94,5 @@ export const InviteUsersMailModal = () => {
     />
   );
 };
+
+export default InviteUsersMailModal;

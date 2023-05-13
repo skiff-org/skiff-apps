@@ -6,7 +6,7 @@ import { useRouterLabelContext } from '../../../context/RouterLabelContext';
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
 import { MailboxThreadInfo } from '../../../models/thread';
 import { DNDItemTypes } from '../../../utils/dragAndDrop';
-import { UserLabel } from '../../../utils/label';
+import { UserLabelPlain, UserLabelAlias } from '../../../utils/label';
 
 import { MessageCell } from './MessageCell';
 
@@ -16,7 +16,7 @@ interface ThreadMessageCellProps {
   displayNames: string[];
   facepileNames: string[];
   addresses: string[];
-  userLabels: Array<UserLabel> | null | undefined;
+  userLabels: Array<UserLabelPlain | UserLabelAlias> | null | undefined;
   subject: string | null | undefined;
   message: string | null | undefined;
   hasAttachment: boolean;

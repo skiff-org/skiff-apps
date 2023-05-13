@@ -27,8 +27,8 @@ export const ThreadToolbar = ({
   const isTrash = systemLabels.includes(SystemLabels.Trash);
   const isDraft = systemLabels.includes(SystemLabels.Drafts);
 
-  const showReplayDrawer = () => {
-    dispatch(skemailMobileDrawerReducer.actions.setShowReplayDrawer(true));
+  const showReplyDrawer = () => {
+    dispatch(skemailMobileDrawerReducer.actions.setShowReplyDrawer(true));
   };
   const onRestoreClick = useCallback(
     () => moveThreads([threadID], LABEL_TO_SYSTEM_LABEL[SystemLabels.Inbox], systemLabels),
@@ -46,7 +46,7 @@ export const ThreadToolbar = ({
       {isTrash && <ToolbarButton icon={Icon.Inbox} onClick={() => void onRestoreClick()} />}
       {!isTrash && <ToolbarButton icon={Icon.Trash} onClick={() => void onTrashClick()} />}
       <ToolbarButton icon={Icon.FolderArrow} onClick={showShowMoveThread} />
-      <ToolbarButton icon={Icon.Reply} onClick={showReplayDrawer} />
+      <ToolbarButton icon={Icon.Reply} onClick={showReplyDrawer} />
       <ToolbarButton icon={Icon.Compose} onClick={onComposeClick} />
     </>
   );

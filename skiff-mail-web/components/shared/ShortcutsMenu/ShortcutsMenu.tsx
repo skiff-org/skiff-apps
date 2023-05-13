@@ -1,4 +1,4 @@
-import { Dialog } from 'nightwatch-ui';
+import { Dialog, ThemeMode } from 'nightwatch-ui';
 import { DialogTypes } from 'nightwatch-ui';
 import React from 'react';
 import { useDispatch } from 'react-redux';
@@ -30,9 +30,9 @@ function ShortcutsMenu() {
     <Dialog
       classesToIgnore={['searchResultRow']}
       customContent
+      forceTheme={ThemeMode.DARK}
       onClose={onClose}
       open={isOpen}
-      themeMode='dark'
       title='Shortcuts'
       type={DialogTypes.Default}
     >

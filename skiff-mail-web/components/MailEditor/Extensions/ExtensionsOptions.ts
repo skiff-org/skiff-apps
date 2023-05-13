@@ -1,8 +1,12 @@
-import { ThemeName } from 'skiff-front-utils';
+import { ThemeMode } from 'nightwatch-ui';
 
 import { ClickOnHandler, PasteHandler } from '../Plugins/PastePlugin';
 
 export interface EditorExtensionsOptions {
+  /**
+   * If signature editor, exclude some marks/nodes (ex. image, bullets).
+   */
+  isMailSettingEditor?: boolean;
   /**
    * disables the Show / Hide bar on mail blockquote
    * if true they are always open
@@ -11,7 +15,7 @@ export interface EditorExtensionsOptions {
   /**
    * editor theme
    */
-  theme?: ThemeName;
+  theme?: ThemeMode;
   /**
    * An array of the thread senders
    */

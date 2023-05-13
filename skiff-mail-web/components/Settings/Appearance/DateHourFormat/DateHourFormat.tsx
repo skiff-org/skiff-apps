@@ -1,18 +1,18 @@
 import { Divider } from 'nightwatch-ui';
 import React from 'react';
-import { TitleActionSection, useTimedRerender } from 'skiff-front-utils';
-
-import useLocalSetting, { LocalSettings } from '../../../../hooks/useLocalSetting';
+import { TitleActionSection, useTimedRerender, useUserPreference } from 'skiff-front-utils';
+import { AllUserPreferences } from 'skiff-front-utils';
+import { StorageTypes } from 'skiff-utils';
 
 /**
  * Component to select date and hour format
  */
 function DateHourFormat() {
-  const [dateFormat, setDateFormat] = useLocalSetting('dateFormat');
-  const [hourFormat, setHourFormat] = useLocalSetting('hourFormat');
+  const [dateFormat, setDateFormat] = useUserPreference(StorageTypes.DATE_FORMAT);
+  const [hourFormat, setHourFormat] = useUserPreference(StorageTypes.HOUR_FORMAT);
   useTimedRerender(60 * 1000); // rerender every minute to keep date preview up-to-date
-  const updateHour = (value) => setHourFormat(value as LocalSettings['hourFormat']) as void;
-  const updateDate = (value) => setDateFormat(value as LocalSettings['dateFormat']) as void;
+  const updateHour = (value) => setHourFormat(value as AllUserPreferences['hourFormat']);
+  const updateDate = (value) => setDateFormat(value as AllUserPreferences['dateFormat']);
 
   return (
     <>
@@ -34,10 +34,10 @@ function DateHourFormat() {
             ]
           }
         ]}
-        subtitle='How to display time.'
+        subtitle='How to display time'
         title='Time format'
       />
-      <Divider />
+      <Divider color='tertiary' />
       <TitleActionSection
         actions={[
           {
@@ -60,7 +60,7 @@ function DateHourFormat() {
             ]
           }
         ]}
-        subtitle='How to display dates.'
+        subtitle='How to display dates'
         title='Date format'
       />
     </>

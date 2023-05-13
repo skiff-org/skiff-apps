@@ -1,10 +1,9 @@
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { first } from 'lodash';
+import first from 'lodash/first';
 import { MutableRefObject, RefObject, useCallback, useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import { VariableSizeList } from 'react-window';
-import { usePrevious } from 'skiff-front-utils';
+import { useMediaQuery, usePrevious } from 'skiff-front-utils';
 
 import { useRouterLabelContext } from '../context/RouterLabelContext';
 import { MailboxThreadInfo } from '../models/thread';

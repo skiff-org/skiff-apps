@@ -1,5 +1,6 @@
 import { isMobile } from 'react-device-detect';
-import { SendFeedbackDocument, SendFeedbackMutation, SendFeedbackMutationVariables } from 'skiff-mail-graphql';
+import { SendFeedbackDocument, SendFeedbackMutation, SendFeedbackMutationVariables } from 'skiff-front-graphql';
+import { getFeedbackTokens } from 'skiff-front-utils';
 
 import client from '../apollo/client';
 
@@ -13,25 +14,7 @@ import client from '../apollo/client';
 export const sendFeedback = async (feedbackText: string, supportingFiles?: File[]) => {
   const zendeskUploadTokens: string[] = [];
   if (supportingFiles?.length) {
-    const res = await Promise.allSettled(
-      supportingFiles?.map(async (file) => {
-        const resp = await (
-          await fetch(`https://skiff.zendesk.com/api/v2/uploads?filename=${file.name}`, {
-            method: 'POST',
-            body: file
-          })
-        ).json();
-        if (resp?.upload?.token) {
-          return resp.upload.token;
-        }
-        throw new Error('Failed to receive upload token from Zendesk');
-      })
-    );
-    res.forEach((r) => {
-      if (r.status === 'fulfilled') {
-        zendeskUploadTokens.push(r.value);
-      }
-    });
+    zendeskUploadTokens.push(...(await getFeedbackTokens(supportingFiles)));
   }
   if (feedbackText.length) {
     await client.mutate<SendFeedbackMutation, SendFeedbackMutationVariables>({
@@ -41,7 +24,8 @@ export const sendFeedback = async (feedbackText: string, supportingFiles?: File[
           feedback: feedbackText,
           zendeskUploadTokens,
           isMobile,
-          origin: 'Skemail'
+          origin: 'Skemail',
+          isNative: false
         }
       }
     });

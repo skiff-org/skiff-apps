@@ -1,19 +1,24 @@
 import axios from 'axios';
 import saveAs from 'file-saver';
-import JSZIP from 'jszip';
-import { Icon } from 'nightwatch-ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { decryptDatagram } from 'skiff-crypto-v2';
+import { AttachmentDatagram, EmailFragment, useGetAttachmentsQuery } from 'skiff-front-graphql';
 import { useToast } from 'skiff-front-utils';
 import { contentAsBase64, isDataUrl } from 'skiff-front-utils';
-import { isDesktopApp, isMobileApp, sendRNWebviewMsg } from 'skiff-front-utils';
-import { AttachmentDatagram, EmailFragment, useGetAttachmentsQuery } from 'skiff-mail-graphql';
+import {
+  isDesktopApp,
+  isMobileApp,
+  sendRNWebviewMsg,
+  BANNED_CONTENT_TYPES,
+  BANNED_FILE_EXTENSIONS
+} from 'skiff-front-utils';
 import { assertExists } from 'skiff-utils';
 import { v4 } from 'uuid';
 
 import { addClientFetchedAttachment, getClientFetchedAttachment } from '../../apollo/clientAttachments';
 import { MailboxEmailInfo } from '../../models/email';
 import { readFile } from '../../utils/readFile';
+import { MESSAGE_MAX_SIZE_IN_BYTES, MESSAGE_MAX_SIZE_IN_MB } from '../MailEditor/Plugins/MessageSizePlugin';
 
 import { AttachmentStates, ClientAttachment } from './types';
 import { canBeFetched, canBeFetchedWithFailed, isAttachment } from './typeUtils';
@@ -88,6 +93,11 @@ const useAttachments = (initialAttachments: InitialAttachmentsData, fetchAll = f
   const uploadAttachment = async (file: File, inline = false) => {
     const localID = v4();
     try {
+      // Don't add attachments that are too large
+      if (file.size > MESSAGE_MAX_SIZE_IN_BYTES) {
+        showAttachmentToast();
+        return;
+      }
       addAttachment({
         id: localID,
         state: AttachmentStates.LocalUploading,
@@ -98,6 +108,22 @@ const useAttachments = (initialAttachments: InitialAttachmentsData, fetchAll = f
         inline
       });
 
+      // Check if file MIME type is banned or if file type from name is banned. Empty/null MIME types are considered invalid
+      const fileExtensionIndex = file.name.lastIndexOf('.');
+      if (
+        BANNED_CONTENT_TYPES.has(file.type) ||
+        (fileExtensionIndex > 0 && BANNED_FILE_EXTENSIONS.has(file.name.substring(fileExtensionIndex)))
+      ) {
+        updateAttachment(localID, {
+          state: AttachmentStates.LocalError,
+          error: 'File type not supported',
+          id: localID,
+          contentType: file.type,
+          name: file.name,
+          size: file.size
+        });
+        return { attachmentID: localID, error: 'File type not supported' };
+      }
       const { content } = await readFile(file, (event) => {
         updateAttachment(localID, {
           state: AttachmentStates.LocalUploading,
@@ -154,7 +180,15 @@ const useAttachments = (initialAttachments: InitialAttachmentsData, fetchAll = f
     fetchPolicy: 'cache-and-network'
   });
   const { enqueueToast } = useToast();
+  const showAttachmentToast = () => {
+    enqueueToast({
+      title: 'Attachment too large',
+      body: `Cannot upload files larger than ${MESSAGE_MAX_SIZE_IN_MB}MB`
+    });
+  };
   const [isDownloadingAttachments, setIsDownloadingAttachments] = useState(false);
+
+  const enqueueDownloadErrorToast = (body: string) => enqueueToast({ title: 'Download failed', body });
 
   const getAttachmentsDownloadData: (ids: string[]) => Promise<{ [attachmentID: string]: AttachmentData }> =
     useCallback(
@@ -177,15 +211,18 @@ const useAttachments = (initialAttachments: InitialAttachmentsData, fetchAll = f
 
   const downloadAttachment = async (id: string, contentType: string, filename: string) => {
     const attachment = (await getAttachmentsDownloadData([id]))[id];
+
+    if (!attachment) {
+      enqueueDownloadErrorToast('Error downloading the attachment');
+      return;
+    }
+
     const decryptedAttachment = await fetchAndDecryptAttachment(attachment);
 
     if (!contentType) contentType = 'text';
 
     if (!decryptedAttachment) {
-      enqueueToast({
-        body: 'something went wrong with the decryption',
-        icon: Icon.Warning
-      });
+      enqueueDownloadErrorToast('Error with the decryption');
       return;
     }
 
@@ -209,16 +246,18 @@ const useAttachments = (initialAttachments: InitialAttachmentsData, fetchAll = f
 
     const attachmentsIds = decryptedAttachmentMetadata.map((attachment) => attachment.attachmentID);
 
+    const firstAttachmentID = attachmentsIds[0];
     // if only one attachment dont zip
-    if (attachmentsIds.length === 1)
+    if (attachmentsIds.length === 1 && !!firstAttachmentID)
       return downloadAttachment(
-        attachmentsIds[0],
-        decryptedAttachmentMetadata[0].decryptedMetadata?.contentType || 'text',
-        decryptedAttachmentMetadata[0].decryptedMetadata?.filename || 'untitled'
+        firstAttachmentID,
+        decryptedAttachmentMetadata[0]?.decryptedMetadata?.contentType || 'text',
+        decryptedAttachmentMetadata[0]?.decryptedMetadata?.filename || 'untitled'
       );
 
     setIsDownloadingAttachments(true);
 
+    const { default: JSZIP } = await import('jszip');
     const zip = new JSZIP();
 
     const attachmentsData = await getAttachmentsDownloadData(attachmentsIds);
@@ -226,14 +265,20 @@ const useAttachments = (initialAttachments: InitialAttachmentsData, fetchAll = f
     await Promise.all(
       decryptedAttachmentMetadata.map(async (attachment) => {
         const attachmentData = attachmentsData[attachment.attachmentID];
+
+        if (!attachmentData) {
+          enqueueDownloadErrorToast('Failed to download attachments data');
+          return;
+        }
+
         const decryptedAttachment = await fetchAndDecryptAttachment(attachmentData);
 
-        if (!decryptedAttachment) return;
+        if (!decryptedAttachment) {
+          enqueueDownloadErrorToast('Error with the decryption');
+          return;
+        }
 
-        await zip.file(
-          attachment.decryptedMetadata?.filename || 'untitled',
-          Buffer.from(decryptedAttachment, 'base64')
-        );
+        zip.file(attachment.decryptedMetadata?.filename || 'untitled', Buffer.from(decryptedAttachment, 'base64'));
       })
     );
 
@@ -341,7 +386,6 @@ const useAttachments = (initialAttachments: InitialAttachmentsData, fetchAll = f
         });
       } catch (error: any) {
         enqueueToast({
-          icon: Icon.Warning,
           body: error.message,
           title: 'Failed getting attachments download data'
         });
@@ -377,7 +421,11 @@ const useAttachments = (initialAttachments: InitialAttachmentsData, fetchAll = f
     initialAttachments.metadata?.forEach((attachment) => {
       if (!attachment.decryptedMetadata) return;
       const { contentType, filename, size, contentId, contentDisposition } = attachment.decryptedMetadata;
-
+      // Don't add attachments that are too large
+      if (size > MESSAGE_MAX_SIZE_IN_BYTES) {
+        showAttachmentToast();
+        return;
+      }
       // Don't display the ics attachment
       if (contentDisposition === 'calendar') return;
 

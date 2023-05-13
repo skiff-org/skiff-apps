@@ -1,5 +1,4 @@
-import { motion } from 'framer-motion';
-import { themeNames, Typography } from 'nightwatch-ui';
+import { themeNames, CorrectedColorSelect, ThemeMode } from 'nightwatch-ui';
 import { isMobile } from 'react-device-detect';
 import styled, { css } from 'styled-components';
 
@@ -34,8 +33,8 @@ export const AnimatedCheckbox = styled.div<{ show: boolean }>`
   position: absolute;
   ${isMobile
     ? `
-      margin-top: 27px;
       margin-left: 18px;
+      margin-top: 18px;
     `
     : ''}
   ${(props) => {
@@ -73,8 +72,8 @@ export const PaperClip = styled.div`
 `;
 
 export const StartBlock = styled.div`
-  width: 13vw;
-  min-width: 13vw;
+  width: 16vw;
+  min-width: 16vw;
   > * {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -138,7 +137,6 @@ export const MessageCellContainer = styled.div<{
 
   & ${ActionsContainer} {
     opacity: 0;
-    pointer-events: none;
   }
   & ${EmailInfo} {
     display: inherit;
@@ -166,11 +164,16 @@ export const MessageCellContainer = styled.div<{
     props.hover &&
     css`
       cursor: pointer;
-      border-bottom: 1px solid var(--border-primary);
       & ${ActionsContainer} {
         opacity: 1;
         pointer-events: default;
       }
+    `}
+  ${(props) =>
+    props.hover &&
+    !props.read &&
+    css`
+      border-bottom: 1px solid var(--border-primary);
     `}
 `;
 
@@ -211,23 +214,25 @@ export const UnreadMobileIndicatorWrapper = styled.div`
 `;
 
 export const AvatarContainer = styled.div<{ hide: boolean }>`
-  height: fit-content;
-  width: fit-content;
-  margin: 22px -4px 0px 4px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 42px;
   flex-shrink: 0;
+  cursor: pointer;
   visibility: ${(props) => (props.hide ? 'hidden' : 'visible')};
 `;
 
-export const UnreadIndicator = styled(motion.div)<{
+export const UnreadIndicator = styled.div<{
   $read: boolean;
   $cellTransition: boolean;
-  $themeMode?: 'light' | 'dark';
+  $forceTheme?: ThemeMode;
 }>`
   width: 8px;
   height: 8px;
   background: rgb(
     ${(props) =>
-      !!props.$themeMode && props.$themeMode === 'dark'
+      !!props.$forceTheme && props.$forceTheme === ThemeMode.DARK
         ? themeNames.dark['--orange-500']
         : themeNames.light['--orange-500']}
   );
@@ -246,12 +251,6 @@ export const EmailSender = styled.div<{ isCompact?: boolean }>`
     `
     : '  width: 100%'}
 `;
-
-export const EmailSubject = styled(Typography)`
-  flex-shrink: 0;
-`;
-
-export const EmailMessage = styled(Typography)``;
 
 export const MobileMessageCellContainer = styled.div<{ multiSelectOpen?: boolean; read: boolean; isDarkMode: boolean }>`
   display: flex;
@@ -300,22 +299,12 @@ export const MobileAvatarWrapper = styled.div`
   padding-top: 4px;
 `;
 
-export const Senders = styled(Typography)`
-  width: fit-content;
-  max-width: 300px;
-`;
-
 export const ContentPreview = styled.div`
   display: flex;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-`;
-
-export const NumEmailsInThread = styled(Typography)`
-  margin-left: 4px;
-  width: fit-content;
 `;
 
 export const EmailBlock = styled.div<{ isCompact?: boolean; transition: boolean }>`
@@ -339,7 +328,11 @@ export const EmailSubjectAndBody = styled.div<{ isMobile?: boolean }>`
   flex-direction: ${(props) => (props.isMobile ? 'column' : 'row')};
 `;
 
-export const MobileReadUnreadBox = styled.div`
+export interface SwipeBoxProps {
+  $forceColor: keyof typeof CorrectedColorSelect;
+}
+
+export const MobileLeftSwipeBox = styled.div<SwipeBoxProps>`
   display: flex;
   flex-direction: column;
   align-items: end;
@@ -347,7 +340,7 @@ export const MobileReadUnreadBox = styled.div`
   height: 100%;
   position: absolute;
   left: 0;
-  background: var(--accent-blue-primary);
+  background: ${(props) => props.$forceColor};
   flex: 0;
   z-index: -1;
   overflow: hidden;
@@ -356,11 +349,7 @@ export const MobileReadUnreadBox = styled.div`
   box-sizing: border-box;
 `;
 
-export interface TrashProps {
-  isUndoTrash: boolean;
-}
-
-export const MobileTrashBox = styled.div<TrashProps>`
+export const MobileRightSwipeBox = styled.div<SwipeBoxProps>`
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -370,7 +359,7 @@ export const MobileTrashBox = styled.div<TrashProps>`
   right: 0;
   position: absolute;
   flex: 0;
-  background: ${(props) => (props.isUndoTrash ? 'var(--accent-yellow-secondary)' : 'var(--accent-red-primary)')};
+  background: ${(props) => props.$forceColor};
   z-index: 1;
   overflow: hidden;
   padding-left: 30px;

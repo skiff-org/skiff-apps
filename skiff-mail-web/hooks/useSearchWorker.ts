@@ -1,15 +1,24 @@
 import { useEffect, useRef } from 'react';
 import { isIOS, isMobile } from 'react-device-detect';
 import { decryptDatagram, decryptSessionKey } from 'skiff-crypto-v2';
+import {
+  AttachmentMetadataDatagram,
+  EmailFragment,
+  MailboxWithContentDocument,
+  MailboxWithContentQuery,
+  MailboxWithContentQueryVariables,
+  ThreadFragment
+} from 'skiff-front-graphql';
+import { MailSubjectDatagram, MailTextDatagram } from 'skiff-front-graphql';
+import { models } from 'skiff-front-graphql';
 import { IndexedSkemail, createWorkerizedSkemailSearchIndex } from 'skiff-front-search';
+import { requireCurrentUserData, useCurrentUserData } from 'skiff-front-utils';
 import { AscDesc } from 'skiff-graphql';
-import { MailboxDocument, MailboxQuery, MailboxQueryVariables } from 'skiff-mail-graphql';
-import { MailSubjectDatagram, MailTextDatagram } from 'skiff-mail-graphql';
-import { models } from 'skiff-mail-graphql';
 import { sleep } from 'skiff-utils';
 
 import client from '../apollo/client';
-import { requireCurrentUserData, useCurrentUserData } from '../apollo/currentUser';
+import { ThreadViewEmailInfo } from '../models/email';
+import { ThreadDetailInfo } from '../models/thread';
 
 import { useDrafts } from './useDrafts';
 
@@ -28,33 +37,62 @@ const SEARCH_PAGINATION_LIMIT = isMobile && isIOS ? 10 : 50;
  *
  * @param {Array<MailboxThreadInfo>} threads threads to add to the search index
  */
-async function addThreadsToSearchIndex(threads: Array<any>) {
+
+function decryptEmailContent(email: EmailFragment) {
+  const currentUser = requireCurrentUserData();
+  const { privateKey } = currentUser.privateUserData;
+
+  const encryptedSessionKey = email.encryptedSessionKey;
+  const sessionKey = decryptSessionKey(
+    encryptedSessionKey?.encryptedSessionKey,
+    privateKey,
+    encryptedSessionKey?.encryptedBy
+  );
+  const text = decryptDatagram(MailTextDatagram, sessionKey, email.encryptedText.encryptedData).body.text || '';
+  const subject =
+    decryptDatagram(MailSubjectDatagram, sessionKey, email.encryptedSubject.encryptedData).body.subject || '';
+  const attachments = email.attachmentMetadata.map((attachment) => {
+    return {
+      attachmentID: attachment.attachmentID,
+      ...decryptDatagram(AttachmentMetadataDatagram, sessionKey, attachment.encryptedData.encryptedData).body
+    };
+  });
+
+  return { text, subject, attachments };
+}
+function getDraftContent(draft: ThreadViewEmailInfo) {
+  return {
+    text: draft.decryptedText,
+    subject: draft.decryptedSubject,
+    attachments:
+      draft.decryptedAttachmentMetadata?.map((a) => {
+        return {
+          ...a.decryptedMetadata,
+          __typename: undefined,
+          attachmentID: a.attachmentID
+        };
+      }) || []
+  };
+}
+
+async function addThreadsToSearchIndex(threads: Array<ThreadFragment | ThreadDetailInfo>) {
   for (const thread of threads) {
     const { emails, attributes, threadID } = thread;
     for (const email of emails) {
-      const { id, createdAt, to, cc, bcc, from, encryptedSessionKey } = email;
-      const currentUser = requireCurrentUserData();
-
+      // Draft emails will already have decrypted data, but emails downloaded
+      // will only have encrypted data (because no-cache is set and type policies are not run).
+      const decryptedContent = 'encryptedText' in email ? decryptEmailContent(email) : getDraftContent(email);
       // Search on parent threads system/user labels since messages don't have their own labels
       const { systemLabels, userLabels } = attributes;
-      const { privateKey } = currentUser.privateUserData;
-      const sessionKey = decryptSessionKey(
-        encryptedSessionKey?.encryptedSessionKey,
-        privateKey,
-        encryptedSessionKey?.encryptedBy
-      );
-
+      const { to, cc, bcc, from, createdAt, id } = email;
       const searchMail: IndexedSkemail = {
         id,
         threadID,
-        content: isIOS
-          ? ''
-          : // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-            decryptDatagram(MailTextDatagram, sessionKey, email.encryptedText.encryptedData).body.text || '',
-        createdAt,
-        updatedAt: createdAt,
-        subject:
-          decryptDatagram(MailSubjectDatagram, sessionKey, email.encryptedSubject.encryptedData).body.subject || '',
+        content: isMobile ? '' : decryptedContent.text || '',
+        // Draft emails will already have a date object, but emails downloaded will have a number (because no-cache is set).
+        createdAt: new Date(createdAt).getTime(),
+        updatedAt: new Date(createdAt).getTime(),
+        subject: decryptedContent.subject || '',
         to,
         toAddresses: to.map((toAddress) => toAddress.address),
         cc,
@@ -66,7 +104,7 @@ async function addThreadsToSearchIndex(threads: Array<any>) {
         systemLabels,
         userLabels: userLabels.map((label) => label.labelName),
         read: attributes.read,
-        attachments: email.decryptedAttachmentMetadata
+        attachments: decryptedContent.attachments
       };
       if (!worker) {
         return;
@@ -95,14 +133,12 @@ const indexSkemails = async (userData: models.User) => {
         direction === 'desc' ? 'oldestThreadUpdatedAt' : 'newestThreadUpdatedAt'
       ];
 
-      const res = await client.query<MailboxQuery, MailboxQueryVariables>({
-        query: MailboxDocument,
+      const res = await client.query<MailboxWithContentQuery, MailboxWithContentQueryVariables>({
+        query: MailboxWithContentDocument,
         variables: {
           request: {
             limit: SEARCH_PAGINATION_LIMIT,
-            [direction === 'desc' ? 'emailsUpdatedBeforeDate' : 'emailsUpdatedAfterDate']: threadUpdatedAtCutoff
-              ? new Date(threadUpdatedAtCutoff)
-              : undefined,
+            lastUpdatedDate: threadUpdatedAtCutoff ? new Date(threadUpdatedAtCutoff) : undefined,
             updatedAtOrderDirection: direction === 'desc' ? AscDesc.Desc : AscDesc.Asc,
             noExcludedLabel: true
           }
@@ -117,12 +153,16 @@ const indexSkemails = async (userData: models.User) => {
 
       const metadata = await worker?.searchIndex?.metadata;
       await worker?.searchIndex.setMetadata({
-        newestThreadUpdatedAt: Math.max(metadata?.newestThreadUpdatedAt || 0, ...threads.map((t) => t.emailsUpdatedAt)),
+        newestThreadUpdatedAt: Math.max(
+          metadata?.newestThreadUpdatedAt || 0,
+          ...threads.map((t) => (t.emailsUpdatedAt instanceof Date ? t.emailsUpdatedAt.getTime() : t.emailsUpdatedAt))
+        ),
         oldestThreadUpdatedAt: Math.min(
           metadata?.oldestThreadUpdatedAt || Infinity,
-          ...threads.map((t) => t.emailsUpdatedAt)
+          ...threads.map((t) => (t.emailsUpdatedAt instanceof Date ? t.emailsUpdatedAt.getTime() : t.emailsUpdatedAt))
         )
       });
+      await worker?.searchIndex.save();
 
       if (!pageInfo.hasNextPage) {
         break;
@@ -161,9 +201,10 @@ export function useInitializeSearchWorker() {
         worker = null;
       }
       while (!stopped) {
-        if (draftThreads) {
-          await addThreadsToSearchIndex(draftThreads);
-        }
+        // temporarily disable indexing of drafts
+        // if (draftThreads) {
+        //   await addThreadsToSearchIndex(draftThreads);
+        // }
         await indexSkemails(userData);
         await sleep(SEARCH_INDEX_SKEMAILS_INTERVAL_MS);
       }

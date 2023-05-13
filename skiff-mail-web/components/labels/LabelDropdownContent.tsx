@@ -1,28 +1,90 @@
-import { DropdownItem, Icon, InputField } from 'nightwatch-ui';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { DISPLAY_SCROLLBAR_CSS, DropdownItem, Icon, Icons, InputField, ThemeMode } from 'nightwatch-ui';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { UserLabelVariant } from 'skiff-graphql';
+import { SystemLabels, UserLabelVariant } from 'skiff-graphql';
 import { trimAndLowercase } from 'skiff-utils';
+import styled from 'styled-components';
 
-import { useAppSelector } from '../../hooks/redux/useAppSelector';
 import { useAvailableUserLabels } from '../../hooks/useAvailableLabels';
-import { useThreadActions } from '../../hooks/useThreadActions';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { ModalType } from '../../redux/reducers/modalTypes';
-import { useGetCachedThreads } from '../../utils/cache/cache';
-import { isFolder, isLabelActive, isUserLabel, UserLabel, UserLabelFolder } from '../../utils/label';
+import {
+  Label,
+  NONE_LABEL,
+  RESTRICTED_DRAG_AND_DROP_LABELS,
+  SYSTEM_LABELS,
+  SystemLabel,
+  UserLabelFolder,
+  UserLabelPlain,
+  isFolder,
+  isNoneLabel,
+  isPlainLabel,
+  isSystemLabel
+} from '../../utils/label';
 
-import { FolderLabelDropdownItem, PlainLabelDropdownItem } from './LabelDropdownItem';
+import { FolderLabelDropdownItem, PlainLabelDropdownItem, SystemLabelDropdownItem } from './LabelDropdownItem';
+
+export const LABEL_DROPDOWN_CONTAINER_WIDTH = 280;
+
+const Container = styled.div`
+  width: ${LABEL_DROPDOWN_CONTAINER_WIDTH}px;
+  padding: 4px;
+  box-sizing: border-box;
+`;
+
+const InputFieldContainer = styled.div`
+  width: 100%;
+  margin-bottom: 2px;
+`;
+
+const ScrollContainer = styled.div<{ $themeMode: ThemeMode }>`
+  max-height: 200px;
+  overflow-y: auto;
+  ${DISPLAY_SCROLLBAR_CSS}
+`;
 
 interface LabelDropdownContentProps {
-  // If threadID is not passed in, it will apply labels to all selected threads
-  threadID?: string;
   variant: UserLabelVariant;
-  currentSystemLabels: string[];
-  isSubMenu?: boolean;
+  isLabelActive: (label: Label) => boolean;
+  setShowDropdown: (open: boolean) => void;
+  // Add the selected labels to threads if applicable
+  addLabelOrFolder?: (label: UserLabelPlain | UserLabelFolder) => Promise<void>;
+  highlightedIdx?: number;
+  includeSystemLabels?: boolean;
+  threadIDs?: string[];
+  // Additional actions to perform after closing the create label modal
+  onCloseCreateLabelOrFolderModal?: (userLabel?: UserLabelPlain | UserLabelFolder) => void;
+  onDeleteLabel?: (label: UserLabelPlain | UserLabelFolder) => void;
+  onSelectFolder?: (folder: UserLabelFolder) => void;
+  onSelectLabel?: (label: UserLabelPlain) => Promise<void> | UserLabelPlain[];
+  onSelectNone?: () => void;
+  onSelectSystemLabel?: (systemLabel: SystemLabel) => void;
+  setHighlightedIdx?: (idx?: number) => void;
+  // Sets the total number of scrollable items - necessary for keyboard navigation
+  setNumItems?: (length: number) => void;
 }
 
-const LabelDropdownContent: FC<LabelDropdownContentProps> = ({ threadID, variant, currentSystemLabels, isSubMenu }) => {
+const LabelDropdownContent: FC<LabelDropdownContentProps> = ({
+  variant,
+  isLabelActive,
+  setShowDropdown,
+  addLabelOrFolder,
+  highlightedIdx,
+  includeSystemLabels = false,
+  threadIDs,
+  onCloseCreateLabelOrFolderModal,
+  onDeleteLabel,
+  onSelectFolder,
+  onSelectLabel,
+  onSelectNone,
+  onSelectSystemLabel,
+  setHighlightedIdx,
+  setNumItems
+}) => {
+  const theme = ThemeMode.DARK;
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [search, setSearch] = useState('');
+
   const dispatch = useDispatch();
   const openEditFolderModal = () =>
     dispatch(
@@ -30,78 +92,92 @@ const LabelDropdownContent: FC<LabelDropdownContentProps> = ({ threadID, variant
         type: ModalType.CreateOrEditLabelOrFolder,
         threadIDs,
         folder: variant === UserLabelVariant.Folder,
-        initialName: search
+        initialName: search,
+        addLabelOrFolder,
+        onClose: onCloseCreateLabelOrFolderModal
       })
     );
 
-  const selectedThreadIDs = useAppSelector((state) => state.mailbox.selectedThreadIDs);
-  const threadIDs = threadID ? [threadID] : selectedThreadIDs;
-  const [hoveredIndex, setHoveredIndex] = useState(0);
-  const threadFragments = useGetCachedThreads(threadIDs);
-  const { applyUserLabel, removeUserLabel, moveThreads } = useThreadActions();
+  const [isOptionsSubMenuOpen, setIsOptionsSubMenuOpen] = useState(false);
 
-  const { existingLabels, availableLabels } = useAvailableUserLabels(
-    variant === UserLabelVariant.Plain ? isUserLabel : isFolder
+  const { existingLabels: existingUserLabels, availableLabels: availableUserLabels } = useAvailableUserLabels(
+    variant === UserLabelVariant.Plain ? isPlainLabel : isFolder
   );
-  const allUserLabels = [...existingLabels, ...availableLabels];
+  const allUserLabels = [...existingUserLabels, ...availableUserLabels];
+  // Filter out all Systems labels you cannot drag threads to + Inbox, which is
+  // redundant since for the most part all emails start out in Inbox
+  const allAvailableSystemLabels = includeSystemLabels
+    ? SYSTEM_LABELS.filter(
+        (label) =>
+          !RESTRICTED_DRAG_AND_DROP_LABELS.has(label.value as SystemLabels) && label.value !== SystemLabels.Inbox
+      )
+    : [];
 
-  const [search, setSearch] = useState('');
-
-  const getFilteredLabels = () => {
+  const getFilteredAndSortedLabels = () => {
+    const sortByName = (l1: Label, l2: Label) => l1.name.localeCompare(l2.name);
+    // Sort labels by name
+    let systemLabels = allAvailableSystemLabels.sort(sortByName);
+    let userLabels = allUserLabels.sort(sortByName);
+    let noneLabel = onSelectNone ? [NONE_LABEL] : [];
     if (search) {
-      return allUserLabels.filter((item) => item.name.toLowerCase().includes(trimAndLowercase(search)));
-    } else {
-      return allUserLabels;
+      // Filter labels by the search term
+      const filterNameMatch = (item: Label) => item.name.toLowerCase().includes(trimAndLowercase(search));
+      systemLabels = systemLabels.filter(filterNameMatch);
+      userLabels = userLabels.filter(filterNameMatch);
+      noneLabel = noneLabel.filter(filterNameMatch);
     }
+    // Order system labels in front of user labels
+    const allLabels = [...noneLabel, ...systemLabels, ...userLabels];
+    return allLabels;
   };
 
-  const filteredLabels = getFilteredLabels().sort((l1, l2) => l1.name.localeCompare(l2.name));
+  const filteredLabels = getFilteredAndSortedLabels();
 
-  const handleArrowUp = useCallback(() => {
-    setHoveredIndex((oldIndex) => (oldIndex === 0 ? filteredLabels.length - 1 : Math.max(0, oldIndex - 1)));
-  }, [filteredLabels]);
-
-  const handleArrowDown = useCallback(() => {
-    setHoveredIndex((oldIndex) =>
-      oldIndex === filteredLabels.length - 1 ? 0 : Math.min(filteredLabels.length - 1, oldIndex + 1)
-    );
-  }, [filteredLabels]);
+  useEffect(() => {
+    if (!!setNumItems) setNumItems(filteredLabels.length);
+  }, [filteredLabels.length, setNumItems]);
 
   const handleEnter = useCallback(async () => {
-    const label: UserLabel | UserLabelFolder = filteredLabels[hoveredIndex];
+    if (isOptionsSubMenuOpen || highlightedIdx === undefined) return;
+    const label = filteredLabels[highlightedIdx];
     if (!label) return;
 
-    const isActive = isLabelActive(label, threadFragments);
+    if (isNoneLabel(label)) {
+      if (onSelectNone) onSelectNone();
+      return;
+    }
+
+    if (isSystemLabel(label)) {
+      if (onSelectSystemLabel) onSelectSystemLabel(label);
+      return;
+    }
+
+    const isActive = isLabelActive(label);
     switch (label.variant) {
       case UserLabelVariant.Folder:
         if (isActive) return;
-        void moveThreads(threadIDs, label, currentSystemLabels);
+        if (onSelectFolder) onSelectFolder(label);
         break;
       case UserLabelVariant.Plain:
-        if (isActive) await removeUserLabel(threadIDs, [label]);
-        else await applyUserLabel(threadIDs, [label]);
+        if (onSelectLabel) await onSelectLabel(label);
         break;
     }
-  }, [filteredLabels, threadFragments]);
+  }, [
+    filteredLabels,
+    highlightedIdx,
+    isLabelActive,
+    isOptionsSubMenuOpen,
+    onSelectFolder,
+    onSelectLabel,
+    onSelectNone,
+    onSelectSystemLabel
+  ]);
 
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
-      switch (event.key) {
-        case 'ArrowUp':
-          handleArrowUp();
-          return;
-        case 'ArrowDown':
-          handleArrowDown();
-          return;
-        case 'Enter':
-          void handleEnter();
-          return;
-        default: {
-          return;
-        }
-      }
+      if (event.key === 'Enter') void handleEnter();
     },
-    [handleArrowUp, handleArrowDown, handleEnter]
+    [handleEnter]
   );
 
   useEffect(() => {
@@ -110,51 +186,100 @@ const LabelDropdownContent: FC<LabelDropdownContentProps> = ({ threadID, variant
   }, [handleKeyPress]);
 
   return (
-    <>
-      <InputField
-        autoFocus={true}
-        onChange={(e) => setSearch(e.target.value)}
-        onClick={(e) => e.stopPropagation()}
-        placeholder='Search'
-        size='small'
-        style={{ marginBottom: '4px', borderRadius: '8px' }}
-        themeMode='dark'
-        value={search}
-      />
-      {filteredLabels.length > 0 &&
-        filteredLabels.map((label, index) => {
-          return isFolder(label) ? (
-            <FolderLabelDropdownItem
-              active={isFolder(label) && isLabelActive(label, threadFragments)}
-              hover={index === hoveredIndex}
-              isSubMenu={isSubMenu}
-              key={label.value}
-              label={label}
-              moveThreads={() => void moveThreads(threadIDs, label, currentSystemLabels)}
-            />
-          ) : (
-            <PlainLabelDropdownItem
-              active={isLabelActive(label, threadFragments)}
-              applyUserLabel={async (labelID: UserLabel) => applyUserLabel(threadIDs, [labelID])}
-              hover={index === hoveredIndex}
-              isSubMenu={isSubMenu}
-              key={label.value}
-              label={label}
-              removeUserLabel={async (labelID: UserLabel) => removeUserLabel(threadIDs, [labelID])}
-            />
-          );
-        })}
+    <Container ref={containerRef}>
+      <InputFieldContainer>
+        <InputField
+          autoFocus
+          borderRadius={6}
+          forceTheme={theme}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+          onClick={(e) => e.stopPropagation()}
+          placeholder='Search'
+          value={search}
+        />
+      </InputFieldContainer>
+      {filteredLabels.length > 0 && (
+        <ScrollContainer $themeMode={ThemeMode.DARK}>
+          {filteredLabels.map((label, index) => {
+            // If 'highlightedIdx' is undefined, that means keyboard navigation is inactive
+            // and in order to reflect that in the DropdownItem, we need to pass undefined to the 'highlight' prop
+            const isHighlighted = highlightedIdx !== undefined ? index === highlightedIdx : undefined;
+            const onHover = () => setHighlightedIdx?.(index);
+            if (isFolder(label) && onSelectFolder) {
+              return (
+                <FolderLabelDropdownItem
+                  active={isFolder(label) && isLabelActive(label)}
+                  highlight={isHighlighted}
+                  key={label.value}
+                  label={label}
+                  onClick={() => {
+                    onSelectFolder(label);
+                  }}
+                  onDeleteLabel={onDeleteLabel}
+                  onHover={onHover}
+                  setIsOptionsSubMenuOpen={setIsOptionsSubMenuOpen}
+                />
+              );
+            } else if (isPlainLabel(label) && onSelectLabel) {
+              return (
+                <PlainLabelDropdownItem
+                  active={isLabelActive(label)}
+                  highlight={isHighlighted}
+                  key={label.value}
+                  label={label}
+                  onClick={async () => {
+                    await onSelectLabel(label);
+                  }}
+                  onDeleteLabel={onDeleteLabel}
+                  onHover={onHover}
+                  setIsOptionsSubMenuOpen={setIsOptionsSubMenuOpen}
+                />
+              );
+            } else if (isSystemLabel(label) && onSelectSystemLabel) {
+              return (
+                <SystemLabelDropdownItem
+                  active={isLabelActive(label)}
+                  highlight={isHighlighted}
+                  key={label.value}
+                  label={label}
+                  onClick={() => {
+                    onSelectSystemLabel(label);
+                  }}
+                  onHover={onHover}
+                />
+              );
+            } else if (isNoneLabel(label) && onSelectNone) {
+              // None label option
+              return (
+                <DropdownItem
+                  active={isLabelActive(label)}
+                  highlight={isHighlighted}
+                  key={label.value}
+                  label={label.value}
+                  onClick={() => {
+                    onSelectNone();
+                  }}
+                  onHover={onHover}
+                  startElement={<Icons forceTheme={ThemeMode.DARK} icon={label.icon} />}
+                />
+              );
+            }
+            return <></>;
+          })}
+        </ScrollContainer>
+      )}
       {filteredLabels.every((label) => label.name.toLowerCase() !== search.toLowerCase()) && (
         <DropdownItem
           icon={Icon.Plus}
-          label={search ? `"${search}"` : `New ${variant === UserLabelVariant.Plain ? 'label' : 'folder'}`}
-          onClick={(e) => {
-            e.stopPropagation(); // necessary so the click doesn't propogate to the incoming modal (which may trigger 'handleClickOutside')
+          label={search ? `"${search}"` : `Add ${variant === UserLabelVariant.Plain ? 'label' : 'folder'}`}
+          onClick={() => {
+            setShowDropdown(false);
             openEditFolderModal();
           }}
+          onHover={() => setHighlightedIdx?.(undefined)}
         />
       )}
-    </>
+    </Container>
   );
 };
 

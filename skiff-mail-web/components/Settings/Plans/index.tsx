@@ -1,34 +1,29 @@
 import { Icon } from 'nightwatch-ui';
-import React, { useMemo } from 'react';
-import { isMobile } from 'react-device-detect';
-import { Setting, SettingType, SettingValue, SETTINGS_LABELS, SubscriptionPlans } from 'skiff-front-utils';
-import { SubscriptionPlan } from 'skiff-graphql';
-import { useGetCoinbaseCheckoutIdQuery } from 'skiff-mail-graphql';
+import { useMemo } from 'react';
+import {
+  SETTINGS_LABELS,
+  Setting,
+  SettingType,
+  SettingValue,
+  SubscriptionPlans,
+  TabPage,
+  isMobileApp,
+  useRequiredCurrentUserData
+} from 'skiff-front-utils';
 
-import { useRequiredCurrentUserData } from '../../../apollo/currentUser';
 import { useSubscriptionPlan } from '../../../utils/userUtils';
-
-import TierButton, { getTierTitle } from './SubscriptionPlans/TierButton/TierButton';
+import { useSettings } from '../useSettings';
 
 export const usePlansSettings: () => Setting[] = () => {
   const { userID } = useRequiredCurrentUserData();
+  const { openSettings } = useSettings();
+  const openBillingPage = () => openSettings({ tab: TabPage.Billing, setting: SettingValue.CurrentSubscriptions });
   const {
-    data: { activeSubscription },
+    data: { activeSubscription, billingInterval },
     loading: subscriptionLoading,
     startPolling,
     stopPolling
-  } = useSubscriptionPlan(userID);
-
-  const {
-    loading: coinbaseCheckoutLoading,
-    error: coinbaseCheckoutError,
-    data: coinbaseCheckoutData
-  } = useGetCoinbaseCheckoutIdQuery({
-    variables: { request: { plan: SubscriptionPlan.Pro } }
-  });
-
-  const showCryptoBanner =
-    activeSubscription === SubscriptionPlan.Free && !coinbaseCheckoutError && !coinbaseCheckoutLoading && !isMobile;
+  } = useSubscriptionPlan();
 
   const settings = useMemo<Setting[]>(
     () => [
@@ -37,25 +32,23 @@ export const usePlansSettings: () => Setting[] = () => {
         value: SettingValue.SubscriptionPlans,
         component: (
           <SubscriptionPlans
-            coinbaseCheckoutID={coinbaseCheckoutData?.getCoinbaseCheckoutID.coinbaseCheckoutID}
+            activeSubscriptionBillingInterval={billingInterval}
             currentUserID={userID}
-            getTierTitle={getTierTitle}
-            showCryptoBanner={showCryptoBanner}
             startPolling={startPolling}
             stopPolling={stopPolling}
             subscription={activeSubscription}
-            tierButton={TierButton}
+            openBillingPage={openBillingPage}
           />
         ),
         label: SETTINGS_LABELS[SettingValue.SubscriptionPlans],
         icon: Icon.Map,
-        color: 'orange'
+        color: 'yellow'
       }
     ],
-    [activeSubscription, showCryptoBanner, coinbaseCheckoutData, userID, startPolling, stopPolling]
+    [activeSubscription, userID, startPolling, stopPolling, billingInterval]
   );
 
-  if (subscriptionLoading) return [];
+  if (subscriptionLoading || isMobileApp()) return [];
 
   return settings;
 };

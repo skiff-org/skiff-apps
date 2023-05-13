@@ -1,8 +1,8 @@
-import { Typography } from 'nightwatch-ui';
+import { Typography, TypographySize } from 'nightwatch-ui';
 import { FC, RefObject, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { isWalletAddress, splitEmailToAliasAndDomain } from 'skiff-front-utils';
-import { isENSName } from 'skiff-utils';
+import { splitEmailToAliasAndDomain } from 'skiff-front-utils';
+import { isWalletAddress, isENSName } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { MailboxEmailInfo } from '../../models/email';
@@ -12,10 +12,9 @@ import { SenderDetails } from './ContactDetails/SenderDetails';
 
 const ThreadBlockHeaderContainer = styled.div<{ disabled: boolean }>`
   display: flex;
-  padding: 16px 0;
   height: fit-content;
   cursor: ${(props) => (props.disabled ? 'auto' : 'pointer')};
-  border-radius: 8px;
+  border-radius: ${isMobile ? 0 : 8}px;
   gap: 8px;
   ${isMobile && 'padding: 16px;'}
 `;
@@ -37,14 +36,16 @@ const HeaderPreview = styled.div<{
   $isWalletAddress: boolean;
   $renderDisplayName: boolean;
 }>`
-  width: calc(100% - 72px);
+  width: calc(100% - ${isMobile ? 150 : 54}px);
   margin-left: 44px;
   ${(props) => `margin-top: ${getHeaderPreviewTopMargin(props.$renderDisplayName, props.$isWalletAddress)}px;`}
-  padding: 0 8px;
-  border-radius: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  box-sizing: border-box;
   pointer-events: ${(props) => (props.$isExpanded ? 'all' : 'none')};
   &:hover {
-    background: ${(props) => (isMobile ? 'initial' : props.$showContacts ? 'transparent' : 'var(--bg-cell-hover)')};
+    background: ${(props) =>
+      isMobile ? 'initial' : props.$showContacts ? 'transparent' : 'var(--bg-overlay-tertiary)'};
     cursor: ${(props) => (isMobile ? 'initial' : props.$showContacts ? 'default' : 'pointer')};
   }
   ${(props) => (props.$showContacts ? `overflow-x: scroll` : '')}
@@ -61,13 +62,6 @@ const SubjectBlock = styled.div`
   gap: 4px;
 `;
 
-// Un-setting min-width to make sure the subject label is not hidden
-const SubjectLabel = styled(Typography)`
-  &.outerText {
-    min-width: unset;
-  }
-`;
-
 const AvatarAndContacts = styled.div`
   width: 100%;
 `;
@@ -77,6 +71,8 @@ interface ThreadBlockHeaderProps {
   disableOnClick: boolean;
   // Handler when user clicks on the block
   onClick: (id: string, evt?: React.MouseEvent) => void;
+  // Handler when user clicks on Reply button
+  reply: (evt?: React.MouseEvent) => void;
   moreButtonRef: RefObject<HTMLDivElement>;
   // Whether the thread content is expanded
   expanded: boolean;
@@ -93,7 +89,8 @@ export const ThreadBlockHeader: FC<ThreadBlockHeaderProps> = ({
   onClick,
   moreButtonRef,
   expanded,
-  setShowMoreOptions
+  setShowMoreOptions,
+  reply
 }) => {
   const { decryptedSubject, from } = email;
   const { address: fromAddress, name: fromDisplayName } = from;
@@ -102,7 +99,7 @@ export const ThreadBlockHeader: FC<ThreadBlockHeaderProps> = ({
 
   const threadHeaderRef: React.MutableRefObject<HTMLDivElement | null> = useRef(null);
 
-  const [fromAlias] = splitEmailToAliasAndDomain(fromAddress);
+  const { alias: fromAlias } = splitEmailToAliasAndDomain(fromAddress);
   const isWalletEmail = isWalletAddress(fromAlias) || isENSName(fromAlias);
 
   const handleClickOutside = (evt: MouseEvent) => {
@@ -138,6 +135,7 @@ export const ThreadBlockHeader: FC<ThreadBlockHeaderProps> = ({
           email={email}
           expanded={expanded}
           moreButtonRef={moreButtonRef}
+          reply={reply}
           setShowMoreOptions={setShowMoreOptions}
           showContacts={showContacts}
         />
@@ -154,8 +152,14 @@ export const ThreadBlockHeader: FC<ThreadBlockHeaderProps> = ({
           <RecipientDetails email={email} expanded={expanded} showContacts={showContacts} />
           {expanded && (!isMobile || showContacts) && (
             <SubjectBlock>
-              <SubjectLabel color='secondary'>Subject:</SubjectLabel>
-              <Typography color={showContacts ? 'primary' : 'secondary'} wrap={showContacts}>
+              <Typography color='secondary' minWidth='unset' size={isMobile ? TypographySize.SMALL : undefined}>
+                Subject:
+              </Typography>
+              <Typography
+                color={showContacts ? 'primary' : 'secondary'}
+                size={isMobile ? TypographySize.SMALL : undefined}
+                wrap={showContacts}
+              >
                 {decryptedSubject}
               </Typography>
             </SubjectBlock>

@@ -1,49 +1,109 @@
 import { Editor } from '@tiptap/core';
-import { Icon, IconButton, IconText, useOnClickOutside } from 'nightwatch-ui';
+import {
+  DROPDOWN_CALLER_CLASSNAME,
+  getThemedColor,
+  Icon,
+  Icons,
+  Portal,
+  Size,
+  ThemeMode,
+  Typography,
+  TypographyWeight,
+  useOnClickOutside
+} from 'nightwatch-ui';
 import { FC, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ToolBarCommand, ToolBarCommandGroupTypes } from './commands/types';
 
 // the minimal distance from the floor
 const OPEN_UPWARDS_OFFSET = 30;
-
+const DROPDOWN_GAP = 6;
 const ToolBarDropdownGroupContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 14px;
+  padding: 6px;
+  padding-left: 8px;
+  gap: 6px;
+  box-sizing: border-box;
+  user-select: none;
   cursor: pointer;
+  border-radius: 6px;
+  &:hover {
+    background: ${getThemedColor('var(--bg-overlay-secondary)', ThemeMode.DARK)};
+  }
 `;
 
 const DropdownContainer = styled.div`
   position: absolute;
-  background-color: var(--bg-emphasis);
-  border-radius: 8px;
+  background: var(--bg-emphasis);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: 187px;
-  padding: 14px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  top: 0;
+  width: 216px;
+  padding: 4px;
+  border: 1px solid ${getThemedColor('var(--border-tertiary)', ThemeMode.DARK)};
+  top: -6px;
   left: 0;
-  gap: 8px;
-  -webkit-backdrop-filter: blur(72px);
-  backdrop-filter: blur(72px);
+  box-shadow: var(--shadow-l2);
   border-radius: 8px;
-  z-index: 9999;
+  z-index: 999999999999;
 `;
 
 const DropdownItemContainer = styled.div`
   box-sizing: border-box;
   cursor: pointer;
-  border-radius: 4px;
-  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 8px;
   width: 100%;
   &:hover {
-    background: rgba(235, 243, 255, 0.08);
+    background: ${getThemedColor('var(--bg-overlay-secondary)', ThemeMode.DARK)};
+  }
+`;
+
+const IconBox = styled.div`
+  display: flex;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  justify-content: center;
+  background: ${getThemedColor('var(--bg-overlay-secondary)', ThemeMode.DARK)};
+  padding: 6px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  aspect-ratio: 1;
+`;
+
+const IconHover = styled.div<{ $active: boolean; $disabled: boolean }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  cursor: pointer;
+
+  ${(props) =>
+    props.$active &&
+    css`
+      background: ${getThemedColor('var(--bg-overlay-secondary)', ThemeMode.DARK)};
+    `}
+  ${(props) =>
+    props.$disabled &&
+    css`
+      background: transparent;
+    `}
+  &:hover {
+    background: ${getThemedColor('var(--bg-overlay-secondary)', ThemeMode.DARK)};
   }
 `;
 
@@ -60,16 +120,15 @@ const ToolBarDropdownGroup: FC<Omit<ToolbarGroupProps, 'type'>> = ({ commands, e
     ['ignoreThisClick']
   );
 
-  const openUpwards =
-    (dropdownRef.current?.getBoundingClientRect()?.height || 0) +
-      (groupContainerRef.current?.getBoundingClientRect()?.top || 0) >=
-    window.innerHeight - OPEN_UPWARDS_OFFSET;
+  const groupRect = groupContainerRef?.current?.getBoundingClientRect();
+  const dropdownRect = dropdownRef.current?.getBoundingClientRect();
+  const openUpwards = (dropdownRect?.height || 0) + (groupRect?.top || 0) >= window.innerHeight - OPEN_UPWARDS_OFFSET;
 
   const currentActive =
     commands
       .filter(({ active }) => active(editor))
       // Get the highest priority active item
-      .sort(({ priority: p1 }, { priority: p2 }) => (p2 || 0) - (p1 || 0))[0]?.label || commands[0].label;
+      .sort(({ priority: p1 }, { priority: p2 }) => (p2 || 0) - (p1 || 0))[0]?.label || commands[0]?.label;
 
   return (
     <>
@@ -80,14 +139,20 @@ const ToolBarDropdownGroup: FC<Omit<ToolbarGroupProps, 'type'>> = ({ commands, e
         }}
         ref={groupContainerRef}
       >
-        <IconText color='white' endIcon={open ? Icon.ChevronUp : Icon.ChevronDown} label={currentActive} level={3} />
+        <Typography forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
+          {currentActive}
+        </Typography>
+        <Icons color='secondary' forceTheme={ThemeMode.DARK} icon={Icon.ChevronDown} />
       </ToolBarDropdownGroupContainer>
-      {
+      <Portal>
         <DropdownContainer
-          className='toolbar-dropdown'
+          className={DROPDOWN_CALLER_CLASSNAME}
           ref={dropdownRef}
           style={{
-            transform: openUpwards ? 'translateY(calc(-5px - 100%))' : 'translateY(48px)',
+            top:
+              (groupRect?.top || 0) +
+              (openUpwards ? -(dropdownRect?.height || 0) - DROPDOWN_GAP : (groupRect?.height || 0) + DROPDOWN_GAP),
+            left: groupRect?.left || 0,
             opacity: open ? 1 : 0,
             pointerEvents: open ? 'auto' : 'none'
           }}
@@ -95,21 +160,23 @@ const ToolBarDropdownGroup: FC<Omit<ToolbarGroupProps, 'type'>> = ({ commands, e
           {commands
             .filter(({ enabled }) => enabled(editor))
             .map(({ icon, command, label }) => (
-              <DropdownItemContainer key={label}>
-                <IconText
-                  label={label}
-                  onClick={() => {
-                    setOpen(false);
-                    command(editor);
-                  }}
-                  startIcon={icon}
-                  themeMode='dark'
-                  type='paragraph'
-                />
+              <DropdownItemContainer
+                key={label}
+                onClick={() => {
+                  setOpen(false);
+                  command(editor);
+                }}
+              >
+                <IconBox>
+                  <Icons color='secondary' forceTheme={ThemeMode.DARK} icon={icon} />
+                </IconBox>
+                <Typography forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
+                  {label}
+                </Typography>
               </DropdownItemContainer>
             ))}
         </DropdownContainer>
-      }
+      </Portal>
     </>
   );
 };
@@ -117,15 +184,14 @@ const ToolBarDropdownGroup: FC<Omit<ToolbarGroupProps, 'type'>> = ({ commands, e
 const ToolBarNormalGroup: FC<Omit<ToolbarGroupProps, 'type'>> = ({ commands, editor }) => (
   <>
     {commands.map(({ active, icon, command, enabled, label }) => (
-      <IconButton
-        active={active(editor)}
-        disabled={!enabled(editor)}
-        icon={icon}
-        key={label}
-        onClick={() => command(editor)}
-        themeMode='dark'
-        tooltip={label}
-      />
+      <IconHover $active={active(editor)} $disabled={!enabled(editor)} key={label} onClick={() => command(editor)}>
+        <Icons
+          color={!enabled(editor) ? 'disabled' : 'primary'}
+          forceTheme={ThemeMode.DARK}
+          icon={icon}
+          size={Size.X_MEDIUM}
+        />
+      </IconHover>
     ))}
   </>
 );

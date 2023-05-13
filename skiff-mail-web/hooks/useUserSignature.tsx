@@ -1,7 +1,6 @@
 import { decryptSymmetric, stringDecryptAsymmetric } from 'skiff-crypto';
-import { useGetUserSignatureQuery, UserSignatureDatagram } from 'skiff-mail-graphql';
-
-import { useRequiredCurrentUserData } from '../apollo/currentUser';
+import { useGetUserSignatureQuery, UserSignatureDatagram } from 'skiff-front-graphql';
+import { useRequiredCurrentUserData } from 'skiff-front-utils';
 
 export function useUserSignature() {
   const { data } = useGetUserSignatureQuery();

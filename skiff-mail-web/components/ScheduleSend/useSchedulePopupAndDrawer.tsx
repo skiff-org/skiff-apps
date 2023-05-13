@@ -3,14 +3,25 @@ import { CalendarPicker, CalendarPickerProps } from '@mui/x-date-pickers/Calenda
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs, { Dayjs } from 'dayjs';
 import customParserFormat from 'dayjs/plugin/customParseFormat';
-import { Icon, ButtonGroup, ButtonGroupItem, Surface, Drawer, Typography, InputField, Button } from 'nightwatch-ui';
+import {
+  Icon,
+  Button,
+  ButtonGroup,
+  ButtonGroupItem,
+  Drawer,
+  InputField,
+  Surface,
+  Size,
+  Typography,
+  TypographySize
+} from 'nightwatch-ui';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { HourPicker } from 'skiff-front-utils';
+import { HourPicker, useTheme, useUserPreference } from 'skiff-front-utils';
+import { StorageTypes } from 'skiff-utils';
 import styled, { css } from 'styled-components';
 
 import { useLocalHourFormat } from '../../hooks/useDate';
-import useLocalSetting from '../../hooks/useLocalSetting';
 
 import DateTimeForm from './DateTimeForm';
 
@@ -67,7 +78,6 @@ const InputContainer = styled.div`
 `;
 
 const PickersContainer = styled.div`
-  width: 100%;
   height: ${!isMobile ? '300px' : '100%'};
 `;
 
@@ -93,7 +103,8 @@ export const useScheduleSendPopupAndDrawer = ({
   setOpen,
   handleSendClick
 }: ScheduleSendPopupProps) => {
-  const [dateFormat] = useLocalSetting('dateFormat');
+  const { theme } = useTheme();
+  const [dateFormat] = useUserPreference(StorageTypes.DATE_FORMAT);
   const timeFormat = useLocalHourFormat();
 
   const [dateAndTime, setDateAndTime] = useState<Dayjs | null>(initialDate || dayjs(Date.now()).add(5, 'minutes'));
@@ -109,7 +120,6 @@ export const useScheduleSendPopupAndDrawer = ({
   const [timeFieldValue, setTimeFieldValue] = useState(dayjs(dateAndTime).format(timeFormat));
   const [dateFieldError, setDateFieldError] = useState<string>();
   const [timeFieldError, setTimeFieldError] = useState<string>();
-
   const updateTime = useCallback(
     (time: string) => {
       const parsed = dayjs(time, timeFormat);
@@ -117,12 +127,12 @@ export const useScheduleSendPopupAndDrawer = ({
       let newDate = dayjs(dateAndTime);
       newDate = newDate.set('hours', parsed.hour());
       newDate = newDate.set('minutes', parsed.minute());
+      setDateAndTime(newDate);
+
       if (newDate.isBefore(Date.now(), 'minute')) {
         setTimeFieldError('Time must be in the future');
-        setDateAndTime(dateAndTime);
       } else {
         setTimeFieldError(undefined);
-        setDateAndTime(newDate);
       }
     },
     [dateAndTime, timeFormat]
@@ -137,13 +147,16 @@ export const useScheduleSendPopupAndDrawer = ({
       newDate = newDate.set('year', parsed.year());
       newDate = newDate.set('month', parsed.month());
       newDate = newDate.set('date', parsed.date());
-
+      setDateAndTime(newDate);
       if (newDate.isBefore(Date.now(), 'day')) {
         setDateFieldError('Date must be in the future');
-        setDateAndTime(dateAndTime);
+        setTimeFieldError('Time must be in the future');
       } else {
         setDateFieldError(undefined);
-        setDateAndTime(newDate);
+        // If time also after current time, we can clear time error as well.
+        if (newDate.isAfter(Date.now())) {
+          setTimeFieldError(undefined);
+        }
       }
     },
     [dateAndTime]
@@ -159,7 +172,7 @@ export const useScheduleSendPopupAndDrawer = ({
 
     if (dateAndTime?.isBefore(Date.now(), 'day')) {
       setDateFieldError('Date must be in the future');
-      setTimeFieldError(undefined);
+      setTimeFieldError('Time must be in the future');
     } else if (dateAndTime?.isBefore(Date.now(), 'minute')) {
       setTimeFieldError('Time must be in the future');
     } else {
@@ -173,6 +186,14 @@ export const useScheduleSendPopupAndDrawer = ({
   const surfaceAnchor = {
     top: (buttonRect?.top || 0) - 15,
     left: (buttonRect?.left || 0) - SURFACE_WIDTH / 2
+  };
+
+  const hasError = !!timeFieldError || !!dateFieldError;
+  const blockIfErrorOnClick = () => {
+    if (hasError) {
+      return;
+    }
+    void handleSendClick(dateAndTime?.toDate());
   };
 
   const ScheduleSendPopup = (
@@ -213,12 +234,7 @@ export const useScheduleSendPopupAndDrawer = ({
         />
       </Container>
       <ButtonGroup>
-        <ButtonGroupItem
-          disabled={dateAndTime?.isBefore(dayjs(Date.now()))}
-          icon={Icon.Send}
-          label={'Send later'}
-          onClick={() => handleSendClick(dateAndTime?.toDate())}
-        />
+        <ButtonGroupItem icon={Icon.Send} label='Send later' onClick={blockIfErrorOnClick} />
         <ButtonGroupItem
           label={'Cancel'}
           onClick={() => {
@@ -230,13 +246,11 @@ export const useScheduleSendPopupAndDrawer = ({
   );
 
   const ScheduleSendDrawer = (
-    <Drawer hideDrawer={() => setOpen(false)} show={open}>
+    <Drawer forceTheme={theme} hideDrawer={() => setOpen(false)} show={open}>
       <DrawerContainer>
         <TextContainer>
-          <Typography color='primary' level={1}>
-            Select Date
-          </Typography>
-          <Typography color='secondary' level={3}>
+          <Typography size={TypographySize.LARGE}>Select Date</Typography>
+          <Typography color='secondary' size={TypographySize.SMALL}>
             After selecting a date, you can choose a time
           </Typography>
         </TextContainer>
@@ -269,6 +283,7 @@ export const useScheduleSendPopupAndDrawer = ({
           )}
           {activePicker === ActivePicker.TIME && (
             <HourPicker
+              forceTheme={theme}
               initialHour={initialDate || dayjs(Date.now()).add(5, 'minutes')}
               itemHeight={48}
               onChange={updateTime}
@@ -276,33 +291,9 @@ export const useScheduleSendPopupAndDrawer = ({
             />
           )}
         </PickersContainer>
-        {!isMobile && (
-          <ButtonGroup>
-            <ButtonGroupItem
-              disabled={!!timeFieldError || !!dateFieldError}
-              icon={Icon.Send}
-              label='Send later'
-              onClick={() => handleSendClick(dateAndTime?.toDate())}
-            />
-            <ButtonGroupItem
-              label='Cancel'
-              onClick={() => {
-                setOpen(false);
-              }}
-            />
-          </ButtonGroup>
-        )}
-        {isMobile && (
-          <Button
-            align='center'
-            disabled={!!timeFieldError || !!dateFieldError}
-            fullWidth
-            onClick={() => handleSendClick(dateAndTime?.toDate())}
-            size='medium'
-          >
-            Send later
-          </Button>
-        )}
+        <Button fullWidth onClick={blockIfErrorOnClick} size={Size.MEDIUM}>
+          Send later
+        </Button>
       </DrawerContainer>
     </Drawer>
   );

@@ -8,10 +8,10 @@ export const linkStyling = `
 `;
 
 export const orderedListStyling = (listType = '') => `
-    padding-left: 20px;
+    padding-left: 30px;
     ${listType ? `list-style-type: ${listType};` : listType}
 `;
-export const bulletListStyling = `padding-left: 20px;`;
+export const bulletListStyling = `padding-left: 30px;`;
 
 export const strikethroughStyling = `
     color: var(--text-primary, ${themeNames.light['--text-primary']});

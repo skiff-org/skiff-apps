@@ -1,9 +1,13 @@
-import { SubscriptionInterval, SubscriptionPlan, CheckoutSession, RequestStatus } from 'skiff-graphql';
+import { GraphQLError } from 'graphql';
 import {
   GetCheckoutSessionUrlOrStripeUpdateStatusDocument,
   GetCheckoutSessionUrlOrStripeUpdateStatusQuery,
-  GetCheckoutSessionUrlOrStripeUpdateStatusQueryVariables
-} from 'skiff-mail-graphql';
+  GetCheckoutSessionUrlOrStripeUpdateStatusQueryVariables,
+  GetCustomDomainCheckoutPortalDocument,
+  GetCustomDomainCheckoutPortalQuery,
+  GetCustomDomainCheckoutPortalQueryVariables
+} from 'skiff-front-graphql';
+import { SubscriptionInterval, SubscriptionPlan, CheckoutSession, RequestStatus } from 'skiff-graphql';
 
 import client from '../apollo/client';
 
@@ -15,7 +19,8 @@ import client from '../apollo/client';
  */
 export const getCheckoutSessionOrUpdatePlan = async (
   subscriptionPlan: SubscriptionPlan,
-  subscriptionInterval: SubscriptionInterval
+  subscriptionInterval: SubscriptionInterval,
+  redirectURL: string
 ): Promise<CheckoutSession> => {
   const response = await client.query<
     GetCheckoutSessionUrlOrStripeUpdateStatusQuery,
@@ -25,7 +30,8 @@ export const getCheckoutSessionOrUpdatePlan = async (
     variables: {
       request: {
         subscriptionPlan,
-        interval: subscriptionInterval
+        interval: subscriptionInterval,
+        redirectURL
       }
     },
     fetchPolicy: 'no-cache'
@@ -35,4 +41,34 @@ export const getCheckoutSessionOrUpdatePlan = async (
     return { status: RequestStatus.Failed };
   }
   return response.data.checkoutPortal;
+};
+
+/**
+ * Get stripe checkout session URL for buying a one-click custom domain from backend.
+ * @param {string} customDomain - the desired one-click domain to buy
+ * @returns {CheckoutSession} CheckoutSession, including status and possibly url.
+ */
+export const getCustomDomainCheckoutSession = async (
+  customDomain: string,
+  redirectURL: string
+): Promise<{ errors?: readonly GraphQLError[]; checkoutSession?: CheckoutSession }> => {
+  const response = await client.query<GetCustomDomainCheckoutPortalQuery, GetCustomDomainCheckoutPortalQueryVariables>({
+    query: GetCustomDomainCheckoutPortalDocument,
+    variables: {
+      request: {
+        customDomain,
+        redirectURL
+      }
+    },
+    errorPolicy: 'all',
+    fetchPolicy: 'no-cache'
+  });
+  if (response.errors?.length) {
+    return { errors: response.errors };
+  }
+  if (!response.data || response.data.customDomainCheckoutPortal.status === RequestStatus.Failed) {
+    console.error('getCustomDomainCheckoutSession: Request failed.');
+    return { checkoutSession: { status: RequestStatus.Failed } };
+  }
+  return { checkoutSession: response.data.customDomainCheckoutPortal };
 };

@@ -6,6 +6,7 @@
     "module": "esnext",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true,
     "noEmit": true,
     "incremental": true,
     "isolatedModules": true,
@@ -23,7 +24,7 @@
     { "path": "../../libs/skiff-front-search" },
     { "path": "../../libs/skiff-front-utils" },
     { "path": "../../libs/skiff-graphql" },
-    { "path": "../../libs/skiff-mail-graphql" },
+    { "path": "../../libs/skiff-front-graphql" },
     { "path": "../../libs/skiff-utils" }
   ]
 }

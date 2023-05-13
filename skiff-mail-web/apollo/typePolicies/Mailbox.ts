@@ -1,7 +1,8 @@
 import { FieldPolicy } from '@apollo/client';
 import { ReadFieldFunction } from '@apollo/client/cache/core/types/common';
-import { last, uniqBy } from 'lodash';
-import { Mailbox, MailboxPageInfo, UserThread } from 'skiff-graphql';
+import last from 'lodash/last';
+import uniqBy from 'lodash/uniqBy';
+import { Mailbox, MailboxPageInfo, MailboxRequest, SystemLabels, UserThread } from 'skiff-graphql';
 import { assertExists } from 'skiff-utils';
 
 const threadSortByDate = (readField: ReadFieldFunction) => (a: UserThread, b: UserThread) => {
@@ -19,8 +20,9 @@ export const mailboxFieldPolicy: FieldPolicy<Mailbox> = {
       // which is just set to `{}` when stringified by Apollo
       label: args?.request?.label,
       filters: args?.request?.filters,
-      emailsUpdatedAfterDate: args?.request?.emailsUpdatedAfterDate,
-      emailsUpdatedBeforeDate: args?.request?.emailsUpdatedBeforeDate
+      updatedAtOrderDirection: (args?.request as MailboxRequest)?.updatedAtOrderDirection,
+      useUpdatedAtField: (args?.request as MailboxRequest)?.useUpdatedAtField,
+      lastUpdatedDate: (args?.request as MailboxRequest)?.lastUpdatedDate?.toISOString()
     }),
   read: (existing, { readField }) =>
     existing ? { ...existing, threads: [...existing?.threads].sort(threadSortByDate(readField)) } : undefined,
@@ -34,23 +36,27 @@ export const mailboxFieldPolicy: FieldPolicy<Mailbox> = {
 
     const existingThreadIDs = new Set(existing.threads.map((thread) => readField('threadID', thread)));
 
-    // if incoming is the result of polling, we'll take all the new incoming threads and replace the existing threads.
-    // (there may be no changes)
-    if (args?.request.polling) {
-      const combinedThreads = [...incoming.threads, ...existing.threads];
-      const dedupedThreads = uniqBy(combinedThreads, (thread) => readField('threadID', thread));
-      return { ...existing, threads: dedupedThreads, pageInfo: existing.pageInfo };
-    }
-
-    // if every thread in the incoming set of threads already exists, this means that its a
-    // removal operation (ex: moving a thread to another system label)
-    else if (
+    const isPollingOrRefetching =
+      (args?.request as MailboxRequest).polling || (args?.request as MailboxRequest).refetching;
+    const isScheduledSend = (args?.request as MailboxRequest).label === SystemLabels.ScheduleSend;
+    const didRemoveThreads =
       incoming.threads.length < existing.threads.length &&
       incoming.threads.every((thread) => {
         const threadID = readField('threadID', thread);
         return !!threadID && existingThreadIDs.has(threadID);
-      })
-    ) {
+      });
+
+    // if incoming is the result of polling or refetching, we'll take all the new incoming threads and replace the existing threads.
+    // (there may be no changes)
+    // Skip if this is the Scheduled Send mailbox -- some emails could have sent, resulting in the removal of emails
+    if (!isScheduledSend && isPollingOrRefetching) {
+      const combinedThreads = [...incoming.threads, ...existing.threads];
+      const dedupedThreads = uniqBy(combinedThreads, (thread) => readField('threadID', thread));
+      return { ...existing, threads: dedupedThreads, pageInfo: existing.pageInfo };
+    }
+    // if every thread in the incoming set of threads already exists, this means that its a
+    // removal operation (ex: moving a thread to another system label)
+    else if (didRemoveThreads) {
       return { ...existing, threads: incoming.threads, pageInfo: incoming.pageInfo ?? existing.pageInfo };
     }
 

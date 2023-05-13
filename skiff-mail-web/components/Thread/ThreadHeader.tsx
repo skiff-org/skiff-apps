@@ -1,44 +1,33 @@
-import Link from 'next/link';
-import { Chip, Icon, IconButton, Icons, Typography } from 'nightwatch-ui';
-import React, { ForwardedRef } from 'react';
+import { Chip, Icon, IconText, Icons, Size, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import React, { ForwardedRef, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { useDate } from '../../hooks/useDate';
+import { skemailHotKeysReducer } from '../../redux/reducers/hotkeysReducer';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { ModalType } from '../../redux/reducers/modalTypes';
 import { useGetCachedThreads } from '../../utils/cache/cache';
-import { getUrlFromUserLabelAndThreadID, UserLabel } from '../../utils/label';
+import { UserLabelAlias, UserLabelPlain } from '../../utils/label';
+import { LinkedLabelChips } from '../labels/LinkedLabelChips';
+import { MoveToLabelDropdown } from '../labels/MoveToLabelDropdown';
 import { THREAD_HEADER_BACKGROUND_ID } from '../mailbox/consts';
 
 import MobileThreadHeaderTitle from './MobileThreadHeader';
 import { ThreadNavigationIDs } from './Thread.types';
 import { ThreadActions } from './ThreadActions/ThreadActions';
 
-const ThreadHeaderContainer = styled.div<{ height?: number }>`
+const ThreadHeaderContainer = styled.div`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  position: absolute;
-  background: var(--bg-main-container);
+  background: ${isMobile ? 'var(--bg-l3-solid)' : 'var(--bg-main-container)'} !important;
   border-bottom: 1px solid var(--border-tertiary);
 
-  @supports (backdrop-filter: blur(72px)) {
-    backdrop-filter: blur(72px);
-    background: ${isMobile ? 'var(--bg-l0-glass)' : 'var(--bg-main-container)'} !important;
-  }
-  @supports (-webkit-backdrop-filter: blur(72px)) {
-    -webkit-backdrop-filter: blur(72px);
-    background: ${isMobile ? 'var(--bg-l0-glass)' : 'var(--bg-main-container)'} !important;
-  }
   z-index: 9;
   width: 100%;
-  ${(props) => {
-    if (props.height && isMobile) {
-      return `height: ${props.height}px;`;
-    }
-  }}
+
   ${isMobile
     ? `
     padding: 0px 12px 12px 12px;
@@ -46,26 +35,39 @@ const ThreadHeaderContainer = styled.div<{ height?: number }>`
     : `
     /* Space on the right of the thread header for the scrollbar */
     width: calc(100% - 9px);
-    padding: 16px 15px 0px 24px;
+
   `}
 `;
 
-const LabelsContainer = styled.div`
+const LabelsContainer = styled.div<{ hasLabels?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   z-index: -1;
-  margin-top: ${!isMobile ? '8px' : undefined};
-  margin-bottom: ${!isMobile ? '6px' : undefined};
-  padding-left: ${isMobile ? '16px' : undefined};
+  box-sizing: border-box;
+  ${(props) =>
+    !isMobile &&
+    css`
+      padding: 0px 16px;
+      margin-bottom: ${props.hasLabels ? '12px' : undefined};
+    `}
+  ${isMobile &&
+  css`
+    margin-top: 8px;
+    padding-left: 16px;
+    overflow-x: auto;
+  `}
   overflow-y: hidden;
-  ${isMobile ? 'overflow-x: auto;' : ''};
 `;
 
 const ThreadTitleContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
+  border-top: 1px solid var(--border-tertiary);
+  padding: 12px 16px;
+  box-sizing: border-box;
+  min-height: 56px;
 `;
 
 const TitleChip = styled.div`
@@ -77,15 +79,27 @@ const TitleChip = styled.div`
 
 const ThreadTitleActionsContainer = styled.div`
   display: flex;
-  gap: 8px;
   flex-direction: column;
 `;
 
 const HeaderButtonsGroup = styled.div`
   display: flex;
   gap: 8px;
-  margin-left: 8px;
-  margin-top: -4px;
+`;
+
+const AddButton = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  aspect-ratio: 1;
+  background: var(--bg-overlay-tertiary);
+  border-radius: 100px;
+  cursor: pointer;
+  :hover {
+    background: var(--bg-overlay-secondary);
+  }
 `;
 
 export const ThreadHeaderDataTest = {
@@ -100,16 +114,17 @@ type ThreadHeaderProps = {
   text?: string | null; // GraphQL
   isExpanded?: boolean;
   onExpand?: () => void;
-  userLabels?: Array<UserLabel>;
+  userLabels?: Array<UserLabelPlain | UserLabelAlias>;
   onClick?: () => void;
   isSkiffSender?: boolean;
   threadBodyRef?: React.RefObject<HTMLDivElement>;
   threadId: string;
-  schedualSendAt?: Date;
+  scheduledSendAt?: Date;
   // defined if component is keeping track of the active thread and email itself instead of using route params
   setActiveThreadAndEmail?: (activeThreadAndEmail: ThreadNavigationIDs | undefined) => void;
   nextThreadAndEmail?: ThreadNavigationIDs;
   prevThreadAndEmail?: ThreadNavigationIDs;
+  loading?: boolean;
 };
 
 const ThreadHeader = (
@@ -123,41 +138,53 @@ const ThreadHeader = (
     isSkiffSender,
     threadId,
     threadBodyRef,
-    schedualSendAt,
+    scheduledSendAt,
     setActiveThreadAndEmail,
     currentLabel,
     nextThreadAndEmail,
     prevThreadAndEmail,
-    emailRefs
+    emailRefs,
+    loading
   }: ThreadHeaderProps,
   ref: ForwardedRef<HTMLDivElement>
 ) => {
   const { getTimeAndDate } = useDate();
   const activeThread = useGetCachedThreads([threadId])[0];
-
+  const labelDropdownRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
+  const [labelsDropdown, setLabelsDropdown] = useState(false);
+  const setHeaderLabelsDropdown = (open?: boolean) => {
+    dispatch(skemailHotKeysReducer.actions.setActiveThreadLabelMenuOpen(open));
+  };
+
+  // make sure only one label drodpown open at a time
+  useEffect(() => {
+    if (labelsDropdown) {
+      setHeaderLabelsDropdown(false);
+    }
+  }, [labelsDropdown]);
+
   const hasUserLabels = userLabels && userLabels.length > 0;
   const renderLabels = () => (
-    <LabelsContainer>
-      {hasUserLabels &&
-        userLabels.map((userLabel) => {
-          const encodedLabelName = encodeURIComponent(userLabel.name.toLowerCase());
-          // clicking on the label should
-          // - redirect to label inbox on mobile
-          // - redirect to label inbox with opened thread on desktop
-          const mobileUrl = `/label#${encodedLabelName}`;
-          const desktopUrl = getUrlFromUserLabelAndThreadID(userLabel.name, threadId);
-          return (
-            <Link href={isMobile ? mobileUrl : desktopUrl} key={userLabel.value} passHref>
-              <Chip
-                key={userLabel.value}
-                label={userLabel.name}
-                startIcon={<Icons color={userLabel.color} icon={Icon.Dot} />}
-              />
-            </Link>
-          );
-        })}
-      {schedualSendAt && (
+    <LabelsContainer hasLabels={hasUserLabels}>
+      {hasUserLabels && (
+        <>
+          <AddButton onClick={() => setLabelsDropdown(true)} ref={labelDropdownRef}>
+            <Icons color='secondary' icon={Icon.Plus} />
+          </AddButton>
+          <MoveToLabelDropdown
+            buttonRef={labelDropdownRef}
+            currentSystemLabels={[currentLabel]}
+            onClose={() => {
+              setLabelsDropdown(false);
+            }}
+            open={labelsDropdown}
+            threadID={threadId}
+          />
+        </>
+      )}
+      {hasUserLabels && <LinkedLabelChips deletable size={Size.SMALL} threadID={threadId} userLabels={userLabels} />}
+      {scheduledSendAt && (
         <Chip
           endIcon={
             <Icons
@@ -171,7 +198,7 @@ const ThreadHeader = (
             />
           }
           key='schedule'
-          label={`Scheduled - ${getTimeAndDate(schedualSendAt)}`}
+          label={`Scheduled - ${getTimeAndDate(scheduledSendAt)}`}
           startIcon={Icon.Clock}
         />
       )}
@@ -186,6 +213,7 @@ const ThreadHeader = (
             emailRefs={emailRefs}
             isSkiffSender={isSkiffSender}
             label={currentLabel}
+            loading={loading}
             nextThreadAndEmail={nextThreadAndEmail}
             onClose={onClose}
             prevThreadAndEmail={prevThreadAndEmail}
@@ -194,16 +222,17 @@ const ThreadHeader = (
           />
           <ThreadTitleContainer>
             <TitleChip>
-              <Typography level={0} type='label' wrap>
-                {text}
+              <Typography size={TypographySize.H3} weight={TypographyWeight.MEDIUM} wrap>
+                {loading ? '' : text}
               </Typography>
             </TitleChip>
             <HeaderButtonsGroup>
               {onExpand && (
-                <IconButton
-                  icon={isExpanded ? Icon.CollapseV : Icon.ExpandV}
+                <IconText
+                  filled
                   onClick={onExpand}
-                  size='small'
+                  size={Size.SMALL}
+                  startIcon={isExpanded ? Icon.CollapseV : Icon.ExpandV}
                   tooltip={isExpanded ? 'Collapse' : 'Expand'}
                 />
               )}

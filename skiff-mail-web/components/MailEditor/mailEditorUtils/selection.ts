@@ -8,7 +8,7 @@ enum NodeName {
   Div = 'div',
   Text = '#text'
 }
-const elementIsOfType = (element: any, name: NodeName) => {
+const elementIsOfType = (element: Element, name: NodeName) => {
   return element.nodeName && element.nodeName === name;
 };
 
@@ -17,7 +17,7 @@ export const isSelectionNotEmpty = (editor: Editor) =>
 
 export const getElementOnSelection = (editor: Editor) => {
   // Get element at selection pos
-  let elementOnSelection = editor.view.domAtPos(editor.state.selection.to).node as any;
+  let elementOnSelection = editor.view.domAtPos(editor.state.selection.to).node as Element;
   const res =
     findNodesWithSameMark(
       editor.state.doc,
@@ -37,9 +37,10 @@ export const getElementOnSelection = (editor: Editor) => {
   // set the elementOnSelection to its parent
   if (
     (!isSelectionNotEmpty(editor) || elementIsOfType(elementOnSelection, NodeName.Text)) &&
-    !elementIsOfType(elementOnSelection, NodeName.P)
+    !elementIsOfType(elementOnSelection, NodeName.P) &&
+    elementOnSelection.parentElement
   ) {
-    elementOnSelection = (elementOnSelection as Element).parentElement;
+    elementOnSelection = elementOnSelection.parentElement;
   }
   // If the element on selection is a paragraph and it has no other children
   // try and set it's anchor child (if it has one) to the element on selection

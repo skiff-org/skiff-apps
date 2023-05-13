@@ -1,16 +1,8 @@
 import { useContext } from 'react';
 
 import { SearchCategory, SearchContext } from './SearchProvider';
-import {
-  SearchItemType,
-  SearchResult,
-  ModifierSearchResult,
-  LabelSearchResult,
-  SkemailSearchResult,
-  UserSearchResult
-} from './searchTypes';
+import { SearchItemType, SearchResult, LabelSearchResult, UserSearchResult } from './searchTypes';
 import { useLabelSearch } from './useLabelSearch';
-import { useNarrowSearch } from './useNarrowSearch';
 import { useSkemailSearch } from './useSkemailSearch';
 import { useUserSearch } from './useUserSearch';
 
@@ -25,34 +17,16 @@ import { useUserSearch } from './useUserSearch';
  * it also returns the `searchResults`, which is an array of the results to be rendered.
  */
 export const useSearch = () => {
-  const { searchResults, category, modifierType, setSearchResults, setQuery, fullView } = useContext(SearchContext);
+  const { searchResults, category, setSearchResults, setQuery, fullView } = useContext(SearchContext);
 
   const { search: skemailSearch } = useSkemailSearch();
   const { search: labelSearch } = useLabelSearch();
   const { search: userSearch } = useUserSearch();
-  const { search: narrowSearch } = useNarrowSearch();
 
   const search = async (searchStr: string) => {
     setQuery(searchStr);
     setSearchResults(undefined);
     const newSearchResults: SearchResult[] = [];
-    if (category === SearchCategory.SKEMAIL && modifierType === undefined) {
-      // Modifier Results
-      // ex: from: hello@skiff.com || has "Finance" label
-      const modifierResults: ModifierSearchResult[] | undefined = await narrowSearch(searchStr);
-      if (modifierResults?.length) {
-        newSearchResults.push({
-          type: SearchItemType.HEADER,
-          label: 'Narrow search'
-        });
-        newSearchResults.push(...modifierResults);
-      }
-    }
-
-    // TODO: recent searches
-
-    // TODO: quick actions
-
     // Search results
     // depending on the category, could be a list of emails, labels, folders, users.
     let categorySearchResults: SearchResult[] = [];
@@ -61,10 +35,12 @@ export const useSearch = () => {
       label: 'Search results'
     };
     if (category === SearchCategory.SKEMAIL) {
-      const skemailResults: SkemailSearchResult[] | undefined = await skemailSearch(searchStr);
+      const skemailResults = await skemailSearch(searchStr);
       if (skemailResults?.length) {
         categorySearchResults = [...skemailResults];
-        if (!fullView) categorySearchResults.unshift(searchResultHeader);
+        if (!fullView) {
+          categorySearchResults.unshift(searchResultHeader);
+        }
       }
     } else if (category === SearchCategory.LABEL) {
       const labelResults: LabelSearchResult[] | undefined = labelSearch(searchStr);

@@ -1,5 +1,6 @@
-import { Icon, Icons, Typography, TypographyProps } from 'nightwatch-ui';
+import { ThemeMode, Typography, TypographyWeight } from 'nightwatch-ui';
 import React from 'react'; // eslint-disable-line
+import { RadioCheckbox } from 'skiff-front-utils';
 import styled from 'styled-components';
 
 import { CHECKED_ID, UNCHECKED_ID } from '../Settings/Appearance/ThemeSelect/ThemeSelectID.constants';
@@ -13,8 +14,8 @@ type SelectBoxProps = {
   iconSvg: JSX.Element;
   dataTest?: string;
   bgColor?: string;
-  labelColor?: TypographyProps['color'];
   position?: 'left' | 'right' | 'center';
+  forceTheme?: ThemeMode;
 };
 
 const BORDER_RADIUS = 12;
@@ -54,45 +55,6 @@ const RadioContainer = styled.div`
   position: relative;
 `;
 
-const CheckedIcon = styled.div`
-  width: 20px;
-  height: 20px;
-  background: #ef5a3c;
-  outline: 2px solid var(--accent-orange-secondary);
-  box-shadow: var(--shadow-l2);
-  border-radius: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-  position: absolute;
-  top: 80px;
-  left: 14px;
-  z-index: 99999;
-  justify-content: center;
-`;
-
-const CheckedIconDot = styled.div`
-  width: 8px;
-  height: 8px;
-  border-radius: 8px;
-  background: var(--icon-always-white);
-  box-shadow: var(--shadow-l2);
-`;
-
-const UnCheckedIcon = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-  position: absolute;
-  top: 80px;
-  left: 14px;
-  z-index: 99999;
-  justify-content: center;
-  opacity: 0.6;
-`;
-
 const IconContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -107,13 +69,18 @@ const ContentContainer = styled.div`
   position: relative;
 `;
 
+const StyledRadioCheckbox = styled(RadioCheckbox)`
+  position: absolute;
+  top: 80px;
+  left: 14px;
+`;
+
 /**
  * Component for rendering a selectable box, that changes when clicked.
  */
 function SelectBox(props: SelectBoxProps) {
   const {
     description,
-    labelColor,
     onClick,
     checked,
     label,
@@ -121,7 +88,8 @@ function SelectBox(props: SelectBoxProps) {
     size = 'small',
     dataTest,
     bgColor,
-    position = 'center'
+    position = 'center',
+    forceTheme
   } = props;
   return (
     <SvgContainer
@@ -136,24 +104,15 @@ function SelectBox(props: SelectBoxProps) {
       <IconContainer>{iconSvg}</IconContainer>
       <ContentContainer>
         <LabelContainer>
-          <Typography color={labelColor} type='label'>
+          <Typography color='primary' forceTheme={forceTheme} weight={TypographyWeight.MEDIUM}>
             {label}
           </Typography>
-          <Typography color={labelColor} style={{ opacity: 0.56 }} wrap>
+          <Typography color='secondary' forceTheme={forceTheme} wrap>
             {description}
           </Typography>
         </LabelContainer>
         <RadioContainer>
-          {checked && (
-            <CheckedIcon data-test={CHECKED_ID}>
-              <CheckedIconDot />
-            </CheckedIcon>
-          )}
-          {!checked && (
-            <UnCheckedIcon data-test={UNCHECKED_ID}>
-              <Icons color={labelColor} icon={Icon.RadioEmpty} size='large' />
-            </UnCheckedIcon>
-          )}
+          <StyledRadioCheckbox checked={checked} dataTest={checked ? CHECKED_ID : UNCHECKED_ID} theme={forceTheme} />
         </RadioContainer>
       </ContentContainer>
     </SvgContainer>

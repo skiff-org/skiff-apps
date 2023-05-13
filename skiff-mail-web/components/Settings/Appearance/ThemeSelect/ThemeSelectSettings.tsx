@@ -1,5 +1,5 @@
-import React from 'react';
-import { ThemeName, THEME_LOCAL_STORAGE_KEY, TitleActionSection, useTheme } from 'skiff-front-utils';
+import { LocalStorageThemeMode, StorageOnlyThemeMode, ThemeMode } from 'nightwatch-ui';
+import { TitleActionSection, useTheme } from 'skiff-front-utils';
 import { WorkspaceEventType } from 'skiff-graphql';
 import styled from 'styled-components';
 
@@ -7,7 +7,7 @@ import Illustration, { Illustrations } from '../../../../svgs/Illustration';
 import { storeWorkspaceEvent } from '../../../../utils/userUtils';
 import SelectBox from '../../../shared/SelectBox';
 
-import { LIGHT_THEME_SELECT, DARK_THEME_SELECT } from './ThemeSelectID.constants';
+import { DARK_THEME_SELECT, LIGHT_THEME_SELECT, SYSTEM_THEME_SELECT } from './ThemeSelectID.constants';
 
 const THEME_SELECT_VERSION = '0.1.0';
 const Container = styled.div`
@@ -31,36 +31,49 @@ const Container = styled.div`
  * whichs opens the account recovery setup dialog.
  */
 function ThemeSelectSettings() {
-  const { theme, setTheme } = useTheme();
+  const { setStoredTheme, storedTheme } = useTheme();
 
-  const updateTheme = (newTheme: ThemeName) => {
-    setTheme(newTheme);
+  const updateTheme = (newTheme: LocalStorageThemeMode) => {
+    setStoredTheme(newTheme);
     void storeWorkspaceEvent(WorkspaceEventType.SelectTheme, newTheme, THEME_SELECT_VERSION);
-    localStorage.setItem(THEME_LOCAL_STORAGE_KEY, newTheme);
   };
+
+  const setThemeDark = () => updateTheme(ThemeMode.DARK);
+  const setThemeLight = () => updateTheme(ThemeMode.LIGHT);
+  const setSystem = () => updateTheme(StorageOnlyThemeMode.SYSTEM);
 
   return (
     <>
-      <TitleActionSection subtitle='Change the appearance of Skiff.' title='Theme' />
+      <TitleActionSection subtitle='Change the appearance of Skiff' title='Theme' />
       <Container>
         <SelectBox
           bgColor='#F5F5F5'
-          checked={theme === 'light'}
+          checked={storedTheme === ThemeMode.LIGHT}
           dataTest={LIGHT_THEME_SELECT}
+          forceTheme={ThemeMode.LIGHT}
           iconSvg={<Illustration illustration={Illustrations.LightMode} />}
-          label='Light mode'
-          labelColor='black'
-          onClick={() => updateTheme('light')}
+          label='Light'
+          onClick={setThemeLight}
           position='right'
         />
         <SelectBox
           bgColor='#292929'
-          checked={theme === 'dark'}
+          checked={storedTheme === ThemeMode.DARK}
           dataTest={DARK_THEME_SELECT}
+          forceTheme={ThemeMode.DARK}
           iconSvg={<Illustration illustration={Illustrations.DarkMode} />}
-          label='Dark mode'
-          labelColor='white'
-          onClick={() => updateTheme('dark')}
+          label='Dark'
+          onClick={setThemeDark}
+          position='right'
+        />
+        <SelectBox
+          bgColor='#E5E5E5'
+          checked={storedTheme === StorageOnlyThemeMode.SYSTEM}
+          dataTest={SYSTEM_THEME_SELECT}
+          forceTheme={ThemeMode.LIGHT}
+          iconSvg={<Illustration illustration={Illustrations.SystemMode} />}
+          label='System'
+          onClick={setSystem}
           position='right'
         />
       </Container>

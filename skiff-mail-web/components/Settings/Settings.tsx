@@ -1,6 +1,6 @@
-import { Icon } from 'nightwatch-ui';
 import { useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
+import { useUserProfile } from 'skiff-front-graphql';
 import {
   DEFAULT_MOBILE_SETTINGS_INDICES,
   DEFAULT_WEB_SETTING_INDICES,
@@ -11,22 +11,22 @@ import {
   SettingsSection,
   SETTINGS_PAPER_ID,
   useTheme,
-  useToast
+  useToast,
+  useRequiredCurrentUserData
 } from 'skiff-front-utils';
 
-import { useRequiredCurrentUserData } from '../../apollo/currentUser';
 import { MOBILE_MAIL_BODY_ID } from '../../constants/mailbox.constants';
 import { useCurrentUserDefinedDisplayName } from '../../hooks/useCurrentUserDefinedDisplayName';
 import { useUsernameFromUser } from '../../hooks/useUsernameFromUser';
-import { useUserProfile } from '../../hooks/useUserProfile';
 
-import { useAvailableSettings, useSettings } from './useSettings';
+import { useAvailableSettings } from './useAvailableSettings';
+import { useSettings } from './useSettings';
 
 export default function Settings() {
   const { availableSettings, loading } = useAvailableSettings();
   const { enqueueToast } = useToast();
   const { closeSettings, openSettings, querySearchParams } = useSettings();
-  const { settingTab: settingsTabValue, setting: settingValue } = querySearchParams;
+  const { settingTab: settingsTabValue, setting: settingValue, fullsize } = querySearchParams;
   const user = useRequiredCurrentUserData();
   const currentDisplayName = useCurrentUserDefinedDisplayName();
   const { username } = useUsernameFromUser(user);
@@ -61,8 +61,8 @@ export default function Settings() {
   const mobileAvatarProps: MobileAvatarProps = {
     onCopy: () => {
       enqueueToast({
-        body: `Username copied.`,
-        icon: Icon.Info
+        title: `Username copied`,
+        body: `${username} saved to clipboard.`
       });
     },
     displayName: currentDisplayName || '',
@@ -81,6 +81,7 @@ export default function Settings() {
     <SettingsDrawer
       avatarProps={mobileAvatarProps}
       containerId={MOBILE_MAIL_BODY_ID}
+      fullsize={!!fullsize}
       initialSettingIndices={settingsIndices}
       onChangeSettingsIndices={openSettings}
       onClose={closeSettings}

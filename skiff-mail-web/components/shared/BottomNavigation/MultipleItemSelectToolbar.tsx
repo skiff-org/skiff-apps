@@ -1,15 +1,15 @@
 import { Icon } from 'nightwatch-ui';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { SystemLabels } from 'skiff-graphql';
 
 import { useRouterLabelContext } from '../../../context/RouterLabelContext';
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
+import { useMarkAsReadUnread } from '../../../hooks/useMarkAsReadUnread';
 import { useThreadActions } from '../../../hooks/useThreadActions';
 import { MailboxThreadInfo } from '../../../models/thread';
 import { skemailMobileDrawerReducer } from '../../../redux/reducers/mobileDrawerReducer';
 import { LABEL_TO_SYSTEM_LABEL } from '../../../utils/label';
-import { handleMarkAsReadUnreadClick } from '../../../utils/mailboxUtils';
 import MailboxMoreOptionsDrawer from '../../mailbox/MailboxActions/MobileMailboxMoreOptionsDrawer';
 import ApplyUserLabelDrawer from '../../Thread/ApplyUserLabelDrawer';
 
@@ -24,10 +24,13 @@ interface MultipleItemSelectToolbarProps {
  * mailbox threads/pages (Inbox, Drafts, Sent, etc..)
  */
 export const MultipleItemSelectToolbar = ({ threads }: MultipleItemSelectToolbarProps) => {
+  const [isMarkAsReadUnreadStarted, setIsMarkAsReadUnreadStarted] = useState(false);
   const dispatch = useDispatch();
   const { archiveThreads, moveThreads, trashThreads, deleteThreads } = useThreadActions();
   const selectedThreadsIds = useAppSelector((state) => state.mailbox.selectedThreadIDs);
   const { value: label } = useRouterLabelContext();
+  const { markThreadsAsReadUnread, isLoading: isMarkAsReadUnreadLoading } = useMarkAsReadUnread();
+
   const isTrash = label === SystemLabels.Trash;
   const isArchive = label === SystemLabels.Archive;
   const isDrafts = label === SystemLabels.Drafts;
@@ -36,45 +39,56 @@ export const MultipleItemSelectToolbar = ({ threads }: MultipleItemSelectToolbar
     (thread) => threads.find((t) => t.threadID === thread)?.attributes.read === false
   );
   const selectedThreads = threads.filter((thread) => selectedThreadsIds.includes(thread.threadID));
+  const nonSelected = selectedThreads.length === 0;
 
-  const closeMultiSelectMenu = () => {
-    // Set mult item selector to false and clear selected threads
-    dispatch(skemailMobileDrawerReducer.actions.setMultipleItemSelector(false));
-  };
-
-  const markAsReadUnreadClick = useCallback(async () => {
-    await handleMarkAsReadUnreadClick(selectedThreads, someSelectedAreUnread);
-    if (selectedThreads.length === threads.length) {
-      closeMultiSelectMenu();
-    }
-  }, [someSelectedAreUnread, selectedThreads]);
-
+  // Set mult item selector to false and clear selected threads
+  const closeMultiSelectMenu = useCallback(
+    () => dispatch(skemailMobileDrawerReducer.actions.setMultipleItemSelector(false)),
+    [dispatch]
+  );
   const onMoreOptionsClick = () => dispatch(skemailMobileDrawerReducer.actions.setShowMailboxMoreOptionsDrawer(true));
 
-  const nonSelected = selectedThreads.length === 0;
+  const onMarkAsReadUnreadClick = () => {
+    markThreadsAsReadUnread(selectedThreads, someSelectedAreUnread);
+    setIsMarkAsReadUnreadStarted(true);
+  };
+
+  // Close multi-select toolbar if the user marked all threads as read / unread
+  useEffect(() => {
+    if (!isMarkAsReadUnreadStarted || isMarkAsReadUnreadLoading) return;
+    if (selectedThreads.length === threads.length) closeMultiSelectMenu();
+    setIsMarkAsReadUnreadStarted(false);
+  }, [
+    closeMultiSelectMenu,
+    isMarkAsReadUnreadStarted,
+    isMarkAsReadUnreadLoading,
+    selectedThreads.length,
+    threads.length
+  ]);
+
   return (
     <>
-      {!isTrash && !isArchive && (
-        <>
-          <ToolbarButton
-            disabled={nonSelected}
-            icon={Icon.Archive}
-            onClick={(e) => {
-              e.stopPropagation();
-              void archiveThreads(selectedThreadsIds);
-              closeMultiSelectMenu();
-            }}
-          />
-          <ToolbarButton
-            disabled={nonSelected}
-            icon={Icon.Trash}
-            onClick={(e) => {
-              e.stopPropagation();
-              void trashThreads(selectedThreadsIds, isDrafts);
-              closeMultiSelectMenu();
-            }}
-          />
-        </>
+      {!isArchive && (
+        <ToolbarButton
+          disabled={nonSelected}
+          icon={Icon.Archive}
+          onClick={(e) => {
+            e.stopPropagation();
+            void archiveThreads(selectedThreadsIds);
+            closeMultiSelectMenu();
+          }}
+        />
+      )}
+      {!isTrash && (
+        <ToolbarButton
+          disabled={nonSelected}
+          icon={Icon.Trash}
+          onClick={(e) => {
+            e.stopPropagation();
+            void trashThreads(selectedThreadsIds, isDrafts);
+            closeMultiSelectMenu();
+          }}
+        />
       )}
       {isTrash ||
         (isArchive && (
@@ -102,7 +116,7 @@ export const MultipleItemSelectToolbar = ({ threads }: MultipleItemSelectToolbar
       <ToolbarButton
         disabled={nonSelected}
         icon={someSelectedAreUnread ? Icon.EnvelopeRead : Icon.EnvelopeUnread}
-        onClick={() => void markAsReadUnreadClick()}
+        onClick={onMarkAsReadUnreadClick}
       />
       <ToolbarButton disabled={nonSelected} icon={Icon.OverflowH} onClick={onMoreOptionsClick} />
       <MailboxMoreOptionsDrawer label={label} selectedThreadsIds={selectedThreadsIds} />

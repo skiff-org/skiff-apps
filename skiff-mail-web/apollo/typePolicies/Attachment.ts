@@ -2,11 +2,9 @@
 
 import { FieldReadFunction, TypePolicy } from '@apollo/client';
 import { decryptSessionKey } from 'skiff-crypto-v2';
-import { memoizeFieldReadFunction } from 'skiff-front-utils';
+import { memoizeFieldReadFunction, requireCurrentUserData } from 'skiff-front-utils';
 import { Attachment } from 'skiff-graphql';
 import { assertExists } from 'skiff-utils';
-
-import { requireCurrentUserData } from '../currentUser';
 
 const readDecryptedSessionKey: FieldReadFunction<Attachment['decryptedSessionKey']> = memoizeFieldReadFunction(
   (_, options) => {

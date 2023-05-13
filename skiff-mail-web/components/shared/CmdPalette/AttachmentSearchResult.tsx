@@ -1,14 +1,13 @@
 import dayjs from 'dayjs';
-import { Icon, Icons, Typography } from 'nightwatch-ui';
+import { Icon, Icons, ThemeMode, Typography, TypographyWeight } from 'nightwatch-ui';
 import { formatTypeSize, getIconFromMIMEType } from 'skiff-front-utils';
 import styled from 'styled-components';
 
 import { SearchAttachment } from '../../../utils/searchWorkerUtils';
 
-import { SEARCH_ITEM_DEFAULT_TYPOGRAPHY_LEVEL } from './constants';
+import { SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE } from './constants';
 import { DateText } from './DateText.styles';
 import { Highlight } from './Highlight';
-import { renderRowBackground } from './SearchResult';
 
 const Container = styled.div`
   cursor: pointer;
@@ -39,64 +38,48 @@ const SearchResultContentArea = styled.div`
   flex-direction: column;
   min-width: 0;
   pointer-events: none;
-  & span.outerText:first-child {
-    color: white !important;
-  }
 `;
 
 interface AttachmentSearchResultProps {
   subject: string;
   query: string;
   attachment: SearchAttachment;
-  active: boolean;
-  hover: boolean;
   style?: React.CSSProperties;
-  rowHeight: number;
   onMouseUp: React.MouseEventHandler<HTMLDivElement>;
-  setHover: (hover: boolean) => void;
 }
 
 export const AttachmentSearchResult = ({
   subject,
   query,
   attachment,
-  active,
-  hover,
   style,
-  rowHeight,
-  onMouseUp,
-  setHover
+  onMouseUp
 }: AttachmentSearchResultProps) => {
   const { fileType, fileSize, fileName, email } = attachment;
   const { subject: emailSubject, createdAt } = email;
   const icon = fileType ? getIconFromMIMEType(fileType) : Icon.PaperClip;
   const formattedTypeAndSize = formatTypeSize(fileType, fileSize);
   return (
-    <Container
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onMouseUp={onMouseUp}
-      style={style}
-      tabIndex={-1}
-    >
-      {renderRowBackground(active, hover, rowHeight)}
+    <Container onMouseUp={onMouseUp} style={style} tabIndex={-1}>
       <IconContainer>
         <Icons color='white' icon={icon} />
       </IconContainer>
       <SearchResultContentArea data-test={`search-result-${subject}`}>
         <NameEmailBlock>
-          <Highlight query={query} size='small' text={fileName} />
+          <Highlight customColor='white' query={query} size='small' text={fileName} />
           <Typography
             color='secondary'
-            level={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_LEVEL}
-            themeMode='dark'
-            type='label'
+            forceTheme={ThemeMode.DARK}
+            size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}
+            weight={TypographyWeight.MEDIUM}
           >{` - ${emailSubject}`}</Typography>
         </NameEmailBlock>
-        <DateText color='secondary' level={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_LEVEL} themeMode='dark'>
-          {dayjs(createdAt).format('MMM D')}
+        <DateText>
+          <Typography color='secondary' forceTheme={ThemeMode.DARK} size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}>
+            {dayjs(createdAt).format('MMM D')}
+          </Typography>
         </DateText>
-        <Typography color='secondary' level={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_LEVEL} themeMode='dark'>
+        <Typography color='secondary' forceTheme={ThemeMode.DARK} size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}>
           {formattedTypeAndSize}
         </Typography>
       </SearchResultContentArea>

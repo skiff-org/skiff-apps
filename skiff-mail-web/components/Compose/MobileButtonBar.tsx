@@ -1,11 +1,11 @@
-import { Button, Icon, IconButton } from 'nightwatch-ui';
+import { Button, Icon, IconButton, Size } from 'nightwatch-ui';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { skemailMobileDrawerReducer } from '../../redux/reducers/mobileDrawerReducer';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 
-import MobileOptionsDrawer from './ComposeToolbarOptions/MobileOptionsDrawer';
+import MobileOptionsDrawer, { MoreBottomBarOption } from './ComposeToolbarOptions/MobileOptionsDrawer';
 
 const ButtonBar = styled.div`
   width: 100%;
@@ -28,8 +28,6 @@ const CloseButtonContainer = styled.div`
   margin-right: auto;
 `;
 
-type Size = 'small' | 'medium' | 'large';
-
 interface MobileButtonBarProps {
   messageSizeExceeded: boolean;
   handleSendClick: () => Promise<void>;
@@ -38,7 +36,6 @@ interface MobileButtonBarProps {
   insertImage: () => void;
 }
 export default function MobileButtonBar({
-  messageSizeExceeded,
   handleSendClick,
   onAttachmentsClick,
   discardDraft,
@@ -48,18 +45,17 @@ export default function MobileButtonBar({
   const showMoreOptionsDrawer = () => {
     dispatch(skemailMobileDrawerReducer.actions.setShowComposeMoreOptionsDrawer(true));
   };
-  const mobileDrawerOptions = {
+  const mobileDrawerOptions: Record<string, MoreBottomBarOption> = {
     image: {
       icon: Icon.Image,
-      size: 'large' as Size,
       onClick: insertImage,
       tooltip: 'Insert image'
     },
     trash: {
       icon: Icon.Trash,
       onClick: discardDraft,
-      size: 'large' as Size,
-      tooltip: 'Discard draft'
+      tooltip: 'Discard draft',
+      color: 'destructive'
     }
   };
 
@@ -71,7 +67,7 @@ export default function MobileButtonBar({
           onClick={() => {
             dispatch(skemailModalReducer.actions.closeCompose());
           }}
-          size='large'
+          size={Size.LARGE}
           tooltip='Close'
         />
       </CloseButtonContainer>
@@ -80,14 +76,16 @@ export default function MobileButtonBar({
           dataTest='add-attachment'
           icon={Icon.PaperClip}
           onClick={onAttachmentsClick}
-          size='large'
+          size={Size.LARGE}
           tooltip='Add attachments'
         />
-        <IconButton icon={Icon.OverflowH} onClick={showMoreOptionsDrawer} size='large' />
+        <IconButton icon={Icon.OverflowH} onClick={showMoreOptionsDrawer} size={Size.LARGE} />
       </IconButtons>
-      <Button dataTest='send-button' disabled={messageSizeExceeded} onClick={() => void handleSendClick()}>
-        Send
-      </Button>
+      <div>
+        <Button dataTest='send-button' onClick={() => void handleSendClick()}>
+          Send
+        </Button>
+      </div>
       <MobileOptionsDrawer moreBottomBarOptions={mobileDrawerOptions} />
     </ButtonBar>
   );

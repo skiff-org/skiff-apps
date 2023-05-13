@@ -1,10 +1,9 @@
 // TODO (EMAIL-1699): deduplicate utils
-import * as ethers from 'ethers';
 import {
   CreateWalletChallengeSkemailDocument,
   CreateWalletChallengeSkemailMutation,
   CreateWalletChallengeSkemailMutationVariables
-} from 'skiff-mail-graphql';
+} from 'skiff-front-graphql';
 import { isENSName } from 'skiff-utils';
 
 import client from '../apollo/client';
@@ -13,7 +12,8 @@ import client from '../apollo/client';
 export const isWalletEnabled = () =>
   !!(window as any).ethereum || !!(window as any).phantom || !!(window as any).solana;
 
-const resolveENSName = async (provider: ethers.ethers.providers.Web3Provider, ensName: string) => {
+const resolveENSName = async (provider: any, ensName: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const address = await provider.resolveName(ensName);
   if (!address) return undefined;
   return address;
@@ -29,6 +29,8 @@ export async function getEthAddrFromENSName(ensName: string) {
   if (!ethereum) return undefined;
   if (!isENSName(ensName)) return undefined;
   try {
+    const { default: ethers } = await import('ethers');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const ens = new ethers.providers.Web3Provider(ethereum);
     return await resolveENSName(ens, ensName);
   } catch (error) {
@@ -46,6 +48,8 @@ export async function getENSNameFromEthAddr(ethAddr: string) {
   const ethereum = (window as any).ethereum;
   if (!ethereum) return undefined;
   try {
+    const { default: ethers } = await import('ethers');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const provider = new ethers.providers.Web3Provider(ethereum);
     const name = await provider.lookupAddress(ethAddr);
     if (!name) return undefined;

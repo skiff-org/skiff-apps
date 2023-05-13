@@ -11,29 +11,28 @@ import { readFile } from '../../../utils/readFile';
  * See https://stackoverflow.com/questions/12168909/blob-from-dataurl
  */
 export const b64toBlobOrURL = (dataURI: string) => {
-  if (!dataURI) return '';
-  const isUrlSrc = dataURI.startsWith('http://') || dataURI.startsWith('https://');
-  if (isUrlSrc) {
-    return dataURI;
+  if (dataURI.trim().startsWith('data:')) {
+    try {
+      const byteString = window.atob(dataURI.split(',')[1] ?? '');
+      // separate out the mime component
+      const mimeString = dataURI.split(',')[0]?.split(':')[1]?.split(';')[0];
+      // write the bytes of the string to an ArrayBuffer
+      const ab = new ArrayBuffer(byteString.length);
+      // create a view into the buffer
+      const ia = new Uint8Array(ab);
+      // set the bytes of the buffer to the correct values
+      for (let idx = 0; idx < byteString.length; idx++) {
+        ia[idx] = byteString.charCodeAt(idx);
+      }
+      // write the ArrayBuffer to a blob, and you're done
+      const blob = new Blob([ab], { type: mimeString });
+      return blob;
+    } catch (err) {}
   }
-
-  const byteString = window.atob(dataURI.split(',')[1]);
-  // separate out the mime component
-  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-  // write the bytes of the string to an ArrayBuffer
-  const ab = new ArrayBuffer(byteString.length);
-  // create a view into the buffer
-  const ia = new Uint8Array(ab);
-  // set the bytes of the buffer to the correct values
-  for (let idx = 0; idx < byteString.length; idx++) {
-    ia[idx] = byteString.charCodeAt(idx);
-  }
-  // write the ArrayBuffer to a blob, and you're done
-  const blob = new Blob([ab], { type: mimeString });
-  return blob;
+  return dataURI;
 };
 
-export const cidToSrc = (cid: string) => `cid:${cid}@skiff.com`;
+export const cidToSrc = (cid: string) => `cid:${cid}@skiff.town`;
 
 export const blobToB64 = async (blob: Blob): Promise<string | ArrayBuffer | null | undefined> =>
   new Promise((resolve, reject) => {
@@ -85,7 +84,7 @@ export const createImagesFromFiles = (imagesFiles: File[], view: EditorView) => 
 export const getAllImagesInEditor = (editor: Editor): { node: Node; pos: number }[] => {
   const images: { node: Node; pos: number }[] = [];
 
-  editor.state.doc.descendants((node, pos) => {
+  editor.view.state.doc.descendants((node, pos) => {
     if (node.type.name === Image.name) {
       images.push({ node, pos });
     }

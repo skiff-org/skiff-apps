@@ -1,4 +1,13 @@
-import { Icons, Typography } from 'nightwatch-ui';
+import {
+  Alignment,
+  Icons,
+  Size,
+  themeNames,
+  ThemeMode,
+  Typography,
+  TypographySize,
+  TypographyWeight
+} from 'nightwatch-ui';
 import styled from 'styled-components';
 
 import { ThreadBlockOptions } from '../Thread.types';
@@ -8,11 +17,12 @@ const EnlargedOptionContainer = styled.div<{ destructive?: boolean }>`
   align-items: center;
   justify-content: center;
   padding: 10px;
-  border: 1px solid ${(props) => (!props.destructive ? 'var(--border-primary)' : 'var(--border-destructive)')};
+  border: 1px solid
+    ${(props) => (!props.destructive ? themeNames.dark['--border-primary'] : themeNames.dark['--border-destructive'])};
   border-radius: 11px;
   gap: 8px;
   height: 50px;
-  width: 60px;
+  width: 100%;
 `;
 
 export const EnlargedOption = ({
@@ -36,9 +46,24 @@ export const EnlargedOption = ({
         }
       }}
     >
-      {option.icon && <Icons color={destructive ? 'destructive' : 'primary'} icon={option.icon} size='large' />}
-      <Typography align='center' color={destructive ? 'destructive' : 'primary'} level={4} noSelect wrap>
-        {option.label}
+      {option.icon && (
+        <Icons
+          color={destructive ? 'destructive' : 'primary'}
+          forceTheme={ThemeMode.DARK}
+          icon={option.icon}
+          size={Size.X_MEDIUM}
+        />
+      )}
+      <Typography
+        align={Alignment.CENTER}
+        color={destructive ? 'destructive' : 'primary'}
+        forceTheme={ThemeMode.DARK}
+        selectable={false}
+        size={TypographySize.CAPTION}
+        weight={TypographyWeight.MEDIUM}
+        wrap
+      >
+        {option.label.toUpperCase()}
       </Typography>
     </EnlargedOptionContainer>
   );

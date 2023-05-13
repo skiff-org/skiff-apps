@@ -5,8 +5,6 @@ export enum GlobalKeyActions {
   UP_ARROW = 'UP_ARROW',
   DOWN_ARROW = 'DOWN_ARROW',
   ENTER = 'ENTER',
-  CMD_1 = 'CMD_1',
-  CMD_2 = 'CMD_2',
   SELECT_THREAD = 'SELECT_THREAD',
   ARCHIVE = 'ARCHIVE',
   TRASH = 'TRASH',
@@ -18,7 +16,8 @@ export enum GlobalKeyActions {
   FORWARD = 'FORWARD',
   LABELS_MENU = 'LABELS_MENU',
   REMOVE_ALL_LABELS = 'REMOVE_ALL_LABELS',
-  OPEN_SHORTCUTS = 'OPEN_SHORTCUTS'
+  OPEN_SHORTCUTS = 'OPEN_SHORTCUTS',
+  OPEN_SETTINGS = 'OPEN_SETTINGS'
 }
 
 // Key combinations vs sequences: https://github.com/greena13/react-hotkeys/blob/master/README.md#key-combinations-vs-sequences
@@ -54,9 +53,8 @@ export const globalSingleKeyMap = {
 
 // Key map for sequences of a single combination with multiple keys (keys must be pressed at the same time)
 export const globalSingleCombinationKeyMap = {
-  [GlobalKeyActions.OPEN_COMMAND_PALETTE]: ['meta+p', 'ctrl+p'],
-  [GlobalKeyActions.CMD_1]: 'meta+1',
-  [GlobalKeyActions.CMD_2]: 'meta+2',
+  [GlobalKeyActions.OPEN_COMMAND_PALETTE]: ['meta+p', 'ctrl+p', 'meta+k', 'ctrl+k'],
+  [GlobalKeyActions.OPEN_SETTINGS]: ['meta+,', 'ctrl+,'],
   [GlobalKeyActions.TRASH]: 'shift+3', // #
   /**
    * remove all labels
@@ -71,65 +69,6 @@ export const globalSingleCombinationKeyMap = {
 // Key map for sequences of multiple combinations (keys must be pressed and released one after another)
 export const globalMultiCombinationKeyMap = {
   [GlobalKeyActions.GO_TO_MAILBOX]: ['g i', 'g t', 'g d', 'g shift+1', 'g e', 'g shift+3']
-};
-
-export enum ComposeKeyActions {
-  TO = 'TO',
-  CC = 'CC',
-  BCC = 'BCC',
-  FROM = 'FROM',
-  EDIT_SUBJECT = 'EDIT_SUBJECT',
-  EDIT_MESSAGE = 'EDIT_MESSAGE',
-  ATTACH = 'ATTACH',
-  DISCARD_DRAFT = 'DISCARD_DRAFT',
-  MOVE_CONTACT_TO_BCC = 'MOVE_CONTACT_TO_BCC',
-  SEND = 'SEND'
-}
-
-/**
- * Hot keys for the compose, only when its open
- */
-export const composeKeyMap = {
-  /**
-   * Focus the To field
-   */
-  [ComposeKeyActions.TO]: ['meta+shift+O'],
-  /**
-   * Focus the CC field
-   */
-  [ComposeKeyActions.CC]: ['meta+shift+C'],
-  /**
-   * Focus the BCC field
-   */
-  [ComposeKeyActions.BCC]: ['meta+shift+B'],
-  /**
-   * Focus the From field
-   */
-  [ComposeKeyActions.FROM]: ['meta+shift+F'],
-  /**
-   * Focus the Subject field
-   */
-  [ComposeKeyActions.EDIT_SUBJECT]: ['meta+shift+S'],
-  /**
-   * Focus the Message body editor
-   */
-  [ComposeKeyActions.EDIT_MESSAGE]: ['meta+shift+M'],
-  /**
-   * Open the attachments file input popup
-   */
-  [ComposeKeyActions.ATTACH]: ['meta+shift+A'],
-  /**
-   * Close the compose and discard draft
-   */
-  [ComposeKeyActions.DISCARD_DRAFT]: ['meta+shift+,'],
-  /**
-   * Add all addresses from CC to BCC
-   */
-  [ComposeKeyActions.MOVE_CONTACT_TO_BCC]: ['meta+shift+I'],
-  /**
-   * Send email
-   */
-  [ComposeKeyActions.SEND]: ['meta+enter']
 };
 
 /**

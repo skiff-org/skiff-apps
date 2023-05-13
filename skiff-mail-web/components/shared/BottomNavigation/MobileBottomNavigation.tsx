@@ -1,4 +1,3 @@
-import { BottomNavigation } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
@@ -18,7 +17,7 @@ const BottomNavigationContainer = styled.div`
   transition: transform 0.2s;
 `;
 
-const StyledBottomNavigation = styled(BottomNavigation)<{ sendingProgress: number | undefined }>`
+const StyledBottomNavigation = styled.div<{ sendingProgress: number | undefined }>`
   display: flex;
   border-top: 1px solid var(--border-secondary);
   background: var(--bg-l3-solid) !important;

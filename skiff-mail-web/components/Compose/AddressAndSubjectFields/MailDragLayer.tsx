@@ -1,11 +1,12 @@
-import { Chip } from 'nightwatch-ui';
+import { Chip, Size } from 'nightwatch-ui';
 import { DragLayerMonitor, useDragLayer, XYCoord } from 'react-dnd';
 import { getAddrDisplayName } from 'skiff-front-utils';
 import styled from 'styled-components';
 
+import { getBadgeIcon } from '../../../utils/composeUtils';
 import { DNDItemTypes } from '../../../utils/dragAndDrop';
 
-import { ComposeAddressChipData, getBadgeIcon } from './RecipientField';
+import { ComposeAddressChipData } from './RecipientField';
 
 interface DragContainerProps {
   offset: XYCoord | null;
@@ -44,7 +45,7 @@ export const MailDragLayer = () => {
     const { formattedDisplayName: chipLabel } = getAddrDisplayName(item.addr);
     return (
       <DragContainer offset={currentOffset}>
-        <Chip label={chipLabel} size='medium' startIcon={getBadgeIcon(item.icon)} />
+        <Chip label={chipLabel} size={Size.MEDIUM} startIcon={getBadgeIcon(chipLabel, item.icon, false)} />
       </DragContainer>
     );
   }

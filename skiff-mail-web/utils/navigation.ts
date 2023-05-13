@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import { useCallback } from 'react';
 import { SystemLabels } from 'skiff-graphql';
 
+import { AppRoutes } from '../constants/route.constants';
+
 export const useNavigate = () => {
   const router = useRouter();
 
@@ -26,7 +28,7 @@ export const useNavigate = () => {
         }
       );
     },
-    []
+    [router]
   );
 
   const navigateToUserLabel = useCallback(
@@ -35,16 +37,28 @@ export const useNavigate = () => {
      */
     async (userLabel: string) => {
       const encodedUserLabel = encodeURIComponent(userLabel.toLocaleLowerCase());
-      await router.push(`/label#${encodedUserLabel}`);
+      await router.push(`${AppRoutes.LABEL}#${encodedUserLabel}`);
     },
-    []
+    [router]
   );
 
   const navigateToInbox = useCallback(async () => {
     await navigateToSystemLabel(SystemLabels.Inbox);
-  }, []);
+  }, [navigateToSystemLabel]);
 
-  return { navigateToSystemLabel, navigateToUserLabel, navigateToInbox };
+  const navigateToSearch = useCallback(async () => {
+    await router.push(
+      {
+        pathname: AppRoutes.SEARCH
+      },
+      undefined,
+      {
+        shallow: true
+      }
+    );
+  }, [router]);
+
+  return { navigateToSystemLabel, navigateToUserLabel, navigateToInbox, navigateToSearch };
 };
 
 /**

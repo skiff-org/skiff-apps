@@ -1,101 +1,86 @@
-import { Icon, Typography } from 'nightwatch-ui';
-import { CopyToClipboardButton, useToast } from 'skiff-front-utils';
-import { DnsRecord, DnsRecordType } from 'skiff-graphql';
-import styled from 'styled-components';
+import { Icons, Icon } from 'nightwatch-ui';
+import { DnsRecord } from 'skiff-graphql';
+import styled, { css } from 'styled-components';
 
-const DnsRecordRowContainer = styled.div`
+import {
+  getErrorStatusForDnsRecord,
+  getValueAndPriority,
+  getErrorDataForDnsRecordValue,
+  UserFacingCustomDomainStatus,
+  DnsRecordColumnHeader,
+  DnsRecordColumnWithPossibleError
+} from '../../../utils/customDomainUtils';
+
+import ValueDescriptionText from './ValueDescriptionText';
+
+export const DnsRecordRowContainer = styled.div<{
+  showErrorStyling?: boolean;
+  errorDetailView?: boolean;
+  isHeader?: boolean;
+}>`
   display: flex;
-  align-items: center;
-  padding: 0px;
-  gap: 3.33%;
-
-  width: 100%;
-  height: 40px;
+  align-items: ${(props) => (props.errorDetailView ? 'flex-start' : 'center')};
+  padding: ${(props) => (props.errorDetailView ? '6' : '4')}px 8px;
+  border-radius: 4px;
+  gap: ${(props) => (props.errorDetailView ? '3.33' : '2.5')}%;
+  ${(props) =>
+    !props.isHeader &&
+    (props.errorDetailView || props.showErrorStyling) &&
+    css`
+      background: var(--bg-overlay-tertiary);
+    `}
 `;
 
-const ValueDescriptionContainer = styled.div<{ $width: number }>`
+export const IconContainer = styled.div`
   display: flex;
-  flex-direction: column;
   align-items: flex-start;
-  padding: 2px 0px;
-
-  height: 40px;
-
-  ${(props) => `
-    min-width: ${props.$width}%;
-  `}
-`;
-
-const StyledCopyToClipboardButton = styled(CopyToClipboardButton)`
-  margin-left: auto;
+  width: 2%; // shared with 4x ValueDescriptionText
 `;
 
 interface DnsRecordRowProps {
   dnsRecord: DnsRecord;
+  domainStatus: UserFacingCustomDomainStatus | undefined; // undefined on initial setup before verification
+  errorDetailView?: boolean; // whether this row is part of an expanded view highlighting specific errors
 }
 
-interface ValueDescriptionTextProps {
-  value: string;
-  description: string;
-  width?: 'normal' | 'short' | 'long';
-}
-// Small sub-component with Value and Description stacked text
-const ValueDescriptionText: React.FC<ValueDescriptionTextProps> = ({
-  value,
-  description,
-  width = 'normal'
-}: ValueDescriptionTextProps) => {
-  const getWidthPx = () => {
-    switch (width) {
-      case 'short':
-        return 8;
-      case 'normal':
-        return 24;
-      case 'long':
-        return 36;
-    }
-  };
-
-  return (
-    <ValueDescriptionContainer $width={getWidthPx()}>
-      <Typography>{value}</Typography>
-      <Typography color='secondary' level={3} type='paragraph'>
-        {description}
-      </Typography>
-    </ValueDescriptionContainer>
-  );
-};
-
-// TODO: This should be fixed in the backend, with DnsRecordType containing a priority value
-function getValueAndPriority(data: string, type: DnsRecordType) {
-  if (type === DnsRecordType.Mx) {
-    const [priority, value] = data.split(' ');
-    return { value, priority };
-  }
-  return { value: data, priority: 'N/A' };
-}
-
-const DnsRecordRow: React.FC<DnsRecordRowProps> = ({ dnsRecord }: DnsRecordRowProps) => {
+const DnsRecordRow: React.FC<DnsRecordRowProps> = ({ dnsRecord, domainStatus, errorDetailView }: DnsRecordRowProps) => {
   const { data, name, type } = dnsRecord;
-  const { value, priority } = getValueAndPriority(data, type);
-
-  const { enqueueToast } = useToast();
-
-  const copyValueToClipboard = () => {
-    void navigator.clipboard.writeText(data);
-    enqueueToast({
-      body: 'Record copied',
-      icon: Icon.Link
-    });
-  };
+  const { value = '', priority = '' } = getValueAndPriority(data, type);
+  // whether to highlight errors with in-line color changes
+  const showErrorStyling =
+    domainStatus && !errorDetailView ? getErrorStatusForDnsRecord(domainStatus, dnsRecord) : false;
+  // data used to highlight specific incorrect records in the error detail view
+  const getErrorData = (valueType: DnsRecordColumnWithPossibleError) =>
+    errorDetailView && domainStatus ? getErrorDataForDnsRecordValue(dnsRecord, valueType, domainStatus) : undefined;
 
   return (
-    <DnsRecordRowContainer>
-      <ValueDescriptionText description='Type' value={type} width='short' />
-      <ValueDescriptionText description='Name' value={name} />
-      <ValueDescriptionText description='Priority' value={priority} width='short' />
-      <ValueDescriptionText description='Value' value={value} width='long' />
-      <StyledCopyToClipboardButton onClick={copyValueToClipboard} />
+    <DnsRecordRowContainer errorDetailView={errorDetailView} showErrorStyling={showErrorStyling}>
+      <ValueDescriptionText
+        errorDetailView={errorDetailView}
+        showErrorStyling={showErrorStyling}
+        value={type}
+        width='short'
+      />
+      <ValueDescriptionText errorDetailView={errorDetailView} showErrorStyling={showErrorStyling} value={name} />
+      {/**error data only shown on priority and value fields */}
+      <ValueDescriptionText
+        errorDetailView={errorDetailView}
+        incorrectData={getErrorData(DnsRecordColumnHeader.PRIORITY)}
+        showErrorStyling={showErrorStyling}
+        value={priority}
+        width='short'
+      />
+      <ValueDescriptionText
+        errorDetailView={errorDetailView}
+        incorrectData={getErrorData(DnsRecordColumnHeader.VALUE)}
+        showErrorStyling={showErrorStyling}
+        value={value}
+        width='long'
+      />
+      {/* allocate space for the error icon in standard table */}
+      {!errorDetailView && (
+        <IconContainer>{showErrorStyling && <Icons color='red' icon={Icon.Warning} />}</IconContainer>
+      )}
     </DnsRecordRowContainer>
   );
 };

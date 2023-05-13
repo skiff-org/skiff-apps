@@ -1,39 +1,50 @@
-import { Icon, DropdownItem, Drawer, IconText, Dropdown, Avatar } from 'nightwatch-ui';
-import { FC, memo, useEffect, useRef, useState } from 'react';
+import { Icon, DropdownItem, Drawer, Icons, Dropdown, Typography } from 'nightwatch-ui';
+import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
+import { useGetCurrentUserCustomDomainsQuery } from 'skiff-front-graphql';
 import {
   createAbbreviatedWalletEmail,
   createEmail,
-  isWalletAddress,
-  useTheme,
   splitEmailToAliasAndDomain,
-  useLocalSetting,
   DrawerOption,
-  DrawerOptions
+  DrawerOptions,
+  useDefaultEmailAlias,
+  useRequiredCurrentUserData,
+  SettingValue,
+  TabPage
 } from 'skiff-front-utils';
 import { CustomDomainRecord } from 'skiff-graphql';
-import { useGetCurrentUserCustomDomainsQuery } from 'skiff-mail-graphql';
-import { CustomDomainStatus } from 'skiff-utils';
+import { CustomDomainStatus, isWalletAddress } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
 import { skemailMobileDrawerReducer } from '../../../redux/reducers/mobileDrawerReducer';
+import { useSettings } from '../../Settings/useSettings';
 import { EmailFieldTypes } from '../Compose.constants';
 
 import AddressField from './AddressField';
 
-const FromAddressLabel = styled.div`
-  padding: 4px 8px;
-  border-radius: 8px;
-  cursor: pointer;
+const FromAddressLabel = styled.div<{ $isFocused: boolean }>`
+  padding: 4px;
+  border-radius: 4px;
+  gap: 6px;
+  display: flex;
+  align-items: center;
+  // prevent layout shift
+  margin-top: ${({ $isFocused }) => ($isFocused ? 1.5 : 0)};
   max-width: ${isMobile ? '78vw' : undefined};
+  cursor: pointer;
   &:hover {
-    background: var(--bg-cell-hover);
+    background: var(--bg-overlay-tertiary);
   }
 `;
 
-// width is a percentage
+const FieldHeight = styled.div`
+  height: 48px;
+  display: flex;
+  align-items: center;
+`;
 
 interface FromAddressFieldProps {
   focusedField: EmailFieldTypes | null;
@@ -52,10 +63,18 @@ const FromAddressField: FC<FromAddressFieldProps> = ({
   setCustomDomainAlias,
   setFocusedField
 }) => {
+  // Index of the alias hovered over in the alias dropdown
+  const [hoveredAliasIndex, setHoveredAliasIndex] = useState<number | undefined>(
+    emailAliases.findIndex((alias) => alias === userEmail)
+  );
+  // Whether the alias dropdown is opened or closed
   const [showUserAliasDropdown, setShowUserAliasDropdown] = useState(false);
-  const [isUserAliasOptionsOpen, setIsUserAliasOptionsOpen] = useState(false);
+  // Whether the alias drawer is opened or closed
   const showAliasDrawer = useAppSelector((state) => state.mobileDrawer.showAliasDrawer);
   const fromSelectRef = useRef<HTMLDivElement>(null);
+
+  const { userID: currentUserID } = useRequiredCurrentUserData();
+  const [defaultEmailAlias] = useDefaultEmailAlias(currentUserID);
 
   // Fetch users custom domains
   const { data: customDomainsData } = useGetCurrentUserCustomDomainsQuery();
@@ -64,35 +83,76 @@ const FromAddressField: FC<FromAddressFieldProps> = ({
       (domain) => domain.verificationStatus === CustomDomainStatus.VERIFIED
     ) ?? [];
 
-  const [defaultCustomDomainAlias] = useLocalSetting('defaultCustomDomainAlias');
+  // Whether the field is focused
+  // Focusing / unfocusing the field opens / closes the alias dropdown
+  const isFocused = focusedField === EmailFieldTypes.FROM;
+
+  const dispatch = useDispatch();
+  const openDrawer = () => dispatch(skemailMobileDrawerReducer.actions.setShowAliasDrawer(true));
+  const closeDrawer = useCallback(
+    () => dispatch(skemailMobileDrawerReducer.actions.setShowAliasDrawer(false)),
+    [dispatch]
+  );
+
+  const { openSettings } = useSettings();
+
+  const onSelectAlias = useCallback(
+    (selectedAlias: string) => {
+      if (selectedAlias !== userEmail) setUserEmail(selectedAlias);
+      if (isMobile) closeDrawer();
+      else {
+        // Move on to the next field when the user selects an email
+        setFocusedField(EmailFieldTypes.SUBJECT);
+      }
+    },
+    [closeDrawer, setFocusedField, setUserEmail, userEmail]
+  );
+
+  // Arrow keys navigate through the alias dropdown
+  // Enter submits the selected alias
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!showUserAliasDropdown) return;
+      if (e.key === 'Enter' && hoveredAliasIndex !== undefined) {
+        const selectedAlias = emailAliases[hoveredAliasIndex];
+        onSelectAlias(selectedAlias ?? '');
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        e.stopPropagation();
+        setFocusedField(EmailFieldTypes.BODY);
+      }
+    },
+    [showUserAliasDropdown, hoveredAliasIndex, emailAliases, onSelectAlias, setFocusedField]
+  );
+
+  // Only enable keyboard listener for desktop
+  useEffect(() => {
+    if (isMobile) return;
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleKeyDown]);
 
   // If a default custom domain exists, let's start with it
   useEffect(() => {
-    const defaultCustomAlias = emailAliases.find((alias) => alias === defaultCustomDomainAlias);
+    const defaultCustomAlias = emailAliases.find((alias) => alias === defaultEmailAlias);
+    if (defaultCustomAlias) setCustomDomainAlias(defaultCustomAlias);
+  }, [defaultEmailAlias, emailAliases, customDomains.length, setCustomDomainAlias]);
 
-    if (defaultCustomAlias) {
-      setCustomDomainAlias(defaultCustomAlias);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultCustomDomainAlias, emailAliases, customDomains.length, setCustomDomainAlias]);
-
-  const dispatch = useDispatch();
-
-  const { theme: currentTheme } = useTheme();
+  // Open / close alias dropdown when the field is focused / unfocused
+  useEffect(() => {
+    if (isFocused) setShowUserAliasDropdown(true);
+    else setShowUserAliasDropdown(false);
+  }, [emailAliases.length, isFocused]);
 
   if (!emailAliases.length) {
     console.error('No email aliases given for the From address field.');
     return null;
   }
 
-  const updateDropdownAndFieldState = (state: boolean) => {
-    setShowUserAliasDropdown(state);
-    setIsUserAliasOptionsOpen(state);
-    setFocusedField(null);
-  };
-
   const getAliasDisplayText = (email: string) => {
-    const [alias, mailDomain] = splitEmailToAliasAndDomain(email);
+    const { alias, domain: mailDomain } = splitEmailToAliasAndDomain(email);
     if (isWalletAddress(alias)) {
       return createAbbreviatedWalletEmail(alias, mailDomain);
     }
@@ -101,92 +161,70 @@ const FromAddressField: FC<FromAddressFieldProps> = ({
 
   const aliasDisplayLabels = emailAliases.map((alias) => getAliasDisplayText(alias));
 
-  // Return the approx width percentage of the email alias dropdown
-  // depending on the length of the longest alias
-
-  const selectAlias = (selectedAlias: string) => {
-    setUserEmail(selectedAlias);
-    updateDropdownAndFieldState(false);
-    setShowUserAliasDropdown(false);
+  const focusAndOpenDropdown = () => {
+    if (isMobile) openDrawer();
+    else setFocusedField(EmailFieldTypes.FROM);
   };
 
+  const renderAddAliasOption = () => (
+    <DropdownItem
+      icon={Icon.Plus}
+      key='add-alias'
+      label='Add alias'
+      onClick={() => {
+        if (isMobile) closeDrawer();
+        else setFocusedField(null);
+        openSettings({ tab: TabPage.Aliases, setting: SettingValue.AddEmailAlias });
+      }}
+      onHover={() => setHoveredAliasIndex(undefined)}
+    />
+  );
+
   return (
-    <AddressField field={EmailFieldTypes.FROM} focusedField={focusedField}>
-      <FromAddressLabel
-        data-test='from-field'
-        onMouseEnter={() => {
-          if (isMobile) return;
-          // Only show the email alias dropdown if the user has multiple aliases
-          if (emailAliases.length > 1) {
-            setFocusedField(EmailFieldTypes.FROM);
-          }
-        }}
-        onMouseLeave={() => {
-          if (!isUserAliasOptionsOpen) {
-            // setShowUserAliasDropdown(false);
-            setFocusedField(null);
-          }
-        }}
-        ref={fromSelectRef}
-      >
-        <IconText
-          color={focusedField === EmailFieldTypes.FROM ? 'primary' : 'secondary'}
-          endIcon={Icon.ChevronDown}
-          label={getAliasDisplayText(userEmail)}
-          onClick={() => {
-            if (emailAliases.length > 1) {
-              if (isMobile) {
-                dispatch(skemailMobileDrawerReducer.actions.setShowAliasDrawer(true));
-              } else {
-                setShowUserAliasDropdown(true);
-              }
-              setFocusedField(EmailFieldTypes.FROM);
-            }
-          }}
-          type='paragraph'
-        />
-      </FromAddressLabel>
+    <AddressField field={EmailFieldTypes.FROM} isFocused={isFocused} showField>
+      <FieldHeight>
+        <FromAddressLabel
+          $isFocused={isFocused}
+          data-test='from-field'
+          onClick={focusAndOpenDropdown}
+          ref={fromSelectRef}
+        >
+          <Typography>{getAliasDisplayText(userEmail)}</Typography>
+          <Icons color='disabled' icon={Icon.ChevronDown} />
+        </FromAddressLabel>
+      </FieldHeight>
       <Dropdown
         buttonRef={fromSelectRef}
-        className='labelItemDropdown'
-        hasSubmenu
+        highlightedIdx={hoveredAliasIndex}
         maxHeight={200}
+        numChildren={emailAliases.length}
         portal
-        setShowDropdown={setShowUserAliasDropdown}
+        setHighlightedIdx={setHoveredAliasIndex}
+        setShowDropdown={() => setFocusedField(null)}
         showDropdown={showUserAliasDropdown}
       >
         {emailAliases.map((alias, index) => (
           <DropdownItem
             active={alias === userEmail}
-            icon={<Avatar label={alias} size='small' />}
+            highlight={hoveredAliasIndex !== undefined ? hoveredAliasIndex === index : undefined}
             key={alias}
             label={aliasDisplayLabels[index]}
-            onClick={() => selectAlias(alias)}
+            onClick={() => onSelectAlias(alias)}
+            onHover={() => setHoveredAliasIndex(index)}
             value={alias}
           />
         ))}
+        {renderAddAliasOption()}
       </Dropdown>
       {isMobile && (
-        <Drawer
-          hideDrawer={() => {
-            dispatch(skemailMobileDrawerReducer.actions.setShowAliasDrawer(false));
-          }}
-          show={showAliasDrawer}
-          title='Choose Alias'
-        >
+        <Drawer hideDrawer={closeDrawer} show={showAliasDrawer} title='Choose Alias'>
           <DrawerOptions>
             {emailAliases.map((alias, index) => (
               <DrawerOption key={index}>
-                <DropdownItem
-                  label={aliasDisplayLabels[index]}
-                  onClick={() => {
-                    setUserEmail(alias);
-                    dispatch(skemailMobileDrawerReducer.actions.setShowAliasDrawer(false));
-                  }}
-                  themeMode={currentTheme}
-                />
+                <DropdownItem label={aliasDisplayLabels[index]} onClick={() => onSelectAlias(alias)} />
               </DrawerOption>
             ))}
+            {renderAddAliasOption()}
           </DrawerOptions>
         </Drawer>
       )}

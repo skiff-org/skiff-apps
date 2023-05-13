@@ -1,9 +1,17 @@
 import { useCallback } from 'react';
-import { isMobileApp, sendRNWebviewMsg, getSessionCacheKeyForUserID } from 'skiff-front-utils';
-import { useClearSessionCacheMutation } from 'skiff-mail-graphql';
+import { useClearSessionCacheMutation } from 'skiff-front-graphql';
+import {
+  isMobileApp,
+  sendRNWebviewMsg,
+  getSessionCacheKeyForUserID,
+  removeCurrentUserData,
+  useCurrentUserData,
+  DEFAULT_WORKSPACE_EVENT_VERSION
+} from 'skiff-front-utils';
+import { WorkspaceEventType } from 'skiff-graphql';
 
 import client from '../apollo/client';
-import { removeCurrentUserData, useCurrentUserData } from '../apollo/currentUser';
+import { storeWorkspaceEvent } from '../utils/userUtils';
 
 /**
  * hook that returns the skemail logout function
@@ -13,6 +21,12 @@ export const useMailLogout = () => {
   const userData = useCurrentUserData();
 
   const skemailLogout = useCallback(async () => {
+    try {
+      await storeWorkspaceEvent(WorkspaceEventType.Logout, '', DEFAULT_WORKSPACE_EVENT_VERSION);
+    } catch (error) {
+      // proceed
+    }
+
     const clearCacheAsync = async () => {
       try {
         await clearSessionCache();

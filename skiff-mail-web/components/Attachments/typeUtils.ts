@@ -37,7 +37,7 @@ export const isAttachment = (attachment: Attachment | null): attachment is Attac
 /**
  * Checks if all attachments ready to be send
  */
-export const isAllHasContent = (
+export const allAttachmentsHaveContent = (
   attachments: ClientAttachment[]
 ): attachments is (ClientLocalAttachment | ClientRemoteFetchedAttachment)[] => attachments.every(hasContent);
 

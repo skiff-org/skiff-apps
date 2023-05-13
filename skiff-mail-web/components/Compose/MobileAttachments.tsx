@@ -20,7 +20,6 @@ export default function MobileAttachments({ attachments, attachmentsSize, remove
       <Attachments
         attachmentSizeExceeded={attachments.length ? attachmentsSize > MESSAGE_MAX_SIZE_IN_BYTES : false}
         attachments={attachments}
-        attachmentsSize={attachmentsSize}
         onDelete={(id) => {
           removeAttachment(id);
         }}

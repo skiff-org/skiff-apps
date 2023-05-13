@@ -1,31 +1,62 @@
-import { isString } from 'lodash';
+import isString from 'lodash/isString';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
+  ACCENT_COLOR_VALUES,
+  CustomCircularProgress,
   Icon,
   Icons,
-  IconButton,
   IconText,
-  Tooltip,
+  IconTextProps,
+  Size,
+  ThemeMode,
   Typography,
-  TooltipLabelProps,
-  CustomCircularProgress
+  TypographySize,
+  TypographyWeight
 } from 'nightwatch-ui';
 import React, { useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
-import { useTheme } from 'skiff-front-utils';
-import { SystemLabels } from 'skiff-graphql';
-import { useGetNumUnreadQuery } from 'skiff-mail-graphql';
+import { useGetNumUnreadQuery } from 'skiff-front-graphql';
+import { IconTextWithEndActions, useTheme } from 'skiff-front-utils';
+import { SystemLabels, UserLabelVariant } from 'skiff-graphql';
 import { POLL_INTERVAL_IN_MS } from 'skiff-utils';
 import styled, { css } from 'styled-components';
 
 import { useCurrentLabel } from '../../hooks/useCurrentLabel';
+import { useDrafts } from '../../hooks/useDrafts';
 import { useThreadActions } from '../../hooks/useThreadActions';
 import { skemailMailboxReducer } from '../../redux/reducers/mailboxReducer';
 import { DNDItemTypes, MessageCellDragObject } from '../../utils/dragAndDrop';
-import { FILES_LABEL, isFolder, Label, LabelType, RESTRICTED_DRAG_AND_DROP_LABELS, UserLabel } from '../../utils/label';
+import {
+  FILES_LABEL,
+  getLabelDisplayName,
+  getURLFromLabel,
+  HiddenLabel,
+  HiddenLabels,
+  isAliasLabel,
+  isFolder,
+  isPlainLabel,
+  isSystemLabel,
+  Label,
+  LabelType,
+  RESTRICTED_DRAG_AND_DROP_LABELS,
+  UserLabelPlain
+} from '../../utils/label';
 import LabelOptionsDropdown from '../labels/LabelOptionsDropdown';
+
+const IconColorContainer = styled.div<{ $color: string }>`
+  background: ${(props) => props.$color};
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  min-height: 16px;
+
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 const SidebarLabel = styled.div<{
   $active: boolean;
@@ -33,11 +64,12 @@ const SidebarLabel = styled.div<{
   $primaryAction?: boolean;
   $isDarkMode?: boolean;
 }>`
-  padding: 4px 4px 4px 8px;
+  padding: 6px 4px 6px 8px;
+  margin: 0px 6px;
   gap: 8px;
-  height: 28px;
-  border-radius: 8px;
-  box-sizing: border-box;
+  height: 32px;
+  max-height: 32px;
+  border-radius: 6px;
   box-sizing: border-box;
   align-items: center;
   display: flex;
@@ -47,24 +79,22 @@ const SidebarLabel = styled.div<{
   ${(props) =>
     !props.$primaryAction &&
     css`
-      background-color: ${props.$active
-        ? 'var(--bg-cell-active)'
+      background: ${props.$active
+        ? 'var(--bg-overlay-tertiary)'
         : props.$isOver
-        ? 'var(--bg-cell-hover)'
+        ? 'var(--bg-overlay-tertiary)'
         : 'transparent'};
       border: ${props.$isOver ? '1px solid var(--border-active)' : '1px solid transparent'};
       &:hover {
-        background-color: ${props.$active ? 'var(--bg-cell-active)' : 'var(--bg-cell-hover)'};
+        background: var(--bg-overlay-tertiary);
         cursor: pointer;
       }
     `}
   ${(props) =>
     props.$primaryAction &&
     css`
-      background-color: ${props.$isDarkMode ? 'var(--border-primary)' : 'var(--bg-l2-solid)'};
-      box-shadow: ${props.$isDarkMode
-        ? '1px 2px 0 rgb(255 255 255 / 7%), inset 1px 1px 0 rgb(255 255 255 / 7%)'
-        : 'var(--shadow-l1)'};
+      background: var(--bg-l2-solid);
+      box-shadow: var(--shadow-l1);
       &:hover {
         box-shadow: var(--shadow-l2);
         cursor: pointer;
@@ -76,42 +106,49 @@ const SidebarItemLink = styled.a`
   text-decoration: none;
 `;
 
-const MoreOptionsWrapper = styled.div`
-  margin-left: auto;
-`;
-
-const IconTextContainer = styled.div`
-  max-width: 172px;
-  user-select: none;
-`;
-
-const UnreadLabel = styled(Typography)`
+const UnreadLabel = styled.div`
   padding-right: 4px;
 `;
 
+const IconTextContainer = styled.div`
+  min-width: 0px;
+`;
+
 /* Rules to determine if something can be dropped in another mailbox */
-const canDrop = (activeLabel: string | null | undefined, targetLabel: string) => {
-  if (!activeLabel) return false;
+const canDrop = (activeLabel: string | null | undefined, targetLabel: Label) => {
+  if (!activeLabel || isAliasLabel(targetLabel)) return false;
   // Threads in Drafts can only be dragged into trash
   if (activeLabel === SystemLabels.Drafts) {
-    return targetLabel === SystemLabels.Trash;
+    return targetLabel.value === SystemLabels.Trash;
   }
   // Threads in Inbox/Spam can be moved to Inbox/Spam/Trash
-  else {
-    return !RESTRICTED_DRAG_AND_DROP_LABELS.has(targetLabel as SystemLabels);
+  if (isSystemLabel(targetLabel)) {
+    return !RESTRICTED_DRAG_AND_DROP_LABELS.has(targetLabel.value as SystemLabels);
   }
+  // Always allow moving to labels and folders
+  if (isPlainLabel(targetLabel) || isFolder(targetLabel)) {
+    return true;
+  }
+  return false;
 };
 
 export enum LabelVariants {
   System = 1,
   User = 2,
   Folder = 3,
-  More = 4
+  More = 4,
+  Alias = 5
 }
 
-const LabelSidebarItem: React.FC<{ label: Label; variant: LabelVariants }> = ({ label, variant }) => {
-  const routeLabel = useCurrentLabel();
+interface LabelSidebarItemProps {
+  label: Exclude<Label, HiddenLabel>;
+  variant: LabelVariants;
+}
+
+const LabelSidebarItem: React.FC<LabelSidebarItemProps> = ({ label, variant }: LabelSidebarItemProps) => {
+  const { label: routeLabel, userLabelVariant } = useCurrentLabel();
   const router = useRouter();
+  const isSearch = router?.asPath?.includes(HiddenLabels.Search);
   const encodedLabelName = encodeURIComponent(
     label.type === LabelType.SYSTEM ? label.value.toLowerCase() : label.name.toLowerCase()
   );
@@ -129,16 +166,25 @@ const LabelSidebarItem: React.FC<{ label: Label; variant: LabelVariants }> = ({ 
     pollInterval: POLL_INTERVAL_IN_MS
   });
 
+  const { draftThreads } = useDrafts();
+  const numDrafts = draftThreads.length;
+
   const numUnreadInbox = data?.unread ?? 0;
 
   // Files label does not populate route label like other system labels (since it's handled by pages/files.tsx)
   const filesLabelActive = label.value === FILES_LABEL.value && router.pathname.includes('/files');
 
+  const isLabelFolder = isFolder(label);
+
   const active =
-    (isString(routeLabel) && encodeURIComponent(routeLabel.toLowerCase()) === encodedLabelName) || filesLabelActive;
+    (isString(routeLabel) &&
+      encodeURIComponent(routeLabel.toLowerCase()) === encodedLabelName &&
+      isLabelFolder === (userLabelVariant === UserLabelVariant.Folder)) ||
+    filesLabelActive;
 
   const handleDrop = (item: MessageCellDragObject) => {
-    return label.type === LabelType.SYSTEM || isFolder(label)
+    if (isAliasLabel(label)) return;
+    return label.type === LabelType.SYSTEM || isLabelFolder
       ? moveThreads(item.threadIDs, label, [item.currRouteLabel])
       : applyUserLabel(item.threadIDs, [label]);
   };
@@ -149,23 +195,52 @@ const LabelSidebarItem: React.FC<{ label: Label; variant: LabelVariants }> = ({ 
     collect: (monitor) => ({
       isOver: !!monitor.isOver()
     }),
-    canDrop: () => !RESTRICTED_DRAG_AND_DROP_LABELS.has(label.value as SystemLabels)
+    canDrop: () => !RESTRICTED_DRAG_AND_DROP_LABELS.has(label.value as SystemLabels) && !isAliasLabel(label)
   }));
 
-  const labelIcon =
-    label.type === LabelType.SYSTEM ? (
-      label.icon
-    ) : (
-      <Icons color={label.color} icon={isFolder(label) ? Icon.Folder : Icon.Tag} />
+  const getLabelIcon = () => {
+    if (label.type === LabelType.SYSTEM) {
+      return <Icons icon={label.icon} />;
+    }
+    if (label.variant === UserLabelVariant.Alias) {
+      return <Icons color={active ? 'primary' : 'secondary'} icon={Icon.At} />;
+    }
+    if (isLabelFolder) {
+      return <Icons color={label.color} icon={Icon.FolderSolid} />;
+    }
+    return (
+      <IconColorContainer
+        $color={
+          label.color
+            ? (ACCENT_COLOR_VALUES[label.color] as Array<string>)?.[1] || 'var(--bg-overlay-tertiary)'
+            : 'var(--bg-overlay-tertiary)'
+        }
+      >
+        <Icons color={label.color} icon={Icon.Dot} size={Size.X_SMALL} />
+      </IconColorContainer>
     );
-  const href = `${label.type === LabelType.SYSTEM ? '/' : '/label#'}${encodedLabelName}`;
+  };
+
+  const href = getURLFromLabel(label);
   const dispatch = useDispatch();
+
+  const hasMoreOptions = variant !== LabelVariants.System && variant !== LabelVariants.Alias;
+
+  const displayLabelName = variant === LabelVariants.Alias ? getLabelDisplayName(label.name) : label.name;
+
+  const iconTextProps: IconTextProps = {
+    color: active ? 'primary' : 'secondary',
+    label: displayLabelName,
+    startIcon: getLabelIcon(),
+    weight: TypographyWeight.REGULAR
+  };
+
   return (
     <div ref={drop}>
       <Link href={href} passHref>
         <SidebarLabel
           $active={active}
-          $isOver={canDrop(routeLabel, label.value) && isOver}
+          $isOver={(canDrop(routeLabel, label) || isSearch) && isOver}
           onClick={() => {
             // we don't use the usual useThreadActions hook to close the active thread
             // because it would update the url and pollute the history stack on mailbox change
@@ -176,39 +251,44 @@ const LabelSidebarItem: React.FC<{ label: Label; variant: LabelVariants }> = ({ 
           onMouseLeave={() => setHover(false)}
           onMouseOver={() => setHover(true)}
         >
-          <IconTextContainer>
-            <IconText
-              color={active || hover ? 'primary' : 'secondary'}
-              label={label.name}
-              startIcon={labelIcon}
-              type='paragraph'
+          {hasMoreOptions && (
+            <IconTextWithEndActions
+              endActions={[
+                {
+                  icon: Icon.OverflowH,
+                  onClick: (e?: React.MouseEvent) => {
+                    e?.stopPropagation();
+                    e?.preventDefault();
+                    setShowDropdown((prev) => !prev);
+                  },
+                  buttonRef: ref
+                }
+              ]}
+              showEndActions={hover || showDropdown}
+              {...iconTextProps}
             />
-          </IconTextContainer>
-          {variant !== LabelVariants.System && (hover || showDropdown) && (
-            <MoreOptionsWrapper>
-              <IconButton
-                icon={Icon.OverflowH}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  setShowDropdown((prev) => !prev);
-                }}
-                ref={ref}
-                size='small'
-              />
-            </MoreOptionsWrapper>
+          )}
+          {!hasMoreOptions && (
+            <IconTextContainer>
+              <IconText {...iconTextProps} />
+            </IconTextContainer>
           )}
           {numUnreadInbox > 0 && (
-            <UnreadLabel color={active || hover ? 'primary' : 'secondary'} level={3}>
-              {numUnreadInbox.toLocaleString()}
-            </UnreadLabel>
+            <Typography color={active ? 'primary' : 'secondary'} size={TypographySize.SMALL}>
+              <UnreadLabel>{numUnreadInbox.toLocaleString()}</UnreadLabel>
+            </Typography>
+          )}
+          {label.value === SystemLabels.Drafts && numDrafts > 0 && (
+            <Typography color={active ? 'primary' : 'secondary'} size={TypographySize.SMALL}>
+              <UnreadLabel>{numDrafts.toLocaleString()}</UnreadLabel>
+            </Typography>
           )}
         </SidebarLabel>
       </Link>
-      {variant !== LabelVariants.System && (
+      {hasMoreOptions && (
         <LabelOptionsDropdown
           buttonRef={ref}
-          label={label as UserLabel}
+          label={label as UserLabelPlain}
           setShowDropdown={setShowDropdown}
           showDropdown={showDropdown}
         />
@@ -221,7 +301,6 @@ interface ActionSidebarItemProps {
   spinner?: boolean;
   progress?: number;
   dataTest?: string;
-  tooltip?: TooltipLabelProps | string;
   label: string;
   icon: Icon;
   color?: 'primary' | 'secondary';
@@ -239,7 +318,6 @@ const ActionSidebarItem: React.FC<ActionSidebarItemProps> = ({
   color = 'primary',
   href,
   onClick,
-  tooltip,
   spinner,
   primaryAction
 }) => {
@@ -247,26 +325,23 @@ const ActionSidebarItem: React.FC<ActionSidebarItemProps> = ({
   const renderSidebarLabel = () => (
     <SidebarLabel
       $active={false}
-      $isDarkMode={theme === 'dark'}
+      $isDarkMode={theme === ThemeMode.DARK}
       $isOver={false}
       $primaryAction={primaryAction}
       data-test={dataTest}
       onClick={onClick}
     >
-      <IconText color={color} label={label} startIcon={icon} type='paragraph' />
+      <IconText color={color} label={label} startIcon={icon} weight={TypographyWeight.REGULAR} />
       {(spinner || progress !== undefined) && <CustomCircularProgress progress={progress} spinner={spinner} />}
     </SidebarLabel>
   );
 
-  const withTooltip = () =>
-    tooltip ? <Tooltip label={tooltip}>{renderSidebarLabel()}</Tooltip> : renderSidebarLabel();
-
   return !!href ? (
     <SidebarItemLink href={href} target='_blank'>
-      {withTooltip()}
+      {renderSidebarLabel()}
     </SidebarItemLink>
   ) : (
-    withTooltip()
+    renderSidebarLabel()
   );
 };
 

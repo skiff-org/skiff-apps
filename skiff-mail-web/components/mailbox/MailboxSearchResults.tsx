@@ -1,42 +1,39 @@
-import { useMediaQuery } from '@mui/material';
 import { AnimatePresence } from 'framer-motion';
-import { uniq, uniqBy } from 'lodash';
-import router from 'next/router';
-import { Icon, IconButton, Icons, InputField, Typography } from 'nightwatch-ui';
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import uniq from 'lodash/uniq';
+import uniqBy from 'lodash/uniqBy';
+import { useRouter } from 'next/router';
+import { Icon, IconButton, InputField, Type, Typography } from 'nightwatch-ui';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
 import Autosizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
-import { usePrevious } from 'skiff-front-utils';
-import { SystemLabels } from 'skiff-graphql';
-import { useGetThreadsFromIDsQuery } from 'skiff-mail-graphql';
-import { filterExists } from 'skiff-utils';
+import { useGetThreadsFromIDsQuery } from 'skiff-front-graphql';
+import { EmptyIllustration, useMediaQuery, usePrevious, useUserPreference } from 'skiff-front-utils';
+import { SystemLabels, ThreadDisplayFormat } from 'skiff-graphql';
+import { filterExists, StorageTypes } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { COMPACT_MAILBOX_BREAKPOINT } from '../../constants/mailbox.constants';
 import { useDrafts } from '../../hooks/useDrafts';
 import { useIosKeyboardHeight } from '../../hooks/useIosKeyboardHeight';
-import useLocalSetting, { ThreadDisplayFormat } from '../../hooks/useLocalSetting';
-import { useSearch as useCmdPaletteSearch } from '../../hooks/useSearch';
+import { useSearch } from '../../hooks/useSearch';
 import { MailboxThreadInfo } from '../../models/thread';
 import { skemailDraftsReducer } from '../../redux/reducers/draftsReducer';
+import { skemailMailboxReducer } from '../../redux/reducers/mailboxReducer';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { RootState } from '../../redux/store/reduxStore';
-import Illustration, { Illustrations } from '../../svgs/Illustration';
 import { getItemHeight } from '../../utils/mailboxUtils';
 import { SearchContext } from '../../utils/search/SearchProvider';
-import { SkemailResultIDs, SkemailSearchResult } from '../../utils/search/searchTypes';
-import { filterSkemailSearchResults } from '../../utils/search/searchUtils';
-import { useSearch } from '../../utils/search/useSearch';
-import { SearchItemType } from '../../utils/searchWorkerUtils';
+import { SkemailResultIDs } from '../../utils/search/searchTypes';
 import Thread from '../Thread';
 import { ThreadNavigationIDs } from '../Thread/Thread.types';
 
 import { MAIL_LIST_CONTAINER_ID } from './consts';
+import { LoadingMailbox } from './LoadingMailbox';
+import { MailboxHeader } from './MailboxHeader';
 import MailboxSearchResultItem from './MailboxItem/MailboxSearchResultItem';
-import { MailboxSkeleton } from './MailboxSkeleton';
 import MessageDetailsPanel from './MessageDetailsPanel';
 
 const MailboxContainer = styled.div`
@@ -62,21 +59,19 @@ const MailboxHeaderBody = styled.div<{ $activeThreadID: boolean }>`
   padding: 0px;
 `;
 
+const HeaderInput = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 16px;
+`;
+
 const MailboxBody = styled.div`
   flex: 1;
   display: flex;
   padding-bottom: 0;
   overflow-y: hidden;
-`;
-
-const EmptyMailbox = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  gap: 24px;
-  justify-content: center;
 `;
 
 const MessageList = styled.div<{ $threadFormat: ThreadDisplayFormat }>`
@@ -91,19 +86,18 @@ const MessageList = styled.div<{ $threadFormat: ThreadDisplayFormat }>`
 
 const SearchBar = styled.div`
   width: 100%;
-`;
-
-const ResultsHeader = styled(Typography)`
-  margin: 0 0 8px 36px;
+  margin-left: auto;
+  max-width: 432px;
+  padding-left: 16px;
 `;
 
 const TopBar = styled.div<{ $hide: boolean }>`
   visibility: ${(props) => `${props.$hide ? 'hidden' : 'visible'}`};
   display: flex;
   gap: 8px;
-  margin-left: 19px;
+  width: 100%;
+  box-sizing: border-box;
   align-items: center;
-  padding-bottom: 16px;
 `;
 
 const MAX_THREADS_TO_QUERY = 50;
@@ -116,107 +110,114 @@ export const MailboxSearchResults = () => {
   // hook since the active thread and email is not stored with the route path
   const [activeThreadID, setActiveThreadID] = useState<string | undefined>(activeResult?.threadID);
   const [activeEmailID, setActiveEmailID] = useState<string | undefined>(activeResult?.emailID);
-  const [skemailsToFetch, setSkemailsToFetch] = useState<SkemailSearchResult[]>([]);
   const [startingIndexToFetch, setStartingIndexToFetch] = useState(0);
   const [resultsToRender, setResultsToRender] = useState<{ emailID: string; thread: MailboxThreadInfo }[]>([]);
+
   const [lastSubmittedQuery, setLastSubmittedQuery] = useState('');
-  // The query we are rendering results for
-  const [activeQuery, setActiveQuery] = useState(query);
 
   const dispatch = useDispatch();
+  const router = useRouter();
+
   const { composeOpen } = useSelector((state: RootState) => state.modal);
   const prevComposeOpen = usePrevious(composeOpen);
 
-  const [threadFormat] = useLocalSetting('threadFormat');
+  // Redux actions
+  // Memoize with `useCallback` so that `useEffect` dependencies don't change every render
+  const setSelectedThreadIDs = useCallback(
+    (selectedThreadIDs: string[]) =>
+      dispatch(skemailMailboxReducer.actions.setSelectedThreadIDs({ selectedThreadIDs })),
+    [dispatch]
+  );
+
+  useEffect(() => {
+    // Unselect threads when we switch labels
+    setSelectedThreadIDs([]);
+    dispatch(skemailMailboxReducer.actions.setLastSelctedIndex(null));
+  }, [dispatch, setSelectedThreadIDs]);
+
+  const [threadFormat] = useUserPreference(StorageTypes.THREAD_FORMAT);
   const messageListRef = useRef<HTMLDivElement>(null);
   const iosKeyboardHeight = useIosKeyboardHeight('mailbox');
 
   const { draftThreads } = useDrafts();
-  const { searchResults: allResults, search } = useSearch();
-  const { setRecentSearches } = useCmdPaletteSearch();
-  const skemailSearchResults = allResults?.filter(filterSkemailSearchResults) ?? [];
+  const { resultThreadEmailIds, searchForQuery, query: activeQuery, setQuery: setActiveQuery, reset } = useSearch();
 
+  const resultThreadIds = resultThreadEmailIds.map((result) => result.threadID);
+  const resultEmailIds = resultThreadEmailIds.map((result) => result.emailID);
   // Fetch thread objects
   const threadIDsToFetch = uniq(
-    skemailsToFetch
-      .slice(startingIndexToFetch, startingIndexToFetch + MAX_THREADS_TO_QUERY)
-      .map((skemail) => skemail.threadID)
+    resultThreadIds.slice(startingIndexToFetch, startingIndexToFetch + MAX_THREADS_TO_QUERY)
   );
+
   const { loading, refetch: refetchThreads } = useGetThreadsFromIDsQuery({
     variables: { threadIDs: threadIDsToFetch },
-    skip: !threadIDsToFetch.length,
     onCompleted: (data) => {
       // Calculate the search results to render given the thread objects fetched from the server
       const newResultsToRender =
-        skemailsToFetch
+        resultEmailIds
           .slice(startingIndexToFetch, startingIndexToFetch + MAX_THREADS_TO_QUERY)
-          .map((skemailResult) => {
-            const thread = data?.userThreads?.find((t) => t?.threadID == skemailResult.threadID);
-            const { id: emailID, threadID } = skemailResult;
+          .map((resultEmailId) => {
+            const threadID = resultThreadEmailIds.find((result) => result.emailID === resultEmailId)?.threadID;
+            const thread = data?.userThreads?.find((t) => t?.threadID === threadID);
             if (!thread) {
-              // it's a draft or it doesn't exist anymore
-              const draftThread = draftThreads.find((draft) => draft.threadID === threadID);
-              if (draftThread) {
-                return {
-                  emailID,
-                  thread: draftThread
-                };
-              }
               return undefined;
             }
-            return { emailID, thread };
+            return { emailID: resultEmailId, thread };
           })
-          ?.filter(filterExists) ?? [];
+          .filter(filterExists) ?? [];
       setResultsToRender((results) =>
         results && startingIndexToFetch > 0
-          ? uniqBy([...results, ...newResultsToRender], (r) => r.emailID)
+          ? uniqBy([...results.filter(filterExists), ...newResultsToRender], (r) => r.emailID)
           : newResultsToRender
       );
     }
   });
 
-  const setActiveResult = (activeThreadAndEmail: ThreadNavigationIDs | undefined) => {
-    const { threadID, emailID } = activeThreadAndEmail || {};
-    setActiveThreadID(threadID);
-    setActiveEmailID(emailID);
+  const setActiveResult = useCallback(
+    (activeThreadAndEmail: ThreadNavigationIDs | undefined) => {
+      const { threadID, emailID } = activeThreadAndEmail || {};
+      setActiveThreadID(threadID);
+      setActiveEmailID(emailID);
 
-    // if the new active thread/email is a draft, open up the compose panel with the draft
-    const draftThread = draftThreads.find((draft) => draft.threadID === threadID);
-    if (draftThread) {
-      const email = draftThread.emails.find((e) => e.id === emailID);
-      if (email) {
-        dispatch(skemailDraftsReducer.actions.setCurrentDraftID({ draftID: draftThread.threadID }));
-        dispatch(skemailModalReducer.actions.editDraftCompose(email));
+      // if the new active thread/email is a draft, open up the compose panel with the draft
+      const draftThread = draftThreads.find((draft) => draft.threadID === threadID);
+      if (draftThread) {
+        const email = draftThread.emails.find((e) => e.id === emailID);
+        if (email) {
+          dispatch(skemailDraftsReducer.actions.setCurrentDraftID({ draftID: draftThread.threadID }));
+          dispatch(skemailModalReducer.actions.editDraftCompose(email));
+        }
       }
-    }
-  };
+    },
+    [dispatch, draftThreads]
+  );
 
-  const startNewSearch = (newActiveResult?: SkemailResultIDs, currQuery?: string) => {
-    const isQueryEmpty = currQuery === '';
-    // Reset state when a new search is submitted
-    setActiveResult(newActiveResult);
-    setIsNewSearch(true);
-    setSkemailsToFetch(isQueryEmpty ? [] : skemailSearchResults);
-    setStartingIndexToFetch(0);
-    const newQuery = currQuery !== undefined ? currQuery : query;
-    // If the query did not change, refetch the results
-    if (newQuery === lastSubmittedQuery) {
-      refetchThreads();
-    }
-    setLastSubmittedQuery(newQuery);
-    if (isQueryEmpty) setResultsToRender([]);
-  };
+  const startNewSearch = useCallback(
+    (newActiveResult?: SkemailResultIDs, currentQuery?: string) => {
+      // Reset state when a new search is submitted
+      setActiveResult(newActiveResult);
+      setIsNewSearch(true);
+      searchForQuery(currentQuery ?? activeQuery);
+      setStartingIndexToFetch(0);
+      // If the query did not change, refetch the results
+      if (activeQuery === lastSubmittedQuery) {
+        void refetchThreads();
+      }
+      setIsNewSearch(false);
+      setLastSubmittedQuery(activeQuery);
+    },
+    [activeQuery, lastSubmittedQuery, refetchThreads, searchForQuery, setActiveResult, setIsNewSearch]
+  );
 
   useEffect(() => {
     // this will run if we switch from the search modal to the full view search page
-    if (fullView && allResults && isNewSearch) {
+    if (fullView && resultThreadIds && isNewSearch) {
       // update active query shown in search bar
       setActiveQuery(query);
-      startNewSearch(activeResult);
+      startNewSearch(activeResult, query);
+      setLastSubmittedQuery(query);
     }
-    // only update when the search results have changed
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allResults]);
+  }, [resultThreadIds, query, fullView, activeResult, isNewSearch, setActiveQuery, startNewSearch]);
 
   // Unset active thread and email if the compose panel was open and now is closed
   useEffect(() => {
@@ -255,7 +256,7 @@ export const MailboxSearchResults = () => {
       return index < startingIndexToFetch + MAX_THREADS_TO_QUERY;
     };
 
-    const loadMoreItems = async () => {
+    const loadMoreItems = () => {
       // set new index to start fetching from
       setStartingIndexToFetch(startingIndexToFetch + MAX_THREADS_TO_QUERY);
     };
@@ -267,7 +268,7 @@ export const MailboxSearchResults = () => {
             {({ height, width }) => (
               <InfiniteLoader
                 isItemLoaded={isItemLoaded}
-                itemCount={skemailSearchResults.length}
+                itemCount={resultThreadIds.length}
                 loadMoreItems={loadMoreItems}
                 threshold={8}
               >
@@ -281,7 +282,7 @@ export const MailboxSearchResults = () => {
                       activeEmailID,
                       query: lastSubmittedQuery
                     }}
-                    itemKey={(index, data) => data.searchResults[index].emailID}
+                    itemKey={(index, data) => data.searchResults[index]?.emailID ?? ''}
                     itemSize={itemHeight}
                     onItemsRendered={onItemsRendered}
                     overscanCount={10}
@@ -304,12 +305,9 @@ export const MailboxSearchResults = () => {
   const renderMailboxBody = () => {
     return (
       <>
-        {showSkeleton && <MailboxSkeleton renderCheckbox={false} />}
+        {showSkeleton && <LoadingMailbox />}
         {!showSkeleton && !resultsToRender.length && (
-          <EmptyMailbox>
-            <Illustration illustration={Illustrations.EmptyMailbox} />
-            <Typography level={0}>No results</Typography>
-          </EmptyMailbox>
+          <EmptyIllustration subtitle='No emails match the query' title='No results' />
         )}
         {!showSkeleton && !!resultsToRender.length && renderSearchResults()}
       </>
@@ -320,58 +318,64 @@ export const MailboxSearchResults = () => {
   const nextSearchResult = resultsToRender[activeEmailIDIndex + 1];
   const prevSearchResult = resultsToRender[activeEmailIDIndex - 1];
 
+  const renderSearchInput = () => {
+    return (
+      <HeaderInput>
+        <TopBar $hide={(isCompact || threadFormat === ThreadDisplayFormat.Full) && messageDetailsPanelOpen}>
+          <SearchBar>
+            <InputField
+              autoFocus
+              endAdornment={
+                activeQuery && (
+                  <Typography color='secondary' onClick={reset}>
+                    Clear
+                  </Typography>
+                )
+              }
+              icon={Icon.Search}
+              innerRef={searchBarRef}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setActiveQuery(e.target.value);
+                if (isNewSearch) setIsNewSearch(false);
+              }}
+              onFocus={() => {
+                if (isNewSearch) setIsNewSearch(false);
+              }}
+              onKeyDown={(evt: React.KeyboardEvent) => {
+                if (evt.key === 'Enter') {
+                  searchBarRef.current?.blur();
+                  void startNewSearch(activeResult);
+                }
+              }}
+              placeholder='Search messages...'
+              value={activeQuery}
+            />
+          </SearchBar>
+          <div>
+            <IconButton icon={Icon.Close} onClick={() => router.back()} type={Type.SECONDARY} />
+          </div>
+        </TopBar>
+      </HeaderInput>
+    );
+  };
+
   return (
     <MailboxContainer>
       <MailboxListThread>
         <MailboxHeaderBody $activeThreadID={!!activeThreadID} id={MAIL_LIST_CONTAINER_ID}>
-          <TopBar $hide={(isCompact || threadFormat === ThreadDisplayFormat.Full) && messageDetailsPanelOpen}>
-            <SearchBar>
-              <InputField
-                endAdornment={
-                  activeQuery && (
-                    <Typography
-                      color='secondary'
-                      onClick={() => {
-                        setActiveQuery('');
-                        startNewSearch(undefined, '');
-                      }}
-                    >
-                      Clear
-                    </Typography>
-                  )
-                }
-                innerRef={searchBarRef}
-                onChange={(e) => {
-                  setActiveQuery(e.target.value);
-                  search(e.target.value);
-                  if (isNewSearch) setIsNewSearch(false);
-                }}
-                onFocus={() => {
-                  if (isNewSearch) setIsNewSearch(false);
-                }}
-                onKeyDown={(evt: React.KeyboardEvent) => {
-                  if (evt.key === 'Enter') {
-                    searchBarRef.current?.blur();
-                    setRecentSearches((recentSearches) => [
-                      { itemType: SearchItemType.Query, subject: activeQuery, filters: [] },
-                      ...recentSearches
-                    ]);
-                    startNewSearch();
-                  }
-                }}
-                placeholder='Search messages...'
-                size='medium'
-                startAdornment={<Icons color='secondary' icon={Icon.EnvelopeSearch} />}
-                value={activeQuery}
-              />
-            </SearchBar>
-            <IconButton color='secondary' icon={Icon.Close} onClick={() => router.back()} />
-          </TopBar>
-          {!showSkeleton && !!resultsToRender.length && (
-            <ResultsHeader level={1} type='heading'>
-              Search results
-            </ResultsHeader>
-          )}
+          <MailboxHeader
+            inputField={renderSearchInput()}
+            onRefresh={async () => {}}
+            setClearAll={() => setSelectedThreadIDs([])}
+            setMobileSearchQuery={() => {
+              // Search page should never appear on mobile
+            }}
+            setSelectAll={() => {
+              setSelectedThreadIDs(resultsToRender.map((t) => t.thread.threadID));
+            }}
+            showSkeleton={false}
+            threads={resultsToRender.map((t) => t.thread)}
+          />
           <MailboxBody>{renderMailboxBody()}</MailboxBody>
         </MailboxHeaderBody>
         <AnimatePresence>
@@ -402,3 +406,5 @@ export const MailboxSearchResults = () => {
     </MailboxContainer>
   );
 };
+
+export default MailboxSearchResults;

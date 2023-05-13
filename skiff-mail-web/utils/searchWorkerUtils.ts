@@ -1,19 +1,15 @@
-import dayjs from 'dayjs';
-import { IconProps, Icon } from 'nightwatch-ui';
+import { Icon, IconProps } from 'nightwatch-ui';
 import { IndexedSkemail } from 'skiff-front-search';
-import { UserLabelVariant } from 'skiff-graphql';
-import { AddressObject } from 'skiff-graphql';
-import { UserLabel as UserLabelOrFolder } from 'skiff-graphql';
+import { AddressObject, UserLabel as UserLabelOrFolder, UserLabelVariant } from 'skiff-graphql';
 
 import { ClientAttachment } from '../components/Attachments';
 import {
-  MAX_QUICK_ACTIONS_SHOWN,
-  HEADER_ROW_HEIGHT,
   CHIP_SELECTION_ROW_HEIGHT,
-  TITLE_ONLY_ROW_HEIGHT,
-  SKEMAIL_ROW_HEIGHT
+  HEADER_ROW_HEIGHT,
+  SKEMAIL_ROW_HEIGHT,
+  TITLE_ONLY_ROW_HEIGHT
 } from '../components/shared/CmdPalette/constants';
-import { DATE_FILTERS } from '../constants/search.constants';
+import { AppRoutes } from '../constants/route.constants';
 import { getSearchWorker } from '../hooks/useSearchWorker';
 
 import { SYSTEM_LABELS } from './label';
@@ -215,8 +211,6 @@ export interface SearchQuery extends SearchItemBase {
   filters: SearchFilter[];
 }
 
-const RESULTS_HEADER = 'Search results';
-
 /**
  * Utility function: Searches for indexed skemails where either the
  * to or from addresses/names match the query value.
@@ -238,165 +232,33 @@ export function filterByTitle(searchItems: Array<SearchAction>, query: string) {
  * for VariableSizeList. Adds headers if necessary.
  * NOTE: Copied from editor MVP
  */
-export function combineSearchResults(
-  query: string,
-  actions: Array<SearchItem>,
-  skemails: Array<SearchItem>,
-  filters: Array<SearchItem>,
-  filterRows: Array<SearchItem>,
-  activeFilters: Array<SearchFilter>,
-  contactList: Array<SearchCategory>,
-  attachmentList: Array<SearchCategory>,
-  labelList: Array<SearchCategory>,
-  folderList: Array<SearchCategory>,
-  filteredRecentSearches: Array<SearchItem>,
-  showFilterBy?: boolean,
-  showActionsToggle?: boolean
-) {
+export function combineSearchResults(actions: Array<SearchItem>, showActionsToggle?: boolean) {
   const searchResults: (SearchHeader | SearchItem)[] = [];
-  const activeFilter = activeFilters.length > 0;
-  const isActiveFilterByType = (categoryFilterType: FilterByType): boolean =>
-    activeFilters.some(
-      (currFilter) =>
-        currFilter.filter.filterType === SearchFilterType.Category &&
-        currFilter.filter.filterValue === categoryFilterType
-    );
-  const pushSearchItems = (header: string, itemsList: Array<SearchItem>, headerOptions?: Partial<SearchHeader>) => {
+
+  const pushSearchItems = (
+    header: string | null,
+    itemsList: Array<SearchItem>,
+    headerOptions?: Partial<SearchHeader>
+  ) => {
     if (itemsList.length > 0) {
-      searchResults.push({
-        itemType: SearchItemType.Header,
-        subject: header,
-        ...headerOptions
-      } as SearchHeader);
+      if (header) {
+        searchResults.push({
+          itemType: SearchItemType.Header,
+          subject: header,
+          ...headerOptions
+        } as SearchHeader);
+      }
       searchResults.push(...itemsList);
     }
   };
-  const contactsFilter = isActiveFilterByType(FilterByType.People);
-  const attachmentsFilter = isActiveFilterByType(FilterByType.Attachments);
-  const labelsFilter = isActiveFilterByType(FilterByType.Labels);
-  const foldersFilter = isActiveFilterByType(FilterByType.Folders);
-  const isCategoryFilterActive = activeFilters.some(
-    (currFilter) => currFilter.filter.filterType === SearchFilterType.Category
-  );
 
-  if (showFilterBy) {
-    searchResults.push({
-      itemType: SearchItemType.Header,
-      subject: 'Filter by...'
-    } as SearchHeader);
-    searchResults.push(...filterRows);
-  }
-
-  if (!activeFilter && !query) {
-    searchResults.push({
-      itemType: SearchItemType.Header,
-      subject: 'Search for...'
-    } as SearchHeader);
-    searchResults.push({
-      itemType: SearchItemType.Category
-    } as SearchCategory);
-  }
-
-  if (!activeFilter) {
-    pushSearchItems('Recent searches', filteredRecentSearches);
-  }
-
-  if (!activeFilter) {
-    pushSearchItems('Quick actions', actions, {
-      headerItemType: SearchItemType.Action,
-      showAllOptions: showActionsToggle,
-      onClickText: actions.length > MAX_QUICK_ACTIONS_SHOWN ? 'View fewer' : 'View all'
-    });
-  }
-
-  // Only show search suggestions for non category filter searches
-  if (filters.length && !isCategoryFilterActive) {
-    searchResults.push({
-      itemType: SearchItemType.Header,
-      subject: 'Narrow search'
-    } as SearchHeader);
-    searchResults.push(...filters);
-  }
-
-  if (skemails.length > 0) {
-    const header = query.length || !!activeFilters.length ? RESULTS_HEADER : 'Recent messages';
-    pushSearchItems(header, skemails, {
-      headerItemType: SearchItemType.Skemail,
-      showAllOptions: !!query.length, // Only show "View all" option if there is a search query
-      onClickText: 'View all'
-    });
-  }
-
-  if (contactsFilter) {
-    pushSearchItems(RESULTS_HEADER, contactList);
-  }
-
-  if (attachmentsFilter) {
-    pushSearchItems(RESULTS_HEADER, attachmentList);
-  }
-
-  if (labelsFilter) {
-    pushSearchItems(RESULTS_HEADER, labelList);
-  }
-
-  if (foldersFilter) {
-    pushSearchItems(RESULTS_HEADER, folderList);
-  }
-  return searchResults;
-}
-
-const filterAddresses = (addressFilter: SearchAddressFilter, results: IndexedSkemail[]) => {
-  const { filterType, filterValue: address } = addressFilter;
-  switch (filterType) {
-    // "To" filter returns anything in To/CC/BCC
-    case SearchFilterType.ToAddress:
-      return results.filter((result) =>
-        [...result.toAddresses, ...result.ccAddresses, ...result.bccAddresses].includes(address.address)
-      );
-    case SearchFilterType.FromMe:
-    case SearchFilterType.FromAddress:
-      return results.filter((result) => result.fromAddress === address.address);
-    default:
-      console.error('Address filter type not supported');
-      return results;
-  }
-};
-
-export const filterSearchResults = (searchResults: IndexedSkemail[], filters: SearchFilter[]) => {
-  // Original, unfiltered results
-  let results = searchResults;
-  filters.forEach((filterItem) => {
-    const { filter } = filterItem;
-    const { filterType, filterValue } = filter;
-    // Labels
-    if (filterType === SearchFilterType.SystemLabel || filterType === SearchFilterType.UserLabel) {
-      // Check if the label filter is in EITHER system or user labels,
-      // in the future we can separate these for greater flexibility if desired
-      results = results.filter((res) => res.userLabels.includes(filterValue) || res.systemLabels.includes(filterValue));
-      // Addresses
-    } else if (
-      filterType === SearchFilterType.ToAddress ||
-      filterType === SearchFilterType.FromAddress ||
-      filterType === SearchFilterType.FromMe
-    ) {
-      results = filterAddresses(filter, results);
-    } else if (filterType === SearchFilterType.HasAttachment) {
-      results = results.filter((res) => !!res.attachments?.length);
-    } else if (filterType === SearchFilterType.Date) {
-      const now = dayjs();
-      results = results.filter((res) => {
-        const resDate = dayjs(res.createdAt);
-        // we use filterValue.end - 1 because isBefore is a strict check so emails from a particular day are not marked as isBefore that day
-        return (
-          resDate.isAfter(now.subtract(filterValue.start, 'day'), 'day') &&
-          resDate.isBefore(now.subtract(filterValue.end - 1, 'day'), 'day')
-        );
-      });
-    }
+  pushSearchItems(null, actions, {
+    headerItemType: SearchItemType.Action,
+    showAllOptions: showActionsToggle
   });
 
-  return results;
-};
+  return searchResults;
+}
 
 export function getFilterPrefix(filterType: SearchFilterType) {
   switch (filterType) {
@@ -496,64 +358,15 @@ export function getFilterTypesToHide(filters: SearchFilter[]) {
   return filterTypesToHide;
 }
 
-export const hideFilters = (filters, filterTypesToHide) => {
-  return filters.filter((filter) => !filterTypesToHide.includes(filter.filter.filterType));
+export const hideFilters = (
+  filters: Array<SearchFilter>,
+  filterTypesToHide: Array<SearchFilterType>
+): Array<SearchFilter> => {
+  const SEARCH_PATH = `/mail/${AppRoutes.SEARCH}`;
+  return filters.filter(
+    (filter) => !filterTypesToHide.includes(filter.filter.filterType) && filter.filter.filterValue !== SEARCH_PATH
+  );
 };
-
-/**
- * Utility function to get the rows of chips under "Filter by..."
- */
-export function getFilterRows(filterTypesToHide: SearchFilterType[], defaultEmailAlias: string | undefined) {
-  const hasAttachmentFilter: SearchFilter = {
-    itemType: SearchItemType.Filter,
-    subject: 'Has attachment',
-    filter: { filterType: SearchFilterType.HasAttachment, filterValue: 'Has attachment' }
-  };
-  const fromMeFilter: SearchFilter[] = defaultEmailAlias
-    ? [
-        {
-          itemType: SearchItemType.Filter,
-          subject: 'From me',
-          filter: {
-            filterType: SearchFilterType.FromMe,
-            filterValue: { address: defaultEmailAlias }
-          }
-        }
-      ]
-    : [];
-
-  const firstFilterRow: SearchFilterRow = {
-    itemType: SearchItemType.FilterRow,
-    subject: '', // Subject does not matter for filter rows so we use an empty subject
-    filters: hideFilters([hasAttachmentFilter, ...fromMeFilter], filterTypesToHide)
-  };
-
-  const dateFilters: SearchFilter[] = DATE_FILTERS.map((dateFilterValue): SearchFilter => {
-    const { subject, start, end } = dateFilterValue;
-    return {
-      itemType: SearchItemType.Filter,
-      subject,
-      filter: {
-        filterType: SearchFilterType.Date,
-        filterValue: {
-          start,
-          end
-        }
-      }
-    };
-  });
-  const secondFilterRow: SearchFilterRow = {
-    itemType: SearchItemType.FilterRow,
-    subject: '', // Subject does not matter for filter rows so we use an empty subject
-    filters: hideFilters(dateFilters, filterTypesToHide)
-  };
-  const filterRows = [firstFilterRow, secondFilterRow].filter((row) => !!row.filters.length);
-  return filterRows;
-}
-
-export function isActiveCategoryFilter(activeFilters: Array<SearchFilter>) {
-  return activeFilters.some((filter) => filter.filter.filterType === SearchFilterType.Category);
-}
 
 export const getRowHeightFromSearchItem = (searchItem: SearchItem) => {
   if (searchItem.itemType === SearchItemType.Header) {

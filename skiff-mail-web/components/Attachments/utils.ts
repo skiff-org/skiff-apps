@@ -1,8 +1,8 @@
 import { Editor } from '@tiptap/core';
 import { EditorView } from 'prosemirror-view';
 import { convertFileListToArray, FileTypes, MIMETypes } from 'skiff-front-utils';
+import { sha256 } from 'skiff-front-utils';
 import { DecryptedAttachment } from 'skiff-graphql';
-import { sha256 } from 'skiff-mail-graphql';
 import { v4 } from 'uuid';
 
 import { blobToB64, cidToSrc, createImagesFromFiles, getAllImagesInEditor } from '../MailEditor/Image/utils';
@@ -44,6 +44,9 @@ export const prepareInlineAttachments = async (
 
   const inlineAttachments: ClientAttachment[] = [];
   const prepareImages = images.map(async ({ node, pos }) => {
+    if (typeof node?.attrs?.src !== 'string') {
+      return;
+    }
     const blobOrURL = b64toBlobOrURL(node.attrs.src);
     if (typeof blobOrURL === 'string') {
       // URL case
@@ -60,7 +63,7 @@ export const prepareInlineAttachments = async (
         id: attachmentID,
         content: base64ImageData as string,
         inline: true,
-        name: node.attrs.title,
+        name: typeof node.attrs?.title === 'string' ? node.attrs?.title ?? '' : '',
         size,
         state: AttachmentStates.Local,
         contentType: type
@@ -81,6 +84,9 @@ export const prepareInlineAttachments = async (
   tr = editor.state.tr;
   // and then we restore the image src to base64
   const restoreImagesSrc = images.map(async ({ node, pos }) => {
+    if (typeof node?.attrs?.src !== 'string') {
+      return;
+    }
     const blobOrURL = b64toBlobOrURL(node.attrs.src);
     // blob is either URL or blob
     const imageData = typeof blobOrURL === 'string' ? blobOrURL : await blobToB64(blobOrURL);

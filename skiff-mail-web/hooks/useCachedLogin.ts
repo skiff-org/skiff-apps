@@ -1,26 +1,29 @@
 import { ApolloError } from '@apollo/client';
 import {
-  getStorageKey,
+  CurrentUserEmailAliasesDocument,
+  CurrentUserEmailAliasesQuery,
+  CurrentUserEmailAliasesQueryVariables,
+  GetSessionCacheDocument,
+  GetSessionCacheQuery,
+  GetSessionCacheQueryVariables
+} from 'skiff-front-graphql';
+import { decryptSessionCacheData, writeSessionCacheData } from 'skiff-front-graphql';
+import { models } from 'skiff-front-graphql';
+import {
   getSessionCacheForLatestUser,
   clearLatestUserIDCache,
   getSessionCacheKeyForUserID,
-  StorageTypes,
-  setNextUUID
+  setNextUUID,
+  initializeDefaultEmailAlias,
+  requireCurrentUserData,
+  saveCurrentUserData,
+  sendUserDataToMobileApp,
+  isMobileApp
 } from 'skiff-front-utils';
 import { BadRequest, isApolloLogicErrorType, NotAuthorized, NotFound } from 'skiff-graphql';
-import {
-  GetSessionCacheDocument,
-  GetSessionCacheQuery,
-  GetSessionCacheQueryVariables,
-  GetUserEmailAndWalletDocument,
-  GetUserEmailAndWalletQuery,
-  GetUserEmailAndWalletQueryVariables
-} from 'skiff-mail-graphql';
-import { decryptSessionCacheData, writeSessionCacheData } from 'skiff-mail-graphql';
-import { models } from 'skiff-mail-graphql';
+import { StorageTypes, getStorageKey } from 'skiff-utils';
 
 import client from '../apollo/client';
-import { requireCurrentUserData, saveCurrentUserData } from '../apollo/currentUser';
 
 const setNextIDAndReload = () => {
   // if login broke for this user, try moving to another user
@@ -33,31 +36,18 @@ const setNextIDAndReload = () => {
   }
 };
 
-const refreshUserEmailAndWallet = async () => {
-  const userID = requireCurrentUserData().userID;
-  const walletAndEmail = await client.query<GetUserEmailAndWalletQuery, GetUserEmailAndWalletQueryVariables>({
-    query: GetUserEmailAndWalletDocument,
-    variables: {
-      request: {
-        userID
-      }
-    }
+const setDefaultEmailAlias = async () => {
+  const { data: emailAliasesData } = await client.query<
+    CurrentUserEmailAliasesQuery,
+    CurrentUserEmailAliasesQueryVariables
+  >({
+    query: CurrentUserEmailAliasesDocument,
+    variables: {},
+    fetchPolicy: 'network-only'
   });
-
-  if (walletAndEmail.data.user) {
-    const { walletAddress, email, rootOrgID } = walletAndEmail.data.user;
-    const user = { ...requireCurrentUserData() };
-    if (walletAddress) {
-      user.walletAddress = walletAddress;
-    }
-    if (email) {
-      user.email = email;
-    }
-    if (rootOrgID) {
-      user.rootOrgID = rootOrgID;
-    }
-    saveCurrentUserData(user);
-  }
+  const emailAliases = emailAliasesData.currentUser?.emailAliases || [];
+  const user = requireCurrentUserData();
+  initializeDefaultEmailAlias(user.userID, emailAliases);
 };
 
 /**
@@ -76,6 +66,7 @@ export const tryCachedLogin = async (): Promise<boolean> => {
 
   let cacheKey: string;
   let alternativeCacheKeys: string[];
+  let userDataToRefresh: undefined | GetSessionCacheQuery['currentUser'] = undefined;
 
   try {
     // request cache key from server (request is authenticated with httpOnly session cookie)
@@ -84,6 +75,7 @@ export const tryCachedLogin = async (): Promise<boolean> => {
     });
     cacheKey = res.data.sessionCache.cacheKey;
     alternativeCacheKeys = res.data.sessionCache.alternativeCacheKeys;
+    userDataToRefresh = res.data.currentUser;
   } catch (e) {
     if (
       e instanceof ApolloError &&
@@ -135,9 +127,30 @@ export const tryCachedLogin = async (): Promise<boolean> => {
     setNextIDAndReload();
     return false;
   }
-
+  // refresh critical data on user load
+  if (userDataToRefresh) {
+    if (userDataToRefresh.recoveryEmail) {
+      decryptedUser.recoveryEmail = userDataToRefresh.recoveryEmail;
+    }
+    if (userDataToRefresh.unverifiedRecoveryEmail) {
+      decryptedUser.unverifiedRecoveryEmail = userDataToRefresh.unverifiedRecoveryEmail;
+    }
+    if (userDataToRefresh.walletAddress) {
+      decryptedUser.walletAddress = userDataToRefresh.walletAddress;
+    }
+    if (userDataToRefresh.rootOrgID) {
+      decryptedUser.rootOrgID = userDataToRefresh.rootOrgID;
+    }
+  }
   saveCurrentUserData(decryptedUser);
-  void refreshUserEmailAndWallet();
+
+  // Send userData to webview
+  if (isMobileApp()) {
+    sendUserDataToMobileApp(decryptedUser);
+  }
+
+  // Initialize the default email alias if no default email alias was set
+  void setDefaultEmailAlias();
 
   return true;
 };

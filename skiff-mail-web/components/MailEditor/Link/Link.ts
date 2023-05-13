@@ -1,11 +1,11 @@
 import Link from '@tiptap/extension-link';
-import { ThemeName } from 'skiff-front-utils';
+import { ThemeMode } from 'nightwatch-ui';
 
 import { linkStyling } from '../nodeStyles';
 
 declare module '@tiptap/extension-link' {
   interface LinkOptions {
-    theme: ThemeName;
+    theme: ThemeMode;
   }
 }
 

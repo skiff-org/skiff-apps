@@ -1,8 +1,9 @@
 import { ApolloError } from '@apollo/client';
-import { Keplr } from '@keplr-wallet/types';
-import { Button, Icon, Tooltip, Typography } from 'nightwatch-ui';
-import React, { useState } from 'react';
+import { Keplr } from '@keplr-wallet/types/build/wallet/keplr';
+import { Button, Tooltip, TooltipContent, TooltipPlacement, TooltipTrigger, Type, Typography } from 'nightwatch-ui';
+import React, { Suspense, useState } from 'react';
 import { isFirefox } from 'react-device-detect';
+import { useUserLabelsLazyQuery, useVerifyWalletAddressCreateAliasMutation } from 'skiff-front-graphql';
 import {
   UserAvatar,
   abbreviateWalletAddress,
@@ -19,23 +20,28 @@ import {
   WalletProviderInfo,
   activateEthProvider,
   getSolanaProvider,
-  WALLET_PROVIDERS
+  WALLET_PROVIDERS,
+  EmailAliasOptions,
+  useRequiredCurrentUserData,
+  updateEmailAliases,
+  useDeleteEmailAlias,
+  useDefaultEmailAlias,
+  DefaultEmailTag,
+  splitEmailToAliasAndDomain
 } from 'skiff-front-utils';
-import { useVerifyWalletAddressCreateAliasMutation } from 'skiff-mail-graphql';
+import { isNameServiceAddress } from 'skiff-utils';
 import styled from 'styled-components';
 
-import { updateEmailAliases } from '../../../../utils/cache/cache';
-import { connectCosmosWallet, connectEthWallet, connectSolWallet } from '../../../../utils/walletUtils/walletUtils';
-import AliasOptions from '../AliasOptions/AliasOptions';
+import { resolveAndSetENSDisplayName } from '../../../../utils/userUtils';
 
-import AddUDAlias from './AddUDAlias';
+const AddUDAlias = React.lazy(() => import('./AddUDAlias'));
 
 const EmailAliasesContainer = styled.div`
   display: flex;
   width: 100%;
   gap: 16px;
   flex-direction: column;
-  margin: 12px 0 20px 0;
+  margin: 0 0 20px 0;
 `;
 
 const WalletAliasRow = styled.div`
@@ -60,26 +66,39 @@ const WalletAlias = styled.div`
   max-width: 75%;
 `;
 
-const WalletButton = styled(Button)`
+const WalletButtonContainer = styled.div`
   width: 48%; // with flex wrap creates 2 cols
 `;
 
-const AnotherWalletText = styled(Typography)`
+const AnotherWalletText = styled.div`
   margin-bottom: 4px;
+`;
+
+const EmailAliasRowEnd = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
 `;
 
 interface AddWalletAliasProps {
   walletAliases: string[];
-  userID: string;
   requestHcaptchaToken: () => Promise<string>;
+  includeDeleteOption: boolean;
 }
 
 /**
  * Component for rendering the interface to add wallet aliases.
  */
-export const AddWalletAlias = ({ walletAliases, userID, requestHcaptchaToken }: AddWalletAliasProps) => {
+export const AddWalletAlias = ({ walletAliases, requestHcaptchaToken, includeDeleteOption }: AddWalletAliasProps) => {
   const { enqueueToast } = useToast();
+  const user = useRequiredCurrentUserData();
+  const { userID } = user;
+
+  const [defaultEmailAlias] = useDefaultEmailAlias(userID);
+
+  const deleteEmailAlias = useDeleteEmailAlias(requestHcaptchaToken);
   const [verifyCreate] = useVerifyWalletAddressCreateAliasMutation();
+  const [fetchUserLabels] = useUserLabelsLazyQuery();
 
   // isAddingWallet is a dict keeps track of if the user is currently adding any of the wallet options
   const initialIsAddingWallet = {};
@@ -91,8 +110,8 @@ export const AddWalletAlias = ({ walletAliases, userID, requestHcaptchaToken }: 
   const handleAddWalletError = (error: ApolloError) => {
     console.error(error.message);
     enqueueToast({
-      body: error.message,
-      icon: Icon.Warning
+      title: 'Failed to add wallet',
+      body: error.message
     });
   };
 
@@ -155,6 +174,9 @@ export const AddWalletAlias = ({ walletAliases, userID, requestHcaptchaToken }: 
         return;
       }
 
+      const { connectEthWallet, connectSolWallet, connectCosmosWallet } = await import(
+        '../../../../utils/walletUtils/walletUtils'
+      );
       let challenge, challengeSignature;
       // Right now, we only support BitKeep's eth wallet
       if (isEth || isBitkeep) {
@@ -180,6 +202,8 @@ export const AddWalletAlias = ({ walletAliases, userID, requestHcaptchaToken }: 
           const emailAliases = response.data?.verifyWalletAddressCreateAlias?.emailAliases;
           if (!response.errors && emailAliases) {
             updateEmailAliases(cache, userID, emailAliases);
+            // refetch user labels to update aliases labels in the sidebar
+            void fetchUserLabels();
           }
         }
       });
@@ -192,47 +216,67 @@ export const AddWalletAlias = ({ walletAliases, userID, requestHcaptchaToken }: 
   const renderWalletButton = (provider: WalletProvider, providerInfo: WalletProviderInfo, onClick: () => void) => {
     const { walletName, icon } = providerInfo;
     return (
-      <WalletButton
-        align='center'
-        disabled={isAddingWallet[provider]}
-        iconColor='source'
-        key={`add-${walletName}`}
-        onClick={onClick}
-        startIcon={icon}
-        type='secondary'
-      >
-        {isAddingWallet[provider] ? `Check wallet...` : walletName}
-      </WalletButton>
+      <WalletButtonContainer>
+        <Button
+          fullWidth
+          iconColor='source'
+          key={`add-${walletName}`}
+          loading={!!isAddingWallet[provider]}
+          onClick={onClick}
+          startIcon={icon}
+          type={Type.SECONDARY}
+        >
+          {isAddingWallet[provider] ? `Check wallet...` : walletName}
+        </Button>
+      </WalletButtonContainer>
     );
   };
+
   const walletDescription = `${
     walletAliases.length ? 'S' : 'Connect a wallet to s'
-  }end and receive email from your Web3 identity.`;
+  }end and receive email from your Web3 identity`;
   return (
     <>
       <TitleActionSection subtitle={walletDescription} title='Wallet aliases' />
       {!!walletAliases.length && (
         <EmailAliasesContainer>
           {walletAliases.map((email) => {
-            const [alias, mailDomain] = email.split('@');
-            const abbreviatedWalletAddress = `${abbreviateWalletAddress(alias)}@${mailDomain}`;
+            const { alias, domain: mailDomain } = splitEmailToAliasAndDomain(email);
+            const abbreviatedWalletAddress = isNameServiceAddress(alias)
+              ? `${alias}@${mailDomain}`
+              : `${abbreviateWalletAddress(alias)}@${mailDomain}`;
+            const isDefaultEmailAlias = defaultEmailAlias === email;
             return (
               <WalletAliasRow key={email}>
                 <WalletAlias>
                   <UserAvatar label={alias} />
-                  <Tooltip direction='top' label={email}>
-                    <span>
-                      <Typography type='paragraph'>{abbreviatedWalletAddress}</Typography>
-                    </span>
+                  <Tooltip placement={TooltipPlacement.RIGHT}>
+                    <TooltipContent>{email}</TooltipContent>
+                    <TooltipTrigger>
+                      <Typography>{abbreviatedWalletAddress}</Typography>
+                    </TooltipTrigger>
                   </Tooltip>
                 </WalletAlias>
-                <AliasOptions emailAlias={email} requestHcaptchaToken={requestHcaptchaToken} userID={userID} />
+                <EmailAliasRowEnd>
+                  {isDefaultEmailAlias && <DefaultEmailTag />}
+                  <EmailAliasOptions
+                    alias={email}
+                    deleteAlias={() => void deleteEmailAlias(email)}
+                    includeDeleteOption={includeDeleteOption}
+                    onSetDefaultAlias={(newValue: string) => void resolveAndSetENSDisplayName(newValue, user)}
+                    userID={userID}
+                  />
+                </EmailAliasRowEnd>
               </WalletAliasRow>
             );
           })}
         </EmailAliasesContainer>
       )}
-      {!!walletAliases.length && <AnotherWalletText>Connect another wallet</AnotherWalletText>}
+      {!!walletAliases.length && (
+        <Typography>
+          <AnotherWalletText>Connect another wallet</AnotherWalletText>
+        </Typography>
+      )}
       <WalletButtons noWalletAliases={!walletAliases.length}>
         {Object.entries(WALLET_PROVIDERS)
           .filter(([provider]) => !(isFirefox && provider === EthProvider.MetaMask)) // hide MetaMask button on Firefox and Bitkeep
@@ -241,7 +285,9 @@ export const AddWalletAlias = ({ walletAliases, userID, requestHcaptchaToken }: 
               void addWallet(provider as WalletProvider);
             })
           )}
-        <AddUDAlias />
+        <Suspense fallback={<></>}>
+          <AddUDAlias />
+        </Suspense>
       </WalletButtons>
     </>
   );

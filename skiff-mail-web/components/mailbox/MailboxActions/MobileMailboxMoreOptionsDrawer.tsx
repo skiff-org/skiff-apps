@@ -1,7 +1,6 @@
-import { Drawer, Icon, IconText } from 'nightwatch-ui';
-import { isMobile } from 'react-device-detect';
+import { Drawer, DropdownItem, Icon } from 'nightwatch-ui';
 import { useDispatch } from 'react-redux';
-import { useTheme, DrawerOption, DrawerOptions } from 'skiff-front-utils';
+import { DrawerOption, DrawerOptions } from 'skiff-front-utils';
 import { SystemLabels, UserLabelVariant } from 'skiff-graphql';
 
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
@@ -22,8 +21,6 @@ export default function MobileMailboxMoreOptionsDrawer({
   const dispatch = useDispatch();
   const show = useAppSelector((state) => state.mobileDrawer.showMailboxMoreOptionsDrawer);
   const { moveThreads } = useThreadActions();
-
-  const { theme } = useTheme();
 
   const setSelectedThreadIDs = (selectedThreadIDs: string[]) =>
     dispatch(skemailMailboxReducer.actions.setSelectedThreadIDs({ selectedThreadIDs }));
@@ -98,18 +95,12 @@ export default function MobileMailboxMoreOptionsDrawer({
   }
 
   return (
-    <Drawer hideDrawer={hideDrawer} show={show} title={'More options'}>
+    <Drawer hideDrawer={hideDrawer} show={show} title='More options'>
       <DrawerOptions>
         {options.map((option) => {
           return (
-            <DrawerOption key={option.label} onClick={option.onClick}>
-              <IconText
-                label={option.label}
-                level={1}
-                startIcon={option.icon}
-                themeMode={isMobile ? theme : 'dark'}
-                type='paragraph'
-              />
+            <DrawerOption key={option.label}>
+              <DropdownItem icon={option.icon} label={option.label} onClick={option.onClick} />
             </DrawerOption>
           );
         })}

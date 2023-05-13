@@ -1,7 +1,5 @@
-/* eslint-disable import/prefer-default-export */
-import { useRequiredCurrentUserData } from '../apollo/currentUser';
-
-import { useUserProfile } from './useUserProfile';
+import { useUserProfile } from 'skiff-front-graphql';
+import { useRequiredCurrentUserData } from 'skiff-front-utils';
 
 /**
  * This hook is the source of truth for getting the most up-to-date display name

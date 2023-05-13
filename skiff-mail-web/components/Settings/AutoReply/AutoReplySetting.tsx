@@ -1,9 +1,9 @@
-import { ButtonGroupItem, Dialog, Icon, InputField } from 'nightwatch-ui';
+import { Editor } from '@tiptap/react';
+import { InputField } from 'nightwatch-ui';
 import React, { useEffect, useRef, useState } from 'react';
+import { isMobile } from 'react-device-detect';
 import { generateSymmetricKey, stringDecryptAsymmetric, stringEncryptAsymmetric } from 'skiff-crypto';
 import { decryptDatagram } from 'skiff-crypto-v2';
-import { TitleActionSection, useToast } from 'skiff-front-utils';
-import { SetAutoReplyRequest } from 'skiff-graphql';
 import {
   useGetAutoReplyQuery,
   useDeleteAutoReplyMutation,
@@ -12,13 +12,23 @@ import {
   useDecryptionServicePublicKeyQuery,
   encryptMessageContent,
   MailSubjectDatagram,
-  MailTextDatagram
-} from 'skiff-mail-graphql';
+  MailHtmlDatagram
+} from 'skiff-front-graphql';
+import { TitleActionSection, ConfirmModal, useToast, requireCurrentUserData } from 'skiff-front-utils';
+import { getTierNameFromSubscriptionPlan, SetAutoReplyRequest } from 'skiff-graphql';
+import { getAutoreplyEnabled, PaywallErrorCode } from 'skiff-utils';
+import styled from 'styled-components';
 
-import { requireCurrentUserData } from '../../../apollo/currentUser';
-import { useDefaultEmailAlias } from '../../../hooks/useDefaultEmailAlias';
+import { usePaywall } from '../../../hooks/usePaywall';
+import { useSubscriptionPlan } from '../../../utils/userUtils';
 import { convertHtmlToTextContent } from '../../MailEditor/mailEditorUtils';
 import { SettingTextArea } from '../SettingTextArea';
+
+const InputFieldContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
 
 export const AutoReplySetting = () => {
   const [newSubject, setNewSubject] = useState<string | undefined>(undefined);
@@ -39,10 +49,13 @@ export const AutoReplySetting = () => {
 
   const [setAutoReply] = useSetAutoReplyMutation();
   const [deleteAutoReply] = useDeleteAutoReplyMutation();
-  const [defaultEmailAlias] = useDefaultEmailAlias();
+  const {
+    data: { activeSubscription }
+  } = useSubscriptionPlan();
 
   const subjectInputRef = useRef<HTMLInputElement>(null);
-  const bodyInputRef = useRef<HTMLInputElement>(null);
+  const bodyInputRef = useRef<Editor>(null);
+  const openPaywallModal = usePaywall();
 
   // reset to initial values
   const reset = () => {
@@ -71,10 +84,7 @@ export const AutoReplySetting = () => {
         await deleteAutoReply({ refetchQueries: [{ query: GetAutoReplyDocument }] });
       }
       reset();
-      enqueueToast({
-        body: 'Auto-reply message deleted',
-        icon: Icon.Trash
-      });
+      enqueueToast({ title: 'Auto-reply deleted' });
     } catch (e) {
       setErrorMsg('Failed to delete auto-reply message');
     }
@@ -106,23 +116,18 @@ export const AutoReplySetting = () => {
       );
 
       const subject = subjectUpdated ? newSubject : currentSubject ?? '';
-      const messageHtmlBody = document.createElement('span');
-      messageHtmlBody.appendChild(document.createTextNode(newAutoReply ?? currentAutoReply ?? ''));
-      const messageTextBody = convertHtmlToTextContent(messageHtmlBody.innerHTML);
+      const messageHtmlBody = newAutoReply ?? currentAutoReply ?? '';
+      const messageTextBody = convertHtmlToTextContent(newAutoReply ?? currentAutoReply ?? '');
 
-      const { encryptedSubject, encryptedText, encryptedHtml, encryptedTextAsHtml } = encryptMessageContent(
-        subject,
-        messageTextBody,
-        messageHtmlBody.innerHTML,
-        [],
-        decryptedSessionKey
-      );
+      const { encryptedSubject, encryptedText, encryptedHtml, encryptedTextAsHtml, encryptedTextSnippet } =
+        encryptMessageContent(subject, messageTextBody, messageHtmlBody, [], decryptedSessionKey);
 
       const request: SetAutoReplyRequest = {
         encryptedSubject,
         encryptedText,
         encryptedHtml,
         encryptedTextAsHtml,
+        encryptedTextSnippet,
         encryptedUserSessionKey: {
           encryptedBy: publicKey,
           encryptedSessionKey: encryptedUserSessionKey
@@ -130,8 +135,7 @@ export const AutoReplySetting = () => {
         encryptedSkiffSessionKey: {
           encryptedBy: publicKey,
           encryptedSessionKey: ecryptedSkiffSessionKey
-        },
-        from: defaultEmailAlias ?? ''
+        }
       };
 
       await setAutoReply({
@@ -148,21 +152,38 @@ export const AutoReplySetting = () => {
   // confirm auto-reply deletion
   const onConfirm = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onDelete();
+    void onDelete();
     setIsConfirmOpen(false);
+  };
+
+  const tierName = getTierNameFromSubscriptionPlan(activeSubscription);
+  const autoreplyEnabled = getAutoreplyEnabled(tierName);
+  const checkPaywallAndEdit = () => {
+    if (!autoreplyEnabled) {
+      openPaywallModal(PaywallErrorCode.AutoReply);
+      return;
+    }
+    setIsEditing(true);
   };
 
   const editClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsEditing(true);
-    subjectInputRef.current?.focus();
+    checkPaywallAndEdit();
   };
+
+  useEffect(() => {
+    // focus when the input field renders
+    if (subjectInputRef.current) {
+      subjectInputRef.current?.focus();
+    }
+  }, [subjectInputRef.current]);
+
   // decrypt current auto-reply message
   useEffect(() => {
     const sessionKey = autoReplyData?.autoReply?.encryptedSessionKey;
     const encryptedSubject = autoReplyData?.autoReply?.encryptedSubject.encryptedData ?? '';
-    const encryptedText = autoReplyData?.autoReply?.encryptedText.encryptedData;
-    if (!!sessionKey && !!encryptedSubject && !!encryptedText) {
+    const encryptedHtml = autoReplyData?.autoReply?.encryptedHtml.encryptedData;
+    if (!!sessionKey && !!encryptedSubject && !!encryptedHtml) {
       // auto-reply was updated
       const decryptedSessionKey = stringDecryptAsymmetric(
         privateKey || '',
@@ -172,8 +193,8 @@ export const AutoReplySetting = () => {
       );
       const decryptedSubject = decryptDatagram(MailSubjectDatagram, decryptedSessionKey, encryptedSubject).body.subject;
       setCurrentSubject(decryptedSubject);
-      const decryptedText = decryptDatagram(MailTextDatagram, decryptedSessionKey, encryptedText).body.text;
-      setCurrentAutoReply(decryptedText);
+      const decryptedHtml = decryptDatagram(MailHtmlDatagram, decryptedSessionKey, encryptedHtml).body.html;
+      setCurrentAutoReply(decryptedHtml);
     } else {
       // auto-reply was deleted
       setCurrentSubject(undefined);
@@ -191,49 +212,50 @@ export const AutoReplySetting = () => {
             type: 'button'
           }
         ]}
-        subtitle='Add an automated reply to incoming messages.'
-        title='Auto reply'
+        subtitle='Add an automated reply to incoming messages'
+        title={isMobile ? '' : 'Auto reply'}
       />
-      {(!!currentAutoReply || isEditing) && (
-        <>
+      {(!!currentAutoReply || isEditing || isMobile) && (
+        <InputFieldContainer>
           <InputField
             error={!!errorMsg}
             innerRef={subjectInputRef}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewSubject(e.target.value)}
-            onFocus={() => setIsEditing(true)}
+            onFocus={() => checkPaywallAndEdit()}
             onKeyPress={(e) => {
               // pressing enter focuses the next field
-              if (e.key === 'Enter') bodyInputRef.current?.focus();
+              if (e.key === 'Enter') {
+                bodyInputRef.current?.commands.focus();
+              }
             }}
             placeholder='Subject'
-            style={{ borderRadius: '8px' }}
             value={newSubject ?? currentSubject}
           />
           <SettingTextArea
             errorMsg={errorMsg}
             innerRef={bodyInputRef}
-            isEditing={isEditing}
+            isEditing={isEditing || isMobile}
             onDelete={() => setIsConfirmOpen(true)}
             onFocus={() => {
-              setIsEditing(true);
+              checkPaywallAndEdit();
               setErrorMsg(undefined);
             }}
-            onSave={onSave}
+            onSave={() => void onSave()}
             placeholder='Add auto-reply message here'
             setValue={setNewAutoReply}
             value={newAutoReply ?? currentAutoReply}
           />
-        </>
+        </InputFieldContainer>
       )}
-      <Dialog
+      <ConfirmModal
+        confirmName='Delete'
         description='Are you sure you want to delete this auto-reply message?'
+        destructive
         onClose={onCloseConfirm}
+        onConfirm={onConfirm}
         open={isConfirmOpen}
         title='Delete'
-      >
-        <ButtonGroupItem key='delete' label='Delete' onClick={onConfirm} />
-        <ButtonGroupItem key='cancel' label='Cancel' onClick={onCloseConfirm} />
-      </Dialog>
+      />
     </>
   );
 };

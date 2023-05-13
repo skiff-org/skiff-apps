@@ -1,75 +1,131 @@
 import { ApolloError } from '@apollo/client';
 import { useAnimation, motion } from 'framer-motion';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import {
-  Button,
   ButtonGroup,
   ButtonGroupItem,
-  Chip,
   Dialog,
   DialogTypes,
+  Divider,
+  DropdownItem,
   Icon,
   IconButton,
   Icons,
-  IconTextProps,
   InputField,
-  Typography
+  Select,
+  Size,
+  Type,
+  Typography,
+  TypographySize,
+  MonoTag,
+  TypographyWeight
 } from 'nightwatch-ui';
+import pluralize from 'pluralize';
 import { useRef, useState } from 'react';
-import { ConfirmModal, useToast } from 'skiff-front-utils';
-import { CustomDomainRecord, DnsRecord } from 'skiff-graphql';
-import { useCreateCustomDomainAliasMutation, useDeleteCustomDomainMutation } from 'skiff-mail-graphql';
-import { CustomDomainStatus, CUSTOM_DOMAIN_RECORD_ERRORS } from 'skiff-utils';
-import styled from 'styled-components';
+import { isMobile } from 'react-device-detect';
+import {
+  useGetAliasesOnDomainQuery,
+  useDeleteCustomDomainMutation,
+  useGetDomainDetailsQuery,
+  useVerifyCustomDomainMutation,
+  useSetCatchallAddressMutation
+} from 'skiff-front-graphql';
+import {
+  ConfirmModal,
+  useToast,
+  renderDate,
+  useCreateAlias,
+  useAllowAddCustomDomainAliases,
+  useCurrentUserEmailAliases,
+  TabPage,
+  SettingValue,
+  useCurrentUserIsOrgAdmin,
+  CUSTOM_DOMAIN_SETUP_BLOG
+} from 'skiff-front-utils';
+import {
+  CustomDomainRecord,
+  CustomDomainSubscriptionInfo,
+  CustomDomainIsDefaultAliasError,
+  CustomDomainIsInAllAliasesError,
+  isApolloLogicErrorType
+} from 'skiff-graphql';
+import { CustomDomainStatus, GODADDY_PRICE_SCALE_FACTOR, CatchallEnabledFeatureFlag } from 'skiff-utils';
+import styled, { css } from 'styled-components';
 
-import { useRequiredCurrentUserData } from '../../../../apollo/currentUser';
-import { useCurrentUserEmailAliases } from '../../../../hooks/useCurrentUserEmailAliases';
-import { updateEmailAliases } from '../../../../utils/cache/cache';
+import {
+  UserFacingCustomDomainStatus,
+  getUserFacingVerificationStatus,
+  EXPIRES_SOON_BUFFER_IN_MS,
+  getErrorStatusForDnsRecord
+} from '../../../../utils/customDomainUtils';
+import { useSettings } from '../../useSettings';
+import DnsRecordHeader from '../DnsRecordHeader';
 import DnsRecordRow from '../DnsRecordRow';
+import VerticalDnsRecord from '../VerticalDnsRecord';
 
+import DomainVerificationErrorBanner from './DomainVerificationErrorBanner';
 import ManageCustomDomainDropdown from './ManageCustomDomainDropdown';
 
 const ManageCustomDomainRowContainer = styled.div`
+  background: var(--bg-overlay-tertiary);
+  border-radius: 8px;
+`;
+
+const ManageCustomDomainRowBlock = styled.div`
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  padding: 12px;
 `;
 
-const DomainName = styled(Typography)`
-  min-width: 80px;
+const DomainName = styled.div`
   flex-shrink: 0;
 `;
 
-const NameAndAlias = styled.div`
+const DomainNameAndAliases = styled.div`
   display: flex;
   flex-direction: column;
 `;
 
-const NameAndVerificationStatus = styled.div`
+const IconAndName = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
 `;
 
-const VerificationStatus = styled.div`
+const NameAndInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const InfoText = styled.div`
+  display: flex;
+`;
+
+const InfoTag = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  padding: 0 4px;
 `;
 
-const RecordsList = styled.div`
+const RecordsList = styled.div<{ errorDetailView?: boolean }>`
   display: flex;
   flex-direction: column;
-  gap: 24px;
-
-  margin-top: 24px;
+  justify-content: center;
+  gap: ${(props) => (props.errorDetailView ? '8px' : '4px')};
+  ${(props) => (props.errorDetailView ? ' width: 100%' : 'padding: 12px 8px 20px 8px')};
 `;
 
-const AliasList = styled.div`
+const CatchallRow = styled.div`
   display: flex;
-  flex-direction: column;
-  margin-top: 12px;
-  width: 100%;
+  flex-direction: row;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 16px 16px 16px 16px;
+`;
+
+const DividerContainer = styled.div`
+  padding: 0 8px;
 `;
 
 const ChooseDefaultList = styled.div`
@@ -90,6 +146,11 @@ const LabelRadioSelect = styled.div`
   :hover {
     background: var(--bg-cell-hover);
   }
+`;
+
+const TitleContainer = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 const CheckedIcon = styled.div`
@@ -125,113 +186,159 @@ const UnCheckedIcon = styled.div`
 
 const ButtonContainer = styled.div`
   display: flex;
-  gap: 8px;
+  ${isMobile &&
+  css`
+    padding: 0 0 8px 12px;
+    gap: 4px;
+  `}
+`;
+
+const ChevronContainer = styled.div`
+  align-self: center;
 `;
 
 const RELOAD_ROTATION = 720;
 const RELOAD_ANIMATION_S = 1;
 
-// Converts errors in DNSRecord array into readable error format
-const getDnsRecordErrors = (dnsRecords: Array<DnsRecord>): string[] => {
-  const errors: string[] = [];
-  for (const { error, type } of dnsRecords) {
-    if (!error) {
-      continue;
-    }
-    if (error.errorType === CUSTOM_DOMAIN_RECORD_ERRORS.RECORD_MISMATCH) {
-      const retrievedRecords = error.errorData?.retrievedRecords ?? [];
-      const additionalText = retrievedRecords.length ? ` (${retrievedRecords.join(', ')})` : '';
-      errors.push(`${type} record mismatch${additionalText}`);
-    } else {
-      errors.push(`${type} error.errorType`);
-    }
-  }
-  return errors;
-};
-
-// Convert a CustomDomainStatus into a user facing label
-const getCustomDomainStatusLabel = (status: CustomDomainStatus): string => {
+const getCustomDomainIcon = (status: UserFacingCustomDomainStatus, expiresSoon: boolean) => {
   switch (status) {
-    case CustomDomainStatus.VERIFIED:
-      return 'verified';
-    case CustomDomainStatus.PENDING:
-      return 'unverified';
-    case CustomDomainStatus.FAILED_REVERIFICATION:
-      return 'failed';
+    case UserFacingCustomDomainStatus.VERIFIED:
+      if (expiresSoon) {
+        return <Icons color='red' icon={Icon.Stopwatch} />;
+      }
+      return <Icons color='green' icon={Icon.Check} />;
+    case UserFacingCustomDomainStatus.PENDING:
+      return <Icons color='disabled' icon={Icon.Clock} />;
+    case UserFacingCustomDomainStatus.DNS_RECORD_ERROR:
+      return <Icons color='destructive' icon={Icon.Warning} />;
   }
 };
-
-// Convert a CustomDomainStatus into a color for the label
-const getCustomDomainStatusColor = (status: CustomDomainStatus): IconTextProps['color'] => {
-  switch (status) {
-    case CustomDomainStatus.VERIFIED:
-      return 'green';
-    case CustomDomainStatus.PENDING:
-      return 'secondary';
-    case CustomDomainStatus.FAILED_REVERIFICATION:
-      return 'destructive';
-  }
-};
-
 interface ManageCustomDomainRowProps {
   customDomain: CustomDomainRecord;
-  defaultCustomDomainAlias: string;
+  defaultEmailAlias: string;
   dropdownOpen: boolean;
+  renewStatus?: Omit<CustomDomainSubscriptionInfo, 'domainID'>;
   refetchCustomDomains: () => void;
-  setDefaultCustomDomainAlias: (newAlias: string) => void;
+  setDefaultEmailAlias: (newAlias: string) => Promise<void>;
   setDropdownOpen: (open: boolean) => void;
 }
 
 const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
   customDomain,
-  defaultCustomDomainAlias,
+  defaultEmailAlias,
   dropdownOpen,
+  renewStatus,
   refetchCustomDomains,
-  setDefaultCustomDomainAlias,
+  setDefaultEmailAlias,
   setDropdownOpen
 }: ManageCustomDomainRowProps) => {
-  const { domainID, domain, dnsRecords, verificationStatus } = customDomain;
-  const { userID } = useRequiredCurrentUserData();
+  const {
+    createdAt,
+    domainID,
+    domain,
+    dnsRecords,
+    verificationStatus: verificationStatusFromDB,
+    skiffManaged
+  } = customDomain;
+  const userFacingVerificationStatus = getUserFacingVerificationStatus(
+    verificationStatusFromDB as CustomDomainStatus,
+    new Date(createdAt),
+    dnsRecords,
+    skiffManaged
+  );
+
+  const [verifyCustomDomain] = useVerifyCustomDomainMutation();
+  const allowAddCustomDomainAliases = useAllowAddCustomDomainAliases();
   const currentUserEmailAliases = useCurrentUserEmailAliases();
+  const isCurrentUserOrgAdmin = useCurrentUserIsOrgAdmin();
+
+  const { data: domainDetailsData } = useGetDomainDetailsQuery({
+    variables: { domain: customDomain.domain },
+    skip: !customDomain.skiffManaged
+  });
+  const emailAliases = useCurrentUserEmailAliases();
+  const hasAliasOnOtherDomain = emailAliases.some((alias) => !alias.endsWith(`@${domain}`));
+  const showAddAliasOption =
+    allowAddCustomDomainAliases && userFacingVerificationStatus === UserFacingCustomDomainStatus.VERIFIED;
+
+  // Current domain catchall info
+  const { data: aliasDomainData, refetch } = useGetAliasesOnDomainQuery({
+    variables: { domainID },
+    skip: !domainID
+  });
+  const [setCatchallAddress] = useSetCatchallAddressMutation();
+  const currentUserAliasesOnDomain =
+    aliasDomainData?.getAliasesOnDomain.domainAliases.map((aliasInfo) => aliasInfo.displayEmailAlias) ?? [];
+  const currentCatchall = aliasDomainData?.getAliasesOnDomain.domainAliases.find(
+    (elem) => elem.isCatchall
+  )?.displayEmailAlias;
+
+  const expiresAt = renewStatus?.supposedEndDate;
+  const renewsAuto = !renewStatus?.cancelAtPeriodEnd; // will auto-renew if cancelAtPeriodEnd is *false*
+  const renewalPrice = domainDetailsData?.getDomainDetails.renewalDetails.price;
   // State
-  const [showRecords, setShowRecords] = useState<boolean>(false);
+  const [showDomainInfo, setShowDomainInfo] = useState<boolean>(false);
   const [showAddAlias, setShowAddAlias] = useState<boolean>(false);
   const [showChooseDefault, setShowChooseDefault] = useState<boolean>(false);
   const [showDeleteDomain, setShowDeleteDomain] = useState<boolean>(false);
   const [newAlias, setNewAlias] = useState('');
-  const [newDefaultAlias, setNewDefaultAlias] = useState(defaultCustomDomainAlias);
+  const [newDefaultAlias, setNewDefaultAlias] = useState(defaultEmailAlias);
   const [error, setError] = useState<string | undefined>();
-  const [createCustomDomainAlias] = useCreateCustomDomainAliasMutation();
   const [rotation, setRotation] = useState(RELOAD_ROTATION);
+  const [postDeleteError, setPostDeleteError] = useState<string>('');
+  const [resolveDnsErrorModal, setResolveDnsErrorModal] = useState<boolean>(false);
 
   // Refs
   const ref = useRef<HTMLDivElement>(null);
 
   // Custom hooks
   const { enqueueToast } = useToast();
+  const { addCustomDomainAlias } = useCreateAlias();
   const controls = useAnimation();
 
   // Graphql
   const [deleteCustomDomainMutation] = useDeleteCustomDomainMutation();
 
-  const deleteCustomDomain = async () => {
-    const { errors } = await deleteCustomDomainMutation({
-      variables: {
-        request: {
-          domainID
-        }
-      }
-    });
+  const featureFlags = useFlags();
+  const hasCatchallEnabled = featureFlags.catchallEnabled as CatchallEnabledFeatureFlag;
 
-    if (errors) {
-      enqueueToast({ body: 'Failed to delete custom domain.', icon: Icon.Warning });
-    } else {
-      enqueueToast({ body: 'Custom domain deleted.', icon: Icon.Trash });
+  const { openSettings } = useSettings();
+
+  const openAliasTab = () => openSettings({ tab: TabPage.Aliases, setting: SettingValue.AddEmailAlias });
+  const openOrgTab = () => openSettings({ tab: TabPage.Org, setting: SettingValue.OrganizationMemberList });
+
+  const deleteCustomDomain = async () => {
+    try {
+      await deleteCustomDomainMutation({
+        variables: {
+          request: {
+            domainID
+          }
+        }
+      });
+      setShowDeleteDomain(false);
+      enqueueToast({ title: 'Custom domain deleted' });
       refetchCustomDomains();
+    } catch (e) {
+      setShowDeleteDomain(false);
+      if (
+        e instanceof ApolloError &&
+        (isApolloLogicErrorType(e.graphQLErrors[0], CustomDomainIsDefaultAliasError) ||
+          isApolloLogicErrorType(e.graphQLErrors[0], CustomDomainIsInAllAliasesError))
+      ) {
+        const failureDescription = `Failed to delete because${
+          isApolloLogicErrorType(e.graphQLErrors[0], CustomDomainIsDefaultAliasError)
+            ? ' an organization member has this domain in their default alias. Change the default alias and then try again.'
+            : ' an organization member has all of their aliases on this domain. Provision a new alias for them and try again.'
+        }`;
+        setPostDeleteError(failureDescription);
+      } else {
+        enqueueToast({ title: 'Delete failed', body: 'Failed to delete custom domain.' });
+      }
     }
   };
 
-  const isDefaultCustomDomain = defaultCustomDomainAlias.includes(domain);
+  const isDefaultCustomDomain = defaultEmailAlias.includes(domain);
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -254,20 +361,7 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
 
   const addNewAlias = async () => {
     try {
-      await createCustomDomainAlias({
-        variables: {
-          request: {
-            emailAlias: newAlias,
-            customDomain: customDomain.domain
-          }
-        },
-        update: (cache, response) => {
-          const updatedEmailAliases = response.data?.createCustomDomainAlias?.emailAliases;
-          if (!response.errors && updatedEmailAliases) {
-            updateEmailAliases(cache, userID, updatedEmailAliases);
-          }
-        }
-      });
+      await addCustomDomainAlias(newAlias, customDomain.domain);
       closeAliasModal();
     } catch (e: any) {
       const { message } = e as ApolloError;
@@ -279,103 +373,299 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
     if (e.key === 'Enter') void addNewAlias();
   };
 
+  const getDeleteModalContent = () => {
+    if (isDefaultCustomDomain || !hasAliasOnOtherDomain) {
+      return {
+        title: isDefaultCustomDomain ? 'Change your default alias' : 'You need a new alias',
+        confirmName: isDefaultCustomDomain ? 'Change default' : 'Add new alias',
+        description: isDefaultCustomDomain
+          ? "You can't delete a domain that is being used in your default alias."
+          : 'All of your aliases are on this domain. Create a new @skiff.com alias and then try again.',
+        onConfirm: openAliasTab
+      };
+    }
+    return {
+      title: `Permanently delete ${domain}?`,
+      confirmName: 'Delete',
+      description: `WARNING: This will delete the domain and all associated aliases for everyone in your organization${
+        skiffManaged ? ', and immediately cancel your annual subscription for this domain' : ''
+      }.`,
+      destructive: true,
+      onConfirm: deleteCustomDomain
+    };
+  };
+
+  const { title, confirmName, description, destructive, onConfirm } = getDeleteModalContent();
+
   const inputField = (
     <InputField
       autoFocus
       endAdornment={<Typography>@{domain}</Typography>}
       errorMsg={error}
-      helperText={error || 'You can use letters, numbers, periods, dashes, and underscores.'}
+      helperText='You can use letters, numbers, periods, dashes, and underscores.'
       onChange={onInputChange}
       onKeyPress={submitOnEnter}
       placeholder='alias'
-      size='large'
-      style={{ paddingRight: `${domain.length * 10}px` }}
+      size={Size.LARGE}
       value={newAlias}
     />
   );
 
   const currentCustomAliases = currentUserEmailAliases.filter((alias) => alias.split('@')[1] === domain);
-  const dnsRecordErrors = getDnsRecordErrors(dnsRecords);
+
+  const renderInfoText = () => {
+    if (userFacingVerificationStatus === UserFacingCustomDomainStatus.DNS_RECORD_ERROR) {
+      if (customDomain.skiffManaged) {
+        return 'Please contact support@skiff.org';
+      }
+      return showDomainInfo
+        ? 'Copy the highlighted records into your DNS provider to ensure they match.'
+        : 'Verification failed.';
+    }
+    if (userFacingVerificationStatus === UserFacingCustomDomainStatus.PENDING) {
+      if (customDomain.skiffManaged) {
+        return `Your domain is registered! DNS records may take a few hours to update`;
+      }
+      return 'Verification may take a few hours';
+    }
+    if (!customDomain.skiffManaged) {
+      // no icon shown in mobile, so we specify that it's verified
+      return isMobile ? 'Verified, externally managed domain' : 'Externally managed domain';
+    }
+    if (expiresAt) {
+      let renewsOrExpiresText = (renewsAuto ? 'Renews ' : 'Expires ') + renderDate(expiresAt);
+      if (renewalPrice && renewsAuto) {
+        renewsOrExpiresText += ` for $${(renewalPrice * GODADDY_PRICE_SCALE_FACTOR).toFixed(2)} (subject to change)`;
+      }
+      return renewsOrExpiresText;
+    }
+  };
+
+  const expiresSoon =
+    expiresAt instanceof Date && !renewsAuto && Date.now() > expiresAt.getTime() - EXPIRES_SOON_BUFFER_IN_MS;
+
+  const getInfoTextColor = () => {
+    if (expiresSoon) {
+      return 'destructive';
+    }
+    return 'disabled';
+  };
+  const hasDNSRecordError = userFacingVerificationStatus === UserFacingCustomDomainStatus.DNS_RECORD_ERROR;
+
+  const erroneousRecords = dnsRecords.filter((dnsRecord) =>
+    getErrorStatusForDnsRecord(userFacingVerificationStatus, dnsRecord)
+  );
+
+  const catchallSelectItems = currentUserAliasesOnDomain.sort().map((domainAlias) => {
+    return (
+      <DropdownItem
+        active={currentCatchall === domainAlias}
+        key={domainAlias}
+        label={domainAlias}
+        value={domainAlias}
+      />
+    );
+  });
+
+  if (currentCatchall) {
+    catchallSelectItems.push(
+      <DropdownItem
+        color='destructive'
+        label='Remove'
+        onClick={() => {
+          void setCatchallAddress({
+            variables: {
+              request: {
+                domainID
+              }
+            }
+          }).then(() => refetch());
+        }}
+      />
+    );
+  }
+
+  const canSetCatchall =
+    hasCatchallEnabled &&
+    catchallSelectItems.length > 0 &&
+    userFacingVerificationStatus === UserFacingCustomDomainStatus.VERIFIED;
+  // skiff managed domains don't display DNS records; only show dropdown button if catchall setting enabled
+  const hasDomainInfoPane = !isMobile && (!skiffManaged || canSetCatchall);
+
+  const renderButtonActions = () => (
+    <ButtonContainer>
+      {!skiffManaged && userFacingVerificationStatus !== UserFacingCustomDomainStatus.VERIFIED && (
+        <motion.div
+          animate={controls}
+          initial={false}
+          key='refresh'
+          transition={{
+            duration: RELOAD_ANIMATION_S,
+            ease: 'easeInOut',
+            times: [0, 0.2, 0.5, 0.8, 1]
+          }}
+        >
+          <IconButton
+            filled={isMobile ? true : false}
+            icon={Icon.Reload}
+            iconColor={isMobile ? 'secondary' : undefined}
+            onClick={() => {
+              async function verifyAndRefetch() {
+                await verifyCustomDomain({
+                  variables: {
+                    domainId: domainID
+                  }
+                });
+                refetchCustomDomains();
+              }
+              void verifyAndRefetch();
+              void controls.start({ rotate: rotation });
+              setRotation((prev) => prev + 720);
+            }}
+            size={isMobile ? undefined : Size.SMALL}
+            tooltip='Refetch'
+            type={isMobile ? Type.SECONDARY : undefined}
+          />
+        </motion.div>
+      )}
+      {/* Hide status tag if verified or on mobile */}
+      {!isMobile && userFacingVerificationStatus !== UserFacingCustomDomainStatus.VERIFIED && (
+        <InfoTag>
+          <MonoTag
+            bgColor={hasDNSRecordError ? undefined : 'var(--bg-overlay-tertiary)'}
+            color={hasDNSRecordError ? 'red' : undefined}
+            label={userFacingVerificationStatus}
+            textColor={hasDNSRecordError ? undefined : 'secondary'}
+          />
+        </InfoTag>
+      )}
+      {/* all dropdown items except, in some cases, 'Add alias' are only available to admins */}
+      {(isCurrentUserOrgAdmin || showAddAliasOption) && (
+        <IconButton
+          filled={isMobile ? true : false}
+          icon={Icon.OverflowH}
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          ref={ref}
+          size={isMobile ? undefined : Size.SMALL}
+          type={isMobile ? Type.SECONDARY : undefined}
+        />
+      )}
+      {hasDomainInfoPane && dnsRecords.length > 0 && (
+        <IconButton
+          icon={showDomainInfo ? Icon.ChevronDown : Icon.ChevronRight}
+          onClick={() => setShowDomainInfo((current) => !current)}
+          size={isMobile ? undefined : Size.SMALL}
+        />
+      )}
+    </ButtonContainer>
+  );
+
   return (
-    <div>
-      <ManageCustomDomainRowContainer>
-        <NameAndAlias>
-          <NameAndVerificationStatus>
-            <DomainName>{domain}</DomainName>
-            <VerificationStatus>
-              <Chip
-                color={getCustomDomainStatusColor(verificationStatus as CustomDomainStatus)}
-                label={getCustomDomainStatusLabel(verificationStatus as CustomDomainStatus)}
-                size='small'
-              />
-              {/* Hide errors if verified */}
-              {verificationStatus !== CustomDomainStatus.VERIFIED &&
-                dnsRecordErrors.map((errorMsg) => (
-                  <Chip color='destructive' key={`${domain}-${errorMsg}`} label={errorMsg} size='small' />
-                ))}
-              {isDefaultCustomDomain && <Chip active label='default' size='small' />}
-            </VerificationStatus>
-          </NameAndVerificationStatus>
-          <AliasList>
-            {currentCustomAliases.map((alias) => (
-              <Typography color='secondary' key={`${customDomain.domainID}-${alias}`} level={3}>
-                {alias}
-              </Typography>
-            ))}
-          </AliasList>
-        </NameAndAlias>
-        {!showRecords && (
-          <ButtonContainer>
-            {verificationStatus === CustomDomainStatus.VERIFIED && (
-              <Button onClick={() => setShowAddAlias(true)} type='secondary'>
-                Add alias
-              </Button>
-            )}
-            {verificationStatus === CustomDomainStatus.PENDING && (
-              <motion.div
-                animate={controls}
-                initial={false}
-                key='refresh'
-                transition={{
-                  duration: RELOAD_ANIMATION_S,
-                  ease: 'easeInOut',
-                  times: [0, 0.2, 0.5, 0.8, 1]
-                }}
-              >
-                <IconButton
-                  color='secondary'
-                  icon={Icon.Reload}
-                  onClick={() => {
-                    void refetchCustomDomains();
-                    void controls.start({ rotate: rotation });
-                    setRotation((prev) => prev + 720);
-                  }}
-                  size='small'
-                  tooltip='Refetch'
+    <ManageCustomDomainRowContainer>
+      <ManageCustomDomainRowBlock>
+        <DomainNameAndAliases>
+          <IconAndName>
+            {!isMobile && getCustomDomainIcon(userFacingVerificationStatus, expiresSoon)}
+            <NameAndInfo>
+              <DomainName>
+                <Typography minWidth='80px' weight={TypographyWeight.MEDIUM}>
+                  {domain}
+                </Typography>
+              </DomainName>
+              <InfoText>
+                <Typography color={getInfoTextColor()} size={TypographySize.SMALL} wrap>
+                  {renderInfoText()}
+                </Typography>
+                {!skiffManaged &&
+                  !showDomainInfo &&
+                  userFacingVerificationStatus === UserFacingCustomDomainStatus.DNS_RECORD_ERROR && (
+                    <Typography color='link' onClick={() => setShowDomainInfo(true)} size={TypographySize.SMALL} wrap>
+                      &nbsp;Check errors
+                    </Typography>
+                  )}
+              </InfoText>
+            </NameAndInfo>
+          </IconAndName>
+        </DomainNameAndAliases>
+        {isMobile ? (
+          <>
+            {(isCurrentUserOrgAdmin || showAddAliasOption) && (
+              <ChevronContainer>
+                <Icons
+                  color='disabled'
+                  icon={showDomainInfo ? Icon.ChevronDown : Icon.ChevronRight}
+                  onClick={() => setShowDomainInfo((prev) => !prev)}
                 />
-              </motion.div>
+              </ChevronContainer>
             )}
-            <IconButton
-              color='secondary'
-              icon={Icon.OverflowH}
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              ref={ref}
-              size='small'
-            />
-          </ButtonContainer>
+          </>
+        ) : (
+          renderButtonActions()
         )}
-        {showRecords && (
-          <Typography color='secondary' onClick={() => setShowRecords(false)} type='label'>
-            Close
-          </Typography>
-        )}
-      </ManageCustomDomainRowContainer>
-      {showRecords && (
-        <RecordsList>
-          {dnsRecords.map((record) => (
-            <DnsRecordRow dnsRecord={record} key={record.data} />
-          ))}
-        </RecordsList>
+      </ManageCustomDomainRowBlock>
+      {showDomainInfo && (
+        <>
+          {isMobile && renderButtonActions()}
+          {/* users with Skiff-managed domains don't need to see records since they can't make adjustments */}
+          {!!dnsRecords.length &&
+            !skiffManaged &&
+            (isMobile ? (
+              dnsRecords.map((record) => (
+                <VerticalDnsRecord dnsRecord={record} domainStatus={userFacingVerificationStatus} key={record.data} />
+              ))
+            ) : (
+              <>
+                {userFacingVerificationStatus === UserFacingCustomDomainStatus.DNS_RECORD_ERROR && (
+                  <DomainVerificationErrorBanner
+                    errorCount={erroneousRecords.length}
+                    onCTAClick={() => setResolveDnsErrorModal(true)}
+                  />
+                )}
+                <DividerContainer>
+                  <Divider color='tertiary' />
+                </DividerContainer>
+                <RecordsList>
+                  <DnsRecordHeader />
+                  {dnsRecords.map((record) => (
+                    <DnsRecordRow dnsRecord={record} domainStatus={userFacingVerificationStatus} key={record.data} />
+                  ))}
+                </RecordsList>
+              </>
+            ))}
+        </>
+      )}
+      {showDomainInfo && canSetCatchall && (
+        <>
+          <DividerContainer>
+            <Divider color='tertiary' />
+          </DividerContainer>
+          <CatchallRow>
+            <TitleContainer>
+              <Typography>Set a catch-all address</Typography>
+            </TitleContainer>
+            <div>
+              <Select
+                filled
+                maxHeight={400}
+                onChange={(value) => {
+                  void setCatchallAddress({
+                    variables: {
+                      request: {
+                        domainID,
+                        emailAlias: value
+                      }
+                    }
+                  }).then(() => void refetch());
+                }}
+                placeholder={currentCatchall ?? 'None'}
+                size={Size.SMALL}
+                value={currentCatchall ?? 'None'}
+              >
+                {catchallSelectItems}
+              </Select>
+            </div>
+          </CatchallRow>
+        </>
       )}
       <Dialog
         description='Add a new custom address.'
@@ -389,13 +679,21 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
         <ButtonGroupItem label='Cancel' onClick={closeAliasModal} />
       </Dialog>
       <ConfirmModal
-        confirmName='Delete'
-        description='This will delete the domain for everyone in your workspace.'
-        destructive
+        confirmName={confirmName}
+        description={description}
+        destructive={destructive}
         onClose={() => setShowDeleteDomain(false)}
-        onConfirm={deleteCustomDomain}
+        onConfirm={onConfirm}
         open={showDeleteDomain}
-        title='Are you sure?'
+        title={title}
+      />
+      <ConfirmModal
+        confirmName='Manage aliases'
+        description={postDeleteError}
+        onClose={() => setPostDeleteError('')}
+        onConfirm={openOrgTab}
+        open={!!postDeleteError}
+        title='Custom domain is still in use'
       />
       <Dialog
         customContent
@@ -407,7 +705,7 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
         <ChooseDefaultList>
           {currentCustomAliases.map((alias) => (
             <LabelRadioSelect key={`${customDomain.domainID}-${alias}`} onClick={() => setNewDefaultAlias(alias)}>
-              <Typography style={{ maxWidth: '260px' }}>{alias}</Typography>
+              <Typography maxWidth='260px'>{alias}</Typography>
               {newDefaultAlias === alias && (
                 <CheckedIcon>
                   <CheckedIconDot />
@@ -415,7 +713,7 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
               )}
               {newDefaultAlias !== alias && (
                 <UnCheckedIcon>
-                  <Icons color='secondary' icon={Icon.RadioEmpty} size='large' />
+                  <Icons color='secondary' icon={Icon.RadioEmpty} size={Size.X_MEDIUM} />
                 </UnCheckedIcon>
               )}
             </LabelRadioSelect>
@@ -425,24 +723,55 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
           <ButtonGroupItem
             label='Save'
             onClick={() => {
-              setDefaultCustomDomainAlias(newDefaultAlias);
+              void setDefaultEmailAlias(newDefaultAlias);
               closeDefaultModal();
             }}
           />
           <ButtonGroupItem label='Cancel' onClick={closeDefaultModal} />
         </ButtonGroup>
       </Dialog>
-      {/* deleteCustomDomain */}
+      <Dialog
+        customContent
+        disableTextSelect
+        onClose={() => setResolveDnsErrorModal(false)}
+        open={resolveDnsErrorModal}
+        title='Fix DNS record configuration'
+        type={DialogTypes.Landscape}
+      >
+        <Typography color='secondary' size={TypographySize.MEDIUM} wrap>
+          {`Please visit your DNS provider for '${domain}' to amend the ${pluralize(
+            'record',
+            erroneousRecords.length
+          )} below.`}
+          &nbsp;Learn more about setting up your domain&nbsp;
+          <a href={CUSTOM_DOMAIN_SETUP_BLOG} rel='noopener noreferrer' target='_blank'>
+            here
+          </a>
+          .
+        </Typography>
+        <RecordsList errorDetailView>
+          <DnsRecordHeader errorDetailView />
+          {erroneousRecords.map((record) => (
+            <DnsRecordRow
+              dnsRecord={record}
+              domainStatus={userFacingVerificationStatus}
+              errorDetailView
+              key={record.data}
+            />
+          ))}
+        </RecordsList>
+      </Dialog>
       <ManageCustomDomainDropdown
         buttonRef={ref}
+        openDeleteDomainModal={() => setShowDeleteDomain(true)}
+        renewsAuto={renewsAuto}
+        setShowAddAlias={(value) => setShowAddAlias(value)}
         setShowDropdown={(value) => setDropdownOpen(value)}
-        showDefaultAlias={() => setShowChooseDefault(true)}
-        showDefaultOption={currentCustomAliases.length > 0}
-        showDeleteDomain={() => setShowDeleteDomain(true)}
+        showAddAliasOption={showAddAliasOption}
         showDropdown={dropdownOpen}
-        showRecords={() => setShowRecords(true)}
+        skiffManaged={customDomain.skiffManaged}
       />
-    </div>
+    </ManageCustomDomainRowContainer>
   );
 };
 

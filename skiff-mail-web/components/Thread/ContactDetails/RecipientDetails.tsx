@@ -1,4 +1,5 @@
-import { Typography } from 'nightwatch-ui';
+import { Typography, TypographySize, TypographyOverflow } from 'nightwatch-ui';
+import { isMobile } from 'react-device-detect';
 import { formatEmailAddress } from 'skiff-front-utils';
 import { AddressObject } from 'skiff-graphql';
 import styled from 'styled-components';
@@ -11,17 +12,6 @@ const RecipientDetailsContainer = styled.div`
   position: relative;
 `;
 
-// If we are showing all contacts, remove the overflow from innerText
-// to allow for horizontal scrolling
-const FullContactList = styled(Typography)<{ showContacts }>`
-  ${(props) =>
-    props.showContacts
-      ? `.innerText {
-            overflow: unset;
-        }`
-      : ''}
-`;
-
 type RecipientDetailsProps = {
   email: MailboxEmailInfo;
   expanded: boolean;
@@ -29,7 +19,7 @@ type RecipientDetailsProps = {
 };
 
 function RecipientDetails({ email, expanded, showContacts }: RecipientDetailsProps) {
-  const { to, cc, bcc, decryptedText } = email;
+  const { to, cc, bcc, decryptedTextSnippet } = email;
   const toCommaList = (addresses: AddressObject[], label: string) => {
     if (addresses.length) {
       const commaList = addresses.map((addr) => addr.name ?? formatEmailAddress(addr.address)).join(', ');
@@ -43,7 +33,12 @@ function RecipientDetails({ email, expanded, showContacts }: RecipientDetailsPro
   const commaContactList = `${toCommaList(to, 'To:')}${toCommaList(cc, 'Cc:')}${toCommaList(bcc, 'Bcc:')}`;
 
   const contacts = (
-    <FullContactList color='secondary' showContacts={showContacts}>
+    <Typography
+      color='secondary'
+      size={isMobile ? TypographySize.SMALL : undefined}
+      // If we are showing all contacts, make overflow visible to allow horizontal scrolling
+      overflow={showContacts ? TypographyOverflow.VISIBLE : undefined}
+    >
       {!showContacts ? (
         commaContactList.trim()
       ) : (
@@ -53,13 +48,17 @@ function RecipientDetails({ email, expanded, showContacts }: RecipientDetailsPro
           {!!bcc.length && <>{toFullList(bcc, 'Bcc:')}</>}
         </>
       )}
-    </FullContactList>
+    </Typography>
   );
 
   return (
     <RecipientDetailsContainer data-test='contact-details'>
       {expanded && contacts}
-      {!expanded && <Typography color='secondary'>{decryptedText}</Typography>}
+      {!expanded && (
+        <Typography color='secondary' size={isMobile ? TypographySize.SMALL : undefined}>
+          {decryptedTextSnippet}
+        </Typography>
+      )}
     </RecipientDetailsContainer>
   );
 }

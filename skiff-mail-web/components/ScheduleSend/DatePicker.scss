@@ -35,6 +35,10 @@
     }
 
     color: var(--text-disabled) !important;
+
+    &.Mui-selected {
+      background-color: var(--accent-orange-secondary) !important;
+    }
   }
 
   .MuiSvgIcon-root {

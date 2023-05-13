@@ -7,14 +7,14 @@ export default function useTouchYDistance(ref: RefObject<HTMLElement>) {
 
   const onTouchStart = (e: TouchEvent) => {
     if (window.TouchEvent && e instanceof TouchEvent) {
-      startY = e.touches[0].pageY;
+      startY = e.touches[0]?.pageY ?? 0;
     }
     currentY = startY;
   };
 
   const onTouchMove = (e: TouchEvent) => {
     if (window.TouchEvent && e instanceof TouchEvent) {
-      currentY = e.touches[0].pageY;
+      currentY = e.touches[0]?.pageY ?? 0;
       setDistance(currentY - startY);
     }
   };

@@ -1,10 +1,17 @@
-import { Button, Icon, IconButton } from 'nightwatch-ui';
+import { Editor } from '@tiptap/react';
+import { Button, Icon, IconButton, Type } from 'nightwatch-ui';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+import { isLinkEnabled } from '../MailEditor/mailEditorUtils';
 import useScheduleSend from '../ScheduleSend/useScheduleSend';
 
 const DeleteButtonContainer = styled.div`
   margin-left: auto;
+`;
+
+const SendButton = styled(Button)`
+  padding-right: 4px;
 `;
 
 interface ComposeActionsArgs {
@@ -12,9 +19,9 @@ interface ComposeActionsArgs {
   toggleLink: () => void;
   insertImage: () => void;
   discardDraft: () => Promise<void>;
-  isLinkEnabled: () => boolean | null;
   messageSizeExceeded: boolean;
   openAttachmentSelect: () => void;
+  editor: Editor | null;
 }
 
 /**
@@ -27,58 +34,88 @@ export default function useComposeActions({
   toggleLink,
   insertImage,
   discardDraft,
-  isLinkEnabled,
   messageSizeExceeded,
-  openAttachmentSelect
+  openAttachmentSelect,
+  editor
 }: ComposeActionsArgs) {
   const { ScheduleSendButton, ScheduleSendDrawer } = useScheduleSend(handleSendClick);
-
+  const [linkActionEnable, setLinkActionEnable] = useState<boolean>(false);
+  useEffect(() => {
+    // Listen to selection change and update the linkActionEnable accordingly
+    const onSelectionChange = () => {
+      if (editor) {
+        void setLinkActionEnable(isLinkEnabled(editor));
+      }
+    };
+    if (editor) {
+      editor.on('selectionUpdate', onSelectionChange);
+    }
+    return () => {
+      if (editor) {
+        editor.off('selectionUpdate', onSelectionChange);
+      }
+    };
+  }, [editor]);
   const desktopDeleteButton = (
     <DeleteButtonContainer key='desktop-delete-button'>
-      <IconButton color='destructive' icon={Icon.Trash} onClick={() => void discardDraft()} tooltip='Discard draft' />
+      <div>
+        <IconButton
+          icon={Icon.Trash}
+          onClick={() => void discardDraft()}
+          tooltip='Discard draft'
+          type={Type.DESTRUCTIVE}
+        />
+      </div>
     </DeleteButtonContainer>
   );
 
   const desktopSendButton = (
-    <Button
-      dataTest='send-button'
-      disabled={messageSizeExceeded}
-      key='desktop-send-button'
-      onClick={() => void handleSendClick()}
-      tooltip={messageSizeExceeded ? 'Attachments are too large!' : undefined}
-    >
-      Send
-    </Button>
+    <div>
+      <SendButton
+        dataTest='send-button'
+        disabled={messageSizeExceeded}
+        key='desktop-send-button'
+        onClick={() => void handleSendClick()}
+      >
+        Send
+      </SendButton>
+    </div>
   );
 
   // Shared Buttons
   const imageButton = (
-    <IconButton
-      dataTest='insert-image'
-      icon={Icon.Image}
-      key='image-compose-button'
-      onClick={insertImage}
-      tooltip='Insert image'
-    />
+    <div>
+      <IconButton
+        dataTest='insert-image'
+        icon={Icon.Image}
+        key='image-compose-button'
+        onClick={insertImage}
+        tooltip='Insert image'
+      />
+    </div>
   );
 
   const linkButton = (
-    <IconButton
-      disabled={!isLinkEnabled()}
-      icon={Icon.Link}
-      key='link-compose-button'
-      onClick={toggleLink}
-      tooltip='Insert link'
-    />
+    <div>
+      <IconButton
+        disabled={!linkActionEnable}
+        icon={Icon.Link}
+        key='link-compose-button'
+        onClick={toggleLink}
+        tooltip='Insert link'
+      />
+    </div>
   );
 
   const attachmentsButton = (
-    <IconButton
-      icon={Icon.PaperClip}
-      key='attachments-compose-button'
-      onClick={openAttachmentSelect}
-      tooltip='Add attachments'
-    />
+    <div>
+      <IconButton
+        icon={Icon.PaperClip}
+        key='attachments-compose-button'
+        onClick={openAttachmentSelect}
+        tooltip='Add attachments'
+      />
+    </div>
   );
 
   const desktopBottomBarButtons = [

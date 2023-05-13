@@ -1,31 +1,18 @@
 // TODO (EMAIL-1699): deduplicate utils
-import { Keplr } from '@keplr-wallet/types';
-import { base58 } from 'ethers/lib/utils';
-import { COSMOS_CHAIN_ID } from 'skiff-front-utils';
+import { Keplr } from '@keplr-wallet/types/build/wallet/keplr';
 import {
   CreateWalletChallengeSkemailDocument,
   CreateWalletChallengeSkemailMutation,
   CreateWalletChallengeSkemailMutationVariables
-} from 'skiff-mail-graphql';
-import { isENSName } from 'skiff-utils';
-import isBase58 from 'validator/lib/isBase58';
+} from 'skiff-front-graphql';
+import { COSMOS_CHAIN_ID } from 'skiff-front-utils';
+import { isENSName, isSolanaAddress } from 'skiff-utils';
 import isEthereumAddress from 'validator/lib/isEthereumAddress';
 
 import client from '../../apollo/client';
 import { getAndSignChallenge, getEthAddr } from '../metamaskUtils';
 
 import { ETHERSCAN_ADDRESS_LOOKUP_URL, ETHERSCAN_ENS_LOOKUP_URL, SOLANA_LOOKUP_URL } from './walletUtils.constants';
-
-/**
- * Checks if the given alias is a Solana address.
- * @returns True if the alias is a Solana wallet address. False otherwise.
- */
-export function isSolanaAddress(emailAlias: string): boolean {
-  // Solana addresses are at least 32 chars long.
-  // We must check for the length as well as the base encoding as aliases that
-  // are not wallet address such as 'test' will return isBase58 as true
-  return emailAlias.length >= 32 && isBase58(emailAlias);
-}
 
 /**
  * Gets a token to sign to verify address.
@@ -83,6 +70,7 @@ export const connectSolWallet = async (provider: any) => {
   const encodedMessage = new TextEncoder().encode(challenge);
   // sign challenge
   const signatureData = await provider.signMessage(encodedMessage, 'utf8');
+  const { base58 } = await import('ethers/lib/utils');
   return { challenge, challengeSignature: base58.encode(signatureData.signature) };
 };
 
@@ -107,6 +95,8 @@ export const connectCosmosWallet = async (provider: Keplr) => {
  * @param wallet the wallet to look up
  */
 export const openWalletLookupLink = (wallet: string) => {
+  if (!wallet) return;
+
   let link = '';
   if (isEthereumAddress(wallet)) {
     link = `${ETHERSCAN_ADDRESS_LOOKUP_URL}${wallet}`;
@@ -126,6 +116,8 @@ export const openWalletLookupLink = (wallet: string) => {
  * @returns the look up copy
  */
 export const getWalletLookUpText = (wallet: string): string => {
+  if (!wallet) return '';
+
   if (isEthereumAddress(wallet) || isENSName(wallet)) {
     return 'View on Etherscan';
   }

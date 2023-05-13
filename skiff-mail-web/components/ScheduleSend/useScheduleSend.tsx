@@ -15,6 +15,7 @@ interface ClosedStep {
 interface DropdownStep {
   type: PopupStepType.Dropdown;
 }
+
 interface PopupStep {
   type: PopupStepType.Popup;
   initialDate?: Dayjs;
@@ -58,49 +59,48 @@ const useScheduleSend = (handleSendClick: (scheduleSendAt?: Date) => Promise<voi
 
   const ScheduleSendButton = (
     <>
-      <IconButton
-        active={popupStep !== PopupStepType.Closed}
-        icon={Icon.Clock}
-        onClick={() => {
-          if (popupStep === PopupStepType.Closed) setStep({ type: PopupStepType.Dropdown });
-        }}
-        ref={ref}
-        tooltip='Send later'
-      />
-      <Portal>
-        <Dropdown
-          buttonRef={ref}
-          openUpwards
-          portal
-          setShowDropdown={(open) => {
-            if (!open) setStep({ type: PopupStepType.Closed });
+      <div>
+        <IconButton
+          active={popupStep !== PopupStepType.Closed}
+          icon={Icon.Clock}
+          onClick={() => {
+            if (popupStep === PopupStepType.Closed) setStep({ type: PopupStepType.Dropdown });
           }}
-          showDropdown={popupStep === PopupStepType.Dropdown}
-        >
-          <DropdownItemWithInfo
-            info={tomorrowMorning.format(`ddd MMM D [at] ${timeFormat}`)}
-            label='Tomorrow morning'
-            onClick={() => {
-              setStep({ type: PopupStepType.Popup, initialDate: tomorrowMorning });
-            }}
-          />
-          <DropdownItemWithInfo
-            info={tomorrowAfternoon.format(`ddd MMM D [at] ${timeFormat}`)}
-            label='Tomorrow afternoon'
-            onClick={() => {
-              setStep({ type: PopupStepType.Popup, initialDate: tomorrowAfternoon });
-            }}
-          />
-          <DropdownItem
-            icon={Icon.Calendar}
-            label='Custom date'
-            onClick={() => {
-              setStep({ type: PopupStepType.Popup });
-            }}
-          />
-        </Dropdown>
-        {!isMobile && ScheduleSendPopup}
-      </Portal>
+          ref={ref}
+          tooltip='Send later'
+        />
+      </div>
+      <Dropdown
+        buttonRef={ref}
+        portal
+        setShowDropdown={(isOpen) => {
+          if (!isOpen) setStep({ type: PopupStepType.Closed });
+        }}
+        showDropdown={popupStep === PopupStepType.Dropdown}
+      >
+        <DropdownItemWithInfo
+          info={tomorrowMorning.format(`ddd MMM D [at] ${timeFormat}`)}
+          label='Tomorrow morning'
+          onClick={() => {
+            setStep({ type: PopupStepType.Popup, initialDate: tomorrowMorning });
+          }}
+        />
+        <DropdownItemWithInfo
+          info={tomorrowAfternoon.format(`ddd MMM D [at] ${timeFormat}`)}
+          label='Tomorrow afternoon'
+          onClick={() => {
+            setStep({ type: PopupStepType.Popup, initialDate: tomorrowAfternoon });
+          }}
+        />
+        <DropdownItem
+          icon={Icon.Calendar}
+          label='Custom date'
+          onClick={() => {
+            setStep({ type: PopupStepType.Popup });
+          }}
+        />
+      </Dropdown>
+      <Portal>{!isMobile && ScheduleSendPopup}</Portal>
     </>
   );
 

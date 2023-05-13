@@ -20,11 +20,15 @@ const usePopulateEditorImages = (attachments: ClientAttachment[], editor?: Edito
       const images = getAllImagesInEditor(editor);
 
       images.map(({ node, pos }) => {
-        // handle only if has cid
-        if (!(node.attrs.src as string).includes('cid')) return;
+        if (typeof node.attrs.src !== 'string') {
+          console.error('Failed to populate image: Image src is not a valid string');
+          return;
+        }
+
+        if (!node.attrs.src.includes('cid')) return;
 
         // get string after cid:[string]
-        const cid = (node.attrs.src as string).match(/cid:(.*)/)?.[1];
+        const cid = node.attrs.src.match(/cid:(.*)/)?.[1];
         if (!cid) return;
 
         const attachment = attachments.find((attach) => attach.contentID === `<${cid}>`);
@@ -36,7 +40,7 @@ const usePopulateEditorImages = (attachments: ClientAttachment[], editor?: Edito
         tr.setNodeMarkup(pos, undefined, { ...node.attrs, src: content });
       });
 
-      editor.view.dispatch(tr);
+      if (tr.steps.length) editor.view.dispatch(tr);
     })();
   }, [editor, attachments]);
 };

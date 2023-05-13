@@ -1,43 +1,35 @@
-import { Drawer, Dropdown, DropdownItem, Icon, IconText } from 'nightwatch-ui';
+import { Drawer, Dropdown, DropdownItem, Icon } from 'nightwatch-ui';
 import { FC } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import {
-  formatEmailAddress,
-  isWalletAddress,
-  splitEmailToAliasAndDomain,
-  useToast,
   DrawerOption,
-  DrawerOptions
+  DrawerOptions,
+  isWalletLookupSupported,
+  splitEmailToAliasAndDomain,
+  useToast
 } from 'skiff-front-utils';
 import { AddressObject } from 'skiff-graphql';
-import { insertIf, isENSName } from 'skiff-utils';
-import styled from 'styled-components';
+import { insertIf } from 'skiff-utils';
 
 import { useDrafts } from '../../../hooks/useDrafts';
 import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { getWalletLookUpText, openWalletLookupLink } from '../../../utils/walletUtils/walletUtils';
-
-const StyledDropdown = styled(Dropdown)`
-  padding-right: 16px;
-`;
 
 interface ContactActionDropdownProps {
   show: boolean;
   setShowActionDropdown: (boolean) => void;
   buttonRef: React.RefObject<HTMLDivElement>;
   address: AddressObject;
-  displayAddress?: boolean;
 }
 
 const ContactActionDropdown: FC<ContactActionDropdownProps> = ({
   show,
   setShowActionDropdown,
   buttonRef,
-  displayAddress,
   address: addressObj
 }) => {
-  const { address } = addressObj;
+  const { address, name } = addressObj;
   const { composeNewDraft } = useDrafts();
   const { enqueueToast } = useToast();
 
@@ -49,31 +41,25 @@ const ContactActionDropdown: FC<ContactActionDropdownProps> = ({
   };
   const showAddressCopiedToast = () => {
     enqueueToast({
-      body: 'Address copied',
-      icon: Icon.Clipboard
+      title: 'Address copied',
+      body: `${address} saved to clipboard.`
     });
   };
 
   const getContent = () => {
-    const [alias] = splitEmailToAliasAndDomain(address);
+    const { alias } = splitEmailToAliasAndDomain(address);
     return [
-      ...insertIf(!!displayAddress, {
-        icon: undefined,
-        onClick: () => {},
-        key: `from-address-${address}`,
-        label: formatEmailAddress(address)
-      }),
       {
         icon: Icon.Send,
         key: `message-address-${address}`,
-        label: 'Direct Message',
+        label: `Email ${name ?? address}`,
         onClick: () => {
           directMessage();
           setShowActionDropdown(false);
         }
       },
       {
-        icon: Icon.Clipboard,
+        icon: Icon.Copy,
         key: `copy-address-${address}`,
         label: 'Copy address',
         onClick: async () => {
@@ -82,7 +68,7 @@ const ContactActionDropdown: FC<ContactActionDropdownProps> = ({
           setShowActionDropdown(false);
         }
       },
-      ...insertIf(isWalletAddress(alias) || isENSName(alias), {
+      ...insertIf(isWalletLookupSupported(alias), {
         icon: Icon.ExternalLink,
         key: `view-wallet-${address}`,
         label: getWalletLookUpText(alias),
@@ -105,20 +91,19 @@ const ContactActionDropdown: FC<ContactActionDropdownProps> = ({
             {content.map(({ icon, key, onClick, label }) => {
               return (
                 <DrawerOption key={key} onClick={onClick}>
-                  <IconText label={label} level={1} startIcon={icon} type='paragraph' />
+                  <DropdownItem icon={icon} label={label} />
                 </DrawerOption>
               );
             })}
           </DrawerOptions>
         </Drawer>
       )}
-      {/* Only render dropdown when it is needed to be shown */}
-      {show && !isMobile && (
-        <StyledDropdown buttonRef={buttonRef} portal setShowDropdown={setShowActionDropdown}>
+      {!isMobile && (
+        <Dropdown buttonRef={buttonRef} portal setShowDropdown={setShowActionDropdown} showDropdown={show}>
           {content.map(({ icon, key, onClick, label }) => {
             return <DropdownItem icon={icon} key={key} label={label} onClick={onClick} />;
           })}
-        </StyledDropdown>
+        </Dropdown>
       )}
     </>
   );

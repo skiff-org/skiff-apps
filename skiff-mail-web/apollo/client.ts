@@ -1,22 +1,54 @@
 import { ApolloClient, ApolloLink, InMemoryCache, NextLink, Operation, from } from '@apollo/client';
-import { onError } from '@apollo/client/link/error';
 import { createUploadLink } from 'apollo-upload-client';
 import fetch from 'cross-fetch';
-import { setupDatadog, datadogOnError, getLatestUserID, isDatadogRUMEnabled } from 'skiff-front-utils';
+import {
+  cloudflareChallengeRedirectLink,
+  getLatestUserID,
+  getCurrentUserData,
+  userTypePolicy,
+  documentTypePolicy,
+  permissionEntryTypePolicy,
+  documentCollaboratorTypePolicy,
+  teamTypePolicy,
+  orgTypePolicy
+} from 'skiff-front-utils';
 import { SKIFF_USERID_HEADER_NAME } from 'skiff-utils';
 
-import { getCurrentUserData } from './currentUser';
 import { parseAsMemoizedDate } from './date';
 import { attachmentTypePolicy } from './typePolicies/Attachment';
 import { emailTypePolicy } from './typePolicies/Email';
 import { mailboxFieldPolicy } from './typePolicies/Mailbox';
 import { userThreadFieldPolicy } from './typePolicies/UserThread';
 
+export const getRouterUri = () => {
+  if (typeof window === 'undefined') {
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  }
+  const { origin } = window.location;
+  if (origin === 'https://app.skiff.com') {
+    return 'https://api.skiff.com';
+  }
+
+  if (origin === 'https://app.skiff.town') {
+    return 'https://api.skiff.town';
+  }
+
+  if (origin === 'https://app.skiff.org') {
+    return 'https://betaapi.skiff.org';
+  }
+
+  if (origin === 'https://staging.skiff.org') {
+    return 'https://api.staging.skiff.org';
+  }
+
+  return process.env.NEXT_PUBLIC_API_BASE_URL;
+};
+
 const uri = (getRouterUri() || 'http://localhost:4000') + '/graphql';
 const cache = new InMemoryCache({
   typePolicies: {
     UserThread: { keyFields: ['threadID'], fields: { emailsUpdatedAt: { read: parseAsMemoizedDate } } },
-    User: { keyFields: ['userID'] },
+    User: userTypePolicy,
     Email: emailTypePolicy,
     Attachment: attachmentTypePolicy,
     Query: {
@@ -24,7 +56,12 @@ const cache = new InMemoryCache({
         mailbox: mailboxFieldPolicy,
         userThread: userThreadFieldPolicy
       }
-    }
+    },
+    Document: documentTypePolicy,
+    PermissionEntry: permissionEntryTypePolicy,
+    DocumentCollaborator: documentCollaboratorTypePolicy,
+    Team: teamTypePolicy,
+    Organization: orgTypePolicy
   }
 });
 
@@ -46,24 +83,14 @@ const authLink = new ApolloLink((operation: Operation, nextLink: NextLink) => {
 });
 
 // Casted to unknown because `createUploadLink` types don't match.
-let link = createUploadLink({
+const link = createUploadLink({
   uri,
   fetch,
   credentials: 'include'
 }) as unknown as ApolloLink;
 
-// Browser only
-if (!(typeof window === 'undefined') && isDatadogRUMEnabled()) {
-  void setupDatadog();
-  const gqleh = onError((errorResponse) => {
-    void datadogOnError(errorResponse);
-  });
-
-  link = gqleh.concat(link);
-}
-
 const client = new ApolloClient({
-  link: from([authLink, link]),
+  link: from([authLink, cloudflareChallengeRedirectLink, link]),
   cache,
   name: 'skemail-web',
   version: process.env.NEXT_PUBLIC_GIT_HASH

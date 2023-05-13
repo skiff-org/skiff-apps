@@ -1,22 +1,19 @@
 import * as IDB from 'idb-keyval';
-import { noop } from 'lodash';
+import noop from 'lodash/noop';
 import { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { useDebouncedAsyncCallback } from 'skiff-front-utils';
+import { ThreadFragment, DraftInfo, useCreateOrUpdateDraftMutation, useDeleteDraftMutation } from 'skiff-front-graphql';
+import { useDebouncedAsyncCallback, useCurrentUserData } from 'skiff-front-utils';
 import { SystemLabels } from 'skiff-graphql';
 import { AddressObject, ThreadAttributes } from 'skiff-graphql';
-import { ThreadFragment } from 'skiff-mail-graphql';
-import { DraftInfo } from 'skiff-mail-graphql';
 import { v4 as uuidv4, validate } from 'uuid';
 
-import { useCurrentUserData } from '../apollo/currentUser';
-import { MailboxEmailInfo } from '../models/email';
+import { MailboxEmailInfo, ThreadViewEmailInfo } from '../models/email';
 import { MailboxThreadInfo } from '../models/thread';
 import { skemailDraftsReducer } from '../redux/reducers/draftsReducer';
-import { getDraftIDBKey, parseAndDecryptDraft, saveDraftToIDB } from '../utils/draftUtils';
+import { getDraftIDBKey, getDraftSaveData, parseAndDecryptDraft } from '../utils/draftUtils';
 
 import { useAppSelector } from './redux/useAppSelector';
-import { getSearchWorker } from './useSearchWorker';
 
 const SAVE_DRAFT_DEBOUNCE_MS = 1000;
 
@@ -32,7 +29,11 @@ export const useDrafts = () => {
   const userData = useCurrentUserData();
   const currentDraftID = useAppSelector((state) => state.draft.currentDraftID);
   const drafts = useAppSelector((state) => state.draft.drafts);
+
   const dispatch = useDispatch();
+  const [upsertDraft] = useCreateOrUpdateDraftMutation();
+  const [deleteRemoteDraft] = useDeleteDraftMutation();
+
   const [saveCurrentDraft, flushSaveCurrentDraft] = useDebouncedAsyncCallback(
     async (
       subject: string,
@@ -44,7 +45,7 @@ export const useDrafts = () => {
     ) => {
       if (!userData) return;
       if (!currentDraftID || !validate(currentDraftID)) {
-        console.error(`Draft ID must be a valid UUID, but was ${currentDraftID}`);
+        console.error(`Draft ID must be a valid UUID, but was ${currentDraftID || ''}`);
         return;
       }
       const currentDraftRaw = await IDB.get(getDraftIDBKey(userData.userID, currentDraftID));
@@ -59,7 +60,18 @@ export const useDrafts = () => {
         createdAt: currentDraft?.createdAt ?? Date.now(),
         existingThread
       };
-      await saveDraftToIDB(draftInfo, userData);
+      const draftContent = getDraftSaveData(draftInfo, userData);
+      const { errors } = await upsertDraft({
+        variables: {
+          request: {
+            ...draftContent
+          }
+        }
+      });
+      // there was a draft in IDB, delete it
+      if (currentDraftRaw && !errors) {
+        await IDB.del(getDraftIDBKey(userData.userID, currentDraftID));
+      }
       dispatch(skemailDraftsReducer.actions.saveDraft({ draftInfo }));
     },
     SAVE_DRAFT_DEBOUNCE_MS
@@ -74,7 +86,7 @@ export const useDrafts = () => {
               const { subject, text, toAddresses, ccAddresses, bccAddresses, draftID, createdAt, existingThread } =
                 draft;
               const existingEmails: Array<MailboxEmailInfo> = existingThread ? existingThread.emails : [];
-              const draftEmail: MailboxEmailInfo = {
+              const draftEmail: ThreadViewEmailInfo = {
                 id: draftID,
                 decryptedAttachmentMetadata: [],
                 decryptedSubject: subject,
@@ -118,7 +130,13 @@ export const useDrafts = () => {
   const deleteDraft = async (draftID: string) => {
     // Cannot parallelize because they both modify IDB
     await IDB.del(getDraftIDBKey(userData.userID, draftID));
-    await getSearchWorker()?.remove(draftID);
+    await deleteRemoteDraft({
+      variables: {
+        request: {
+          draftID
+        }
+      }
+    });
     dispatch(skemailDraftsReducer.actions.deleteDraft({ draftID }));
   };
 

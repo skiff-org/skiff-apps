@@ -1,12 +1,12 @@
 import type { DomainResolver } from '@uauth/common';
 import UAuth from '@uauth/js';
-import { Button, Icon } from 'nightwatch-ui';
+import { Button, Icon, Type } from 'nightwatch-ui';
 import React, { useState } from 'react';
+import { useCreateUdAliasMutation } from 'skiff-front-graphql';
 import { useToast } from 'skiff-front-utils';
-import { useCreateUdAliasMutation } from 'skiff-mail-graphql';
 import styled from 'styled-components';
 
-const WalletButton = styled(Button)`
+const WalletButtonContainer = styled.div`
   width: 48%; // with flex wrap creates 2 cols
 `;
 
@@ -31,8 +31,8 @@ const AddUDAlias: React.FC = () => {
   const onError = (error: any) => {
     console.error('Create UD alias', error);
     enqueueToast({
-      body: 'Could not connect Unstoppable.',
-      icon: Icon.Warning
+      title: 'Failed to connect',
+      body: 'Could not connect Unstoppable.'
     });
   };
 
@@ -58,17 +58,19 @@ const AddUDAlias: React.FC = () => {
   };
 
   return (
-    <WalletButton
-      align='center'
-      disabled={isAddingAlias}
-      iconColor='source'
-      key='add-unstoppable'
-      onClick={onClick}
-      startIcon={Icon.Unstoppable}
-      type='secondary'
-    >
-      {isAddingAlias ? `Check wallet...` : 'Unstoppable Domains'}
-    </WalletButton>
+    <WalletButtonContainer>
+      <Button
+        fullWidth
+        iconColor='source'
+        key='add-unstoppable'
+        loading={isAddingAlias}
+        onClick={onClick}
+        startIcon={Icon.Unstoppable}
+        type={Type.SECONDARY}
+      >
+        {isAddingAlias ? `Check wallet...` : 'Unstoppable Domains'}
+      </Button>
+    </WalletButtonContainer>
   );
 };
 

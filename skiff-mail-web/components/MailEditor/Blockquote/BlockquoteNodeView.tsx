@@ -1,6 +1,6 @@
 import { BlockquoteOptions } from '@tiptap/extension-blockquote';
 import { NodeViewContent, NodeViewProps, NodeViewWrapper } from '@tiptap/react';
-import { Icon, IconText } from 'nightwatch-ui';
+import { Typography } from 'nightwatch-ui';
 import { TextSelection } from 'prosemirror-state';
 import { hasParentNode } from 'prosemirror-utils';
 
@@ -34,14 +34,14 @@ const BlockquoteNodeView = ({
   return (
     <NodeViewWrapper>
       {showToggle && (
-        <IconText
+        <Typography
           color='link'
-          endIcon={isOpen ? Icon.ChevronUp : Icon.ChevronDown}
-          label={`${isOpen ? 'Hide' : 'Show'} previous content`}
           onClick={() => {
             updateAttributes({ isOpen: !isOpen });
           }}
-        />
+        >
+          {`${isOpen ? 'Hide' : 'Show'} previous content`}
+        </Typography>
       )}
       {(!showToggle || isOpen) && (
         <blockquote style={{ borderLeft: `2px solid ${getLeftBorderColor(sender)}` }}>

@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { isIOS } from 'react-device-detect';
+import { useSetPushTokenMutation } from 'skiff-front-graphql';
 import { sendRNWebviewMsg } from 'skiff-front-utils';
-import { useSetPushTokenMutation } from 'skiff-mail-graphql';
 
 import useBackButton from './useBackButton';
 

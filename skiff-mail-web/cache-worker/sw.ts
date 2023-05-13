@@ -10,7 +10,7 @@ import {
   SERVICE_WORKER_VERSION
 } from '../utils/serviceWorker';
 
-const version = 9.0; // Version of the current sw, each increment of 1 will force update sw
+const version = 10.0; // Version of the current sw, each increment of 1 will force update sw
 
 const shouldForceUpdate = (activeVersion: number) => {
   // We should update whenever version is incremented by 1

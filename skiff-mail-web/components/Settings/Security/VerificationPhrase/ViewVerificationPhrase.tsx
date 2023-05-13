@@ -1,10 +1,9 @@
 import { Icon, Typography } from 'nightwatch-ui';
 import React, { useEffect, useState } from 'react';
+import { isMobile } from 'react-device-detect';
 import { generateVerificationPhraseFromSigningKey } from 'skiff-crypto';
-import { TitleActionSection, useToast } from 'skiff-front-utils';
+import { TitleActionSection, useToast, useRequiredCurrentUserData } from 'skiff-front-utils';
 import styled from 'styled-components';
-
-import { useRequiredCurrentUserData } from '../../../../apollo/currentUser';
 
 const PhraseField = styled.div`
   background: var(--bg-field-default);
@@ -17,13 +16,15 @@ const PhraseField = styled.div`
   padding: 8px 12px;
   gap: 12px;
   border-radius: 12px;
-  width: 116px;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 const PhrasesContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, 140px);
+  grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
   grid-auto-flow: row dense;
+  grid-template-rows: 1fr min-content;
   column-gap: 12px;
   row-gap: 12px;
 `;
@@ -40,16 +41,13 @@ function ViewVerificationPhrase() {
   const copyText = (e: React.MouseEvent) => {
     e?.stopPropagation();
     void navigator.clipboard.writeText(verificationPhrase);
-    enqueueToast({
-      body: 'Verification phrase copied',
-      icon: Icon.Copy
-    });
+    enqueueToast({ title: 'Verification phrase copied' });
   };
 
   useEffect(() => {
     // Called when modal is triggered
-    const fetchVerificationPhrase = async () => {
-      const generatedVerificationPhrase = await generateVerificationPhraseFromSigningKey(userData.signingPublicKey);
+    const fetchVerificationPhrase = () => {
+      const generatedVerificationPhrase = generateVerificationPhraseFromSigningKey(userData.signingPublicKey);
       setVerificationPhrase(generatedVerificationPhrase);
     };
     void fetchVerificationPhrase();
@@ -64,11 +62,12 @@ function ViewVerificationPhrase() {
           {
             onClick: copyText,
             label: 'Copy',
-            type: 'button'
+            type: 'button',
+            icon: Icon.Copy
           }
         ]}
-        subtitle='Other Skiff users can use your verification phrase to verify your identity.'
-        title='Verification phrase'
+        subtitle='Other Skiff users can use your verification phrase to verify your identity'
+        title={isMobile ? '' : 'Verification phrase'}
       />
       <PhrasesContainer>
         {verificationPhrases.map((phrase) => {

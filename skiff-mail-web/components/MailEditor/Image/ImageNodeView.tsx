@@ -1,12 +1,12 @@
-import Skeleton from '@mui/material/Skeleton';
 import { ImageOptions } from '@tiptap/extension-image';
 import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
 import { useEffect, useState } from 'react';
-import { isDataUrl, proxyUrl } from 'skiff-front-utils';
+import { isDataUrl } from 'skiff-front-utils';
 import styled from 'styled-components';
 
 import { imgStyling } from '../nodeStyles';
 
+import { Skeleton } from 'nightwatch-ui';
 import { b64ToImageUrl } from './utils';
 
 const StyledImage = styled.img`
@@ -18,7 +18,6 @@ const StyledImage = styled.img`
  */
 const ImageNodeView = ({ node, selected }: NodeViewProps<ImageOptions>) => {
   const { src, alt, title }: { [key: string]: string } = node.attrs;
-  const [proxiedSrc, setProxiedSrc] = useState<string>();
   const [blobUrlSrc, setBlobUrlSrc] = useState<string>();
 
   useEffect(() => {
@@ -26,8 +25,6 @@ const ImageNodeView = ({ node, selected }: NodeViewProps<ImageOptions>) => {
     if (isDataUrl(src) && src.includes('base64')) {
       setBlobUrlSrc(b64ToImageUrl(src));
     }
-    const originUrl: URL = new URL(window.location.origin);
-    setProxiedSrc(proxyUrl(src, originUrl) || src);
   }, [src]);
 
   return (
@@ -37,13 +34,13 @@ const ImageNodeView = ({ node, selected }: NodeViewProps<ImageOptions>) => {
       }}
     >
       {src && src.startsWith('cid') ? (
-        <Skeleton style={{ width: 100, height: 100 }} />
+        <Skeleton width='100px' height='100px' />
       ) : (
         <StyledImage
           alt={alt}
           className={selected ? 'ProseMirror-selectednode' : ''}
           data-drag-handle='true'
-          src={blobUrlSrc || proxiedSrc}
+          src={blobUrlSrc || src}
           title={title}
         />
       )}

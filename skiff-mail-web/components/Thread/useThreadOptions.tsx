@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { SystemLabels, UserLabelVariant, AddressObject } from 'skiff-graphql';
 
 import { useDrafts } from '../../hooks/useDrafts';
+import { useMarkAsReadUnread } from '../../hooks/useMarkAsReadUnread';
 import { useThreadActions } from '../../hooks/useThreadActions';
 import { useUserSignature } from '../../hooks/useUserSignature';
 import { MailboxEmailInfo } from '../../models/email';
@@ -13,8 +14,7 @@ import { skemailMobileDrawerReducer } from '../../redux/reducers/mobileDrawerRed
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { ModalType, ReportPhishingOrConcernType, BlockUnblockSenderType } from '../../redux/reducers/modalTypes';
 import { LABEL_TO_SYSTEM_LABEL, SystemLabel } from '../../utils/label';
-import { handleMarkAsReadUnreadClick } from '../../utils/mailboxUtils';
-import LabelDropdownContent from '../labels/LabelDropdownContent';
+import MoveToLabelDropdownContent from '../labels/MoveToLabelDropdownContent';
 
 import { OptionWithSubOption } from './Thread.types';
 import { ThreadBlockOptions } from './Thread.types';
@@ -22,12 +22,13 @@ export const useThreadOptions = (
   thread: MailboxThreadInfo | undefined,
   email: MailboxEmailInfo | undefined,
   currentLabel: string,
-  onClose: () => void,
   defaultEmailAlias: string | undefined,
-  emailAliases: string[]
+  emailAliases: string[],
+  setOpenThreadOptionsDropdown?: (open: boolean) => void
 ) => {
   const dispatch = useDispatch();
   const { composeNewDraft } = useDrafts();
+  const { markThreadsAsReadUnread } = useMarkAsReadUnread();
   const { moveThreads, trashThreads, archiveThreads } = useThreadActions();
   const userSignature = useUserSignature();
 
@@ -171,10 +172,12 @@ export const useThreadOptions = (
     return subOptions;
   };
   const LabelSubDropdown = () => (
-    <DropdownSubmenu hasSubmenu icon={Icon.Tag} key='label' label='Add label'>
-      <LabelDropdownContent
+    <DropdownSubmenu icon={Icon.Tag} key='label' label='Add label'>
+      <MoveToLabelDropdownContent
         currentSystemLabels={[currentLabel]}
-        isSubMenu
+        setShowDropdown={(showDropdown) => {
+          if (!!setOpenThreadOptionsDropdown) setOpenThreadOptionsDropdown(showDropdown);
+        }}
         threadID={thread.threadID}
         variant={UserLabelVariant.Plain}
       />
@@ -210,12 +213,9 @@ export const useThreadOptions = (
       subOptions: getReportSuboptions()
     },
     {
-      label: `Mark as ${thread.attributes.read ? 'unread' : 'read'}`,
+      label: 'Mark as unread',
       icon: Icon.EnvelopeUnread,
-      onClick: () => {
-        void handleMarkAsReadUnreadClick([thread], false);
-        onClose();
-      }
+      onClick: () => markThreadsAsReadUnread([thread], false)
     },
     {
       label: 'Add label',

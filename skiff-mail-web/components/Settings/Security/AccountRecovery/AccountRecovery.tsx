@@ -1,17 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useLoginSrpStep2Mutation } from 'skiff-front-graphql';
+import { getRecoveryDataFromUsername } from 'skiff-front-graphql';
+import { models } from 'skiff-front-graphql';
 import {
-  AccountRecoveryAction,
   ConfirmModal,
+  DEFAULT_WORKSPACE_EVENT_VERSION,
   TitleActionSection,
-  DEFAULT_WORKSPACE_EVENT_VERSION
+  useRequiredCurrentUserData
 } from 'skiff-front-utils';
 import { LoginMutationStatus, LoginSrpRequest, WorkspaceEventType } from 'skiff-graphql';
-import { useLoginSrpStep2Mutation } from 'skiff-mail-graphql';
-import { getRecoveryDataFromUsername, uploadRecoveryData } from 'skiff-mail-graphql';
-import { models } from 'skiff-mail-graphql';
 
 import client from '../../../../apollo/client';
-import { setBrowserRecoveryShare, useRequiredCurrentUserData } from '../../../../apollo/currentUser';
 import { storeWorkspaceEvent } from '../../../../utils/userUtils';
 import ConfirmPasswordDialog from '../../../shared/ConfirmPasswordDialog';
 
@@ -28,14 +27,14 @@ function AccountRecovery() {
 
   // Whether or not account recovery is enabled.
   const [enabled, setEnabled] = useState(false);
-  // Opens confirm modal for disabling account recovery.
-  const [isConfirmDisableOpen, setIsConfirmDisableOpen] = useState(false);
+  // Opens confirm modal for resetting account recovery key.
+  const [isConfirmResetOpen, setIsConfirmResetOpen] = useState(false);
   // Opens modal for re-authenticating.
   const [isAuthenticationOpen, setIsAuthenticationOpen] = useState(false);
   // Opens recovery instruction modal.
   const [isAccountRecoveryDialogOpen, setIsAccountRecoveryDialogOpen] = useState(false);
 
-  const closeConfirmDisable = () => setIsConfirmDisableOpen(false);
+  const closeConfirmReset = () => setIsConfirmResetOpen(false);
   const openAuthenticationModal = () => setIsAuthenticationOpen(true);
 
   const checkAccountRecovery = useCallback(async () => {
@@ -49,8 +48,8 @@ function AccountRecovery() {
     void checkAccountRecovery();
   };
 
-  const toggleEnabled = () => {
-    if (enabled) setIsConfirmDisableOpen(true);
+  const handleOnClick = () => {
+    if (enabled) setIsConfirmResetOpen(true);
     else openAuthenticationModal();
   };
 
@@ -59,17 +58,12 @@ function AccountRecovery() {
   const onSubmitAuthentication = async (loginSrpRequest: LoginSrpRequest) => {
     // Authenticate
     const response = await loginSrpStep2({ variables: { request: loginSrpRequest } });
-    if (response.data?.loginSrp?.status !== LoginMutationStatus.Authenticated) return false;
-    // If the user is enabling, upload recovery data and open account recovery dialog.
-    if (!enabled) {
-      setIsAccountRecoveryDialogOpen(true);
-      return true;
+    if (response.data?.loginSrp?.status !== LoginMutationStatus.Authenticated) {
+      return false;
     }
-    // If the user is disabling, delete account recovery data.
-    const recoveryData = await uploadRecoveryData(userData, AccountRecoveryAction.DELETE, client);
-    setBrowserRecoveryShare(recoveryData.recoveryBrowserShare);
-    setEnabled(false);
-    void storeWorkspaceEvent(WorkspaceEventType.AccountRecoveryToggle, 'disable', DEFAULT_WORKSPACE_EVENT_VERSION);
+    // If the user is resetting recovery key, upload recovery data and open account recovery dialog.
+    setIsAccountRecoveryDialogOpen(true);
+    void storeWorkspaceEvent(WorkspaceEventType.AccountRecoveryKeyReset, '', DEFAULT_WORKSPACE_EVENT_VERSION);
     return true;
   };
 
@@ -83,35 +77,36 @@ function AccountRecovery() {
       <TitleActionSection
         actions={[
           {
-            onChange: toggleEnabled,
-            checked: enabled,
-            type: 'toggle'
+            onClick: handleOnClick,
+            type: 'button',
+            label: 'Reset',
+            destructive: true
           }
         ]}
-        subtitle='Set up a backup password phrase.'
-        title='Account recovery'
+        subtitle='Generate a new recovery key and PDF.'
+        title='Reset recovery key'
       />
       {/* Account recovery dialog */}
       <AccountRecoveryDialog closeDialog={closeAccountRecoveryDialog} isOpen={isAccountRecoveryDialogOpen} />
       {/* Re-authentication dialog */}
       <ConfirmPasswordDialog
-        description={`Please re-authenticate to confirm ${enabled ? 'disabling' : 'enabling'} account recovery.`}
+        description='Please re-authenticate to confirm.'
         handleSubmit={onSubmitAuthentication}
         onClose={() => setIsAuthenticationOpen(false)}
         open={isAuthenticationOpen}
       />
       {/* Confirm disabling account recovery dialog */}
       <ConfirmModal
-        confirmName='Disable'
-        description='If you forget your password, you will not be able to recover your account.'
+        confirmName='Reset'
+        description='Your current recovery key and PDF will be invalidated, and a new key will be generated.'
         destructive
-        onClose={closeConfirmDisable}
+        onClose={closeConfirmReset}
         onConfirm={() => {
           openAuthenticationModal();
-          closeConfirmDisable();
+          closeConfirmReset();
         }}
-        open={isConfirmDisableOpen}
-        title='Disable account recovery?'
+        open={isConfirmResetOpen}
+        title='Reset account recovery key?'
       />
     </>
   );

@@ -8,24 +8,26 @@ import {
   createSRPKey
 } from 'skiff-crypto';
 import {
+  encryptPrivateUserData,
+  UpdateSrpDocument,
+  UpdateSrpMutation,
+  UpdateSrpMutationVariables,
+  useCanDirectlyUpdateSrpQuery
+} from 'skiff-front-graphql';
+import {
   PasswordAndConfirmPasswordBlock,
   isMetaMaskEnabled,
   getInjectedAddr,
   encryptSecretWithWallet,
-  TitleActionSection
+  TitleActionSection,
+  useRequiredCurrentUserData,
+  saveCurrentUserData,
+  useToast
 } from 'skiff-front-utils';
 import { LoginMutationStatus, SignatureContext } from 'skiff-graphql';
 import { LoginSrpRequest } from 'skiff-graphql';
-import {
-  encryptPrivateUserData,
-  UpdateSrpDocument,
-  UpdateSrpMutation,
-  UpdateSrpMutationVariables
-} from 'skiff-mail-graphql';
-import styled from 'styled-components';
 
 import client from '../../../../apollo/client';
-import { saveCurrentUserData, useRequiredCurrentUserData } from '../../../../apollo/currentUser';
 import ConfirmPasswordDialog from '../../../shared/ConfirmPasswordDialog';
 
 const STEPS_PASSWORD_CHANGE = {
@@ -33,13 +35,6 @@ const STEPS_PASSWORD_CHANGE = {
   CHANGE_MODAL: 1,
   AUTHENTICATE_MODAL: 2
 };
-
-const ChangePasswordContainer = styled.div`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  justify-content: space-between;
-`;
 
 /**
  * Component for rendering the change password section in AccountSettings.
@@ -53,6 +48,10 @@ const ChangePassword: React.FC = () => {
   const [passwordChangeError, setPasswordChangeError] = useState('');
   // if the user's chosen password is strong enough or not (judged by zxcvbn protocol)
   const [strongPassword, setStrongPassword] = useState(true);
+  const { enqueueToast } = useToast();
+
+  const { data: canDirectlyUpdateData } = useCanDirectlyUpdateSrpQuery({ fetchPolicy: 'network-only' });
+  const canSkipLoginSrp = !!canDirectlyUpdateData?.currentUser?.canDirectlyUpdateSrp;
 
   // resets all password states and modal to landing page
   const resetChangePasswordState = () => {
@@ -74,21 +73,14 @@ const ChangePassword: React.FC = () => {
     return true;
   };
 
-  const onSubmitChangePassword = () => {
-    if (!checkPasswords()) {
-      return;
-    }
-    setStepPasswordChange(STEPS_PASSWORD_CHANGE.AUTHENTICATE_MODAL);
-  };
-
   /**
    * Submit mutation to update SRP variables and change user's password
    * also submit new encryptedUserData
    */
-  const updatePassword = async (loginSrpRequest: LoginSrpRequest) => {
+  const updatePassword = async (loginSrpRequest?: LoginSrpRequest) => {
     const salt = srp.generateSalt();
     const masterSecret = await createKeyFromSecret(password, salt);
-    const verifierPrivateKey = await createSRPKey(masterSecret, salt);
+    const verifierPrivateKey = createSRPKey(masterSecret, salt);
     const verifier = srp.deriveVerifier(verifierPrivateKey);
 
     const passwordDerivedSecret = createPasswordDerivedSecret(masterSecret, salt);
@@ -96,29 +88,17 @@ const ChangePassword: React.FC = () => {
     // Get signatures
     const saltSignature = createDetachedSignatureAsymmetric(
       salt,
-      userData.privateUserData
-        ? userData.privateUserData.signingPrivateKey
-          ? userData.privateUserData.signingPrivateKey
-          : ''
-        : '',
+      userData.privateUserData.signingPrivateKey,
       SignatureContext.SrpSalt
     );
     const verifierSignature = createDetachedSignatureAsymmetric(
       verifier,
-      userData.privateUserData
-        ? userData.privateUserData.signingPrivateKey
-          ? userData.privateUserData.signingPrivateKey
-          : ''
-        : '',
+      userData.privateUserData.signingPrivateKey,
       SignatureContext.SrpVerifier
     );
     const userDataSignature = createDetachedSignatureAsymmetric(
       encryptedPrivateNewUserData,
-      userData.privateUserData
-        ? userData.privateUserData.signingPrivateKey
-          ? userData.privateUserData.signingPrivateKey
-          : ''
-        : '',
+      userData.privateUserData.signingPrivateKey,
       SignatureContext.UpdateUserData
     );
     // Send username, salt, and verifier to server
@@ -132,7 +112,7 @@ const ChangePassword: React.FC = () => {
       }
       newEncryptedMetamaskSecret = await encryptSecretWithWallet(ethAddr, password);
     }
-    const response = await client.mutate<UpdateSrpMutation, UpdateSrpMutationVariables>({
+    const { data } = await client.mutate<UpdateSrpMutation, UpdateSrpMutationVariables>({
       mutation: UpdateSrpDocument,
       variables: {
         request: {
@@ -151,9 +131,13 @@ const ChangePassword: React.FC = () => {
     newUserData.passwordDerivedSecret = passwordDerivedSecret;
     saveCurrentUserData(newUserData);
 
-    const status = response.data?.updateSrp.status;
+    const status = data?.updateSrp.status;
     if (status === LoginMutationStatus.Updated) {
       setStepPasswordChange(STEPS_PASSWORD_CHANGE.LANDING_PAGE);
+      resetChangePasswordState();
+      enqueueToast({
+        title: 'Password updated'
+      });
       return true;
     }
     if (status === LoginMutationStatus.Rejected) {
@@ -161,10 +145,21 @@ const ChangePassword: React.FC = () => {
     } else if (status === LoginMutationStatus.AuthFailure) {
       setPasswordChangeError('Authentication was rejected. Please try again.');
     } else {
-      setPasswordChangeError('An unkonwn error occurred. Please try again.');
+      setPasswordChangeError('An unknown error occurred. Please try again.');
       console.error('Unexpected status received from server.');
     }
     return false;
+  };
+
+  const onSubmitChangePassword = () => {
+    if (!checkPasswords()) {
+      return;
+    }
+    if (canSkipLoginSrp) {
+      void updatePassword();
+    } else {
+      setStepPasswordChange(STEPS_PASSWORD_CHANGE.AUTHENTICATE_MODAL);
+    }
   };
 
   // Submits change password form
@@ -179,6 +174,20 @@ const ChangePassword: React.FC = () => {
     resetChangePasswordState();
   };
 
+  const changePasswordBlock = (
+    <PasswordAndConfirmPasswordBlock
+      confirmPassword={confirmPassword}
+      loginError={passwordChangeError}
+      onEnterKeyPress={handleChangePasswordKeyPress}
+      password={password}
+      passwordLabel='New Password'
+      setConfirmPassword={setConfirmPassword}
+      setLoginError={setPasswordChangeError}
+      setPassword={setPassword}
+      setStrongPassword={setStrongPassword}
+    />
+  );
+
   return (
     <>
       <ConfirmPasswordDialog
@@ -186,39 +195,27 @@ const ChangePassword: React.FC = () => {
         onClose={() => setStepPasswordChange(STEPS_PASSWORD_CHANGE.LANDING_PAGE)}
         open={stepPasswordChange === STEPS_PASSWORD_CHANGE.AUTHENTICATE_MODAL}
       />
-      <ChangePasswordContainer>
-        <TitleActionSection
-          actions={[
-            {
-              onClick: () => setStepPasswordChange(STEPS_PASSWORD_CHANGE.CHANGE_MODAL),
-              label: 'Update',
-              type: 'button'
-            }
-          ]}
-          subtitle='Use a strong password'
-          title='Change password'
-        />
-      </ChangePasswordContainer>
+      <TitleActionSection
+        actions={[
+          {
+            onClick: () => setStepPasswordChange(STEPS_PASSWORD_CHANGE.CHANGE_MODAL),
+            label: 'Update',
+            type: 'button'
+          }
+        ]}
+        subtitle='Use a strong password'
+        title='Change password'
+      />
       <Dialog
-        description="You'll be asked to authenticate afterwards"
-        inputField={
-          <PasswordAndConfirmPasswordBlock
-            confirmPassword={confirmPassword}
-            loginError={passwordChangeError}
-            onEnterKeyPress={handleChangePasswordKeyPress}
-            password={password}
-            passwordLabel='New Password'
-            setConfirmPassword={setConfirmPassword}
-            setLoginError={setPasswordChangeError}
-            setPassword={setPassword}
-            setStrongPassword={setStrongPassword}
-          />
+        description={
+          canSkipLoginSrp ? 'Make sure to save your new password' : "You'll be asked to authenticate afterwards"
         }
+        inputField={changePasswordBlock}
         onClose={onChangeModalClose}
         open={stepPasswordChange === STEPS_PASSWORD_CHANGE.CHANGE_MODAL}
         title='Change Password'
       >
-        <ButtonGroupItem label='Next' onClick={onSubmitChangePassword} />
+        <ButtonGroupItem label={canSkipLoginSrp ? 'Confirm' : 'Next'} onClick={onSubmitChangePassword} />
         <ButtonGroupItem label='Cancel' onClick={onChangeModalClose} />
       </Dialog>
     </>

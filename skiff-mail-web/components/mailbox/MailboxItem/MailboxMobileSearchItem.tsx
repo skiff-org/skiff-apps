@@ -1,9 +1,9 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { ListChildComponentProps } from 'react-window';
+import { useCurrentUserEmailAliases } from 'skiff-front-utils';
 
 import { useRouterLabelContext } from '../../../context/RouterLabelContext';
-import { useCurrentUserEmailAliases } from '../../../hooks/useCurrentUserEmailAliases';
 import { threadsEqual, userLabelsEqual } from '../../../utils/mailboxUtils';
 import { SearchSkemail } from '../../../utils/searchWorkerUtils';
 import { MobileMessageCell } from '../MessageCell/MobileMessageCell';
@@ -28,18 +28,31 @@ function MobileMailboxSearchItem({ index, style, data }: ListChildComponentProps
   }
 
   const { skemails, selectedThreadIDs: currSelectedThreadIDs, activeThreadID, setActiveThreadID } = data;
-  const { createdAt, from, to, id, threadID, content, read, subject } = skemails[index];
+  const {
+    createdAt = new Date(Date.now()),
+    from = { address: '' },
+    to = [],
+    id,
+    threadID = '',
+    content,
+    read = true,
+    subject
+  } = skemails[index] ?? {};
 
   const onMobileSearchResultClick = () => {
     setActiveThreadID({ threadID });
   };
   const isSelected = threadIsSelected(currSelectedThreadIDs, threadID);
 
-  const isOutboundEmail = currentUserAliases.includes(from.address);
+  const isOutboundEmail = currentUserAliases.includes(from.address ?? '');
   const outboundDisplayNames = to.map((addressObj) => addressObj.name || addressObj.address);
   const outboundAddresses = to.map((addressObj) => addressObj.address);
   const displayNames = isOutboundEmail && !!to.length ? outboundDisplayNames : [from.name || from.address];
   const addresses = isOutboundEmail && !!to.length ? outboundAddresses : [from.address];
+
+  if (!threadID) {
+    return <React.Fragment key={createdAt.toString()} />;
+  }
 
   return (
     <div key={threadID} style={{ ...style }}>
@@ -70,7 +83,7 @@ const threadActive = (
   next: Readonly<ListChildComponentProps<MobileMailboxSearchItemData>>
 ) => {
   // re-render if thread was active or if thread will be active or if thread array was changed
-  const threadID = prev.data.skemails[prev.index].threadID;
+  const threadID = prev.data.skemails[prev.index]?.threadID ?? '';
 
   const wasActive = prev.data.activeThreadID === threadID;
   const willBeActive = next.data.activeThreadID === threadID;
@@ -78,8 +91,8 @@ const threadActive = (
   const selectedStateChanged =
     prev.data.selectedThreadIDs.includes(threadID) !== next.data.selectedThreadIDs.includes(threadID); // Thread selected/deselected
   const userLabelsChanged = !userLabelsEqual(
-    prev.data.skemails[prev.index].userLabels,
-    next.data.skemails[next.index].userLabels
+    prev.data.skemails[prev.index]?.userLabels ?? [],
+    next.data.skemails[next.index]?.userLabels ?? []
   );
   const styleChanged = prev.style !== next.style;
   const indexChanged = prev.index !== next.index;

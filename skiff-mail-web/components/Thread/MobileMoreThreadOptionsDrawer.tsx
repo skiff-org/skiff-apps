@@ -1,5 +1,5 @@
-import { partition } from 'lodash';
-import { Divider, IconText, Drawer } from 'nightwatch-ui';
+import partition from 'lodash/partition';
+import { Drawer, DropdownItem } from 'nightwatch-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -19,12 +19,13 @@ interface MobileMoreThreadOptionsDrawerProps {
 }
 
 const MobileActionsContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 12px 0;
-  flex-wrap: wrap;
-  justify-content: space-around;
   width: 100%;
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
 `;
 
 export const MobileMoreThreadOptionsDrawer: React.FC<MobileMoreThreadOptionsDrawerProps> = ({
@@ -78,7 +79,7 @@ export const MobileMoreThreadOptionsDrawer: React.FC<MobileMoreThreadOptionsDraw
     </MobileActionsContainer>
   );
 
-  const mobileOptionsToItem = (option) => {
+  const mobileOptionsToItem = (option: ThreadBlockOptions) => {
     if (option.subOptions) {
       // Move thread button
       return (
@@ -93,19 +94,21 @@ export const MobileMoreThreadOptionsDrawer: React.FC<MobileMoreThreadOptionsDraw
             }
           }}
         >
-          <IconText key={option.label} label={option.label} level={1} startIcon={option.icon} type='paragraph' />
+          <DropdownItem icon={option.icon} key={option.label} label={option.label} />
         </DrawerOption>
       );
     }
     return (
-      <DrawerOption
-        key={option.label}
-        onClick={() => {
-          hideDrawer();
-          option.onClick();
-        }}
-      >
-        <IconText key={option.label} label={option.label} level={1} startIcon={option.icon} type='paragraph' />
+      <DrawerOption key={option.label}>
+        <DropdownItem
+          icon={option.icon}
+          key={option.label}
+          label={option.label}
+          onClick={() => {
+            hideDrawer();
+            option.onClick?.();
+          }}
+        />
       </DrawerOption>
     );
   };
@@ -113,12 +116,7 @@ export const MobileMoreThreadOptionsDrawer: React.FC<MobileMoreThreadOptionsDraw
   return (
     <Drawer hideDrawer={hideDrawer} show={drawerOpen}>
       <DrawerOptions>
-        {!!actionButtonOptions.length && (
-          <>
-            {createMobileActions()}
-            <Divider style={{ margin: '8px 0' }} />
-          </>
-        )}
+        {!!actionButtonOptions.length && <>{createMobileActions()}</>}
         {listActionOptions.map(mobileOptionsToItem)}
       </DrawerOptions>
     </Drawer>

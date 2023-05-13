@@ -1,64 +1,80 @@
-import { AutocompleteRenderGetTagProps, createFilterOptions } from '@mui/material/Autocomplete';
-import { isString } from 'lodash';
-import { Icon, Avatar, Chip, Typography } from 'nightwatch-ui';
+import { MonoTag } from 'nightwatch-ui';
 import { FC, memo, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { useDrag, useDrop } from 'react-dnd';
-import { getEmptyImage } from 'react-dnd-html5-backend';
-import { getAddressTooltipLabel, getAddrDisplayName, formatEmailAddress } from 'skiff-front-utils';
+import { useDrop } from 'react-dnd';
+import { IsCustomDomainDocument, IsCustomDomainQuery, IsCustomDomainQueryVariables } from 'skiff-front-graphql';
+import { AddressObjectWithDisplayPicture, splitEmailToAliasAndDomain } from 'skiff-front-utils';
 import { AddressObject } from 'skiff-graphql';
-import styled from 'styled-components';
+import { isSkiffAddress } from 'skiff-utils';
+import styled, { css } from 'styled-components';
+import client from '../../../apollo/client';
 
+import { toAddressObjects } from '../../../utils/composeUtils';
 import { DNDItemTypes } from '../../../utils/dragAndDrop';
-import { isSkiffAddress, resolveENSName } from '../../../utils/userUtils';
-import ChipInput from '../../ChipInput';
-import ContactRowOption from '../../ContactRowOption';
+import { resolveENSName } from '../../../utils/userUtils';
+import AddressAutocomplete from '../AddressAutocomplete/AddressAutocomplete';
 import { EmailFieldTypes } from '../Compose.constants';
 
 import AddressField from './AddressField';
 
 // matches bracketed address (e.g. jasong@gmail.com from Jason Ginsberg <jasong@gmail.com>)
-const BRACKET_EMAIL_REGEX = /<([\w.!#$%&’*+\/=?^_`{|}~-]+@[\w-]+(?:\.[\w-]+)+)>/;
+const BRACKET_EMAIL_REGEX = /[\w.-]+@[a-zA-Z_-]+?\.[a-zA-Z]{2,30}(\.[a-zA-Z]{2,30})*/g;
 
 const NUM_CONTACTS_TO_RENDER = 20;
 
-const ChipWrapper = styled.div`
-  cursor: pointer;
-`;
-
 const ChipInputWrapper = styled.div`
   width: 100%;
+`;
+
+const InputWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: text;
 `;
 
 interface RecipientFieldProps {
   field: EmailFieldTypes;
   focusedField: EmailFieldTypes | null;
   addresses: AddressObject[];
-  contactList: AddressObject[];
+  contactList: AddressObjectWithDisplayPicture[];
   setAddresses: (addresses: AddressObject[]) => void;
   onFocus: (field: EmailFieldTypes) => void;
-  onBlur: () => void;
+  onBlur?: () => void;
   onDrop: (draggedAddressChip: AddressObject, fromFieldType: EmailFieldTypes, toFieldType: EmailFieldTypes) => void;
   additionalButtons?: React.ReactNode;
   dataTest?: string;
 }
 
-const TooltipLabel = styled.div`
-  display: flex;
-  flex-direction: column;
+const TagContainer = styled.div`
+  min-height: 20px;
+  // prevent layout shift
+  padding-left: 10px;
+  padding-top: 1px;
+  margin-right: 0px;
 `;
 
-export const getBadgeIcon = (isSkiffInternal) => {
-  if (isSkiffInternal === undefined) {
-    return undefined;
-  } else {
-    return isSkiffInternal ? (
-      <Avatar color='green' icon={Icon.ShieldCheck} size='xsmall' />
-    ) : (
-      <Avatar disabled icon={Icon.Lock} size='xsmall' />
-    );
-  }
-};
+const FIELD_ID = 'recipient-field';
+
+const DEFAULT_MAX_WIDTH = 500;
+const MaxWidthFieldContainer = styled.div<{ $maxWidth: number }>`
+  max-width: ${({ $maxWidth }) => $maxWidth || DEFAULT_MAX_WIDTH}px;
+  overflow: hidden;
+  display: flex;
+  white-space: nowrap;
+  font-family: Skiff Sans Text;
+  font-weight: 380;
+  font-size: 15px;
+  line-height: 130%;
+`;
+
+const OverflowContainer = styled.div`
+  ${isMobile &&
+  css`
+    overflow: auto;
+  `};
+`;
 
 export interface ComposeAddressChipData {
   addr: AddressObject;
@@ -76,21 +92,26 @@ const RecipientField: FC<RecipientFieldProps> = ({
   contactList,
   setAddresses,
   onFocus,
-  onBlur,
   onDrop,
+  onBlur,
   additionalButtons,
   dataTest
 }) => {
+  const [contactOptionsToRender, setContactOptionsToRender] = useState<AddressObjectWithDisplayPicture[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const [numCommas, setNumCommas] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [contactOptionsToRender, setContactOptionsToRender] = useState<AddressObject[]>([]);
-  const [inputValue, setInputValue] = useState('');
   const [skiffInternalAddressMap] = useState<Map<string, boolean>>(new Map());
+  const [maxFieldWidth, setMaxFieldWidth] = useState(DEFAULT_MAX_WIDTH);
 
+  const isFocused = focusedField === field;
+  const isFromFieldFocused = focusedField === EmailFieldTypes.FROM;
   const emailAddresses = addresses.map((addr) => addr.address);
+
   // Only show addresses that have not yet been added to the field
   const filteredContactList = contactList
-    .filter((contact) => contact.address.includes(inputValue))
+    .filter((contact) => contact.address.includes(inputValue) || contact.name?.includes(inputValue))
     .filter((contact) => !emailAddresses.includes(contact.address))
     .slice(0, NUM_CONTACTS_TO_RENDER);
 
@@ -106,38 +127,32 @@ const RecipientField: FC<RecipientFieldProps> = ({
       setContactOptionsToRender(options);
     };
     void getContactOptionsToRender();
-  }, [inputValue]);
+    // Using full contact list as dep causes infinite loop, can add memo to it but that'd be more expensive than the small computation
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputValue, filteredContactList.length]);
 
   useEffect(() => {
-    const getSkiffInternal = (emailAddressList: string[]) => {
-      emailAddressList.map((emailAddress) => {
-        // const isSkiffInternal = isSkiffAddress(emailAddress, customDomains);
-        const isSkiffInternal = isSkiffAddress(emailAddress);
-
-        skiffInternalAddressMap.set(emailAddress, isSkiffInternal);
-      });
+    const getSkiffInternal = async (emailAddressList: string[]) => {
+      await Promise.allSettled(
+        emailAddressList.map(async (emailAddress) => {
+          const isSkiffInternal = isSkiffAddress(emailAddress);
+          const { domain } = splitEmailToAliasAndDomain(emailAddress);
+          if (isSkiffInternal) {
+            skiffInternalAddressMap.set(emailAddress, isSkiffInternal);
+          } else {
+            const isSkiffCustomDomainResponse = await client.query<IsCustomDomainQuery, IsCustomDomainQueryVariables>({
+              query: IsCustomDomainDocument,
+              variables: {
+                domains: domain
+              }
+            });
+            skiffInternalAddressMap.set(emailAddress, isSkiffCustomDomainResponse.data.isCustomDomain);
+          }
+        })
+      );
     };
-    getSkiffInternal(emailAddresses);
+    void getSkiffInternal(emailAddresses);
   }, [emailAddresses, skiffInternalAddressMap]);
-
-  const RenderOption = (props, option: AddressObject) => (
-    // Need list prop so that index logic works correctly
-    <li {...props} key={option.address}>
-      <ContactRowOption address={option} />
-    </li>
-  );
-
-  const [draggedAddr, setDraggedAddr] = useState<AddressObject>();
-  const [dragIsSkiffInternal, setDragIsSkiffInternal] = useState<boolean | undefined>();
-
-  const [{ isDragging }, drag, preview] = useDrag({
-    item: { addr: draggedAddr, icon: dragIsSkiffInternal, field: field },
-    type: DNDItemTypes.MAIL_CHIP,
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging()
-    }),
-    canDrag: !isMobile
-  });
 
   const [, dropRef] = useDrop({
     accept: DNDItemTypes.MAIL_CHIP,
@@ -149,129 +164,139 @@ const RecipientField: FC<RecipientFieldProps> = ({
     })
   });
 
-  useEffect(() => {
-    preview(getEmptyImage(), { captureDraggingState: true });
-  }, [preview]);
-
-  const renderTags = (tags: Array<AddressObject>, getTagProps: AutocompleteRenderGetTagProps) =>
-    tags.map((addr, index) => {
-      const { address, name } = addr;
-      const { className, key, onDelete } = getTagProps({ index });
-      const tooltipLabel = getAddressTooltipLabel(address);
-      const { formattedDisplayName: chipLabel } = getAddrDisplayName(addr);
-      const isSkiffInternal = skiffInternalAddressMap.get(address);
-
-      return (
-        <ChipWrapper
-          className={className}
-          key={key}
-          onMouseDown={(event) => event.stopPropagation()}
-          onMouseEnter={() => {
-            setDragIsSkiffInternal(isSkiffInternal);
-            setDraggedAddr(addr);
-          }}
-        >
-          <Chip
-            customTooltip={
-              !isDragging ? (
-                <TooltipLabel>
-                  {isSkiffInternal !== undefined && (
-                    <Typography level={3} themeMode='dark' type='label'>
-                      {isSkiffInternal ? 'End-to-end encrypted' : 'Encrypted'}
-                    </Typography>
-                  )}
-                  <Typography
-                    color='secondary'
-                    level={3}
-                    style={{ color: 'rgba(255, 255, 255, 0.74)' }}
-                    themeMode='dark'
-                  >
-                    {!!name ? address : tooltipLabel}
-                  </Typography>
-                </TooltipLabel>
-              ) : undefined
-            }
-            label={chipLabel}
-            // only show the tooltip if the user's display name
-            // is the chip's label or if it's a wallet address
-            onDelete={onDelete}
-            startIcon={getBadgeIcon(isSkiffInternal)}
-          />
-        </ChipWrapper>
-      );
-    });
-
-  // If one of the new values is a plain string and not an object from the contact list, convert it into the address obj
-  const toAddressObjects = (values: Array<string | AddressObject>) =>
-    values.reduce((acc, val) => {
-      if (isString(val)) {
-        const addrs: AddressObject[] = val.split(/\s+/).map((address) => {
-          return {
-            address: formatEmailAddress(address, false)
-          };
-        });
-        return [...acc, ...addrs];
-      } else {
-        return [...acc, val];
-      }
-    }, [] as AddressObject[]);
-
-  const addressInputPlaceholder = 'Search and add people';
+  const addressInputPlaceholder = 'Recipients';
 
   const getPastedValues = (e: React.ClipboardEvent) => {
     return e.clipboardData.getData('text/plain');
   };
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const pastedValue = getPastedValues(e);
-    const parsedValue = pastedValue.match(BRACKET_EMAIL_REGEX);
-    if (!!parsedValue && parsedValue.length > 1) {
-      const pastedEmail = parsedValue[1].trim();
-      setAddresses(toAddressObjects([pastedEmail] as string[]).concat(addresses));
-    } else {
-      //trim in case of leading or trailing spaces in pastedValue
-      setAddresses(toAddressObjects([pastedValue.trim()] as string[]).concat(addresses));
+  const handlePaste = (e?: React.ClipboardEvent<HTMLDivElement>) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    if (!e) return;
+    try {
+      const pastedValue = getPastedValues(e);
+      const parsedValues = pastedValue.match(BRACKET_EMAIL_REGEX);
+
+      const pastedEmails = parsedValues?.map((value) => value.trim());
+      if (!!pastedEmails && pastedEmails.length > 0) {
+        setAddresses(toAddressObjects(pastedEmails).concat(addresses));
+      }
+    } catch (e) {
+      console.error('Error parsing pasted emails', e);
     }
   };
 
+  const tagsToText = (tags: Array<AddressObject>) => {
+    const tagNames = tags.map((tag) => {
+      const { address, name } = tag;
+      return name || address;
+    });
+
+    return `${tagNames.join(', ')}`;
+  };
+
   useEffect(() => {
-    if (focusedField === field) inputRef.current?.focus();
-  }, [focusedField, field]);
+    const updateWidth = () => {
+      // convert vw to pixels
+      const maxWidth = Math.min(Math.max((window.innerWidth * 45) / 100, 624), (window.innerWidth * 90) / 100);
+      setMaxFieldWidth(maxWidth);
+    };
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  function countCommas(element: HTMLElement | null) {
+    const text = element?.firstChild?.nodeValue;
+    if (!text) return 0;
+    let r = 0;
+
+    element.removeChild(element.firstChild);
+    for (let i = 0; i < text.length; i++) {
+      const newNode = document.createElement('span');
+      newNode.style.fontFamily = 'Skiff Sans Text';
+      newNode.style.fontWeight = '380';
+      newNode.style.whiteSpace = 'pre';
+      newNode.style.fontSize = '15';
+      newNode.style.userSelect = 'none';
+      newNode.style.lineHeight = '130%';
+      const char = text.charAt(i);
+      newNode.appendChild(document.createTextNode(char));
+      element.appendChild(newNode);
+
+      if (newNode.offsetLeft <= maxFieldWidth && char === ',') {
+        r++;
+      }
+    }
+    return r;
+  }
+
+  useEffect(() => {
+    if (!isFocused) {
+      const type: HTMLElement | null = document.getElementById(`${field}-${FIELD_ID}`);
+      const countedCommas = countCommas(type);
+      setNumCommas(countedCommas);
+    }
+  }, [addresses.length, isFocused, isFromFieldFocused]);
+
+  const showField = addresses.length > 0 || field === EmailFieldTypes.BCC || field === EmailFieldTypes.CC;
 
   return (
-    <div ref={dropRef}>
-      <AddressField dataTest={dataTest} field={field} focusedField={focusedField}>
-        <ChipInputWrapper ref={drag}>
-          <ChipInput
-            autoFocus={focusedField === field}
-            // https://mui.com/material-ui/react-autocomplete/#custom-filter
-            filterOptions={createFilterOptions({
-              trim: true,
-              stringify: (option) => `${option.name ?? ''} ${option.address}`
-            })}
-            getOptionLabel={(option: string | AddressObject) =>
-              typeof option !== 'string' ? option.name ?? option.address : option
-            }
-            handlePaste={handlePaste}
-            hideActive
-            inputRef={inputRef}
-            onBlur={onBlur}
-            onChange={(value) => setAddresses(toAddressObjects(value))}
-            onFocus={() => onFocus(field)}
-            onInputChange={(newInputValue) => setInputValue(newInputValue)}
-            options={contactOptionsToRender}
-            placeholder={addresses.length === 0 ? addressInputPlaceholder : undefined}
-            renderOption={RenderOption}
-            renderTags={renderTags}
-            style={{ width: '100%' }}
-            value={addresses}
-          />
-        </ChipInputWrapper>
-        {additionalButtons}
-      </AddressField>
-    </div>
+    <>
+      <OverflowContainer ref={dropRef}>
+        <AddressField
+          additionalButtons={additionalButtons}
+          dataTest={dataTest}
+          field={field}
+          isFocused={isFocused}
+          moveButtons={addresses.length > 0 && isFocused && !!additionalButtons}
+          showField={showField}
+          onClick={() => {
+            inputRef.current?.focus();
+          }}
+        >
+          {!isFocused && addresses.length > 0 && (
+            <InputWrapper onClick={() => onFocus(field)}>
+              <MaxWidthFieldContainer $maxWidth={maxFieldWidth} data-test={FIELD_ID} id={`${field}-${FIELD_ID}`}>
+                {tagsToText(addresses)}
+              </MaxWidthFieldContainer>
+              <TagContainer>
+                {addresses.length - numCommas - 1 > 0 && (
+                  <MonoTag
+                    bgColor='var(--bg-overlay-tertiary)'
+                    label={`${addresses.length - numCommas - 1} more`}
+                    textColor='secondary'
+                  />
+                )}
+              </TagContainer>
+            </InputWrapper>
+          )}
+          {(isFocused || addresses.length === 0) && (
+            <ChipInputWrapper>
+              <AddressAutocomplete
+                addresses={addresses}
+                field={field}
+                inputValue={inputValue}
+                isFocused={isFocused}
+                onBlur={onBlur ? () => onBlur() : undefined}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
+                onChipDelete={(removeIndex: number) =>
+                  setAddresses(addresses.filter((_option, index) => index !== removeIndex))
+                }
+                onFocus={() => onFocus(field)}
+                onPaste={handlePaste}
+                inputRef={inputRef}
+                options={contactOptionsToRender}
+                placeholder={addresses.length === 0 ? addressInputPlaceholder : undefined}
+                setAddresses={setAddresses}
+                setInputValue={setInputValue}
+                skiffInternalAddressMap={skiffInternalAddressMap}
+              />
+            </ChipInputWrapper>
+          )}
+        </AddressField>
+      </OverflowContainer>
+    </>
   );
 };
 

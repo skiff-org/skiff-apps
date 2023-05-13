@@ -1,4 +1,4 @@
-import { Icon, Icons, Typography } from 'nightwatch-ui';
+import { Icon, Icons, Size, Typography } from 'nightwatch-ui';
 import { MouseEventHandler } from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
@@ -25,7 +25,7 @@ const BottomNavigationAction = styled.div`
   }
 `;
 
-const EnlargeIcon = styled(Icons)`
+const EnlargeIcon = styled.div`
   transform: scale(1.25);
 `;
 
@@ -33,7 +33,11 @@ export default function ToolbarButton({ icon, label, onClick, link, disabled }: 
   const iconColor = disabled ? 'disabled' : 'primary';
   return (
     <BottomNavigationAction onClick={disabled ? undefined : onClick}>
-      {icon && <EnlargeIcon color={link ? 'link' : iconColor} icon={icon} size='large' />}
+      {icon && (
+        <EnlargeIcon>
+          <Icons color={link ? 'link' : iconColor} icon={icon} size={Size.X_MEDIUM} />
+        </EnlargeIcon>
+      )}
       {!!label && <Typography color={link ? 'link' : iconColor}>{label}</Typography>}
     </BottomNavigationAction>
   );

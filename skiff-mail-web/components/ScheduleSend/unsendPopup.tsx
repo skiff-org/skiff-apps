@@ -1,8 +1,8 @@
 import { ButtonGroup, ButtonGroupItem, Dialog, DialogTypes, Typography } from 'nightwatch-ui';
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import { ThreadFragment } from 'skiff-front-graphql';
 import { SystemLabels } from 'skiff-graphql';
-import { ThreadFragment } from 'skiff-mail-graphql';
 
 import { NO_SUBJECT_TEXT } from '../../constants/mailbox.constants';
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
@@ -33,7 +33,7 @@ const UnSendModal = () => {
 
     // save as draft
     composeNewDraft();
-    await saveCurrentDraft(
+    saveCurrentDraft(
       scheduledMessage.decryptedSubject || NO_SUBJECT_TEXT,
       scheduledMessage.decryptedHtml || '',
       scheduledMessage.to,

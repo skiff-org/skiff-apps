@@ -46,7 +46,7 @@ export default function PinchZoom({ contentDocument }: { contentDocument?: Docum
     <TransformWrapper {...pinchProps}>
       <TransformComponent
         contentClass={PINCH_TO_ZOOM_CONTENT}
-        contentStyle={{ boxSizing: 'border-box', padding: '0 16px', transformOrigin: '0% 0%' }}
+        contentStyle={{ boxSizing: 'border-box', padding: '0', transformOrigin: '0% 0%' }}
         wrapperClass={PINCH_TO_ZOOM_CONTAINER}
         wrapperStyle={{ overflow: 'auto hidden' }}
       >

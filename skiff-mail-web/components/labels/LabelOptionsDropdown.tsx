@@ -1,39 +1,74 @@
-import { isString } from 'lodash';
-import { ButtonGroupItem, Dialog, DialogTypes, Dropdown, DropdownItem, Icon } from 'nightwatch-ui';
-import React, { RefObject, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import isString from 'lodash/isString';
+import {
+  BackgroundBlocker,
+  ButtonGroupItem,
+  CustomCircularProgress,
+  Dialog,
+  DialogTypes,
+  Dropdown,
+  DropdownItem,
+  Icon,
+  InputField,
+  Size,
+  ThemeMode,
+  accentColorToPrimaryColor,
+  themeNames
+} from 'nightwatch-ui';
+import React, { RefObject, useRef, useState } from 'react';
+import { useDeleteUserLabelMutation, useEditUserLabelMutation } from 'skiff-front-graphql';
 import { useToast } from 'skiff-front-utils';
 import { UserLabelVariant } from 'skiff-graphql';
-import { useDeleteUserLabelMutation } from 'skiff-mail-graphql';
+import { upperCaseFirstLetter } from 'skiff-utils';
+import styled from 'styled-components';
 
 import { useCurrentLabel } from '../../hooks/useCurrentLabel';
-import { skemailModalReducer } from '../../redux/reducers/modalReducer';
-import { ModalType } from '../../redux/reducers/modalTypes';
-import { removeUserLabelFromCache } from '../../utils/cache/cache';
-import { UserLabel, UserLabelFolder } from '../../utils/label';
+import { removeUserLabelFromCache, updateUserLabelsOnCreateOrEdit } from '../../utils/cache/cache';
+import { UserLabelFolder, UserLabelPlain } from '../../utils/label';
 import { useNavigate } from '../../utils/navigation';
 
 interface LabelOptionsDropdownProps {
-  label: UserLabel | UserLabelFolder;
+  label: UserLabelPlain | UserLabelFolder;
   buttonRef: RefObject<HTMLDivElement>;
   showDropdown: boolean;
   setShowDropdown: (value: boolean) => void;
-  isSubMenu?: boolean;
+  isSubmenu?: boolean;
+  onDeleteLabel?: (label: UserLabelPlain | UserLabelFolder) => void;
 }
+
+const InputFieldContainer = styled.div`
+  width: 100%;
+  margin-bottom: 2px;
+`;
+
+const ColorSquare = styled.div<{ color: string }>`
+  width: 16px;
+  height: 16px;
+
+  background: ${(props) => themeNames.dark[props.color]};
+  border: 1px solid ${themeNames.dark['--border-primary']};
+
+  border-radius: 4px;
+`;
 
 const LabelOptionsDropdown: React.FC<LabelOptionsDropdownProps> = ({
   label,
   buttonRef,
   showDropdown,
   setShowDropdown,
-  isSubMenu
+  isSubmenu,
+  onDeleteLabel
 }) => {
   const { navigateToInbox } = useNavigate();
-  const dispatch = useDispatch();
-  const routeLabel = useCurrentLabel();
+  const { label: routeLabel } = useCurrentLabel();
+  const [labelName, setLabelName] = useState(label.name);
   const { enqueueToast } = useToast();
-
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [editLabel, { loading }] = useEditUserLabelMutation();
   const [deleteLabel] = useDeleteUserLabelMutation();
+
+  const closeDropdown = () => {
+    setShowDropdown(false);
+  };
 
   const deleteUserLabel = async (labelID: string) => {
     await deleteLabel({
@@ -59,23 +94,31 @@ const LabelOptionsDropdown: React.FC<LabelOptionsDropdownProps> = ({
       if (isLabelToDeleteActive) {
         await navigateToInbox();
       }
+      if (onDeleteLabel) onDeleteLabel(label);
     } catch (e) {
       console.error(e);
       enqueueToast({
-        body: `Failed to delete ${label.variant === UserLabelVariant.Folder ? 'folder' : 'label'}`,
-        icon: Icon.Warning
+        title: 'Delete failed',
+        body: `Failed to delete ${label.variant === UserLabelVariant.Folder ? 'folder' : 'label'}`
       });
     }
   };
 
-  const openEditModal = () => {
-    dispatch(
-      skemailModalReducer.actions.setOpenModal({
-        type: ModalType.CreateOrEditLabelOrFolder,
-        label,
-        folder: label.variant === UserLabelVariant.Folder
-      })
-    );
+  const editUserLabel = async (color?: string) => {
+    const { data } = await editLabel({
+      variables: {
+        request: {
+          labelID: label?.value,
+          labelName,
+          color,
+          variant: label.variant === UserLabelVariant.Folder ? UserLabelVariant.Folder : UserLabelVariant.Plain
+        }
+      },
+      update: (cache, response) => {
+        updateUserLabelsOnCreateOrEdit(cache, response?.data?.editUserLabel, response?.errors);
+      }
+    });
+    return data;
   };
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -84,30 +127,66 @@ const LabelOptionsDropdown: React.FC<LabelOptionsDropdownProps> = ({
     e?.stopPropagation();
     setIsConfirmOpen(false);
   };
-  const closeDropdown = () => setShowDropdown(false);
 
   return (
     <>
+      {showDropdown && <BackgroundBlocker onClick={() => setShowDropdown(false)} />}
       <Dropdown
         buttonRef={buttonRef}
-        className='labelItemDropdown'
-        isSubMenu={isSubMenu}
+        isSubmenu={isSubmenu}
         portal
+        ref={dropdownRef}
         setShowDropdown={setShowDropdown}
         showDropdown={showDropdown}
+        width={280}
       >
+        <InputFieldContainer>
+          <InputField
+            autoFocus
+            borderRadius={6}
+            endAdornment={
+              loading ? <CustomCircularProgress forceTheme={ThemeMode.DARK} size={Size.SMALL} spinner /> : undefined
+            }
+            forceTheme={ThemeMode.DARK}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLabelName(e.target.value)}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            onKeyPress={(e) => {
+              e?.stopPropagation();
+              if (e.key === 'Enter') {
+                void editUserLabel();
+                setShowDropdown(false);
+              }
+            }}
+            placeholder={label.variant === UserLabelVariant.Folder ? 'Folder' : 'Label'}
+            value={labelName}
+          />
+        </InputFieldContainer>
+        {Object.entries(accentColorToPrimaryColor).map(([colorValue, colorStyling]) => {
+          const colorName = upperCaseFirstLetter(colorValue.replace(/-/g, ' '));
+          const color = colorStyling.replace('var(', '');
+          const colorNameNoVar = color.replace(')', '');
+          const isActive = colorValue === label?.color;
+          return (
+            <DropdownItem
+              active={isActive}
+              key={colorValue}
+              label={colorName}
+              onClick={async (e: React.MouseEvent) => {
+                e.stopPropagation();
+                await editUserLabel(colorValue);
+                setShowDropdown(false);
+              }}
+              startElement={<ColorSquare color={colorNameNoVar} />}
+            />
+          );
+        })}
         <DropdownItem
-          icon={Icon.Edit}
-          label={`Edit ${label.variant === UserLabelVariant.Folder ? 'folder' : 'label'}`}
-          onClick={(e: React.MouseEvent) => {
-            e.stopPropagation();
-            openEditModal();
-            closeDropdown();
-          }}
-        />
-        <DropdownItem
+          color='destructive'
           icon={Icon.Trash}
-          label='Trash'
+          label='Delete'
           onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
             openConfirmDialog();
@@ -128,7 +207,7 @@ const LabelOptionsDropdown: React.FC<LabelOptionsDropdownProps> = ({
           label='Delete'
           onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
-            deleteLabelHandler();
+            void deleteLabelHandler();
             closeConfirmDialog(e);
           }}
         />

@@ -1,12 +1,18 @@
-import { Button, InputField, Typography } from 'nightwatch-ui';
+import {
+  Alignment,
+  Button,
+  InputField,
+  InputType,
+  Size,
+  Typography,
+  TypographySize,
+  TypographyWeight
+} from 'nightwatch-ui';
 import React, { useState } from 'react';
-import { getEnvironment } from 'skiff-front-utils';
-import { isMobileApp, sendRNWebviewMsg } from 'skiff-front-utils';
+import { getEnvironment, saveCurrentUserData, sendUserDataToMobileApp, isMobileApp } from 'skiff-front-utils';
 import styled from 'styled-components';
 
-import { saveCurrentUserData } from '../apollo/currentUser';
 import MobileHead from '../components/shared/MobileHead';
-import { loginServerSRP } from '../utils/loginUtils';
 import { useNavigate } from '../utils/navigation';
 
 const StyledPage = styled.div`
@@ -23,8 +29,12 @@ const LoginContainer = styled.div`
   gap: 16px;
 `;
 
-const LoginInput = styled(InputField)`
+const InputFieldContainer = styled.div`
   margin-bottom: 10px;
+`;
+
+const LoginTextContainer = styled.div`
+  margin-bottom: 20px;
 `;
 
 export function Index() {
@@ -37,7 +47,9 @@ export function Index() {
   const login = async () => {
     setError('');
     setLoading(true);
+    const { loginServerSRP } = await import('../utils/loginUtils');
     const { user, error: loginError } = await loginServerSRP(username, password);
+
     if (!user || loginError) {
       setError(loginError ?? 'User not found.');
       setLoading(false);
@@ -45,7 +57,7 @@ export function Index() {
     }
 
     if (isMobileApp()) {
-      sendRNWebviewMsg('userLoggedIn', { userID: user.userID });
+      sendUserDataToMobileApp(user);
     }
 
     saveCurrentUserData(user);
@@ -64,27 +76,33 @@ export function Index() {
       <LoginContainer>
         {!loading && (env === 'development' || env === 'local' || env === 'review_app' || env === 'vercel') && (
           <>
-            <Typography align='center' level={0} style={{ marginBottom: 20, fontSize: 24 }} type='heading'>
-              Log in to Skemail
-            </Typography>
-            <LoginInput
-              dataTest='login-email-input'
-              onChange={(e) => setUsername(e.target.value)}
-              onKeyPress={submitOnEnter}
-              placeholder='Username'
-              size='large'
-              value={username}
-            />
-            <LoginInput
-              dataTest='login-password-input'
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyPress={submitOnEnter}
-              password
-              placeholder='Password'
-              size='large'
-              value={password}
-            />
-            <Button align='center' dataTest='login-submit' fullWidth onClick={() => void login()}>
+            <LoginTextContainer>
+              <Typography align={Alignment.CENTER} size={TypographySize.H3} weight={TypographyWeight.BOLD}>
+                Log in to Skemail
+              </Typography>
+            </LoginTextContainer>
+            <InputFieldContainer>
+              <InputField
+                dataTest='login-email-input'
+                onChange={(e) => setUsername(e.target.value)}
+                onKeyPress={submitOnEnter}
+                placeholder='Username'
+                size={Size.LARGE}
+                value={username}
+              />
+            </InputFieldContainer>
+            <InputFieldContainer>
+              <InputField
+                dataTest='login-password-input'
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyPress={submitOnEnter}
+                placeholder='Password'
+                size={Size.LARGE}
+                type={InputType.PASSWORD}
+                value={password}
+              />
+            </InputFieldContainer>
+            <Button dataTest='login-submit' fullWidth onClick={() => void login()}>
               Login
             </Button>
             {error && (
@@ -95,7 +113,7 @@ export function Index() {
           </>
         )}
         {loading && (
-          <Typography align='center' level={0} type='heading'>
+          <Typography align={Alignment.CENTER} size={TypographySize.H3} weight={TypographyWeight.BOLD}>
             Loading...
           </Typography>
         )}

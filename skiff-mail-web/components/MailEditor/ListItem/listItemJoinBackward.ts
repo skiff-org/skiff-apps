@@ -171,7 +171,7 @@ function deleteBarrier(state: EditorState, $cut: ResolvedPos, dispatch: Dispatch
       if (dispatch) {
         let end = Fragment.empty;
         for (let i = wrap.length - 1; i >= 0; i--) {
-          end = Fragment.from(wrap[i].copy(end));
+          end = Fragment.from(wrap[i]?.copy(end));
         }
         const tr = state.tr.step(
           new ReplaceAroundStep(

@@ -20,6 +20,10 @@ export const useIosKeyboardHeight = (id: string, bottomNavOffset?: boolean) => {
       }
       setHeight(calcHeight);
     };
+
+    if (window.lastIosKeyboardHeight) {
+      setHeight(window.lastIosKeyboardHeight);
+    }
   }, []);
 
   return height;

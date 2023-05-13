@@ -1,4 +1,4 @@
-import { Drawer, Typography } from 'nightwatch-ui';
+import { Drawer, DropdownItem } from 'nightwatch-ui';
 import { useDispatch } from 'react-redux';
 import { DrawerOption, DrawerOptions } from 'skiff-front-utils';
 
@@ -21,7 +21,7 @@ export default function ReportThreadBlockDrawer() {
               option.onClick(e);
             }}
           >
-            <Typography level={1}>{option.label}</Typography>
+            <DropdownItem label={option.label} />
           </DrawerOption>
         ))}
       </DrawerOptions>

@@ -1,7 +1,16 @@
-import { Icon, IconButton, Typography } from 'nightwatch-ui';
+import {
+  Icon,
+  IconButton,
+  IconText,
+  Size,
+  ThemeMode,
+  Typography,
+  TypographyWeight,
+  getThemedColor
+} from 'nightwatch-ui';
 import { FC } from 'react';
-import { formatBytes } from 'skiff-front-utils';
 import { Email, SystemLabels, UserThread } from 'skiff-graphql';
+import { bytesToHumanReadable } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useNavigate } from '../../../utils/navigation';
@@ -11,15 +20,21 @@ import useAttachments from '../useAttachments';
 const TopBarContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: center;
   align-items: center;
-  padding: 8px 16px;
+  padding: 8px 8px 8px 16px;
   gap: 8px;
-  background: var(--bg-emphasis);
-  backdrop-filter: blur(72px);
-  border-radius: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  background: ${getThemedColor('var(--bg-l1-solid)', ThemeMode.DARK)};
+  border-radius: 8px 8px 0px 0px;
   z-index: 9999;
-  margin-top: 46px;
+`;
+
+const RightSection = styled.div`
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;
 
 const VerticalDivider = styled.div`
@@ -28,17 +43,16 @@ const VerticalDivider = styled.div`
   background: rgba(255, 255, 255, 0.26);
 `;
 
-const NameTypography = styled(Typography)`
-  max-width: 250px;
-`;
-
 interface TopBarProps {
   attachment: ClientAttachment;
+  closeModal: () => void;
   thread?: UserThread;
   email?: Email;
+  onPrev?: () => void;
+  onNext?: () => void;
 }
 
-const TopBar: FC<TopBarProps> = ({ attachment, thread, email }) => {
+const TopBar: FC<TopBarProps> = ({ attachment, thread, email, onPrev, onNext, closeModal }) => {
   const { navigateToSystemLabel } = useNavigate();
   const { downloadAttachment } = useAttachments({ clientAttachments: [attachment] });
 
@@ -47,40 +61,82 @@ const TopBar: FC<TopBarProps> = ({ attachment, thread, email }) => {
   const { id: emailID, decryptedSubject } = email ?? {};
   const activeThreadQuery = { threadID, emailID };
 
+  const PrimaryText: React.FC = ({ children }) => (
+    <Typography forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
+      {children}
+    </Typography>
+  );
+
+  const SecondaryText: React.FC = ({ children }) => (
+    <Typography color='secondary' forceTheme={ThemeMode.DARK}>
+      {children}
+    </Typography>
+  );
+
+  const humanReadableSize = size ? bytesToHumanReadable(size) : '';
+
   return (
     <TopBarContainer>
-      <NameTypography color='white'>{name}</NameTypography>
-      <Typography color='secondary' themeMode='dark'>
-        &nbsp;/ {size ? formatBytes(size) : ''}
-      </Typography>
+      <PrimaryText>{name}</PrimaryText>
+      <SecondaryText>{humanReadableSize}</SecondaryText>
       <VerticalDivider />
       {email && (
         <>
-          <NameTypography color='white'>{decryptedSubject}</NameTypography>
-          <Typography color='secondary' themeMode='dark'>
-            {email?.from.name || email?.from.address}
-          </Typography>
+          <PrimaryText>{decryptedSubject}</PrimaryText>
+          <SecondaryText>{email?.from.name ?? email?.from.address}</SecondaryText>
           {thread && (
             <IconButton
-              color='white'
+              forceTheme={ThemeMode.DARK}
               icon={Icon.ExternalLink}
-              onClick={async () => {
-                await navigateToSystemLabel(attributes?.systemLabels[0] as SystemLabels, activeThreadQuery);
-              }}
-              size='small'
+              onClick={() => void navigateToSystemLabel(attributes?.systemLabels[0] as SystemLabels, activeThreadQuery)}
+              size={Size.SMALL}
             />
           )}
           <VerticalDivider />
         </>
       )}
-      <IconButton
-        color='white'
-        icon={Icon.Download}
+      <IconText
+        color='primary'
+        forceTheme={ThemeMode.DARK}
         onClick={(e) => {
-          e.stopPropagation();
-          downloadAttachment(attachmentID, contentType, name);
+          e?.stopPropagation();
+          void downloadAttachment(attachmentID, contentType, name);
         }}
+        startIcon={Icon.Download}
       />
+      <RightSection>
+        {(!!onPrev || !!onNext) && (
+          <>
+            <IconButton
+              disabled={!onPrev}
+              forceTheme={ThemeMode.DARK}
+              icon={Icon.Backward}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onPrev) onPrev();
+              }}
+            />
+            <IconButton
+              disabled={!onNext}
+              forceTheme={ThemeMode.DARK}
+              icon={Icon.Forward}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onNext) onNext();
+              }}
+            />
+            <VerticalDivider />
+          </>
+        )}
+        <IconButton
+          forceTheme={ThemeMode.DARK}
+          icon={Icon.Close}
+          onClick={(e) => {
+            e.stopPropagation();
+            closeModal();
+          }}
+        />
+      </RightSection>
     </TopBarContainer>
   );
 };

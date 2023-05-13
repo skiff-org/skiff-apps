@@ -1,14 +1,14 @@
-import { Icon, IconButton, TooltipLabelProps } from 'nightwatch-ui';
+import { Icon, IconButton, Size, TooltipLabelProps, Type } from 'nightwatch-ui';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { SystemLabels } from 'skiff-graphql';
 
+import { useMarkAsReadUnread } from '../../../hooks/useMarkAsReadUnread';
 import { useThreadActions } from '../../../hooks/useThreadActions';
 import { MailboxThreadInfo } from '../../../models/thread';
 import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { ModalType } from '../../../redux/reducers/modalTypes';
 import { LABEL_TO_SYSTEM_LABEL } from '../../../utils/label';
-import { handleMarkAsReadUnreadClick } from '../../../utils/mailboxUtils';
 
 interface MessageCellActionsProps {
   // selected thread
@@ -29,10 +29,12 @@ interface MessageCellActionsProps {
 export const MessageCellActions = ({ read, thread, label }: MessageCellActionsProps) => {
   const dispatch = useDispatch();
   const { archiveThreads, trashThreads, moveThreads } = useThreadActions();
+  const { markThreadsAsReadUnread } = useMarkAsReadUnread();
 
-  const markAsReadUnreadClick = useCallback(async () => {
-    await handleMarkAsReadUnreadClick([thread], !read);
-  }, [read, thread]);
+  const markAsReadUnreadClick = useCallback(
+    () => markThreadsAsReadUnread([thread], !read),
+    [markThreadsAsReadUnread, thread, read]
+  );
 
   const isTrashed = label === SystemLabels.Trash;
   const isArchived = label === SystemLabels.Archive;
@@ -47,14 +49,14 @@ export const MessageCellActions = ({ read, thread, label }: MessageCellActionsPr
 
   const renderIconButton = (icon: Icon, tooltip: TooltipLabelProps | string, onClick: () => void) => (
     <IconButton
-      color='secondary'
       icon={icon}
       onClick={(e: React.MouseEvent) => {
         e.stopPropagation();
         onClick();
       }}
-      size='small'
+      size={Size.SMALL}
       tooltip={tooltip}
+      type={Type.SECONDARY}
     />
   );
 
@@ -65,7 +67,7 @@ export const MessageCellActions = ({ read, thread, label }: MessageCellActionsPr
         renderIconButton(
           read ? Icon.EnvelopeUnread : Icon.EnvelopeRead,
           read ? 'Mark as unread' : 'Mark as read',
-          () => void markAsReadUnreadClick()
+          markAsReadUnreadClick
         )}
       {/* undo trash / archive */}
       {isTrashedOrArchived &&
@@ -83,8 +85,7 @@ export const MessageCellActions = ({ read, thread, label }: MessageCellActionsPr
           () => void archiveThreads([thread.threadID])
         )}
       {/* trash */}
-      {!isTrashedOrArchived &&
-        renderIconButton(Icon.Trash, { title: 'Trash', shortcut: '#' }, () => void handleThrashThread())}
+      {!isTrashed && renderIconButton(Icon.Trash, { title: 'Trash', shortcut: '#' }, () => void handleThrashThread())}
     </>
   );
 };

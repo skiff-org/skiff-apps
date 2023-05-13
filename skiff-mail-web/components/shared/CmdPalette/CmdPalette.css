@@ -26,7 +26,3 @@
   min-width: 0;
   pointer-events: none;
 }
-
-.searchResultContent span.outerText:first-child {
-  color: white !important;
-}

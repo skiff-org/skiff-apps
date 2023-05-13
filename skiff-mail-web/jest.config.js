@@ -16,10 +16,13 @@ const customJestConfig = {
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
       '<rootDir>/__mocks__/fileMock.js',
     '^.+\\.(png|jpg|jpeg|gif|webp|avif|ico|bmp|svg)$': `<rootDir>/__mocks__/fileMock.js`,
+    '^lodash-es(.*)': 'lodash$1',
     '^uuid$': require.resolve('uuid'), // source: https://github.com/uuidjs/uuid/pull/616#issuecomment-1111012599
-    '^react-pdf': require.resolve('react-pdf') // needed because we manually use ESM version but jest need cjs version
+    '^react-pdf': require.resolve('react-pdf'), // needed because we manually use ESM version but jest need cjs version
+    '@simplewebauthn/browser': `<rootDir>/__mocks__/fileMock.js`
   },
-  testPathIgnorePatterns: ['./__tests__/mocks/'],
+  testPathIgnorePatterns: ['./__tests__/mocks/', './__tests__/testUtils/'],
+  transformIgnorePatterns: ['!node_modules/'],
   testTimeout: 20000
 };
 

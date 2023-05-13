@@ -3,9 +3,11 @@ import { AddressObject, Email, UserThread } from 'skiff-graphql';
 import { PaywallErrorCode, TierName } from 'skiff-utils';
 
 import { ClientAttachment } from '../../components/Attachments';
+import { MarkAsType } from '../../components/Settings/Filters/Filters.constants';
+import { Condition, MoveToType } from '../../components/Settings/Filters/Filters.types';
 import { MailboxEmailInfo } from '../../models/email';
-import { MailboxThreadInfo } from '../../models/thread';
-import { UserLabel, UserLabelFolder } from '../../utils/label';
+import { ThreadDetailInfo } from '../../models/thread';
+import { UserLabelPlain, UserLabelFolder } from '../../utils/label';
 
 /**
  * This file keeps track of all the different types of modals that we have in the app.
@@ -17,7 +19,6 @@ import { UserLabel, UserLabelFolder } from '../../utils/label';
 
 export enum ModalType {
   CreateOrEditLabelOrFolder,
-  ImportMail,
   CommandPalette,
   ReportPhishingOrConcern,
   BlockUnblockSender,
@@ -32,8 +33,12 @@ export enum ModalType {
   QrCode,
   Feedback,
   Paywall,
+  ConfirmSignature,
   AddEmail,
-  Downgrade
+  Downgrade,
+  SearchCustomDomain,
+  PlanDelinquency,
+  Filter
 }
 
 /******** Attachments Preview ***********/
@@ -44,14 +49,6 @@ export interface AttachmentsPreviewModal {
   initialAttachmentIndex?: number;
   thread?: UserThread;
   email?: Email;
-}
-
-/******** Import Email Modal ***********/
-export interface ImportMailModal {
-  type: ModalType.ImportMail;
-  error?: string;
-  googleAuthClientCode?: string;
-  outlookAuthClientCode?: string;
 }
 
 /******** Settings Modal ***********/
@@ -72,9 +69,13 @@ export interface SkemailWelcomeModal {
 /******** User Label Modal ***********/
 export interface CreateOrEditLabelOrFolderModal {
   type: ModalType.CreateOrEditLabelOrFolder;
+  // Add labels to threads if applicable
+  addLabelOrFolder?: (label: UserLabelPlain | UserLabelFolder) => Promise<void>;
+  // Additional actions to perform after closing the modal
+  onClose?: (userLabel?: UserLabelPlain | UserLabelFolder) => void;
   // The threads the newly created label will be added to
   threadIDs?: string[];
-  label?: UserLabel | UserLabelFolder;
+  label?: UserLabelPlain | UserLabelFolder;
   folder?: boolean;
   initialName?: string;
 }
@@ -125,7 +126,7 @@ export interface ReferralSplashModal {
 
 export interface UnSendModal {
   type: ModalType.UnSendMessage;
-  thread: MailboxThreadInfo;
+  thread: ThreadDetailInfo;
 }
 
 /******** Shortcuts Modal ***********/
@@ -151,12 +152,20 @@ export interface FeedbackModal {
 export interface PaywallModal {
   type: ModalType.Paywall;
   paywallErrorCode: PaywallErrorCode;
+  // Additional actions to perform after closing the modal
+  onClose?: () => void;
+}
+
+/******** Confirm Signature (Disable) Modal ***********/
+export interface ConfirmSignatureModal {
+  type: ModalType.ConfirmSignature;
+  onConfirm: () => void;
 }
 
 /******** Add Email Modal ***********/
 export interface AddEmailModal {
   type: ModalType.AddEmail;
-  onSendSuccess?: () => void;
+  onSendSuccess?: (email: string) => void;
 }
 
 /******** Downgrade Modal ***********/
@@ -166,8 +175,32 @@ export interface DowngradeModal {
   downgradeProgress: DowngradeProgress;
 }
 
+/******** Search Custom Domain Modal ***********/
+export interface SearchCustomDomainModal {
+  type: ModalType.SearchCustomDomain;
+}
+
+/******** Plan Delinquency Modal ***********/
+export interface PlanDelinquencyModal {
+  type: ModalType.PlanDelinquency;
+  currentTier: TierName;
+  downgradeProgress: DowngradeProgress | undefined;
+  delinquentAlias?: string;
+}
+
+/******** Filter Modal ***********/
+export interface FilterModal {
+  type: ModalType.Filter;
+  filterID?: string;
+  selectedMoveToOption?: MoveToType;
+  selectedLabels?: UserLabelPlain[];
+  selectedMarkAsOption?: MarkAsType;
+  activeConditions?: Condition[];
+  shouldORFilters?: boolean;
+  name?: string;
+}
+
 export type Modals =
-  | ImportMailModal
   | SettingsModal
   | CommandPaletteModal
   | SkemailWelcomeModal
@@ -183,15 +216,18 @@ export type Modals =
   | FeedbackModal
   | ReferralSplashModal
   | PaywallModal
+  | ConfirmSignatureModal
   | AddEmailModal
-  | DowngradeModal;
+  | DowngradeModal
+  | SearchCustomDomainModal
+  | PlanDelinquencyModal
+  | FilterModal;
 
 /******** Type Guards ***********/
 export const isAttachmentPreviewModal = (modal: Modals | undefined): modal is AttachmentsPreviewModal =>
   modal?.type === ModalType.AttachmentPreview;
-export const isImportModal = (modal: Modals | undefined): modal is ImportMailModal =>
-  modal?.type === ModalType.ImportMail;
 export const isCreateOrEditLabelOrFolderModal = (modal: Modals | undefined): modal is CreateOrEditLabelOrFolderModal =>
   modal?.type === ModalType.CreateOrEditLabelOrFolder;
 export const isUnSendModal = (modal: Modals | undefined): modal is UnSendModal =>
   modal?.type === ModalType.UnSendMessage;
+export const isFilterModal = (modal: Modals | undefined): modal is FilterModal => modal?.type === ModalType.Filter;

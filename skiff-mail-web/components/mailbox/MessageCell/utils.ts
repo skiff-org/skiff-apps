@@ -1,3 +1,4 @@
+import { Size } from 'nightwatch-ui';
 import { isMobile } from 'react-device-detect';
 import { formatName } from 'skiff-front-utils';
 
@@ -44,6 +45,20 @@ const getMultiSelectCellTransition = (transition: boolean) => {
   }
 };
 
+const getStackedFacepileSize = (numAvatars: number) => {
+  switch (numAvatars) {
+    case 1:
+      return Size.X_MEDIUM;
+    case 2:
+      return Size.MEDIUM;
+    case 3:
+      return Size.SMALL;
+    case 4:
+    default:
+      return Size.X_SMALL;
+  }
+};
+
 export const getSenders = (displayNames: string[]) => {
   if (!displayNames.length) return '';
   if (displayNames.length === 1) {
@@ -59,4 +74,4 @@ export const getSenders = (displayNames: string[]) => {
   return `${formatName(firstDisplayName)} ... ${formatName(lastDisplayName)}`;
 };
 
-export { waitFor, getBoxWidth, getCheckBoxWrapperTransform, getMultiSelectCellTransition };
+export { waitFor, getBoxWidth, getCheckBoxWrapperTransform, getMultiSelectCellTransition, getStackedFacepileSize };

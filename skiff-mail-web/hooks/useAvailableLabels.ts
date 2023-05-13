@@ -1,9 +1,10 @@
-import { intersection, partition } from 'lodash';
+import intersection from 'lodash/intersection';
+import partition from 'lodash/partition';
+import { useUserLabelsQuery } from 'skiff-front-graphql';
 import { SystemLabels } from 'skiff-graphql';
-import { useUserLabelsQuery } from 'skiff-mail-graphql';
 
 import { useGetCachedSelectedThreads } from '../utils/cache/cache';
-import { isUserLabel, isLabelActive, SYSTEM_LABELS, userLabelFromGraphQL, Label } from '../utils/label';
+import { isPlainLabel, isLabelActive, SYSTEM_LABELS, userLabelFromGraphQL, Label } from '../utils/label';
 
 import { RESTRICTED_DRAG_AND_DROP_LABELS } from './../utils/label';
 
@@ -25,7 +26,7 @@ export const useAvailableUserLabels = (labelsFilter?: (label: Label) => boolean)
   const threadFragments = useGetCachedSelectedThreads();
 
   const { data, loading } = useUserLabelsQuery();
-  const userLabels = (data?.userLabels ?? []).map(userLabelFromGraphQL).filter(labelsFilter || isUserLabel);
+  const userLabels = (data?.userLabels ?? []).map(userLabelFromGraphQL).filter(labelsFilter || isPlainLabel);
 
   const [existingLabels, availableLabels] = partition(userLabels, (label) => isLabelActive(label, threadFragments));
 

@@ -1,111 +1,129 @@
-import { Icon, Icons, IconButton, DropdownItem } from 'nightwatch-ui';
-import { FC, useRef, useState } from 'react';
+import {
+  ACCENT_COLOR_VALUES,
+  DropdownItem,
+  Icon,
+  IconText,
+  Icons,
+  Size,
+  ThemeMode,
+  getThemedColor
+} from 'nightwatch-ui';
+import { Dispatch, FC, SetStateAction, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { useDispatch } from 'react-redux';
-import { useTheme } from 'skiff-front-utils';
 import styled from 'styled-components';
 
-import { skemailMobileDrawerReducer } from '../../redux/reducers/mobileDrawerReducer';
-import { skemailModalReducer } from '../../redux/reducers/modalReducer';
-import { ModalType } from '../../redux/reducers/modalTypes';
-import { UserLabel, UserLabelFolder } from '../../utils/label';
+import { SystemLabel, UserLabelFolder, UserLabelPlain } from '../../utils/label';
 
 import LabelOptionsDropdown from './LabelOptionsDropdown';
 
-const IconButtonWrapper = styled.div`
-  ${!isMobile &&
-  `
-  width: 26px;
-  height: 26px;
-  `}
+const EndElements = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const IconColorContainer = styled.div<{ $color: string }>`
+  background: ${(props) => getThemedColor(props.$color, ThemeMode.DARK)};
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  min-height: 16px;
+
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 interface PlainLabelDropdownItemProps {
-  label: UserLabel;
+  label: UserLabelPlain;
   active: boolean;
-  hover?: boolean;
-  isSubMenu?: boolean;
-  removeUserLabel: (label: UserLabel) => Promise<void>;
-  applyUserLabel: (label: UserLabel) => Promise<void>;
+  onClick: () => Promise<void>;
+  setIsOptionsSubMenuOpen?: Dispatch<SetStateAction<boolean>>;
+  highlight?: boolean;
+  onDeleteLabel?: (label: UserLabelPlain | UserLabelFolder) => void;
+  onHover?: () => void;
 }
+
+const renderOptionsButton = (
+  ref: React.RefObject<HTMLDivElement>,
+  setShowSubDropdown: Dispatch<SetStateAction<boolean>>,
+  setIsOptionsSubMenuOpen?: Dispatch<SetStateAction<boolean>>
+) => (
+  <IconText
+    color='secondary'
+    forceTheme={ThemeMode.DARK}
+    onClick={(e) => {
+      e?.stopPropagation();
+      setShowSubDropdown((prev) => !prev);
+      if (setIsOptionsSubMenuOpen) setIsOptionsSubMenuOpen((prev) => !prev);
+    }}
+    ref={ref}
+    startIcon={Icon.OverflowH}
+  />
+);
 
 export const PlainLabelDropdownItem: FC<PlainLabelDropdownItemProps> = ({
   label,
   active,
-  removeUserLabel,
-  applyUserLabel,
-  hover,
-  isSubMenu
+  onClick,
+  highlight,
+  setIsOptionsSubMenuOpen,
+  onDeleteLabel,
+  onHover
 }: PlainLabelDropdownItemProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [showSubDropdown, setShowSubDropdown] = useState<boolean>(false);
 
-  const { theme: currentTheme } = useTheme();
-  const theme = isMobile ? currentTheme : 'dark';
-
-  const dispatch = useDispatch();
-
-  const mobileOpenEditLabelModal = () => {
-    // Hide label drawer and open edit modal
-    dispatch(skemailMobileDrawerReducer.actions.setShowApplyLabelDrawer(null));
-    dispatch(skemailModalReducer.actions.setOpenModal({ type: ModalType.CreateOrEditLabelOrFolder, label: label }));
-  };
-
-  const handleOnClick = async (e: any) => {
+  const handleOnClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (active) {
-      await removeUserLabel(label);
-    } else {
-      await applyUserLabel(label);
-    }
+    await onClick();
   };
-
-  const optionsButton = (
-    <IconButtonWrapper>
-      <IconButton
-        icon={Icon.OverflowH}
-        onClick={(e) => {
-          e.stopPropagation();
-          // On mobile open modal, on browser open dropdown
-          if (isMobile) {
-            mobileOpenEditLabelModal();
-          } else {
-            setShowDropdown((prev) => !prev);
-          }
-        }}
-        ref={ref}
-        size={isMobile ? 'large' : 'small'}
-        themeMode={theme}
-      />
-    </IconButtonWrapper>
-  );
 
   return (
     <>
       <DropdownItem
-        endElement={optionsButton}
-        hover={hover}
-        icon={<Icons color={label.color} icon={Icon.Dot} themeMode={theme} />}
+        active={active && isMobile}
+        endElement={
+          <EndElements>
+            <IconColorContainer
+              $color={
+                label.color
+                  ? (ACCENT_COLOR_VALUES[label.color] as Array<string>)?.[1] || 'var(--bg-overlay-tertiary)'
+                  : 'var(--bg-overlay-tertiary)'
+              }
+            >
+              <Icons color={label.color} forceTheme={ThemeMode.DARK} icon={Icon.Dot} size={Size.X_SMALL} />
+            </IconColorContainer>
+            {renderOptionsButton(ref, setShowSubDropdown, setIsOptionsSubMenuOpen)}
+          </EndElements>
+        }
+        highlight={highlight}
         key={label.value}
         label={label.name}
+        onHover={onHover}
         onClick={handleOnClick}
+        // Mobile colored dots and filled checkboxes are passed as start elements so they'd be displayed at full opacity
         startElement={
-          <Icons
-            color={active ? 'primary' : 'secondary'}
-            icon={active ? Icon.CheckboxFilled : Icon.CheckboxEmpty}
-            onClick={handleOnClick}
-            size={isMobile ? 'large' : 'small'}
-            themeMode={theme}
-          />
+          isMobile ? (
+            <Icons color={label.color} forceTheme={ThemeMode.DARK} icon={Icon.Dot} />
+          ) : active ? (
+            <Icons color='link' icon={Icon.CheckboxFilled} onClick={handleOnClick} forceTheme={ThemeMode.DARK} />
+          ) : (
+            <Icons color='secondary' icon={Icon.CheckboxEmpty} onClick={handleOnClick} forceTheme={ThemeMode.DARK} />
+          )
         }
-        themeMode={theme}
       />
       <LabelOptionsDropdown
         buttonRef={ref}
-        isSubMenu={isSubMenu}
+        isSubmenu
         label={label}
-        setShowDropdown={setShowDropdown}
-        showDropdown={showDropdown}
+        onDeleteLabel={onDeleteLabel}
+        setShowDropdown={(value) => {
+          setShowSubDropdown(value);
+          if (setIsOptionsSubMenuOpen) setIsOptionsSubMenuOpen(value);
+        }}
+        showDropdown={showSubDropdown}
       />
     </>
   );
@@ -114,84 +132,86 @@ export const PlainLabelDropdownItem: FC<PlainLabelDropdownItemProps> = ({
 interface FolderLabelDropdownItemProps {
   label: UserLabelFolder;
   active: boolean;
-  isSubMenu?: boolean;
-  hover?: boolean;
-  moveThreads: () => void;
+  onClick: () => Promise<void> | void;
+  setIsOptionsSubMenuOpen?: Dispatch<SetStateAction<boolean>>;
+  highlight?: boolean;
+  onDeleteLabel?: (label: UserLabelPlain | UserLabelFolder) => void;
+  onHover?: () => void;
 }
 
 export const FolderLabelDropdownItem: FC<FolderLabelDropdownItemProps> = ({
   label,
   active,
-  moveThreads,
-  hover,
-  isSubMenu
+  onClick,
+  highlight,
+  setIsOptionsSubMenuOpen,
+  onDeleteLabel,
+  onHover
 }) => {
   const ref = useRef<HTMLDivElement>(null);
-  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [showSubDropdown, setShowSubDropdown] = useState<boolean>(false);
 
-  const { theme: currentTheme } = useTheme();
-  const theme = isMobile ? currentTheme : 'dark';
-  const maxDropdownItemWidth = 200;
-
-  const dispatch = useDispatch();
-
-  const mobileOpenEditorFolderModal = () => {
-    // Hide label drawer and open edit modal
-    dispatch(skemailMobileDrawerReducer.actions.setShowApplyLabelDrawer(null));
-    dispatch(
-      skemailModalReducer.actions.setOpenModal({
-        type: ModalType.CreateOrEditLabelOrFolder,
-        folder: true,
-        label: label
-      })
-    );
-  };
-
-  const handleOnClick = async (e: any) => {
+  const handleOnClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!active) moveThreads();
+    if (!active) await onClick();
   };
-
-  const optionsButton = (
-    <IconButtonWrapper>
-      <IconButton
-        icon={Icon.OverflowH}
-        onClick={(e) => {
-          e.stopPropagation();
-          // On mobile open modal, on browser open dropdown
-          if (isMobile) {
-            mobileOpenEditorFolderModal();
-          } else {
-            setShowDropdown((prev) => !prev);
-          }
-        }}
-        ref={ref}
-        size={isMobile ? 'large' : 'small'}
-        themeMode={theme}
-      />
-    </IconButtonWrapper>
-  );
 
   return (
     <>
       <DropdownItem
         active={active}
-        endElement={optionsButton}
-        hover={hover}
+        endElement={renderOptionsButton(ref, setShowSubDropdown, setIsOptionsSubMenuOpen)}
+        highlight={highlight}
         key={label.value}
         label={label.name}
-        maxWidth={maxDropdownItemWidth}
         onClick={handleOnClick}
-        startElement={<Icons color={label.color} icon={Icon.Folder} themeMode={theme} />}
-        themeMode={theme}
+        onHover={onHover}
+        startElement={<Icons color={label.color} forceTheme={ThemeMode.DARK} icon={Icon.FolderSolid} />}
       />
       <LabelOptionsDropdown
         buttonRef={ref}
-        isSubMenu={isSubMenu}
+        isSubmenu
         label={label}
-        setShowDropdown={setShowDropdown}
-        showDropdown={showDropdown}
+        onDeleteLabel={onDeleteLabel}
+        setShowDropdown={(value) => {
+          setShowSubDropdown(value);
+          if (setIsOptionsSubMenuOpen) setIsOptionsSubMenuOpen(value);
+        }}
+        showDropdown={showSubDropdown}
       />
     </>
+  );
+};
+
+interface SystemLabelDropdownItemProps {
+  label: SystemLabel;
+  active: boolean;
+  highlight?: boolean;
+  onClick: () => Promise<void> | void;
+  onHover?: () => void;
+}
+
+export const SystemLabelDropdownItem: FC<SystemLabelDropdownItemProps> = ({
+  label,
+  active,
+  onClick,
+  highlight,
+  onHover
+}) => {
+  const handleOnClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!active) await onClick();
+  };
+
+  return (
+    <DropdownItem
+      active={active}
+      highlight={highlight}
+      key={label.value}
+      label={label.name}
+      onClick={handleOnClick}
+      onHover={onHover}
+      startElement={<Icons forceTheme={ThemeMode.DARK} icon={label.icon} />}
+    />
   );
 };

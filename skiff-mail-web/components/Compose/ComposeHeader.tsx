@@ -1,10 +1,11 @@
-import { Icon, IconButton, Typography } from 'nightwatch-ui';
+import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
+import { Icon, IconButton, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
-import { skemailModalReducer } from '../../redux/reducers/modalReducer';
+import { ComposeExpandTypes, skemailModalReducer } from '../../redux/reducers/modalReducer';
 
 const ComposeHeaderContainer = styled.div<{ collapsed: boolean }>`
   display: flex;
@@ -12,14 +13,12 @@ const ComposeHeaderContainer = styled.div<{ collapsed: boolean }>`
   justify-content: space-between;
   align-items: center;
   cursor: ${(props) => (props.collapsed ? 'pointer' : 'default')};
-  padding: ${(props) => (props.collapsed ? '10px 24px' : '24px 0px')};
+  padding: ${(props) => (props.collapsed ? '10px 24px' : '16px 16px 0px')};
   box-sizing: border-box;
 `;
 
 const HeaderButtonsGroup = styled.div`
   display: flex;
-  gap: 8px;
-  margin-right: -8px;
 `;
 
 type ComposeHeaderProps = {
@@ -34,32 +33,50 @@ export const ComposeHeaderDataTest = {
 const ComposeHeader: FC<ComposeHeaderProps> = (props) => {
   const { onClose, text } = props;
   const dispatch = useDispatch();
-  const expand = () => dispatch(skemailModalReducer.actions.expand());
-  const collapse = () => dispatch(skemailModalReducer.actions.collapse());
-  const { isComposeCollapsed } = useAppSelector((state) => state.modal);
-  const toggleCollapse = isComposeCollapsed ? expand : collapse;
+  const { replyComposeOpen } = useAppSelector((state) => state.modal);
+  const expand = () => {
+    dispatch(skemailModalReducer.actions.expand());
+  };
+  const fullExpand = () => {
+    dispatch(skemailModalReducer.actions.fullExpand());
+  };
+  const collapse = () => {
+    dispatch(skemailModalReducer.actions.collapse());
+  };
+  const { composeCollapseState } = useAppSelector((state) => state.modal);
 
+  const collapsed = composeCollapseState === ComposeExpandTypes.Collapsed;
+  const fullExpanded = composeCollapseState === ComposeExpandTypes.FullExpanded;
+  const toggleCollapse = collapsed || fullExpanded ? expand : collapse;
+  if (replyComposeOpen) return null;
   return (
-    <ComposeHeaderContainer collapsed={isComposeCollapsed} onClick={isComposeCollapsed ? expand : undefined}>
-      <Typography color={isComposeCollapsed ? 'white' : 'primary'} level={isComposeCollapsed ? 1 : 0} type='label'>
+    <ComposeHeaderContainer collapsed={collapsed} onClick={collapsed ? expand : undefined}>
+      <Typography
+        color='primary'
+        size={collapsed ? TypographySize.LARGE : TypographySize.H4}
+        weight={TypographyWeight.MEDIUM}
+      >
         {text}
       </Typography>
       <HeaderButtonsGroup>
-        <IconButton
-          color={isComposeCollapsed ? 'white' : 'primary'}
-          icon={isComposeCollapsed ? Icon.Expand : Icon.HorizontalRule}
-          onClick={toggleCollapse}
-          tooltip={isComposeCollapsed ? 'Expand' : 'Minimize'}
-        />
-        <IconButton
-          color={isComposeCollapsed ? 'white' : 'primary'}
-          dataTest={ComposeHeaderDataTest.closeButton}
-          icon={Icon.Close}
-          onClick={() => {
-            onClose();
-          }}
-          tooltip='Close'
-        />
+        <FloatingDelayGroup delay={{ open: 200, close: 200 }}>
+          <IconButton
+            icon={collapsed ? Icon.Expand : Icon.HorizontalRule}
+            onClick={toggleCollapse}
+            tooltip={collapsed ? 'Expand' : 'Minimize'}
+          />
+          {composeCollapseState === ComposeExpandTypes.Expanded && (
+            <IconButton icon={Icon.Expand} onClick={fullExpand} tooltip='Full screen' />
+          )}
+          <IconButton
+            dataTest={ComposeHeaderDataTest.closeButton}
+            icon={Icon.Close}
+            onClick={() => {
+              onClose();
+            }}
+            tooltip='Close'
+          />
+        </FloatingDelayGroup>
       </HeaderButtonsGroup>
     </ComposeHeaderContainer>
   );

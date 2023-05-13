@@ -1,25 +1,18 @@
-import { useGetUserContactListQuery } from 'skiff-mail-graphql';
-import { POLL_INTERVAL_IN_MS, trimAndLowercase } from 'skiff-utils';
-
-import { useRequiredCurrentUserData } from '../../apollo/currentUser';
+import { useGetAllCurrentUserContactsQuery } from 'skiff-front-graphql';
+import { contactToAddressObject } from 'skiff-front-utils';
+import { trimAndLowercase } from 'skiff-utils';
 
 import { SearchItemType, UserSearchResult } from './searchTypes';
 
 // used for searching through contact list when the user selects the "USER" category
 export const useUserSearch = () => {
-  const { userID } = useRequiredCurrentUserData();
-  const { data, error } = useGetUserContactListQuery({
-    variables: {
-      request: { userID }
-    },
-    pollInterval: POLL_INTERVAL_IN_MS
+  const { data: contactsData } = useGetAllCurrentUserContactsQuery({
+    onError: (error) => {
+      console.error(`Failed to retrieve User's contact list`, JSON.stringify(error, null, 2));
+    }
   });
 
-  if (error) {
-    console.error(`Failed to retrieve User's contact list`, JSON.stringify(error, null, 2));
-  }
-
-  const contactList = data?.user?.contactList ?? [];
+  const contactList = contactsData?.allContacts?.map(contactToAddressObject) ?? [];
 
   const search = (searchString: string) => {
     const searchStr = trimAndLowercase(searchString);

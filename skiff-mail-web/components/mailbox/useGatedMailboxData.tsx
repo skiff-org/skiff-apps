@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MailboxQuery } from 'skiff-mail-graphql';
+import { MailboxQuery } from 'skiff-front-graphql';
 
 /**
  * This hook allows us to not show newly fetched data until animation is complete

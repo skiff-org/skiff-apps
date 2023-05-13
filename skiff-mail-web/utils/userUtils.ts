@@ -1,14 +1,5 @@
+import { isAndroid, isIOS, isMacOs, isMobile } from 'react-device-detect';
 import { createDetachedSignatureAsymmetric } from 'skiff-crypto';
-import { formatName, getMailDomain, isReservedCustomDomain, splitEmailToAliasAndDomain } from 'skiff-front-utils';
-import {
-  SubscriptionPlan,
-  User,
-  LoginSrpRequest,
-  RequestStatus,
-  SignatureContext,
-  WorkspaceEventType,
-  getTierNameFromSubscriptionPlan
-} from 'skiff-graphql';
 import {
   DeleteAccountDocument,
   DeleteAccountMutation,
@@ -16,29 +7,38 @@ import {
   DeleteMailAccountDocument,
   DeleteMailAccountMutation,
   DeleteMailAccountMutationVariables,
+  GetSubscriptionInfoDocument,
+  GetSubscriptionInfoQuery,
+  GetSubscriptionInfoQueryVariables,
   GetUserProfileDataDocument,
   GetUserProfileDataQuery,
   GetUserProfileDataQueryVariables,
   GetUsersProfileDataDocument,
   GetUsersProfileDataQuery,
   GetUsersProfileDataQueryVariables,
-  GetUserSubscriptionInfoDocument,
-  GetUserSubscriptionInfoQuery,
-  useGetUserSubscriptionInfoQuery,
-  GetUserSubscriptionInfoQueryVariables,
-  models,
   StoreWorkspaceEventDocument,
   StoreWorkspaceEventMutation,
   StoreWorkspaceEventMutationVariables,
+  USER_NOT_FOUND,
   UpdateDisplayNameDocument,
   UserID,
-  USER_NOT_FOUND
-} from 'skiff-mail-graphql';
+  models,
+  useGetSubscriptionInfoQuery
+} from 'skiff-front-graphql';
+import { formatName, requireCurrentUserData, saveCurrentUserData, splitEmailToAliasAndDomain } from 'skiff-front-utils';
+import {
+  LoginSrpRequest,
+  RequestStatus,
+  SignatureContext,
+  SubscriptionPlan,
+  User,
+  WorkspaceEventType,
+  getTierNameFromSubscriptionPlan
+} from 'skiff-graphql';
 import { isENSName } from 'skiff-utils';
 import isEthereumAddress from 'validator/lib/isEthereumAddress';
 
 import client from '../apollo/client';
-import { requireCurrentUserData, saveCurrentUserData } from '../apollo/currentUser';
 
 import { getENSNameFromEthAddr } from './metamaskUtils';
 
@@ -60,18 +60,6 @@ export async function getUserProfileFromID(userID: string, forceNetwork = false)
   return userProfileDataQueryRes;
 }
 
-// compare against domain for mail sending
-export const isSkiffAddress = (address: string, customDomains?: string[]) => {
-  const domain = address.slice(address.lastIndexOf('@') + 1);
-  if (domain !== getMailDomain() && !isReservedCustomDomain(domain)) {
-    if (customDomains) {
-      return customDomains.includes(domain);
-    }
-    return false;
-  }
-  return true;
-};
-
 /**
  * @param {WorkspaceEventType} eventName - name of the event.
  * @param {string} data - data to be reported, i.e. a step index
@@ -85,7 +73,15 @@ export async function storeWorkspaceEvent(eventName: WorkspaceEventType, data: s
       request: {
         eventName,
         data,
-        version
+        version,
+        platformInfo: {
+          isMobile: isMobile,
+          isIos: isIOS,
+          isAndroid: isAndroid,
+          isMacOs: isMacOs,
+          isReactNative: !!window.ReactNativeWebView,
+          isSkiffWindowsDesktop: !!window.IsSkiffWindowsDesktop
+        }
       }
     }
   });
@@ -103,8 +99,8 @@ export const getDisplayPictureDataFromUser = (user?: Pick<Partial<User>, 'public
 // If the given string is a display name, return the first name in the display name.
 // i.e name = "Display Name" will return "Display"
 // If the given string is an email address, return the entire email address.
-export const getFirstNameOrEmail = (name: string) => {
-  if (!name.length) return '';
+export const getFirstNameOrEmail = (name: string | undefined) => {
+  if (!name) return '';
   return name.split(' ')[0];
 };
 
@@ -271,7 +267,7 @@ export const resolveAndSetENSDisplayName = async (defaultEmail: string, user: mo
  */
 export const resolveENSName = async (defaultEmail: string, currDisplayName?: string | null) => {
   if (!currDisplayName) {
-    const [alias] = splitEmailToAliasAndDomain(defaultEmail);
+    const { alias } = splitEmailToAliasAndDomain(defaultEmail);
     const isEthAddress = isEthereumAddress(alias);
     if (isEthAddress) {
       return getENSNameFromEthAddr(alias);
@@ -282,39 +278,61 @@ export const resolveENSName = async (defaultEmail: string, currDisplayName?: str
   return undefined;
 };
 
-export const getSubscriptionPlan = async (userID: string) => {
-  const res = await client.query<GetUserSubscriptionInfoQuery, GetUserSubscriptionInfoQueryVariables>({
-    query: GetUserSubscriptionInfoDocument,
-    variables: {
-      request: { userID }
-    }
+export const getSubscriptionPlan = async () => {
+  const res = await client.query<GetSubscriptionInfoQuery, GetSubscriptionInfoQueryVariables>({
+    query: GetSubscriptionInfoDocument,
+    variables: {}
   });
 
-  const tierName = res.data?.user?.subscriptionInfo.subscriptionPlan;
-  const isCryptoSubscription = res.data?.user?.subscriptionInfo.isCryptoSubscription;
+  const tierName = res.data?.currentUser?.subscriptionInfo.subscriptionPlan;
+  const isCryptoSubscription = res.data?.currentUser?.subscriptionInfo.isCryptoSubscription;
   const activeSubscription = tierName
     ? SubscriptionPlan[tierName as keyof typeof SubscriptionPlan]
     : SubscriptionPlan.Free;
-  return { ...res, data: { activeSubscription, isCryptoSubscription } };
+  const cancelAtPeriodEnd = res.data?.currentUser?.subscriptionInfo.cancelAtPeriodEnd;
+  const supposedEndDate = res.data?.currentUser?.subscriptionInfo.supposedEndDate;
+  const stripeStatus = res.data?.currentUser?.subscriptionInfo.stripeStatus;
+  const billingInterval = res.data?.currentUser?.subscriptionInfo.billingInterval;
+  return {
+    ...res,
+    data: {
+      activeSubscription,
+      isCryptoSubscription,
+      cancelAtPeriodEnd,
+      supposedEndDate,
+      stripeStatus,
+      billingInterval
+    }
+  };
 };
 
-export function useSubscriptionPlan(userID: string) {
-  const res = useGetUserSubscriptionInfoQuery({
-    variables: {
-      request: { userID }
-    }
-  });
-  const tierName = res.data?.user?.subscriptionInfo.subscriptionPlan;
-  const isCryptoSubscription = res.data?.user?.subscriptionInfo.isCryptoSubscription;
+export function useSubscriptionPlan() {
+  const res = useGetSubscriptionInfoQuery();
+  const tierName = res.data?.currentUser?.subscriptionInfo.subscriptionPlan;
+  const isCryptoSubscription = res.data?.currentUser?.subscriptionInfo.isCryptoSubscription;
   const activeSubscription = tierName
     ? SubscriptionPlan[tierName as keyof typeof SubscriptionPlan]
     : SubscriptionPlan.Free;
-  return { ...res, data: { activeSubscription, isCryptoSubscription } };
+  const cancelAtPeriodEnd = res.data?.currentUser?.subscriptionInfo.cancelAtPeriodEnd;
+  const supposedEndDate = res.data?.currentUser?.subscriptionInfo.supposedEndDate;
+  const stripeStatus = res.data?.currentUser?.subscriptionInfo.stripeStatus;
+  const billingInterval = res.data?.currentUser?.subscriptionInfo.billingInterval;
+  return {
+    ...res,
+    data: {
+      activeSubscription,
+      isCryptoSubscription,
+      cancelAtPeriodEnd,
+      supposedEndDate,
+      stripeStatus,
+      billingInterval
+    }
+  };
 }
 
-export const getTierName = async (userID: string) => {
+export const getTierName = async () => {
   const {
     data: { activeSubscription }
-  } = await getSubscriptionPlan(userID);
+  } = await getSubscriptionPlan();
   return getTierNameFromSubscriptionPlan(activeSubscription);
 };

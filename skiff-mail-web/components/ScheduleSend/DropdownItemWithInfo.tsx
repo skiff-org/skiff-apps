@@ -1,4 +1,4 @@
-import { themeNames, Typography } from 'nightwatch-ui';
+import { ThemeMode, themeNames, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
 import { FC } from 'react';
 import styled from 'styled-components';
 
@@ -32,10 +32,15 @@ const DropdownItemWithInfo: FC<DropdownItemWithInfoProps> = ({ label, info, onCl
   return (
     <DropdownItem onClick={onClick}>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <Typography level={3} themeMode='dark' type='heading'>
+        <Typography forceTheme={ThemeMode.DARK} size={TypographySize.SMALL} weight={TypographyWeight.BOLD}>
           {label}
         </Typography>
-        <Typography color='secondary' level={3} themeMode='dark' type='paragraph'>
+        <Typography
+          color='secondary'
+          forceTheme={ThemeMode.DARK}
+          size={TypographySize.SMALL}
+          weight={TypographyWeight.REGULAR}
+        >
           {info}
         </Typography>
       </div>

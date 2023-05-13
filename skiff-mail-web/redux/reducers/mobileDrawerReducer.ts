@@ -22,7 +22,7 @@ export interface SkemailMobileDrawerReducerState {
   showApplyLabelDrawer: UserLabelVariant | null;
   showMailboxMoreOptionsDrawer: boolean;
   showMailboxSelectDrawer: boolean;
-  showReplayDrawer: boolean;
+  showReplyDrawer: boolean;
   showComposeMoreOptionsDrawer: boolean;
   showAliasDrawer: boolean;
   multipleItemSelector: boolean; //Is multiple item selector active
@@ -37,7 +37,7 @@ export const initialPageState: SkemailMobileDrawerReducerState = {
     emailSpecific: false
   },
   showMoveThreadDrawer: false,
-  showReplayDrawer: false,
+  showReplyDrawer: false,
   showReportThreadBlockDrawer: false,
   showApplyLabelDrawer: null,
   multipleItemSelector: false,
@@ -62,8 +62,8 @@ export const skemailMobileDrawerReducer = createSlice({
     setShowMoreThreadOptionsDrawer: (state, action: PayloadAction<ThreadOptionsDrawerPayload>) => {
       state.showMoreThreadOptionsDrawer = action.payload;
     },
-    setShowReplayDrawer: (state, action: PayloadAction<boolean>) => {
-      state.showReplayDrawer = action.payload;
+    setShowReplyDrawer: (state, action: PayloadAction<boolean>) => {
+      state.showReplyDrawer = action.payload;
     },
     setShowMoveThreadDrawer: (state, action: PayloadAction<boolean>) => {
       state.showMoveThreadDrawer = action.payload;

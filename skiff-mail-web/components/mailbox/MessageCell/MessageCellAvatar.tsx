@@ -1,33 +1,28 @@
-import React from 'react';
-import { splitEmailToAliasAndDomain, UserAvatar } from 'skiff-front-utils';
+import { Size, ThemeMode } from 'nightwatch-ui';
+import { UserAvatar, splitEmailToAliasAndDomain } from 'skiff-front-utils';
 
+import { useDisplayNameFromAddress } from '../../../hooks/useDisplayNameFromAddress';
 import { useDisplayPictureDataFromAddress } from '../../../hooks/useDisplayPictureDataFromAddress';
 
 export interface MessageCellAvatarProps {
   senderName: string;
-  numAvatars: number;
-  key?: string;
   address?: string;
+  /** Needed to allow Facepile size to override Avatar theme and size */
+  forceTheme?: ThemeMode;
+  size?: Size;
 }
 
-export const MessageCellAvatar = ({ key, address, senderName, numAvatars }: MessageCellAvatarProps) => {
-  const getMobileSize = () => {
-    switch (numAvatars) {
-      case 1:
-        return 'xmedium';
-      case 2:
-        return 'medium';
-      case 3:
-        return 'small';
-      case 4:
-      default:
-        return 'xsmall';
-    }
-  };
+export const MessageCellAvatar = ({ senderName, address, forceTheme, size }: MessageCellAvatarProps) => {
   const displayPictureData = useDisplayPictureDataFromAddress(address);
-  const mobileSize = getMobileSize();
-  const [senderNameAlias] = splitEmailToAliasAndDomain(senderName);
+  const contactDisplayName = useDisplayNameFromAddress(address);
+
+  const { alias: senderNameAlias } = splitEmailToAliasAndDomain(senderName);
   return (
-    <UserAvatar displayPictureData={displayPictureData} key={key} label={senderNameAlias} size={mobileSize} squared />
+    <UserAvatar
+      displayPictureData={displayPictureData}
+      forceTheme={forceTheme}
+      label={contactDisplayName || senderNameAlias}
+      size={size}
+    />
   );
 };

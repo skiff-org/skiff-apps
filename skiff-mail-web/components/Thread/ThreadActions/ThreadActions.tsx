@@ -1,54 +1,68 @@
-import { Icon, IconButton, Icons, Tooltip } from 'nightwatch-ui';
+import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
+import { Icon, IconText, Size, TypographyWeight } from 'nightwatch-ui';
 import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { SystemLabels, UserLabelVariant } from 'skiff-graphql';
-import { useGetThreadFromIdQuery } from 'skiff-mail-graphql';
+import { useGetThreadFromIdQuery } from 'skiff-front-graphql';
+import { useMediaQuery, useUserPreference } from 'skiff-front-utils';
+import { SystemLabels, ThreadDisplayFormat, UserLabelVariant } from 'skiff-graphql';
+import { StorageTypes } from 'skiff-utils';
 import styled from 'styled-components';
 
+import { COMPACT_MAILBOX_BREAKPOINT } from '../../../constants/mailbox.constants';
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
-import { useCurrentUserEmailAliases } from '../../../hooks/useCurrentUserEmailAliases';
-import { useDefaultEmailAlias } from '../../../hooks/useDefaultEmailAlias';
-import { useDrafts } from '../../../hooks/useDrafts';
+import { useMarkAsReadUnread } from '../../../hooks/useMarkAsReadUnread';
 import { useThreadActions } from '../../../hooks/useThreadActions';
-import { useUserSignature } from '../../../hooks/useUserSignature';
 import { skemailHotKeysReducer } from '../../../redux/reducers/hotkeysReducer';
-import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { LABEL_TO_SYSTEM_LABEL } from '../../../utils/label';
-import { handleMarkAsReadUnreadClick } from '../../../utils/mailboxUtils';
-import { LabelDropdown } from '../../labels/LabelDropdown';
+import { MoveToLabelDropdown } from '../../labels/MoveToLabelDropdown';
 import { ThreadNavigationIDs } from '../Thread.types';
 
 const ThreadToolbar = styled.div`
   display: flex;
   align-items: center;
-  height: 36px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  height: 60px;
 `;
 
 const Toolbar = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
   gap: 8px;
 `;
 
-const ReplyActions = styled.div`
-  margin-left: auto;
+const Separator = styled.div`
+  background: var(--border-tertiary);
+  margin: 0px 4px;
+  width: 2px;
+  height: 20px;
+`;
+
+const LeftButtons = styled.div`
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 `;
 
-const Separator = styled.div`
-  background: var(--border-secondary);
-  margin: 0px 8px;
-  width: 1.5px;
-  height: 20px;
-  border-radius: 10px;
+const RightButtons = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
 `;
 
-const LockContainer = styled.div<{ $isSkiffSender: boolean }>`
-  background: ${(props) => (props.$isSkiffSender ? 'var(--accent-green-secondary)' : 'var(--bg-field-default)')};
-  padding: 6px;
-  border-radius: 8px;
+const MarginRight = styled.div`
+  width: 11px;
+`;
+
+const Spacer = styled.div`
+  width: 90px;
+  background: var(--cta-secondary-default);
+  border: 1px solid var(--border-secondary);
+  border-radius: 4px;
+  height: 26px;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.02);
 `;
 
 export const ThreadActionsDataTest = {
@@ -73,7 +87,10 @@ interface ThreadActionsProps {
   prevThreadAndEmail?: ThreadNavigationIDs;
   // is skiff-to-skiff
   isSkiffSender?: boolean;
+  loading?: boolean;
 }
+
+const SKIFF_WHITEPAPER = 'https://skiff.com/whitepaper';
 
 /**
  * Thread Actions
@@ -85,77 +102,36 @@ export const ThreadActions = ({
   label,
   threadID,
   onClose,
-  emailRefs,
   setActiveThreadAndEmail,
   nextThreadAndEmail,
   prevThreadAndEmail,
-  isSkiffSender
+  isSkiffSender,
+  loading
 }: ThreadActionsProps) => {
   const { data } = useGetThreadFromIdQuery({ variables: { threadID } });
-  const emails = data?.userThread?.emails ?? [];
-  const email = emails[emails.length - 1];
   const thread = data?.userThread;
   const labelDropdownRef = useRef<HTMLDivElement>(null);
   const isDrafts = label === SystemLabels.Drafts;
   const isDraftsOrSent = isDrafts || label === SystemLabels.Sent;
   const isTrash = label === SystemLabels.Trash;
   const isArchive = label === SystemLabels.Archive;
-  const [defaultEmailAlias] = useDefaultEmailAlias();
+  // need noSsr in useMediaQuery to avoid the first render returning isCompact as false
+  const isCompact = useMediaQuery(`(max-width:${COMPACT_MAILBOX_BREAKPOINT}px)`, { noSsr: true });
+  const [threadFormat] = useUserPreference(StorageTypes.THREAD_FORMAT);
+
+  const { markThreadsAsReadUnread } = useMarkAsReadUnread();
 
   const moveToDropdownRef = useRef<HTMLDivElement>(null);
   const [moveToDropdownOpen, setMoveToDropdownOpen] = useState(false);
 
   const { moveThreads, archiveThreads, setActiveThreadID, trashThreads, deleteThreads } = useThreadActions();
-  const { composeNewDraft } = useDrafts();
   const { activeThreadLabelsDropdownOpen } = useAppSelector((state) => state.hotkeys);
-  const setLabelsDropdown = (open?: boolean) =>
-    dispatch(skemailHotKeysReducer.actions.setActiveThreadLabelMenuOpen(open));
 
   // Redux actions
   const dispatch = useDispatch();
-  const emailAliases = useCurrentUserEmailAliases();
-  const userSignature = useUserSignature();
 
-  const reply = () => {
-    composeNewDraft();
-    if (thread) {
-      dispatch(
-        skemailModalReducer.actions.replyCompose({
-          email,
-          thread,
-          emailAliases,
-          defaultEmailAlias,
-          signature: userSignature
-        })
-      );
-    }
-    //Scroll to latest email
-    const lastEmailRef = emailRefs[email.id];
-    if (lastEmailRef?.current) {
-      lastEmailRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const replyAll = () => {
-    composeNewDraft();
-    if (thread) {
-      dispatch(
-        skemailModalReducer.actions.replyAllCompose({
-          email,
-          thread,
-          emailAliases,
-          defaultEmailAlias,
-          signature: userSignature
-        })
-      );
-    }
-  };
-
-  const forward = () => {
-    composeNewDraft();
-    if (thread) {
-      dispatch(skemailModalReducer.actions.forwardCompose({ email, emailAliases, defaultEmailAlias }));
-    }
+  const setLabelsDropdown = (open?: boolean) => {
+    dispatch(skemailHotKeysReducer.actions.setActiveThreadLabelMenuOpen(open));
   };
 
   const setActiveMessage = (threadAndEmail: ThreadNavigationIDs) => {
@@ -164,193 +140,210 @@ export const ThreadActions = ({
     } else {
       setActiveThreadID({ threadID: threadAndEmail.threadID });
     }
-    if (thread && !thread.attributes.read) void handleMarkAsReadUnreadClick([thread], true);
+    if (thread && !thread.attributes.read) markThreadsAsReadUnread([thread], true);
   };
 
-  const prev = () => {
+  const selectPreviousThread = () => {
     if (!!prevThreadAndEmail) {
       setActiveMessage(prevThreadAndEmail);
     }
   };
 
-  const next = () => {
+  const selectNextThread = () => {
     if (!!nextThreadAndEmail) {
       setActiveMessage(nextThreadAndEmail);
     }
   };
 
+  // only clearActiveThreadID if there is no next thread
+  const clearActiveThreadIDAfterAction = !nextThreadAndEmail;
+
   return (
     <ThreadToolbar>
       <Toolbar>
-        {!isDrafts && (
-          <>
-            {true && (
-              <>
-                <IconButton color='secondary' icon={Icon.Close} onClick={onClose} />
-                <Separator />
-              </>
-            )}
-            <IconButton
-              color='secondary'
-              disabled={!prevThreadAndEmail}
-              icon={Icon.ArrowUp}
-              onClick={prev}
-              size='small'
-              tooltip='Move up'
-              type='filled'
-            />
-            <IconButton
-              color='secondary'
-              disabled={!nextThreadAndEmail}
-              icon={Icon.ArrowDown}
-              onClick={next}
-              size='small'
-              tooltip='Move down'
-              type='filled'
-            />
-            <Separator />
-            <div>
-              <IconButton
-                color='secondary'
-                hideTooltip={activeThreadLabelsDropdownOpen}
-                icon={Icon.Tag}
-                onClick={() => setLabelsDropdown()}
-                ref={labelDropdownRef}
-                tooltip={{ title: 'Labels', shortcut: 'L' }}
+        <LeftButtons>
+          {!isDrafts && (
+            <>
+              <IconText
+                iconColor='secondary'
+                onClick={onClose}
+                startIcon={isCompact || threadFormat === ThreadDisplayFormat.Full ? Icon.ArrowLeft : Icon.Close}
               />
-              <LabelDropdown
-                buttonRef={labelDropdownRef}
+              <Separator />
+              <IconText
+                disabled={!prevThreadAndEmail}
+                filled
+                onClick={selectPreviousThread}
+                size={Size.SMALL}
+                startIcon={Icon.Backward}
+                tooltip='Previous email'
+              />
+              <IconText
+                disabled={!nextThreadAndEmail}
+                filled
+                onClick={selectNextThread}
+                size={Size.SMALL}
+                startIcon={Icon.Forward}
+                tooltip='Next email'
+              />
+            </>
+          )}
+        </LeftButtons>
+        <RightButtons>
+          <div>
+            <IconText
+              filled
+              onClick={() => setLabelsDropdown()}
+              ref={labelDropdownRef}
+              startIcon={Icon.Tag}
+              tooltip={{ title: 'Labels', shortcut: 'L' }}
+            />
+            <MoveToLabelDropdown
+              buttonRef={labelDropdownRef}
+              currentSystemLabels={[label]}
+              onClose={() => {
+                setLabelsDropdown(false);
+              }}
+              open={activeThreadLabelsDropdownOpen}
+              threadID={threadID}
+            />
+          </div>
+          {label !== SystemLabels.ScheduleSend && (
+            <div>
+              <IconText
+                filled
+                onClick={() => setMoveToDropdownOpen(true)}
+                ref={moveToDropdownRef}
+                startIcon={Icon.FolderArrow}
+                tooltip='Move to'
+              />
+              <MoveToLabelDropdown
+                buttonRef={moveToDropdownRef}
                 currentSystemLabels={[label]}
+                nextThreadAndEmail={nextThreadAndEmail}
                 onClose={() => {
-                  setLabelsDropdown(false);
+                  setMoveToDropdownOpen(false);
                 }}
-                open={activeThreadLabelsDropdownOpen}
+                open={moveToDropdownOpen}
                 threadID={threadID}
+                variant={UserLabelVariant.Folder}
               />
             </div>
-            {label !== SystemLabels.ScheduleSend && (
-              <div>
-                <IconButton
-                  color='secondary'
-                  hideTooltip={moveToDropdownOpen}
-                  icon={Icon.FolderArrow}
-                  onClick={() => setMoveToDropdownOpen(true)}
-                  ref={moveToDropdownRef}
-                  tooltip='Move to'
-                />
-                <LabelDropdown
-                  buttonRef={moveToDropdownRef}
-                  currentSystemLabels={[label]}
-                  onClose={() => {
-                    setMoveToDropdownOpen(false);
-                  }}
-                  open={moveToDropdownOpen}
-                  threadID={threadID}
-                  variant={UserLabelVariant.Folder}
-                />
-              </div>
-            )}
-            {isTrash && (
-              <IconButton
-                color='secondary'
-                icon={Icon.Trash}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  void deleteThreads([threadID]);
-                }}
-                tooltip='Permanently delete'
+          )}
+          {(isTrash || isArchive) && (
+            <IconText
+              dataTest={ThreadActionsDataTest.undoTrashIcon}
+              filled
+              onClick={(e) => {
+                e?.stopPropagation();
+                // undo trash or archive
+                void moveThreads(
+                  [threadID],
+                  LABEL_TO_SYSTEM_LABEL[SystemLabels.Inbox],
+                  [label],
+                  clearActiveThreadIDAfterAction
+                );
+                selectNextThread();
+              }}
+              startIcon={Icon.MoveMailbox}
+              tooltip={{ title: 'Move to inbox', shortcut: 'Z' }}
+            />
+          )}
+          {![SystemLabels.Spam, SystemLabels.ScheduleSend].includes(label as SystemLabels) && (
+            <IconText
+              filled
+              onClick={() => {
+                void moveThreads(
+                  [threadID],
+                  LABEL_TO_SYSTEM_LABEL[SystemLabels.Spam],
+                  [label],
+                  clearActiveThreadIDAfterAction
+                );
+                selectNextThread();
+              }}
+              startIcon={Icon.Spam}
+              tooltip='Report spam'
+            />
+          )}
+          {label === SystemLabels.Spam && (
+            <IconText
+              filled
+              onClick={() => {
+                void moveThreads(
+                  [threadID],
+                  LABEL_TO_SYSTEM_LABEL[SystemLabels.Inbox],
+                  [label],
+                  clearActiveThreadIDAfterAction
+                );
+                selectNextThread();
+              }}
+              startIcon={Icon.MoveMailbox}
+              tooltip='Not spam'
+            />
+          )}
+          {!isArchive && !isTrash && !isDraftsOrSent && (
+            <IconText
+              filled
+              onClick={(e) => {
+                e?.stopPropagation();
+                void archiveThreads([threadID], false, clearActiveThreadIDAfterAction);
+                selectNextThread();
+              }}
+              startIcon={Icon.Archive}
+              tooltip={{ title: 'Archive', shortcut: 'E' }}
+            />
+          )}
+          {!isTrash && (
+            <IconText
+              color='destructive'
+              dataTest={ThreadActionsDataTest.moveToTrashIcon}
+              filled
+              onClick={(e) => {
+                e?.stopPropagation();
+                void trashThreads([threadID], isDrafts, false, clearActiveThreadIDAfterAction);
+                selectNextThread();
+              }}
+              startIcon={Icon.Trash}
+              tooltip={{ title: 'Trash', shortcut: '#' }}
+            />
+          )}
+          {isTrash && (
+            <IconText
+              color='destructive'
+              filled
+              onClick={(e) => {
+                e?.stopPropagation();
+                void deleteThreads([threadID], false, clearActiveThreadIDAfterAction);
+                selectNextThread();
+              }}
+              startIcon={Icon.Trash}
+              tooltip='Permanently delete'
+            />
+          )}
+          <Separator />
+          {loading && <Spacer />}
+          {isSkiffSender !== undefined && !loading && (
+            <FloatingDelayGroup delay={{ open: 0, close: 200 }}>
+              <IconText
+                color={loading ? 'inverse' : isSkiffSender ? 'green' : 'primary'}
+                filled
+                iconColor={isSkiffSender ? 'green' : 'secondary'}
+                label={isSkiffSender ? 'E2EE' : 'Secure'}
+                onClick={() => window.open(SKIFF_WHITEPAPER, '_blank', 'noopener noreferrer')}
+                startIcon={isSkiffSender ? Icon.ShieldCheck : Icon.Lock}
+                tooltip={isSkiffSender ? 'Thread is end-to-end encrypted' : 'Thread is encrypted'}
+                weight={TypographyWeight.REGULAR}
               />
-            )}
-            {![SystemLabels.Spam, SystemLabels.ScheduleSend].includes(label as SystemLabels) && (
-              <IconButton
-                color='secondary'
-                icon={Icon.Spam}
-                onClick={() => {
-                  void moveThreads([threadID], LABEL_TO_SYSTEM_LABEL[SystemLabels.Spam], [label]);
-                }}
-                tooltip='Report spam'
-              />
-            )}
-            {label === SystemLabels.Spam && (
-              <IconButton
-                color='secondary'
-                icon={Icon.MoveMailbox}
-                onClick={() => {
-                  void moveThreads([threadID], LABEL_TO_SYSTEM_LABEL[SystemLabels.Inbox], [label]);
-                }}
-                tooltip='Not spam'
-              />
-            )}
-          </>
-        )}
-        {!isArchive && !isTrash && !isDraftsOrSent && (
-          <IconButton
-            color='secondary'
-            icon={Icon.Archive}
-            onClick={(e) => {
-              e.stopPropagation();
-              void archiveThreads([threadID]);
-            }}
-            tooltip={{ title: 'Archive', shortcut: 'E' }}
-          />
-        )}
-        {!isArchive && !isTrash && (
-          <IconButton
-            color='secondary'
-            dataTest={ThreadActionsDataTest.moveToTrashIcon}
-            icon={Icon.Trash}
-            onClick={(e) => {
-              e.stopPropagation();
-              void trashThreads([threadID], isDrafts);
-            }}
-            tooltip={{ title: 'Trash', shortcut: '#' }}
-          />
-        )}
-        {(isTrash || isArchive) && (
-          <IconButton
-            color='secondary'
-            dataTest={ThreadActionsDataTest.undoTrashIcon}
-            icon={Icon.MoveMailbox}
-            onClick={(e) => {
-              e.stopPropagation();
-              // undo trash or archive
-              void moveThreads([threadID], LABEL_TO_SYSTEM_LABEL[SystemLabels.Inbox], [label]);
-            }}
-            tooltip={{ title: 'Move to inbox', shortcut: 'Z' }}
-          />
-        )}
-        <Separator />
-        {isSkiffSender !== undefined && (
-          <Tooltip label={isSkiffSender ? 'Thread is end-to-end encrypted' : 'Thread is encrypted'}>
-            <LockContainer $isSkiffSender={isSkiffSender}>
-              <Icons
-                color={isSkiffSender ? 'green' : 'primary'}
-                icon={isSkiffSender ? Icon.ShieldCheck : Icon.Lock}
-                size='small'
-              />
-            </LockContainer>
-          </Tooltip>
-        )}
+              {isSkiffSender && (
+                <>
+                  {/* needed to prevent move folder dropdown from flashing */}
+                  <MarginRight />
+                </>
+              )}
+            </FloatingDelayGroup>
+          )}
+        </RightButtons>
       </Toolbar>
-      <ReplyActions>
-        <IconButton icon={Icon.Reply} onClick={reply} size='small' tooltip='Reply' type='filled' />
-        <IconButton
-          color='secondary'
-          icon={Icon.ReplyAll}
-          onClick={replyAll}
-          size='small'
-          tooltip='Reply all'
-          type='filled'
-        />
-        <IconButton
-          color='secondary'
-          icon={Icon.ForwardEmail}
-          onClick={forward}
-          size='small'
-          tooltip='Forward'
-          type='filled'
-        />
-      </ReplyActions>
     </ThreadToolbar>
   );
 };

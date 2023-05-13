@@ -1,13 +1,19 @@
 import DOMPurify from 'dompurify';
-import { debounce } from 'lodash';
-import { themeNames } from 'nightwatch-ui';
-import React, { FC, useCallback, useEffect, useState, useMemo, useRef } from 'react';
+import debounce from 'lodash/debounce';
+import { ThemeMode, themeNames } from 'nightwatch-ui';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isIOS, isMobile, isSafari } from 'react-device-detect';
 import { createPortal } from 'react-dom';
 import { useDispatch } from 'react-redux';
-import { rewriteCSSAttribute, rewriteHTMLAttribute, getResourceProxyURL, useTheme } from 'skiff-front-utils';
-import { contentAsDataUrl } from 'skiff-front-utils';
-import { isDesktopApp } from 'skiff-front-utils';
+import {
+  contentAsDataUrl,
+  getResourceProxyURL,
+  isDesktopApp,
+  PLACEHOLDER_CONTENT_URL,
+  proxyAttributes,
+  rewriteCSSAttribute,
+  useTheme
+} from 'skiff-front-utils';
 import styled from 'styled-components';
 
 import { useDrafts } from '../../../hooks/useDrafts';
@@ -21,12 +27,12 @@ import {
   addQuotesContainer,
   displayCidImage,
   ElementMark,
-  queryMarkedElements,
-  overrideIFrameElementClick,
-  setCidImages,
-  setMailtoLinks,
+  handleTransactionalMail,
   lightenDarkText,
-  handleTransactionalMail
+  overrideIFrameElementClick,
+  queryMarkedElements,
+  setCidImages,
+  setMailtoLinks
 } from './mailModifyUtils';
 import LazyPinchZoom from './PinchZoom/LazyPinchZoom';
 
@@ -34,7 +40,6 @@ const StylediFrame = React.memo(
   styled.iframe`
     width: 100%;
     height: 62px;
-    transition: height 0.2s;
     border: 0;
   `
 );
@@ -42,13 +47,15 @@ const StylediFrame = React.memo(
 export interface MailViewProps {
   email: MailboxEmailInfo;
   attachments: ClientAttachment[];
+  disableRemoteContent: boolean;
 }
 
 const ALLOWED_PX_INTERVAL = 10;
 export const MAIL_CONTENT_CONTAINER_ID = 'mail-content-container';
 export const MAIL_CONTENT_CONTAINER_DATA_TEST = 'mail-content-container';
+export const MAIL_HTML_IFRAME = 'mail-html-iframe';
 
-const MailHTMLView: FC<MailViewProps> = ({ email, attachments }) => {
+const MailHTMLView: FC<MailViewProps> = ({ email, attachments, disableRemoteContent }) => {
   const [iframeState, setIframeState] = useState('init');
   // Iframe ref
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -56,7 +63,7 @@ const MailHTMLView: FC<MailViewProps> = ({ email, attachments }) => {
   const iframeRootDivRef = useRef<HTMLDivElement>();
   // Last iframe height - helps with avoiding infinty height for mail with 100% height elements
   const prevHeightRef = useRef<number>(0);
-  // Show previues content state, default to hiding previous content
+  // Show previous content state, default to hiding previous content
   const [showQuotes, setShowQuotes] = useState(true);
 
   const dispatch = useDispatch();
@@ -64,9 +71,12 @@ const MailHTMLView: FC<MailViewProps> = ({ email, attachments }) => {
   const { composeNewDraft } = useDrafts();
 
   const originUrl: URL = new URL(window.location.origin);
-  const resourceProxyURL = getResourceProxyURL(new URL(window.location.origin));
-  const resourceProxyCspString = resourceProxyURL.origin.toString() + resourceProxyURL.pathname.toString();
-  const csp = `default-src 'none'; img-src blob: data: ${resourceProxyCspString}; style-src 'unsafe-inline'; script-src 'none'`;
+  const resourceProxyURLForCSP = getResourceProxyURL(new URL(window.location.origin), false);
+
+  const resourceProxyCspString = resourceProxyURLForCSP.origin.toString() + resourceProxyURLForCSP.pathname.toString();
+  const csp = `default-src 'none'; img-src ${
+    window.location.origin + PLACEHOLDER_CONTENT_URL
+  } blob: data: ${resourceProxyCspString}; style-src 'unsafe-inline'; script-src 'none';`;
 
   const getIframeHtml = (content: string, extraBodyStyle = '') =>
     `
@@ -76,12 +86,25 @@ const MailHTMLView: FC<MailViewProps> = ({ email, attachments }) => {
       <base target="_blank" />
       <meta http-equiv='Content-Security-Policy' content="${csp}">
       <meta name="viewport" content="width=device-width">
+      <style>
+        strong {
+          font-weight: 560 !important;
+        }
+        @media print {
+          .printOnly {
+            display: block !important;
+          }
+        }
+        .printOnly {
+          display: none;
+        }
+      </style>
     </head>
 
     <body style="line-height: 1.25;font-family: 'Skiff Sans Text', system-ui, sans-serif;margin: 0px;white-space: normal;overflow: auto hidden;${extraBodyStyle}">
       <div id="${MAIL_CONTENT_CONTAINER_ID}" data-test=${MAIL_CONTENT_CONTAINER_DATA_TEST}>
         <div style="display: flex !important; width: 100% !important;">
-          <div style="width: 100% !important;padding-bottom:10px !important;overflow-wrap: anywhere;-webkit-font-smoothing: antialiased;">
+          <div style="width: 100% !important;font-weight: 380;overflow-wrap: anywhere;-webkit-font-smoothing: antialiased;">
             ${content}
           </div>
         </div>
@@ -92,39 +115,33 @@ const MailHTMLView: FC<MailViewProps> = ({ email, attachments }) => {
 
   // Create Iframe document to render mail
   const iframeSrcDoc = useMemo(() => {
-    const extraStyle = theme === 'light' ? 'color: var(--text-primary);' : ''; // When on light mode add color
+    const extraStyle = theme === ThemeMode.LIGHT ? 'color: var(--text-primary);' : ''; // When on light mode add color
 
     const bodyContent = getEmailBody(email);
 
     const dom = new DOMParser().parseFromString(bodyContent, 'text/html');
-    // Rewrite all src attributes if they are a full url
-    rewriteHTMLAttribute(dom, '', 'src', originUrl);
-    rewriteHTMLAttribute(dom, 'img', 'href', originUrl);
-    rewriteHTMLAttribute(dom, 'img', 'srcset', originUrl);
-    rewriteHTMLAttribute(dom, 'image', 'href', originUrl);
-    rewriteHTMLAttribute(dom, 'image', 'xlink\\:href', originUrl);
-    rewriteHTMLAttribute(dom, 'table', 'background', originUrl);
-    rewriteHTMLAttribute(dom, 'td', 'background', originUrl);
-    rewriteHTMLAttribute(dom, 'video', 'poster', originUrl);
-    // Rewrite all url() in inline styles
-    rewriteCSSAttribute(dom, originUrl);
+    proxyAttributes(dom, disableRemoteContent);
+    rewriteCSSAttribute(dom, originUrl, disableRemoteContent);
 
     const sanitizedContent = DOMPurify.sanitize(dom.documentElement.outerHTML);
 
     return getIframeHtml(sanitizedContent, extraStyle);
-  }, [email.id]);
+  }, [email.id, disableRemoteContent]);
 
   const currentIframeDoc = iframeRef.current?.contentDocument;
 
-  // Show/Hide previues content by showQuotes
+  // Show/Hide previous content by showQuotes
   useEffect(() => {
     if (currentIframeDoc) {
       const [quote] = queryMarkedElements(currentIframeDoc, ElementMark.LastEmailQuote);
       if (quote) {
-        const [quoteButton] = queryMarkedElements(currentIframeDoc, ElementMark.QuoteToggleButton)!;
-
-        quoteButton.innerText = `${showQuotes ? 'Show' : 'Hide'} previous content`;
         quote.hidden = showQuotes;
+
+        const [quoteButton] = queryMarkedElements(currentIframeDoc, ElementMark.QuoteToggleButton);
+
+        if (quoteButton) {
+          quoteButton.innerText = `${showQuotes ? 'Show' : 'Hide'} previous content`;
+        }
       }
     }
   }, [showQuotes, currentIframeDoc]);
@@ -169,14 +186,21 @@ const MailHTMLView: FC<MailViewProps> = ({ email, attachments }) => {
 
     const themeColor = themeNames[theme];
     Object.keys(themeColor).forEach((key) => {
-      doc?.body.style.setProperty(key, themeColor[key]);
+      doc?.body.style.setProperty(key, themeColor[key] ?? null);
     });
 
-    if (theme === 'dark') {
+    // remove padding from transactional emails
+    if (doc?.body.getElementsByTagName('TABLE').length > 0) {
+      doc?.body.style.setProperty('padding', '0px');
+    } else {
+      doc?.body.style.setProperty('padding', '0px 16px');
+    }
+
+    if (theme === ThemeMode.DARK) {
       lightenDarkText(doc);
     }
 
-    setCidImages(doc);
+    void setCidImages(doc);
     setMailtoLinks(doc, (address) => {
       composeNewDraft();
       dispatch(skemailModalReducer.actions.directMessageCompose({ address }));
@@ -287,6 +311,7 @@ const MailHTMLView: FC<MailViewProps> = ({ email, attachments }) => {
       allowFullScreen={false}
       csp={csp}
       data-test='message-content-iframe'
+      id={MAIL_HTML_IFRAME}
       frameBorder='0'
       ref={iframeRef}
       sandbox={`allow-same-origin allow-popups allow-popups-to-escape-sandbox ${

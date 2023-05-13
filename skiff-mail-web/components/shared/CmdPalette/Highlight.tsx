@@ -1,9 +1,8 @@
-import { themeNames, Typography } from 'nightwatch-ui';
-import React from 'react';
+import { ThemeMode, themeNames, Typography, TypographyProps, TypographyWeight } from 'nightwatch-ui';
 import styled from 'styled-components';
 
-const SearchText = styled.span`
-  color: ${themeNames.dark['--icon-link']};
+const SearchText = styled.span<{ $isAction?: boolean }>`
+  color: ${({ $isAction }) => ($isAction ? themeNames.dark['--text-primary'] : themeNames.dark['--text-link'])};
 `;
 interface Props {
   text: string;
@@ -11,30 +10,32 @@ interface Props {
   size?: 'large' | 'small';
   sender?: string;
   read?: boolean;
+  customColor?: TypographyProps['color'];
+  isAction?: boolean;
 }
 
-export const Highlight = ({ text, query, size = 'large', sender, read }: Props) => {
+export const Highlight = ({ isAction, text, query, sender, read, customColor }: Props) => {
   const index = text.toLowerCase().indexOf(query.toLowerCase());
-  const level = size === 'large' ? 2 : 3;
 
   const isSubject = !sender;
   // use read === false and not !read because if read is undefined, then the search result is not an email
-  const type = read === false && isSubject ? 'label' : 'paragraph';
+  const typographyWeight = read === false && isSubject ? TypographyWeight.MEDIUM : TypographyWeight.REGULAR;
   const color = read === false ? 'primary' : 'secondary';
+  const textColor = customColor ?? color;
 
   if (index < 0) {
     return (
-      <Typography color={color} dataTest='highlight' level={level} themeMode='dark' type={type}>
+      <Typography color={textColor} dataTest='highlight' forceTheme={ThemeMode.DARK} weight={typographyWeight}>
         {text}
       </Typography>
     );
   }
 
   return (
-    <Typography color={color} level={level} themeMode='dark' type={type}>
+    <Typography color={textColor} forceTheme={ThemeMode.DARK} weight={typographyWeight}>
       {sender && `${sender} – `}
       <span>{text.slice(0, index)}</span>
-      <SearchText>{text.slice(index, index + query.length)}</SearchText>
+      <SearchText $isAction={isAction}>{text.slice(index, index + query.length)}</SearchText>
       <span>{text.slice(index + query.length)}</span>
     </Typography>
   );

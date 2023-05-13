@@ -1,14 +1,14 @@
-import { ProgressSizes } from 'nightwatch-ui';
+import { CustomCircularProgressProps } from 'nightwatch-ui';
 import { isAndroid } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import {
-  getIconFromMIMEType,
-  MIMETypes,
+  contentAsBase64,
   FilePreviewDisplay,
-  PreviewSize,
+  getIconFromMIMEType,
   isMobileApp,
-  sendRNWebviewMsg,
-  contentAsBase64
+  MIMETypes,
+  PreviewSize,
+  sendRNWebviewMsg
 } from 'skiff-front-utils';
 
 import { skemailModalReducer } from '../../../../redux/reducers/modalReducer';
@@ -16,11 +16,9 @@ import { getNwContentType, getPreviewDataByType } from '../../../../utils/attach
 import { ClientAttachment } from '../../types';
 import { errorAttachment, hasContent, inProgress } from '../../typeUtils';
 
-import { InnerContainer } from './Containers';
-
 export interface PreviewProps {
   refetch: () => void;
-  progressSize: ProgressSizes;
+  progressSize: CustomCircularProgressProps['size'];
   tryToOpenProtectedPdf?: boolean;
 }
 
@@ -61,17 +59,20 @@ const AttachmentPreviewDisplay = ({
         contentType: contentTypeFromMimeType,
         mimeType: attachment.contentType,
         fileName: attachment.name,
-        tryToOpenProtectedPdf: previewProps.tryToOpenProtectedPdf
+        tryToOpenProtectedPdf: previewProps.tryToOpenProtectedPdf,
+        tooLargeForPreview: false,
+        fileTypeLabel: ''
       }}
       placeholderIcon={getIconFromMIMEType(attachment.contentType)}
       progress={inProgress(attachment) ? attachment.progress : undefined}
       progressSize={previewProps.progressSize}
       refetch={previewProps.refetch}
+      showEmptyIllustration
       size={PreviewSize.Large}
     />
   );
 
-  return <InnerContainer>{Preview}</InnerContainer>;
+  return Preview;
 };
 
 export default AttachmentPreviewDisplay;

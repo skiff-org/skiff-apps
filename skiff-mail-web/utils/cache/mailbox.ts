@@ -1,6 +1,11 @@
 import { ApolloCache } from '@apollo/client';
+import {
+  MailboxDocument,
+  MailboxQuery,
+  MailboxQueryVariables,
+  ThreadWithoutContentFragment
+} from 'skiff-front-graphql';
 import { MailboxFilters, Mailbox } from 'skiff-graphql';
-import { MailboxDocument, MailboxQuery, MailboxQueryVariables, ThreadFragment } from 'skiff-mail-graphql';
 
 import { getSearchWorker } from '../../hooks/useSearchWorker';
 
@@ -38,7 +43,11 @@ export function updateReadUnreadFilterThreads(
   );
 }
 
-export function addThreadsToMailboxQuery(cache: ApolloCache<any>, label: string, threadsToAdd: ThreadFragment[]): void {
+export function addThreadsToMailboxQuery(
+  cache: ApolloCache<any>,
+  label: string,
+  threadsToAdd: ThreadWithoutContentFragment[]
+): void {
   const read = threadsToAdd.every((thread) => thread.attributes.read);
   const filter = read ? { read: true } : { read: false };
   cache.updateQuery<MailboxQuery, MailboxQueryVariables>(
@@ -93,7 +102,7 @@ export function addThreadsToMailboxQuery(cache: ApolloCache<any>, label: string,
 export function removeThreadsFromMailboxQuery(
   cache: ApolloCache<any>,
   label: string,
-  threadsToRemove: ThreadFragment[]
+  threadsToRemove: ThreadWithoutContentFragment[]
 ): void {
   const read = threadsToRemove.every((thread) => thread.attributes.read);
   const filters = read ? { read: true } : { read: false };
@@ -108,7 +117,7 @@ export function removeThreadsFromMailboxQuery(
         return null;
       }
       const existingThreads = existing.mailbox.threads ?? [];
-      const newThreads: ThreadFragment[] = existingThreads.filter((existingThread) => {
+      const newThreads = existingThreads.filter((existingThread) => {
         const shouldRemove = threadsToRemove.some((thread) => thread.threadID === existingThread.threadID);
         return !shouldRemove;
       });
@@ -133,7 +142,7 @@ export function removeThreadsFromMailboxQuery(
         return null;
       }
       const existingThreads = existing.mailbox.threads ?? [];
-      const newThreads: ThreadFragment[] = existingThreads.filter((existingThread) => {
+      const newThreads = existingThreads.filter((existingThread) => {
         const shouldRemove = threadsToRemove.some((thread) => thread.threadID === existingThread.threadID);
         if (shouldRemove) {
           existingThread.emails.forEach((email) => getSearchWorker()?.remove(email.id));

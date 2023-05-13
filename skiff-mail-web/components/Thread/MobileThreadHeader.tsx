@@ -1,4 +1,4 @@
-import { Icon, IconButton, Typography } from 'nightwatch-ui';
+import { Icon, IconButton, Size, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
 import { useEffect, useState } from 'react';
 import { isAndroid } from 'react-device-detect';
 import { isMobileApp } from 'skiff-front-utils';
@@ -30,6 +30,10 @@ const HeaderButtonContainer = styled.div`
   padding-top: constant(safe-area-inset-top); /* IOS < 11.2*/
   padding-top: env(safe-area-inset-top); /* IOS > = 11.2*/
   ${isMobileApp() && isAndroid && `padding-top:${window.statusBarHeight + 'px'};`}
+`;
+
+const TextContainer = styled.div`
+  margin-left: 16px;
 `;
 
 // px of when the animation will be completed (from top)
@@ -81,6 +85,7 @@ export default function MobileThreadHeader({
         const heightChange = calcScrollAnimatedOffset(bodyScrollOffset, 0, mailThreadOffset);
         headerRef.style.whiteSpace = bodyScrollOffset > 10 ? 'nowrap' : headerRef?.style.whiteSpace;
         backRef.style.transform = `translateY(${1 * heightChange}px)`;
+        headerContainerRef.style.marginBottom = `${-1 * heightChange}px`;
         headerContainerRef.style.transform = `translateY(${-1 * heightChange}px)`;
         headerRef.style.transform = `scale(${calcScrollAnimatedOffset(bodyScrollOffset, 1, 0.85)}) translateY(${
           -1 * heightChange
@@ -108,7 +113,7 @@ export default function MobileThreadHeader({
               e.stopPropagation();
               onClose();
             }}
-            size='large'
+            size={Size.LARGE}
           />
         </BackButtonTitleContainer>
         <NavButtons>
@@ -121,7 +126,7 @@ export default function MobileThreadHeader({
                 setActiveThreadID({ threadID: prevThreadID });
               }
             }}
-            size='large'
+            size={Size.LARGE}
           />
           <IconButton
             disabled={!nextThreadID}
@@ -132,19 +137,21 @@ export default function MobileThreadHeader({
                 setActiveThreadID({ threadID: nextThreadID });
               }
             }}
-            size='large'
+            size={Size.LARGE}
           />
         </NavButtons>
       </HeaderButtonsGroup>
-      <Typography
-        id={THREAD_HEADER_ID}
-        level={0}
-        style={{ marginLeft: '16px', maxWidth: 'calc(100vw - 116px)' }}
-        type='label'
-        wrap={titleWrap}
-      >
-        {text?.trim() || NO_SUBJECT_TEXT}
-      </Typography>
+      <TextContainer>
+        <Typography
+          id={THREAD_HEADER_ID}
+          maxWidth='calc(100vw - 116px)'
+          size={TypographySize.H3}
+          weight={TypographyWeight.MEDIUM}
+          wrap={titleWrap}
+        >
+          {text?.trim() || NO_SUBJECT_TEXT}
+        </Typography>
+      </TextContainer>
     </HeaderButtonContainer>
   );
 }

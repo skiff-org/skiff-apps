@@ -1,17 +1,33 @@
-import {} from '@skiff-org/skiff-ui';
-import { Button, ButtonGroupItem, Dialog, DialogTypes, Divider, Icon, InputField, Typography } from 'nightwatch-ui';
+import {
+  Button,
+  ButtonGroupItem,
+  Dialog,
+  DialogTypes,
+  Divider,
+  Icon,
+  InputField,
+  Size,
+  Type,
+  Typography
+} from 'nightwatch-ui';
 import { Fragment, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { ALIAS_MINIMUM_LENGTH, getStorageKey, StorageTypes, getEditorBasePath } from 'skiff-front-utils';
-import { useCreateEmailAliasMutation, useSetUserPublicKeyMutation } from 'skiff-mail-graphql';
+import { useSetUserPublicKeyMutation } from 'skiff-front-graphql';
+import {
+  ALIAS_MINIMUM_LENGTH,
+  getEditorBasePath,
+  getEndAdornment,
+  useDefaultEmailAlias,
+  useRequiredCurrentUserData,
+  useCreateAlias
+} from 'skiff-front-utils';
+import { StorageTypes, getStorageKey } from 'skiff-utils';
 
-import { useRequiredCurrentUserData } from '../../apollo/currentUser';
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { ModalType } from '../../redux/reducers/modalTypes';
-import Illustration, { Illustrations } from '../../svgs/Illustration';
-import { updateEmailAliases } from '../../utils/cache/cache';
 import { isWalletEnabled } from '../../utils/metamaskUtils';
+import { resolveAndSetENSDisplayName } from '../../utils/userUtils';
 
 import { ConnectWalletModal } from './ConnectWalletModal/ConnectWalletModal';
 
@@ -20,9 +36,13 @@ export const SkemailWelcomeModal: React.FC = () => {
   const [error, setError] = useState<string | undefined>();
   const [renderConnectWalletOptions, setRenderConnectWalletOptions] = useState(false);
 
-  const userData = useRequiredCurrentUserData();
-  const { openModal: openSharedModal } = useAppSelector((state) => state.modal);
   const dispatch = useDispatch();
+  const userData = useRequiredCurrentUserData();
+  const { addEmailAlias } = useCreateAlias();
+  const { openModal: openSharedModal } = useAppSelector((state) => state.modal);
+  const [, setDefaultEmailAlias] = useDefaultEmailAlias(userData.userID, (newValue: string) => {
+    void resolveAndSetENSDisplayName(newValue, userData);
+  });
 
   const [setUserPublicKey] = useSetUserPublicKeyMutation({
     variables: {
@@ -36,19 +56,8 @@ export const SkemailWelcomeModal: React.FC = () => {
     }
   });
 
-  const [createEmailAliasMutation] = useCreateEmailAliasMutation({
-    variables: {
-      request: {
-        emailAlias: alias
-      }
-    },
-    update: (cache, response) => {
-      const emailAliases = response.data?.createEmailAlias?.emailAliases;
-      if (!response.errors && emailAliases) {
-        updateEmailAliases(cache, userData.userID, emailAliases);
-      }
-    }
-  });
+  const defaultMailDomain = getEndAdornment(false, userData.username);
+
   const setKeysAndAlias = async () => {
     if (alias.length <= 5) {
       setError(`Email alias must be greater than ${ALIAS_MINIMUM_LENGTH} characters.`);
@@ -61,7 +70,9 @@ export const SkemailWelcomeModal: React.FC = () => {
       console.error(err);
     }
     try {
-      await createEmailAliasMutation();
+      await addEmailAlias(alias);
+      // The initial email alias should be set as the default alias
+      setDefaultEmailAlias(`${alias}${defaultMailDomain}`);
 
       // Close modal
       dispatch(skemailModalReducer.actions.setOpenModal(undefined));
@@ -96,24 +107,26 @@ export const SkemailWelcomeModal: React.FC = () => {
     <Fragment>
       {isWalletEnabled() && (
         <>
-          <Button align='center' fullWidth onClick={onConnectWalletClick} startIcon={Icon.Wallet} type='secondary'>
-            Connect wallet
-          </Button>
+          <div style={{ width: '100%' }}>
+            <Button fullWidth onClick={onConnectWalletClick} startIcon={Icon.Wallet} type={Type.SECONDARY}>
+              Connect wallet
+            </Button>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', margin: '16px 0', width: '100%' }}>
-            <Divider length='short' />
+            <Divider width='40%' />
             <span style={{ fontWeight: 560, color: 'var(--text-secondary)' }}>or</span>
-            <Divider length='short' />
+            <Divider width='40%' />
           </div>
         </>
       )}
       <InputField
-        endAdornment={<Typography>@skiff.com</Typography>}
+        endAdornment={<Typography>{defaultMailDomain}</Typography>}
         errorMsg={error}
-        helperText={error || 'You can use letters, numbers, and periods.'}
+        helperText='You can use letters, numbers, and periods.'
         onChange={onInputChange}
         onKeyPress={submitOnEnter}
         placeholder='Email'
-        size='large'
+        size={Size.LARGE}
         value={alias}
       />
     </Fragment>
@@ -138,7 +151,6 @@ export const SkemailWelcomeModal: React.FC = () => {
       {!renderConnectWalletOptions && (
         <Dialog
           description='Create your email address. Add up to 3 aliases later.'
-          icon={<Illustration illustration={Illustrations.EmptyMailbox} />}
           inputField={renderInputFields()}
           onClose={() => {
             // fixes possible infinite redirect
@@ -153,7 +165,7 @@ export const SkemailWelcomeModal: React.FC = () => {
             disabled={!!error || !alias}
             key='skemail-welcome-confirm'
             label='Create account'
-            onClick={setKeysAndAlias}
+            onClick={() => void setKeysAndAlias()}
           />
         </Dialog>
       )}
@@ -163,10 +175,12 @@ export const SkemailWelcomeModal: React.FC = () => {
           onBack={onConnectWalletModalBack}
           onClose={onConnectWalletModalClose}
           open={renderConnectWalletOptions}
-          setUserPublicKey={setUserPublicKey}
+          setUserPublicKey={() => void setUserPublicKey()}
           userID={userData.userID}
         />
       )}
     </>
   );
 };
+
+export default SkemailWelcomeModal;

@@ -5,7 +5,8 @@ export const PROD_BASE_URL = 'https://app.skiff.com';
 
 export enum EditorAppRoutes {
   HOME = '/',
-  SIGNUP = '/signup'
+  SIGNUP = '/signup',
+  LOGIN = '/login'
 }
 
 export enum QueryParam {
@@ -14,6 +15,9 @@ export enum QueryParam {
 }
 
 export enum AppRoutes {
+  HOME = '/',
+  MAIL = '/mail',
   INBOX = '/inbox',
-  SEARCH = '/search'
+  SEARCH = '/search',
+  LABEL = '/label'
 }

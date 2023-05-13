@@ -1,6 +1,16 @@
-import { Avatar, Icon, IconButton, Tooltip, Typography } from 'nightwatch-ui';
+import {
+  Avatar,
+  Icon,
+  IconButton,
+  Tooltip,
+  TooltipContent,
+  TooltipPlacement,
+  TooltipTrigger,
+  Type,
+  Typography
+} from 'nightwatch-ui';
 import React, { useEffect, useState } from 'react';
-import { abbreviateWalletAddress, TitleActionSection } from 'skiff-front-utils';
+import { abbreviateWalletAddress, splitEmailToAliasAndDomain, TitleActionSection } from 'skiff-front-utils';
 import styled from 'styled-components';
 import isEthereumAddress from 'validator/lib/isEthereumAddress';
 
@@ -16,6 +26,7 @@ const ENSAliasRow = styled.div`
 const ENSAliasEmails = styled.div`
   display: flex;
   gap: 12px;
+  width: 100%;
   align-items: center;
 `;
 
@@ -43,11 +54,11 @@ export const ENSAlias: React.FC<ENSAliasProps> = ({ walletAliases }) => {
       const ensEmailAliases = {} as ENSAliasDict;
       await Promise.all(
         walletAliases.map(async (email) => {
-          const [alias, mailDomain] = email.split('@');
-          if (isEthereumAddress(alias)) {
+          const { alias, domain: mailDomain } = splitEmailToAliasAndDomain(email);
+          if (!!alias && isEthereumAddress(alias)) {
             const ensName = await getENSNameFromEthAddr(alias);
             if (!ensName) return;
-            if (!(ensName in ensEmailAliases)) {
+            if (!(ensName in ensEmailAliases) && mailDomain) {
               ensEmailAliases[ensName] = { walletAlias: alias, mailDomain };
             }
           }
@@ -79,7 +90,7 @@ export const ENSAlias: React.FC<ENSAliasProps> = ({ walletAliases }) => {
             type: 'button'
           }
         ]}
-        subtitle='Send and receive email from your ENS name.'
+        subtitle='Send and receive email from your ENS name'
         title='ENS aliases'
       />
       {!!Object.keys(ensAliases).length &&
@@ -90,22 +101,25 @@ export const ENSAlias: React.FC<ENSAliasProps> = ({ walletAliases }) => {
               <ENSAliasEmails>
                 <Avatar label={ensAlias} />
                 <div>
-                  <Typography type='paragraph'>{ensAlias}</Typography>
-                  <Tooltip direction='top' label={`${walletAlias}@${mailDomain}`}>
-                    <span>
-                      <Typography color='secondary' type='paragraph'>
+                  <Typography>{ensAlias}</Typography>
+                  <Tooltip placement={TooltipPlacement.RIGHT}>
+                    <TooltipContent>{`${walletAlias}@${mailDomain}`}</TooltipContent>
+                    <TooltipTrigger>
+                      <Typography color='secondary'>
                         {`${abbreviateWalletAddress(walletAlias)}@${mailDomain}`}
                       </Typography>
-                    </span>
+                    </TooltipTrigger>
                   </Tooltip>
                 </div>
               </ENSAliasEmails>
-              <IconButton
-                color='secondary'
-                icon={Icon.ExternalLink}
-                onClick={() => viewOnENS(ensAlias)}
-                tooltip='View on ENS'
-              />
+              <div>
+                <IconButton
+                  icon={Icon.ExternalLink}
+                  onClick={() => viewOnENS(ensAlias)}
+                  tooltip='View on ENS'
+                  type={Type.SECONDARY}
+                />
+              </div>
             </ENSAliasRow>
           );
         })}

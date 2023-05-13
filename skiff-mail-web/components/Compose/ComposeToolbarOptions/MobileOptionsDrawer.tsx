@@ -1,29 +1,26 @@
-import { Icon, Icons, DropdownItem, DropdownItemProps, Drawer } from 'nightwatch-ui';
-import { isMobile } from 'react-device-detect';
+import { Icon, DropdownItem, DropdownItemColor, DropdownItemComponent, Drawer } from 'nightwatch-ui';
 import { useDispatch } from 'react-redux';
-import { useTheme, DrawerOption, DrawerOptions } from 'skiff-front-utils';
+import { DrawerOption, DrawerOptions } from 'skiff-front-utils';
 
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
 import { skemailMobileDrawerReducer } from '../../../redux/reducers/mobileDrawerReducer';
 
-interface MoreBottomBarOption {
+export interface MoreBottomBarOption {
   icon: Icon;
-  size: string;
   tooltip: string;
-  onClick?: () => void;
+  onClick?: () => Promise<void> | void;
   active?: boolean;
   disabled?: boolean;
+  color?: DropdownItemColor;
 }
 interface MobileOptionsDrawerProps {
-  moreBottomBarOptions: { [key: string]: MoreBottomBarOption };
+  moreBottomBarOptions: Record<string, MoreBottomBarOption>;
 }
 
 // More options drawer for mobile
 export default function MobileOptionsDrawer({ moreBottomBarOptions }: MobileOptionsDrawerProps) {
   const dispatch = useDispatch();
   const showMoreOptions = useAppSelector((state) => state.mobileDrawer.showComposeMoreOptionsDrawer);
-  const { theme: currentTheme } = useTheme();
-  const theme = isMobile ? currentTheme : 'dark';
 
   const hideDrawer = () => {
     dispatch(skemailMobileDrawerReducer.actions.setShowComposeMoreOptionsDrawer(false));
@@ -37,15 +34,10 @@ export default function MobileOptionsDrawer({ moreBottomBarOptions }: MobileOpti
             if (option.disabled) return null;
             return (
               <DrawerOption key={option.tooltip} onClick={option.onClick}>
-                <DropdownItem
-                  active={option.active}
-                  icon={<Icons icon={option.icon} themeMode={theme} />}
-                  label={option.tooltip}
-                  themeMode={theme}
-                />
+                <DropdownItem active={option.active} color={option?.color} icon={option.icon} label={option.tooltip} />
               </DrawerOption>
             );
-          }) as React.ReactElement<DropdownItemProps> | React.ReactElement<DropdownItemProps>[]
+          }) as DropdownItemComponent | DropdownItemComponent[]
         }
       </DrawerOptions>
     </Drawer>

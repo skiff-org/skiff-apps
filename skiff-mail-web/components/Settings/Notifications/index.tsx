@@ -1,10 +1,25 @@
 import { Icon } from 'nightwatch-ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Setting, SETTINGS_LABELS, SettingType, SettingValue, useToast } from 'skiff-front-utils';
+import { isBrowser } from 'react-device-detect';
+import {
+  GetUserTagsDocument,
+  useSetNotificationPreferencesMutation,
+  useBrowserPushNotificationsEnabledQuery,
+  useUnsubscribeNotificationMutation
+} from 'skiff-front-graphql';
+import {
+  Setting,
+  SETTINGS_LABELS,
+  SettingType,
+  SettingValue,
+  useToast,
+  useRequiredCurrentUserData,
+  useEnableMailPushNotifications
+} from 'skiff-front-utils';
 import { UserFeature } from 'skiff-graphql';
-import { GetUserTagsDocument, useSetNotificationPreferencesMutation } from 'skiff-mail-graphql';
+import { insertIf } from 'skiff-utils';
 
-import { useRequiredCurrentUserData } from '../../../apollo/currentUser';
+import client from '../../../apollo/client';
 import { useFeatureTag } from '../../../hooks/useUserTags';
 
 export const useNotificationsSettings: () => Setting[] = () => {
@@ -12,10 +27,6 @@ export const useNotificationsSettings: () => Setting[] = () => {
   const { value: emailDisabled, loading: emailPrefLoading } = useFeatureTag(
     userID,
     UserFeature.EmailNotificationDisabled
-  );
-  const { value: inAppDisabled, loading: inAppPrefLoading } = useFeatureTag(
-    userID,
-    UserFeature.InAppNotificationDisabled
   );
 
   const { enqueueToast } = useToast();
@@ -25,12 +36,18 @@ export const useNotificationsSettings: () => Setting[] = () => {
     if (!error) return;
 
     enqueueToast({
-      body: 'Request failed, please try again.',
-      icon: Icon.Warning
+      title: 'Could not update settings',
+      body: 'Failed to change notification preference. Try again.'
     });
   }, [enqueueToast, error]);
 
   const [setNotificationPreferences] = useSetNotificationPreferencesMutation({ onError: () => setError(true) });
+
+  // web push
+  const { enableNotifications } = useEnableMailPushNotifications({ client: client });
+  const [unsubUser] = useUnsubscribeNotificationMutation();
+  const { data: browserPushData, loading: browserPushLoading, refetch } = useBrowserPushNotificationsEnabledQuery();
+  const browserPushEnabled = browserPushData?.browserPushNotificationsEnabled ?? false;
 
   const updateNotificationPreferences = useCallback(
     (preferences: { inApp: boolean; email: boolean }) =>
@@ -42,42 +59,42 @@ export const useNotificationsSettings: () => Setting[] = () => {
   );
 
   const emailNotificationsEnabled = !emailDisabled;
-  const inAppNotificationEnabled = !inAppDisabled;
 
   const settings = useMemo<Setting[]>(
     () => [
-      {
+      ...insertIf<Setting>(isBrowser, {
         type: SettingType.Toggle,
-        value: SettingValue.InAppNotifications,
-        label: SETTINGS_LABELS[SettingValue.InAppNotifications],
-        description: 'Enable/disable push notifications in-app.',
-        icon: Icon.Bell,
-        color: 'dark-blue',
-        checked: inAppNotificationEnabled,
-        onChange: () =>
-          updateNotificationPreferences({ inApp: !inAppNotificationEnabled, email: emailNotificationsEnabled }),
-        loading: inAppPrefLoading
-      },
+        value: SettingValue.BrowserNotifications,
+        label: 'Browser notifications',
+        icon: Icon.NotificationBadge,
+        color: 'pink',
+        checked: browserPushEnabled,
+        onChange: () => {
+          const runChange = async () => {
+            if (browserPushEnabled) {
+              console.log('Unsubscribing notifications');
+              await unsubUser();
+            } else {
+              console.log('Enabling notifications');
+              await enableNotifications();
+            }
+            await refetch();
+          };
+          void runChange();
+        }
+      }),
       {
         type: SettingType.Toggle,
         value: SettingValue.EmailNotifications,
         label: SETTINGS_LABELS[SettingValue.EmailNotifications],
-        description: 'Enable/disable notifications sent via email.',
         icon: Icon.EnvelopeUnread,
         color: 'yellow',
         checked: emailNotificationsEnabled,
-        onChange: () =>
-          updateNotificationPreferences({ inApp: inAppNotificationEnabled, email: !emailNotificationsEnabled }),
+        onChange: () => void updateNotificationPreferences({ inApp: true, email: !emailNotificationsEnabled }),
         loading: emailPrefLoading
       }
     ],
-    [
-      emailNotificationsEnabled,
-      emailPrefLoading,
-      inAppNotificationEnabled,
-      inAppPrefLoading,
-      updateNotificationPreferences
-    ]
+    [emailNotificationsEnabled, emailPrefLoading, browserPushLoading, updateNotificationPreferences, browserPushEnabled]
   );
   return settings;
 };

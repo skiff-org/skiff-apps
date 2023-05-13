@@ -16,7 +16,11 @@ export { BulletList, Document, Heading, ListItem, OrderedList, Paragraph, Text, 
 
 export const buildEditorNodes = (options?: EditorExtensionsOptions) => [
   Document,
-  Paragraph,
+  Paragraph.configure({
+    HTMLAttributes: {
+      style: 'padding: 0px; margin: 0px; min-height: 1em;'
+    }
+  }),
   Text,
   Heading,
   BulletList,

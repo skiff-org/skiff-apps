@@ -1,191 +1,84 @@
-import { ApolloError } from '@apollo/client';
-import { Avatar, Button, Typography } from 'nightwatch-ui';
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch } from 'react-redux';
-import { NewEmailAliasInput, TitleActionSection, useTheme, ConfirmModal } from 'skiff-front-utils';
-import { useCreateEmailAliasMutation } from 'skiff-mail-graphql';
-import { isPaywallErrorCode, PaywallErrorCode } from 'skiff-utils';
-import styled from 'styled-components';
+import { useGetCurrentUserCustomDomainsQuery } from 'skiff-front-graphql';
+import {
+  EmailAliases,
+  useRequiredCurrentUserData,
+  useCreateAlias,
+  useAllowAddCustomDomainAliases,
+  useDeleteEmailAlias,
+  SettingValue
+} from 'skiff-front-utils';
+import { CustomDomainStatus, PaywallErrorCode } from 'skiff-utils';
 
 import { skemailModalReducer } from '../../../../redux/reducers/modalReducer';
 import { ModalType } from '../../../../redux/reducers/modalTypes';
-import { updateEmailAliases } from '../../../../utils/cache/cache';
-import AliasOptions from '../AliasOptions/AliasOptions';
-
-const EmailAliasesContainer = styled.div`
-  display: flex;
-  width: 100%;
-  gap: 16px;
-  flex-direction: column;
-  margin-top: 12px;
-`;
-
-const EmailAliasRow = styled.div`
-  display: flex;
-  height: 20%;
-  width: 100%;
-  justify-content: space-between;
-`;
-
-const EmailAliasUsername = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
-const AddAliasContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  gap: 12px;
-`;
+import { resolveAndSetENSDisplayName } from '../../../../utils/userUtils';
+import { useSettings } from '../../useSettings';
 
 interface AddEmailAliasProps {
   emailAliases: string[];
-  userID: string;
   hcaptchaElement: JSX.Element;
   requestHcaptchaToken: () => Promise<string>;
+  includeDeleteOption: boolean;
 }
 
 /**
  * Component for rendering the interface to add email aliases.
  */
-export const AddEmailAlias = ({ emailAliases, userID, hcaptchaElement, requestHcaptchaToken }: AddEmailAliasProps) => {
-  const [isAddingAlias, setIsAddingAlias] = useState(false);
-  const [newAlias, setNewAlias] = useState('');
-  const [preSubmitError, setPreSubmitError] = useState('');
-  const [postSubmitError, setPostSubmitError] = useState('');
-  const [didSubmit, setDidSubmit] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+export const AddEmailAlias = ({
+  emailAliases,
+  hcaptchaElement,
+  requestHcaptchaToken,
+  includeDeleteOption
+}: AddEmailAliasProps) => {
+  /** Custom hooks */
+  const deleteEmailAlias = useDeleteEmailAlias(requestHcaptchaToken);
+  const { addCustomDomainAlias, addEmailAlias, isLoading: isCreatingAlias } = useCreateAlias();
+  const { querySearchParams } = useSettings();
 
-  const [createEmailAlias, { loading }] = useCreateEmailAliasMutation();
+  // Only admins can add custom domain aliases
+  const allowAddCustomDomainAliases = useAllowAddCustomDomainAliases();
+  const user = useRequiredCurrentUserData();
 
-  const { theme } = useTheme();
+  /** Redux */
   const dispatch = useDispatch();
+  const openPaywallModal = (paywallErrorCode: PaywallErrorCode) =>
+    dispatch(
+      skemailModalReducer.actions.setOpenModal({
+        type: ModalType.Paywall,
+        paywallErrorCode
+      })
+    );
 
-  const clearErrors = () => {
-    setPreSubmitError('');
-    setPostSubmitError('');
+  /** Graphql */
+  const { data: customDomainData } = useGetCurrentUserCustomDomainsQuery();
+  const customDomains =
+    customDomainData?.getCurrentUserCustomDomains.domains
+      .filter((domain) => domain.verificationStatus === CustomDomainStatus.VERIFIED)
+      .map(({ domain }) => domain) ?? [];
+
+  const createEmailAlias = async (newAlias: string, customDomain?: string) => {
+    if (customDomain) await addCustomDomainAlias(newAlias, customDomain);
+    else await addEmailAlias(newAlias);
   };
 
-  const cancel = () => {
-    setIsAddingAlias(false);
-    setNewAlias('');
-    clearErrors();
-  };
-
-  const startAddAlias = () => {
-    setIsAddingAlias(true);
-  };
-
-  const addAlias = async () => {
-    setShowConfirmModal(false);
-
-    try {
-      await createEmailAlias({
-        variables: {
-          request: {
-            emailAlias: newAlias
-          }
-        },
-        update: (cache, response) => {
-          const updatedEmailAliases = response.data?.createEmailAlias?.emailAliases;
-          if (!response.errors && updatedEmailAliases) {
-            updateEmailAliases(cache, userID, updatedEmailAliases);
-          }
-        }
-      });
-      setNewAlias('');
-      setIsAddingAlias(false);
-      // Clear any previous errors
-      clearErrors();
-      setDidSubmit(false);
-    } catch (e: unknown) {
-      // Typescript won't allow us to annotate `e` as ApolloError above, so
-      // we cast it below
-      const code = (e as ApolloError)?.graphQLErrors?.[0].extensions.code as PaywallErrorCode;
-      if (isPaywallErrorCode(code)) {
-        dispatch(
-          skemailModalReducer.actions.setOpenModal({
-            type: ModalType.Paywall,
-            paywallErrorCode: code
-          })
-        );
-      } else {
-        setPostSubmitError((e as ApolloError).message);
-      }
-    }
-  };
-
-  const handleAddAliasClick = () => {
-    setDidSubmit(true);
-
-    if (preSubmitError || postSubmitError) {
-      if (preSubmitError) setPostSubmitError(preSubmitError);
-      return;
-    }
-
-    setShowConfirmModal(true);
-  };
+  const onSetDefaultAlias = (newValue: string) => void resolveAndSetENSDisplayName(newValue, user);
 
   return (
-    <>
-      <TitleActionSection
-        actions={[
-          {
-            onClick: isAddingAlias ? cancel : startAddAlias,
-            label: isAddingAlias ? 'Cancel' : 'Add alias',
-            type: 'button'
-          }
-        ]}
-        subtitle='Create additonal addresses for sending and receiving mail.'
-        title='Email aliases'
-      />
-      {isAddingAlias && (
-        <AddAliasContainer>
-          <NewEmailAliasInput
-            didSubmit={didSubmit}
-            helperText='You can use letters, numbers, and periods.'
-            newAlias={newAlias}
-            onEnter={() => void handleAddAliasClick}
-            postSubmitError={postSubmitError}
-            preSubmitError={preSubmitError}
-            setAlias={setNewAlias}
-            setDidSubmit={setDidSubmit}
-            setPostSubmitError={setPostSubmitError}
-            setPreSubmitError={setPreSubmitError}
-            theme={theme}
-            username={newAlias}
-          />
-          <Button disabled={loading} onClick={handleAddAliasClick}>
-            Add
-          </Button>
-        </AddAliasContainer>
-      )}
-      {!!emailAliases.length && (
-        <EmailAliasesContainer>
-          {emailAliases.map((alias) => (
-            <EmailAliasRow key={alias}>
-              <EmailAliasUsername>
-                <Avatar label={alias} />
-                <Typography type='paragraph'>{alias}</Typography>
-              </EmailAliasUsername>
-              <AliasOptions emailAlias={alias} requestHcaptchaToken={requestHcaptchaToken} userID={userID} />
-            </EmailAliasRow>
-          ))}
-        </EmailAliasesContainer>
-      )}
-      <ConfirmModal
-        confirmName='Add alias'
-        description='You will be able to send and receive mail at this alias.'
-        onClose={() => setShowConfirmModal(false)}
-        onConfirm={addAlias}
-        open={showConfirmModal}
-        title={`Add ${newAlias}@skiff.com`}
-      />
-      {/* Captcha for deleting aliases */}
-      {hcaptchaElement}
-    </>
+    <EmailAliases
+      createEmailAlias={createEmailAlias}
+      deleteEmailAlias={deleteEmailAlias}
+      hcaptchaElement={hcaptchaElement}
+      includeDeleteOption={includeDeleteOption}
+      isAddingAlias={isCreatingAlias}
+      onSetDefaultAlias={onSetDefaultAlias}
+      openAddAlias={querySearchParams.setting === SettingValue.AddEmailAlias}
+      openPaywallModal={openPaywallModal}
+      userCustomDomains={allowAddCustomDomainAliases ? customDomains : undefined}
+      userEmailAliases={emailAliases}
+      userID={user.userID}
+    />
   );
 };
 

@@ -1,8 +1,11 @@
 import Bold from '@tiptap/extension-bold';
 import Code from '@tiptap/extension-code';
 import Italic from '@tiptap/extension-italic';
+import TextStyle from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
+import { ThemeMode } from 'nightwatch-ui';
 
+import { TextColor, HighlightColor } from '../Color';
 import { Link } from '../Link';
 import { Strike } from '../Strike';
 
@@ -16,5 +19,8 @@ export const buildEditorMarks = (options?: EditorExtensionsOptions) => [
   Italic,
   Strike,
   Underline,
-  Link.configure({ theme: options?.theme || 'light' })
+  TextStyle,
+  HighlightColor,
+  TextColor,
+  Link.configure({ theme: options?.theme || ThemeMode.LIGHT })
 ];

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { remove } from 'lodash';
-import { DraftInfo } from 'skiff-mail-graphql';
+import remove from 'lodash/remove';
+import { DraftInfo } from 'skiff-front-graphql';
 
 export interface SkemailDraftsReducerState {
   drafts: Array<DraftInfo>;

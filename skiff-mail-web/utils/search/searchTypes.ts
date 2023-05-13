@@ -1,25 +1,21 @@
 import { Icon } from 'nightwatch-ui';
-import { IndexedSkemail } from 'skiff-front-search';
-
-import { SearchModifierType } from './searchModifiers';
 
 // The different types of items that will be rendered in each row of the search results body
 export enum SearchItemType {
   SKEMAIL_RESULT,
   LABEL_RESULT,
   USER_RESULT,
-
   QUICK_ACTION,
-  HEADER,
-  MODIFIERS
+  HEADER
 }
 
 interface SearchItemBase {
   type: SearchItemType;
 }
 
-export interface SkemailSearchResult extends SearchItemBase, IndexedSkemail {
+export interface SkemailSearchResult extends SearchItemBase {
   type: SearchItemType.SKEMAIL_RESULT;
+  id: string;
 }
 
 export interface SearchSectionHeader extends SearchItemBase {
@@ -40,21 +36,9 @@ export interface LabelSearchResult extends SearchItemBase {
   color?: string;
 }
 
-// this is for the search results under 'Narrow search'
-export interface ModifierSearchResult extends SearchItemBase {
-  type: SearchItemType.MODIFIERS;
-  modifier: SearchModifierType;
-  value: string;
-}
-
 // Use this type in functions/components related to search. it's up to the function/component to
 // check what the actual type of the returned SearchResult and use it accordingly
-export type SearchResult =
-  | SkemailSearchResult
-  | SearchSectionHeader
-  | UserSearchResult
-  | LabelSearchResult
-  | ModifierSearchResult;
+export type SearchResult = SkemailSearchResult | SearchSectionHeader | UserSearchResult | LabelSearchResult;
 
 export interface SkemailResultIDs {
   threadID: string;

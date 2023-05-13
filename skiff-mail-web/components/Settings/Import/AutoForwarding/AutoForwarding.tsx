@@ -1,78 +1,11 @@
-import { LayoutGroup, motion } from 'framer-motion';
-import { Typography } from 'nightwatch-ui';
-import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Tabs, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { TitleActionSection } from 'skiff-front-utils';
 import styled from 'styled-components';
 
 import { MailType, MAIL_FORWARDING_CONFIGS } from './AutoForwarding.constants';
-
-const Container = styled(motion.ul)`
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  background: var(--bg-field-default);
-  border-radius: 12px;
-  height: 32px;
-  padding: 0 5px;
-`;
-const Slider = styled(motion.div)`
-  background: var(--bg-l3-solid);
-  box-shadow: var(--shadow-l1);
-  position: absolute;
-  height: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 8px;
-  top: -4px;
-  left: 0;
-  right: 0;
-  z-index: -1;
-`;
-
-const SliderContainer = styled.div`
-  width: 175px;
-`;
-
-const Item = styled(motion.li)`
-  position: relative;
-  width: 100%;
-  cursor: pointer;
-  isolation: isolate;
-`;
-
-interface MailAppTabProps {
-  value: MailType;
-  setValue: (app: MailType) => void;
-}
-const MailAppTab = (props: MailAppTabProps) => {
-  const { value, setValue } = props;
-  const [isLoaded, setIsLoaded] = useState(false);
-  useEffect(() => {
-    // Important: this cancels the initial dropdown on the first load of the component.
-    setTimeout(() => {
-      setIsLoaded(true);
-    });
-  });
-  return (
-    <Container>
-      {Object.values(MailType).map((item) => (
-        <Item key={item} onClick={() => setValue(item)}>
-          <LayoutGroup>
-            <Typography align='center' color={item === value ? 'primary' : 'disabled'} level={3} noSelect type='label'>
-              {item}
-            </Typography>
-            {item === value && <Slider layout={isLoaded ? 'position' : 'size'} layoutId='slider' />}
-          </LayoutGroup>
-        </Item>
-      ))}
-    </Container>
-  );
-};
 
 // Styling to match typography component in the list
 const Number = styled.div`
@@ -121,14 +54,14 @@ export const AutoForwarding: React.FC = () => {
          */}
         <InstructionList>
           {instructions.map((instruction, index) => (
-            <InstructionItem key={instruction?.toString() || 'instr'}>
+            <InstructionItem key={instruction.key}>
               <Number>
-                <Typography color='secondary' level={3} type='label'>
+                <Typography color='secondary' size={TypographySize.SMALL} weight={TypographyWeight.MEDIUM}>
                   {index + 1}
                 </Typography>
               </Number>
-              <Typography color='secondary' type='paragraph' wrap>
-                {instruction}
+              <Typography color='secondary' wrap>
+                {instruction.value}
               </Typography>
             </InstructionItem>
           ))}
@@ -137,22 +70,25 @@ export const AutoForwarding: React.FC = () => {
     );
   };
 
-  const mailSlider = (
-    <SliderContainer>
-      <MailAppTab setValue={setValue} value={value} />
-    </SliderContainer>
-  );
-
   return (
     <>
       <TitleActionSection
         actions={[
           {
-            content: mailSlider,
+            content: (
+              <Tabs
+                fullWidth={isMobile}
+                tabs={Object.values(MailType).map((type) => ({
+                  label: type,
+                  active: value === type,
+                  onClick: () => setValue(type)
+                }))}
+              />
+            ),
             type: 'custom'
           }
         ]}
-        subtitle='Have emails sent to your old email address automatically forward to your Skiff address.'
+        subtitle='Have emails sent to your old email address automatically forward to your Skiff address'
         title='Auto-forwarding'
       />
       {renderInstructions(value)}

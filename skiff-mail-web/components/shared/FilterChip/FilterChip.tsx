@@ -1,4 +1,4 @@
-import { Chip, Icons, IconProps } from 'nightwatch-ui';
+import { Chip, Icons, IconProps, Size, ThemeMode, TypographyWeight } from 'nightwatch-ui';
 import React from 'react';
 import { formatEmailAddress, getAddressTooltipLabel, UserAvatar } from 'skiff-front-utils';
 import { AddressObject, UserLabel } from 'skiff-graphql';
@@ -39,10 +39,24 @@ const FilterChip: React.FC<FilterChipProps> = ({
   const displayPictureData = useDisplayPictureDataFromAddress(filterValue as AddressObject);
   const getStartIcon = () => {
     if (isAddressFilter) {
-      return <UserAvatar displayPictureData={displayPictureData} label={subject} size='xsmall' themeMode='dark' />;
+      return (
+        <UserAvatar
+          displayPictureData={displayPictureData}
+          forceTheme={ThemeMode.DARK}
+          label={subject}
+          size={Size.X_SMALL}
+        />
+      );
     } else {
       const { icon, color } = getIconFromFilter(filter, userLabels);
-      return <Icons color={(color as IconProps['color']) ?? 'white'} icon={icon} size='small' themeMode='dark' />;
+      return (
+        <Icons
+          color={(color as IconProps['color']) ?? 'white'}
+          forceTheme={ThemeMode.DARK}
+          icon={icon}
+          size={Size.SMALL}
+        />
+      );
     }
   };
   const emailAddress = formatLabel ? formatEmailAddress(subject) : subject;
@@ -65,15 +79,15 @@ const FilterChip: React.FC<FilterChipProps> = ({
   return (
     <Chip
       color='white'
+      forceTheme={ThemeMode.DARK}
       key={subject}
       label={getChipLabel()}
       noBorder={noBorder}
       onDelete={onDelete}
-      size='small'
+      size={Size.SMALL}
       startIcon={getStartIcon()}
-      themeMode='dark'
       tooltip={isAddressFilter && formatLabel ? getAddressTooltipLabel(subject) : undefined}
-      typographyType='label'
+      typographyWeight={TypographyWeight.MEDIUM}
     />
   );
 };

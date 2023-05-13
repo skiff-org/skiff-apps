@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
-import { formatEmailAddress, formatName } from 'skiff-front-utils';
-import { models } from 'skiff-mail-graphql';
+import { models } from 'skiff-front-graphql';
+import { formatEmailAddress, formatName, useDefaultEmailAlias } from 'skiff-front-utils';
 
-import { useDefaultEmailAlias } from './useDefaultEmailAlias';
-
-export const useUsernameFromUser = (user: Pick<models.User, 'username'>) => {
-  const [defaultEmailAlias] = useDefaultEmailAlias();
+export const useUsernameFromUser = (user: Pick<models.User, 'userID' | 'username'>) => {
+  const [defaultEmailAlias] = useDefaultEmailAlias(user.userID);
   const [email, setEmail] = useState('');
 
   useEffect(() => {

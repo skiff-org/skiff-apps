@@ -109,7 +109,7 @@ export default Blockquote.extend({
        * affects only mail quotes
        */
       isOpen: {
-        default: true
+        default: false
       }
     };
   },

@@ -1,16 +1,5 @@
-import { getStorageKey, StorageTypes } from 'skiff-front-utils';
-
-export enum NotificationBannerState {
-  Shown = 'Shown', // Notification banner has been shown
-  Never = 'NeverShowAgain', // Never show again
-  Remind = 'Remind' // Remind on reload
-}
-
-export enum NotificationPermissions {
-  DEFAULT = 'default',
-  GRANTED = 'granted',
-  DENIED = 'denied'
-}
+import { NotificationBannerState, NotificationPermissions } from 'skiff-front-utils';
+import { getStorageKey, StorageTypes } from 'skiff-utils';
 
 export const shouldShowBanner = (notificationPermission: NotificationPermission, userID: string) => {
   const state = localStorage.getItem(`${getStorageKey(StorageTypes.NOTIFICATION_BANNER_KEY)}:${userID}`);

@@ -22,11 +22,19 @@ export const setEditor = (editor: Editor, content: Content, jumpToStart = false)
 /**
  * check if the toggle link command should be enabled
  */
-export const isLinkEnabled = (editor: Editor) => editor && isSelectionNotEmpty(editor) && !editor?.isActive('link');
+export const isLinkEnabled = (editor: Editor): boolean =>
+  editor && isSelectionNotEmpty(editor) && !editor?.isActive('link');
 
 /**
  * toggle a link around the current selection
  */
 export const toggleLink = (editor: Editor) => {
   editor?.commands.toggleLinkCreatePopup();
+};
+
+/**
+ * toggle color popup
+ */
+export const toggleColor = (editor: Editor) => {
+  editor?.commands.toggleColorPopup();
 };

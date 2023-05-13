@@ -1,18 +1,20 @@
 import { FieldReadFunction, TypePolicy } from '@apollo/client';
 import { decryptDatagram, decryptSessionKey } from 'skiff-crypto-v2';
-import { memoizeFieldReadFunction } from 'skiff-front-utils';
-import { Email } from 'skiff-graphql';
 import {
   AttachmentMetadataDatagram,
   MailHtmlDatagram,
   MailSubjectDatagram,
   MailTextAsHTMLDatagram,
   MailTextDatagram
-} from 'skiff-mail-graphql';
+} from 'skiff-front-graphql';
+import { memoizeFieldReadFunction, requireCurrentUserData } from 'skiff-front-utils';
+import { Email } from 'skiff-graphql';
 import { assertExists } from 'skiff-utils';
 
-import { requireCurrentUserData } from '../currentUser';
 import { parseAsMemoizedDate } from '../date';
+
+const DECRYPT_FAILURE_SUBJECT = '[ERROR] Failed to Decrypt Email';
+const DECRYPT_FAILURE_TEXT = 'This email failed to decrypt properly. Please contact support.';
 
 // Type policy to decrypt an encrypted session field using the user's local private key. Used to decrypt other encrypted fields on the email.
 const readDecryptedSessionKey: FieldReadFunction<Email['decryptedSessionKey']> = memoizeFieldReadFunction(
@@ -24,18 +26,19 @@ const readDecryptedSessionKey: FieldReadFunction<Email['decryptedSessionKey']> =
     return { id, privateKey: currentUser.privateUserData.privateKey, encryptedSessionKey };
   },
   ({ id, privateKey, encryptedSessionKey }) => {
-    assertExists(privateKey, 'Must provide a private key to decrypt the session key');
-    assertExists(encryptedSessionKey, 'Must provide an encrypted session key to decrypt the session key');
     try {
+      assertExists(privateKey, 'Must provide a private key to decrypt the session key');
+      assertExists(encryptedSessionKey, 'Must provide an encrypted session key to decrypt the session key');
       return decryptSessionKey(encryptedSessionKey?.encryptedSessionKey, privateKey, encryptedSessionKey?.encryptedBy);
     } catch (e) {
-      console.error(`readDecryptedSessionKey: failed to decrypt session key for email ${id}`, e);
+      console.error(`readDecryptedSessionKey: failed to decrypt session key for email`, { id, e });
       return null;
     }
   }
 );
 
 // These type policies use the decrypted session key to decrypt the encrypted fields on the email.
+// TODO(easdar) move to a generic function and template.
 const readDecryptedSubject: FieldReadFunction<Email['decryptedSessionKey']> = memoizeFieldReadFunction(
   (_, options) => {
     const sessionKey = options.readField<Email['decryptedSessionKey']>('decryptedSessionKey');
@@ -44,13 +47,13 @@ const readDecryptedSubject: FieldReadFunction<Email['decryptedSessionKey']> = me
     return { sessionKey, encryptedSubject, id };
   },
   ({ sessionKey, encryptedSubject, id }) => {
-    assertExists(sessionKey, 'Must provide sessionKey to decrypt the subject');
-    assertExists(encryptedSubject, 'Must provide encryptedSubject');
     try {
+      assertExists(sessionKey, 'Must provide sessionKey to decrypt the subject');
+      assertExists(encryptedSubject, 'Must provide encryptedSubject');
       return decryptDatagram(MailSubjectDatagram, sessionKey, encryptedSubject.encryptedData).body.subject;
     } catch (e) {
-      console.error(`readDecryptedSubject: failed to decrypt subject for email ${id}`, e);
-      return null;
+      console.error(`readDecryptedSubject: failed to decrypt subject for email`, { id, e });
+      return DECRYPT_FAILURE_SUBJECT;
     }
   }
 );
@@ -64,13 +67,13 @@ const readDecryptedText: FieldReadFunction<Email['decryptedSessionKey']> = memoi
     return { sessionKey, encryptedText, id };
   },
   ({ sessionKey, encryptedText, id }) => {
-    assertExists(sessionKey, 'Must provide sessionKey to decrypt the text');
-    assertExists(encryptedText, 'Must provide encryptedText');
     try {
+      assertExists(sessionKey, 'Must provide sessionKey to decrypt the text');
+      assertExists(encryptedText, 'Must provide encryptedText');
       return decryptDatagram(MailTextDatagram, sessionKey, encryptedText.encryptedData).body.text;
     } catch (e) {
-      console.error(`readDecryptedText: failed to decrypt text for email ${id}`, e);
-      return null;
+      console.error(`readDecryptedText: failed to decrypt text for email`, { id, e });
+      return DECRYPT_FAILURE_TEXT;
     }
   }
 );
@@ -84,12 +87,12 @@ const readDecryptedHtml: FieldReadFunction<Email['decryptedSessionKey']> = memoi
     return { sessionKey, encryptedHtml, id };
   },
   ({ sessionKey, encryptedHtml, id }) => {
-    assertExists(sessionKey, 'Must provide sessionKey to decrypt the html');
-    assertExists(encryptedHtml, 'Must provide encryptedHtml');
     try {
+      assertExists(sessionKey, 'Must provide sessionKey to decrypt the html');
+      assertExists(encryptedHtml, 'Must provide encryptedHtml');
       return decryptDatagram(MailHtmlDatagram, sessionKey, encryptedHtml.encryptedData).body.html;
     } catch (e) {
-      console.error(`readDecryptedHtml: failed to decrypt html for email ${id}`, e);
+      console.error(`readDecryptedHtml: failed to decrypt html for email`, { id, e });
       return null;
     }
   }
@@ -104,12 +107,34 @@ const readDecryptedTextAsHtml: FieldReadFunction<Email['decryptedSessionKey']> =
     return { sessionKey, encryptedTextAsHtml, id };
   },
   ({ sessionKey, encryptedTextAsHtml, id }) => {
-    assertExists(sessionKey, 'Must provide sessionKey to decrypt the text as html');
-    assertExists(encryptedTextAsHtml, 'Must provide encryptedTextAsHtml');
     try {
+      assertExists(sessionKey, 'Must provide sessionKey to decrypt the text as html');
+      assertExists(encryptedTextAsHtml, 'Must provide encryptedTextAsHtml');
       return decryptDatagram(MailTextAsHTMLDatagram, sessionKey, encryptedTextAsHtml.encryptedData).body.textAsHTML;
     } catch (e) {
-      console.error(`readDecryptedTextAsHtml: failed to decrypt textAsHtml for email ${id}`, e);
+      console.error(`readDecryptedTextAsHtml: failed to decrypt textAsHtml for email`, { id, e });
+      return null;
+    }
+  }
+);
+
+const readDecryptedTextSnippet: FieldReadFunction<Email['decryptedSessionKey']> = memoizeFieldReadFunction(
+  (_, options) => {
+    const sessionKey = options.readField<Email['decryptedSessionKey']>('decryptedSessionKey');
+    const encryptedTextSnippet = options.readField<Email['encryptedTextSnippet']>('encryptedTextSnippet');
+    const id = options.readField<Email['id']>('id');
+
+    return { sessionKey, encryptedTextSnippet, id };
+  },
+  ({ sessionKey, encryptedTextSnippet, id }) => {
+    try {
+      assertExists(sessionKey, 'Must provide sessionKey to decrypt the text as html');
+      if (encryptedTextSnippet) {
+        return decryptDatagram(MailTextDatagram, sessionKey, encryptedTextSnippet.encryptedData).body.text;
+      }
+      return null;
+    } catch (e) {
+      console.error(`readDecryptedTextSnippet: failed to decrypt textAsHtml for email`, { id, e });
       return null;
     }
   }
@@ -125,30 +150,35 @@ const readDecryptedAttachmentMetadata: FieldReadFunction<Email['decryptedAttachm
       return { sessionKey, attachmentMetadata, id };
     },
     ({ sessionKey, attachmentMetadata, id }) => {
-      assertExists(sessionKey, 'Must provide sessionKey to decrypt attachment metadata');
-      assertExists(attachmentMetadata, 'Must provide attachmentMetadata');
-      const decryptedAttachments = attachmentMetadata.map((attachment) => {
-        try {
-          return {
-            attachmentID: attachment.attachmentID,
-            decryptedMetadata: decryptDatagram(
-              AttachmentMetadataDatagram,
-              sessionKey,
-              attachment.encryptedData.encryptedData
-            ).body
-          };
-        } catch (e) {
-          console.error(
-            `readDecryptedAttachmentMetadata: failed to decrypt attachment ${attachment.attachmentID} for email ${id}`,
-            e
-          );
-          return {
-            attachmentID: attachment.attachmentID,
-            decryptedMetadata: null
-          };
-        }
-      });
-      return decryptedAttachments;
+      try {
+        assertExists(sessionKey, 'Must provide sessionKey to decrypt attachment metadata');
+        assertExists(attachmentMetadata, 'Must provide attachmentMetadata');
+        const decryptedAttachments = attachmentMetadata.map((attachment) => {
+          try {
+            return {
+              attachmentID: attachment.attachmentID,
+              decryptedMetadata: decryptDatagram(
+                AttachmentMetadataDatagram,
+                sessionKey,
+                attachment.encryptedData.encryptedData
+              ).body
+            };
+          } catch (e) {
+            console.error(
+              `readDecryptedAttachmentMetadata: failed to decrypt attachment ${attachment.attachmentID} for email`,
+              { id, e }
+            );
+            return {
+              attachmentID: attachment.attachmentID,
+              decryptedMetadata: null
+            };
+          }
+        });
+        return decryptedAttachments;
+      } catch (e) {
+        console.error(`readDecryptedAttachmentMetadata: failed to decrypt attachments for email`, { id, e });
+        return null;
+      }
     }
   );
 
@@ -169,6 +199,9 @@ export const emailTypePolicy: TypePolicy = {
     decryptedTextAsHtml: {
       read: readDecryptedTextAsHtml
     },
+    decryptedTextSnippet: {
+      read: readDecryptedTextSnippet
+    },
     createdAt: {
       read: parseAsMemoizedDate
     },
@@ -176,7 +209,7 @@ export const emailTypePolicy: TypePolicy = {
       read: readDecryptedAttachmentMetadata
     },
     encryptedRawMimeUrl: {
-      read: (existing) => existing
+      read: (existing: string) => existing
     }
   }
 };

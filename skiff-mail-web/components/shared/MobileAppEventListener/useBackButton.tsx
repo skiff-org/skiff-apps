@@ -28,7 +28,7 @@ export default function useBackButton(): () => void {
     showMailboxSelectDrawer,
     showMoreThreadOptionsDrawer,
     showMoveThreadDrawer,
-    showReplayDrawer,
+    showReplyDrawer,
     showReportThreadBlockDrawer
   } = useAppSelector((state) => state.mobileDrawer);
 
@@ -55,8 +55,8 @@ export default function useBackButton(): () => void {
       );
     } else if (showMoveThreadDrawer) {
       return dispatch(skemailMobileDrawerReducer.actions.setShowMoveThreadDrawer(false));
-    } else if (showReplayDrawer) {
-      return dispatch(skemailMobileDrawerReducer.actions.setShowReplayDrawer(false));
+    } else if (showReplyDrawer) {
+      return dispatch(skemailMobileDrawerReducer.actions.setShowReplyDrawer(false));
     } else if (showReportThreadBlockDrawer) {
       return dispatch(skemailMobileDrawerReducer.actions.setShowReportThreadBlockDrawer(false));
     } else if (composeOpen) {

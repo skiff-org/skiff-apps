@@ -1,25 +1,22 @@
-import { Chip, Icon, IconButton, Icons, Tooltip, Typography } from 'nightwatch-ui';
+import { Icon, IconText, Size, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
 import React, { RefObject, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import {
-  abbreviateWalletAddress,
+  UserAvatar,
+  createAbbreviatedWalletEmail,
   getAddrDisplayName,
-  getAddressTooltipLabel,
-  getWalletIcon,
-  isWalletAddress,
-  splitEmailToAliasAndDomain,
-  UserAvatar
+  splitEmailToAliasAndDomain
 } from 'skiff-front-utils';
-import { isENSName } from 'skiff-utils';
+import { isENSName, isWalletAddress } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useDate } from '../../../hooks/useDate';
 import { useDisplayPictureDataFromAddress } from '../../../hooks/useDisplayPictureDataFromAddress';
 import { MailboxEmailInfo } from '../../../models/email';
 import { skemailMobileDrawerReducer } from '../../../redux/reducers/mobileDrawerReducer';
-import { getWalletLookUpText, openWalletLookupLink } from '../../../utils/walletUtils/walletUtils';
 
+import { useDisplayNameFromAddress } from '../../../hooks/useDisplayNameFromAddress';
 import ContactActionDropdown from './ContactActionDropdown';
 
 const SenderBlock = styled.div`
@@ -28,59 +25,51 @@ const SenderBlock = styled.div`
   gap: 16px;
 `;
 
-const AvatarBlock = styled(UserAvatar)`
+const AvatarBlock = styled.div`
   margin-top: 6px;
-`;
-
-const InlineTypography = styled(Typography)<{ isWalletAddress: boolean; renderLinkIcon: boolean }>`
-  display: inline-flex;
-  ${(props) => {
-    if (props.isWalletAddress) {
-      return `margin-right: ${props.renderLinkIcon ? '4px' : '8px'};`;
-    }
-  }};
 `;
 
 const Email = styled.div`
   margin-top: ${isMobile ? '-8px' : ''};
   padding: ${isMobile ? '11px 0px 22px 0px' : ''};
+  max-width: ${isMobile ? '212px' : ''};
+  width: fit-content;
 `;
 
-const FromAndDateContainer = styled.div<{ isWalletAddress: boolean; renderLinkIcon: boolean }>`
+const FromAndDateContainer = styled.div`
   width: 100%;
   display: flex;
-  ${(props) => {
-    if (props.isWalletAddress) {
-      return `
-        align-items: center;
-        flex-wrap: ${!props.renderLinkIcon ? 'wrap' : 'no-wrap'};
-      `;
-    }
-    return 'flex-direction: column;';
-  }}
+  flex-direction: column;
   min-width: 0;
 `;
 
 const ThreadActionButtonContainer = styled.div`
   display: flex;
-  gap: 4px;
+  gap: 16px;
   align-items: center;
 `;
 
-const HeaderDate = styled(Typography)`
-  min-width: fit-content;
-`;
-
-const NameAndDate = styled.div<{ $isWalletEmail: boolean; $renderDisplayName: boolean }>`
-  width: ${(props) => (isMobile && props.$isWalletEmail && !props.$renderDisplayName ? '90%' : '100%')};
+const NameAndDate = styled.div`
+  width: 100%;
   height: 20px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 `;
 
 const Name = styled.span`
   max-width: 68%;
+`;
+
+const Buttons = styled.div`
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  background: var(--bg-l3-solid);
+  border: 1px solid var(--border-secondary);
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
 `;
 
 interface SenderDetailsProps {
@@ -89,33 +78,34 @@ interface SenderDetailsProps {
   expanded: boolean;
   moreButtonRef: RefObject<HTMLDivElement>;
   setShowMoreOptions: (showMoreOptions: boolean) => void;
+  reply: (evt?: React.MouseEvent) => void;
 }
-
-export const SenderDetailsDataTest = {
-  externalLinkBtn: 'external-link-btn'
-};
 
 export const SenderDetails: React.FC<SenderDetailsProps> = ({
   email,
   showContacts,
   expanded,
   moreButtonRef,
-  setShowMoreOptions
+  setShowMoreOptions,
+  reply
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { from, createdAt } = email;
-  const createdAtDate = createdAt as Date;
-  const { address: fromAddress, name: fromDisplayName } = email.from;
+  const { from, createdAt, scheduleSendAt } = email;
 
+  // All mail should have a scheduleSendAt value since even regular sends are scheduled for 5 seconds after creation
+  // Fallback includes for type safety
+  const displayedDate = scheduleSendAt ?? createdAt;
+
+  const { address: fromAddress, name: fromDisplayName } = email.from;
   const [showFromContactDropdown, setShowFromContactDropdown] = useState<boolean>(false);
 
   const fromContactRef = useRef<HTMLDivElement>(null);
   const { getMonthAndDay, getTime } = useDate();
 
-  const [fromAlias] = splitEmailToAliasAndDomain(fromAddress);
-  const isWalletEmail = isWalletAddress(fromAlias) || isENSName(fromAlias);
+  const { alias: fromAlias } = splitEmailToAliasAndDomain(fromAddress);
+  const isWalletEmail = isWalletAddress(fromAlias);
   const displayPictureData = useDisplayPictureDataFromAddress(fromAddress);
-
+  const contactDisplayName = useDisplayNameFromAddress(fromAddress);
   // redux actions
   const dispatch = useDispatch();
   const setCurrentEmail = (currEmail: MailboxEmailInfo) =>
@@ -125,117 +115,88 @@ export const SenderDetails: React.FC<SenderDetailsProps> = ({
 
   const renderDateAndActionsButton = () => (
     <ThreadActionButtonContainer>
-      <HeaderDate color='tertiary' level={3}>
-        {isMobile ? getMonthAndDay(createdAtDate) : `${getMonthAndDay(createdAtDate)}, ${getTime(createdAtDate)}`}
-      </HeaderDate>
+      {!isMobile && (
+        <Typography color='disabled' minWidth='fit-content' size={TypographySize.SMALL}>
+          {`${getMonthAndDay(displayedDate)}, ${getTime(displayedDate)}`}
+        </Typography>
+      )}
       {expanded && (
-        <IconButton
-          color='secondary'
-          icon={Icon.OverflowH}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (isMobile) {
-              // set the email in the more options drawer to the current email
-              setCurrentEmail(email);
-              // open drawer
-              openShowMoreOptionsDrawer();
-            } else {
-              // open dropdown
-              setShowMoreOptions(true);
-            }
-          }}
-          ref={moreButtonRef}
-        />
+        <Buttons>
+          <IconText dataTest='mobile-reply' iconColor='secondary' onClick={reply} startIcon={Icon.Reply} />
+          <IconText
+            iconColor='secondary'
+            onClick={(e) => {
+              e?.stopPropagation();
+              if (isMobile) {
+                // set the email in the more options drawer to the current email
+                setCurrentEmail(email);
+                // open drawer
+                openShowMoreOptionsDrawer();
+              } else {
+                // open dropdown
+                setShowMoreOptions(true);
+              }
+            }}
+            ref={moreButtonRef}
+            startIcon={Icon.OverflowH}
+          />
+        </Buttons>
       )}
     </ThreadActionButtonContainer>
   );
 
   // render the address as the display name if the user has not specified a display name
   const { displayName, formattedDisplayName } = getAddrDisplayName(email.from);
+  const { alias, domain } = splitEmailToAliasAndDomain(fromAddress);
 
   const renderNameAndDate = () => {
     return (
-      <NameAndDate $isWalletEmail={isWalletEmail} $renderDisplayName={!!fromDisplayName}>
+      <NameAndDate>
         <Name ref={fromContactRef}>
-          <Tooltip direction='top' hidden={!!fromDisplayName} label={getAddressTooltipLabel(fromAddress)}>
-            <div>
-              <InlineTypography
-                color={showContacts ? 'link' : 'primary'}
-                isWalletAddress={isWalletEmail}
-                onClick={showContacts ? () => setShowFromContactDropdown((prev) => !prev) : undefined}
-                renderLinkIcon={isWalletEmail && !fromDisplayName}
-                type='label'
-              >
-                {formattedDisplayName}
-              </InlineTypography>
-            </div>
-          </Tooltip>
-          <ContactActionDropdown
-            address={from}
-            buttonRef={fromContactRef}
-            displayAddress
-            setShowActionDropdown={setShowFromContactDropdown}
-            show={showFromContactDropdown}
-          />
+          <Typography
+            color={showContacts ? 'link' : 'primary'}
+            inline
+            onClick={showContacts ? () => setShowFromContactDropdown((prev) => !prev) : undefined}
+            weight={TypographyWeight.MEDIUM}
+          >
+            {isENSName(alias) ? alias : contactDisplayName || formattedDisplayName}
+          </Typography>
         </Name>
+        <ContactActionDropdown
+          address={from}
+          buttonRef={fromContactRef}
+          setShowActionDropdown={setShowFromContactDropdown}
+          show={showFromContactDropdown}
+        />
         {renderDateAndActionsButton()}
       </NameAndDate>
     );
   };
 
   const renderAddress = () => {
-    if (isWalletEmail) {
-      const walletLookUpTooltip = getWalletLookUpText(fromAlias);
-      const openWalletLookupPage = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        openWalletLookupLink(fromAlias);
-      };
-      if (!fromDisplayName) {
-        return (
-          <IconButton
-            color='secondary'
-            dataTest={SenderDetailsDataTest.externalLinkBtn}
-            icon={Icon.ExternalLink}
-            onClick={openWalletLookupPage}
-            tooltip={walletLookUpTooltip}
-          />
-        );
-      }
-
-      const getWalletChipLabel = () => {
-        if (!fromDisplayName) return getWalletLookUpText(fromAlias);
-        return isENSName(fromAlias) ? fromAlias : `${abbreviateWalletAddress(fromAlias)}`;
-      };
-      const chipLabel = getWalletChipLabel();
-      const walletIcon = getWalletIcon(fromAlias);
-      return (
-        <Chip
-          endIcon={<Icons color='secondary' icon={Icon.ExternalLink} size='medium' />}
-          label={chipLabel}
-          onClick={openWalletLookupPage}
-          size='small'
-          startIcon={walletIcon}
-          tooltip={walletLookUpTooltip}
-        />
-      );
-    }
     if (fromDisplayName) {
       return (
         <Email>
-          <InlineTypography color='secondary' isWalletAddress={false} renderLinkIcon={false} type='paragraph'>
-            &lt;{fromAddress}&gt;
-          </InlineTypography>
+          <Typography color='secondary' inline size={isMobile ? TypographySize.SMALL : undefined}>
+            &lt;{isWalletEmail ? createAbbreviatedWalletEmail(alias, domain) : fromAddress}&gt;
+          </Typography>
         </Email>
       );
     }
   };
 
-  const [displayNameAlias] = splitEmailToAliasAndDomain(displayName);
+  const { alias: displayNameAlias } = splitEmailToAliasAndDomain(displayName);
 
   return (
     <SenderBlock>
-      <AvatarBlock displayPictureData={displayPictureData} label={displayNameAlias} size='large' />
-      <FromAndDateContainer isWalletAddress={isWalletEmail} renderLinkIcon={isWalletEmail && !fromDisplayName}>
+      <AvatarBlock>
+        <UserAvatar
+          displayPictureData={displayPictureData}
+          label={contactDisplayName || displayNameAlias}
+          size={Size.LARGE}
+        />
+      </AvatarBlock>
+      <FromAndDateContainer>
         {renderNameAndDate()}
         {renderAddress()}
       </FromAndDateContainer>

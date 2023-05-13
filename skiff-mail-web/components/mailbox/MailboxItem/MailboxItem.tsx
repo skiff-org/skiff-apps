@@ -1,21 +1,22 @@
-import { uniqBy } from 'lodash';
+import uniqBy from 'lodash/uniqBy';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import { ListChildComponentProps } from 'react-window';
+import { useCurrentUserEmailAliases } from 'skiff-front-utils';
 import { SystemLabels } from 'skiff-graphql';
 import { filterExists } from 'skiff-utils';
 
 import { NO_SUBJECT_TEXT } from '../../../constants/mailbox.constants';
 import { useRouterLabelContext } from '../../../context/RouterLabelContext';
-import { useCurrentUserEmailAliases } from '../../../hooks/useCurrentUserEmailAliases';
+import { useMarkAsReadUnread } from '../../../hooks/useMarkAsReadUnread';
+import { useUserLabelsToRenderAsChips } from '../../../hooks/useUserLabelsToRenderAsChips';
 import { MailboxEmailInfo } from '../../../models/email';
 import { MailboxThreadInfo } from '../../../models/thread';
 import { skemailDraftsReducer } from '../../../redux/reducers/draftsReducer';
 import { skemailMailboxReducer } from '../../../redux/reducers/mailboxReducer';
 import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
-import { userLabelFromGraphQL, isUserLabel } from '../../../utils/label';
-import { handleMarkAsReadUnreadClick, threadsEqual, userLabelsEqual } from '../../../utils/mailboxUtils';
+import { threadsEqual, userLabelsEqual } from '../../../utils/mailboxUtils';
 import { convertHtmlToTextContent } from '../../MailEditor/mailEditorUtils';
 import { animateMailListHeader } from '../MailboxHeader';
 import { MobileMessageCell } from '../MessageCell/MobileMessageCell';
@@ -34,16 +35,15 @@ interface MailboxItemData {
 function MailboxItem({ index, style, data }: ListChildComponentProps<MailboxItemData>) {
   const dispatch = useDispatch();
   const { value: label } = useRouterLabelContext();
+  const { markThreadsAsReadUnread } = useMarkAsReadUnread();
+  const currentUserEmailAliases = useCurrentUserEmailAliases();
+
   const isDrafts = label === SystemLabels.Drafts;
   const isSent = label === SystemLabels.Sent;
   const isScheduledSend = label === SystemLabels.ScheduleSend;
   const isOutboundFolder = isDrafts || isSent || isScheduledSend;
-  const currentUserEmailAliases = useCurrentUserEmailAliases();
-  const openDraft = (draft: MailboxEmailInfo) => dispatch(skemailModalReducer.actions.editDraftCompose(draft));
 
-  if (index === 0) {
-    return <div style={style} />;
-  }
+  const openDraft = (draft: MailboxEmailInfo) => dispatch(skemailModalReducer.actions.editDraftCompose(draft));
 
   const {
     threads,
@@ -53,8 +53,14 @@ function MailboxItem({ index, style, data }: ListChildComponentProps<MailboxItem
     setActiveThreadID
   } = data;
 
-  const thread = threads[index];
+  const thread = index === 0 ? undefined : threads[index];
+  const allUserLabels = useUserLabelsToRenderAsChips(thread?.attributes.userLabels || []);
+
+  if (index === 0) {
+    return <div style={style} />;
+  }
   if (!thread?.emails?.length) return null;
+
   const isSelected = threadIsSelected(currSelectedThreadIDs, thread.threadID);
   const firstEmail = thread.emails[0];
   const latestEmail = thread.emails[thread.emails.length - 1];
@@ -63,13 +69,14 @@ function MailboxItem({ index, style, data }: ListChildComponentProps<MailboxItem
   emailsSortedByCreatedDesc.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
   // Latest from address that isn't the sender and that is different from the first email sender of the thread
   const latestUniqueFrom = emailsSortedByCreatedDesc.find(
-    (email) => email.from.address !== firstEmail.from.address
+    (email) => email.from.address !== firstEmail?.from.address
   )?.from;
   // Latest email in thread that was sent by current user, used for display names and avatars for outbound mail items
   const outboundDisplayTos =
-    emailsSortedByCreatedDesc.find((email) => currentUserEmailAliases.includes(email.from.address))?.to ||
-    latestEmail.to;
-  const inboundDisplayFroms = [firstEmail.from, latestUniqueFrom].filter(filterExists);
+    (emailsSortedByCreatedDesc.find((email) => currentUserEmailAliases.includes(email.from.address))?.to ||
+      latestEmail?.to) ??
+    [];
+  const inboundDisplayFroms = [firstEmail?.from, latestUniqueFrom].filter(filterExists);
 
   // If the email is outbound, display up to two addresses from the TO field of the last email in the thread sent by current user
   // Else, display the latest and first FROM addresses in the thread
@@ -111,7 +118,7 @@ function MailboxItem({ index, style, data }: ListChildComponentProps<MailboxItem
   };
 
   const getMessage = () => {
-    const decryptedText = latestEmail.decryptedText;
+    const decryptedText = latestEmail?.decryptedTextSnippet;
     // Drafts are saved in local storage as HTML,
     // so we need to convert it to human readable text
     if (label === SystemLabels.Drafts) {
@@ -121,7 +128,8 @@ function MailboxItem({ index, style, data }: ListChildComponentProps<MailboxItem
     return decryptedText;
   };
 
-  const onMessageCellClick = (e) => {
+  const onMessageCellClick = (e: React.MouseEvent<Element | HTMLInputElement, MouseEvent>) => {
+    if (!latestEmail) return;
     if (isMobile) {
       // Reset In case header is hidden
       animateMailListHeader('1');
@@ -142,7 +150,8 @@ function MailboxItem({ index, style, data }: ListChildComponentProps<MailboxItem
 
   const message = getMessage();
 
-  const threadUserlabels = thread.attributes.userLabels.map(userLabelFromGraphQL).filter(isUserLabel);
+  // Do not render the user label if we are in the user label mailbox as it is redundant
+  const labelsToRender = allUserLabels?.filter((userLabel) => userLabel.value !== label);
 
   return (
     <div key={thread.threadID} style={{ ...style }}>
@@ -152,16 +161,16 @@ function MailboxItem({ index, style, data }: ListChildComponentProps<MailboxItem
           addresses={facepileAddresses}
           displayNames={displayNames}
           facepileNames={facepileNames}
-          hasAttachment={!!latestEmail.decryptedAttachmentMetadata?.length}
+          hasAttachment={!!latestEmail?.decryptedAttachmentMetadata?.length}
           key={thread.threadID}
           label={label}
           message={message}
           onClick={onMessageCellClick}
           onSelectToggle={onSelectToggle}
           selected={isSelected}
-          subject={thread.emails[0].decryptedSubject || NO_SUBJECT_TEXT}
+          subject={thread.emails[0]?.decryptedSubject || NO_SUBJECT_TEXT}
           thread={thread}
-          userLabels={threadUserlabels}
+          userLabels={labelsToRender}
         />
       )}
       {isMobile && (
@@ -172,19 +181,19 @@ function MailboxItem({ index, style, data }: ListChildComponentProps<MailboxItem
             date={thread.emailsUpdatedAt}
             displayNames={displayNames}
             facepileNames={facepileNames}
-            hasAttachment={!!latestEmail.decryptedAttachmentMetadata?.length}
+            hasAttachment={!!latestEmail?.decryptedAttachmentMetadata?.length}
             key={thread.threadID}
             label={label}
-            markAsReadUnreadClick={async () => handleMarkAsReadUnreadClick([thread], !thread.attributes.read)}
+            markThreadsAsReadUnread={() => markThreadsAsReadUnread([thread], !thread.attributes.read)}
             message={message}
             numEmails={thread.emails.length}
             onClick={onMessageCellClick}
             onSelectToggle={onSelectToggle}
             read={thread.attributes.read}
             selected={isSelected}
-            subject={thread.emails[0].decryptedSubject || NO_SUBJECT_TEXT}
+            subject={thread.emails[0]?.decryptedSubject || NO_SUBJECT_TEXT}
             threadID={thread.threadID}
-            userLabels={threadUserlabels}
+            userLabels={labelsToRender}
           />
         </>
       )}
@@ -197,7 +206,7 @@ const threadActive = (
   next: Readonly<ListChildComponentProps<MailboxItemData>>
 ) => {
   // re-render if thread was active or if thread will be active or if thread array was changed
-  const threadID = prev.data.threads[prev.index].threadID;
+  const threadID = prev.data.threads[prev.index]?.threadID ?? '';
 
   const wasActive = prev.data.activeThreadID === threadID;
   const willBeActive = next.data.activeThreadID === threadID;
@@ -205,11 +214,11 @@ const threadActive = (
   const selectedStateChanged =
     prev.data.selectedThreadIDs.includes(threadID) !== next.data.selectedThreadIDs.includes(threadID); // Thread selected/deselected
   const userLabelsChanged = !userLabelsEqual(
-    prev.data.threads[prev.index].attributes?.userLabels.map((l) => l.labelID),
-    next.data.threads[next.index].attributes?.userLabels.map((l) => l.labelID)
+    prev.data.threads[prev.index]?.attributes?.userLabels.map((l) => l.labelID) ?? [],
+    next.data.threads[next.index]?.attributes?.userLabels.map((l) => l.labelID) ?? []
   );
   const readStatusChanged =
-    prev.data.threads[prev.index].attributes?.read !== next.data.threads[next.index].attributes?.read;
+    prev.data.threads[prev.index]?.attributes?.read !== next.data.threads[next.index]?.attributes?.read;
   const multSelectChanged = prev.data.mobileMultiItemsActive !== next.data.mobileMultiItemsActive;
   const styleChanged = prev.style !== next.style;
   const indexChanged = prev.index !== next.index;

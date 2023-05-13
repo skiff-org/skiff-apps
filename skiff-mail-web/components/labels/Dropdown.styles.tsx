@@ -1,11 +1,4 @@
-import { Dropdown } from 'nightwatch-ui';
 import styled from 'styled-components';
-
-export const StyledDropdown = styled(Dropdown)`
-  .surface.optionMenu {
-    padding: 0px;
-  }
-`;
 
 export const SearchInputField = styled.div`
   padding: 8px;
@@ -25,7 +18,7 @@ export const DropdownBody = styled.div`
 `;
 
 export const DropdownFooter = styled.div`
-  padding: 8px 4px;
   width: 100%;
+  padding: 16px 4px;
   box-sizing: border-box;
 `;

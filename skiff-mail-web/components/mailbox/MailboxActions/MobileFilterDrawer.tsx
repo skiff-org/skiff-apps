@@ -1,4 +1,4 @@
-import { Drawer, Icon, Icons, Typography } from 'nightwatch-ui';
+import { Drawer, Icon, Icons, Size, themeNames, ThemeMode, Typography, TypographySize } from 'nightwatch-ui';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { DrawerBlocksContainer } from 'skiff-front-utils';
@@ -14,7 +14,7 @@ const DrawerOptionsContentContainer = styled.div`
   display: flex;
   flex-direction: column;
 
-  padding: 0 16px;
+  padding: 0 8px;
 `;
 
 const DrawerBlockContainer = styled.div<{ active?: boolean }>`
@@ -26,11 +26,12 @@ const DrawerBlockContainer = styled.div<{ active?: boolean }>`
   width: 80px;
   height: 88px;
   gap: 10px;
-  border: 1px solid ${(props) => (props.active ? 'var(--border-active)' : 'var(--border-secondary)')};
+  border: 1px solid
+    ${(props) => (props.active ? themeNames.dark['--border-active'] : themeNames.dark['--border-secondary'])};
   border-radius: 12px;
 `;
 
-const ScaledIcon = styled(Icons)`
+const ScaledIcon = styled.div`
   transform: scale(1.5) !important;
 `;
 
@@ -46,7 +47,7 @@ const CheckedIndicator = styled.div`
   top: 0;
   right: 0;
   transform: translate(50%, -50%);
-  border: 2px solid var(--bg-l3-solid);
+  border: 2px solid #242424;
 `;
 interface DrawerBlockProps {
   icon: Icon;
@@ -59,12 +60,20 @@ const DrawerBlock = ({ icon, label, active, onClick }: DrawerBlockProps) => {
     <DrawerBlockContainer active={active} onClick={onClick}>
       {active && (
         <CheckedIndicator>
-          <Icons color='white' icon={Icon.Check} size='xsmall' />
+          <Icons color='white' icon={Icon.Check} size={Size.X_SMALL} />
         </CheckedIndicator>
       )}
-      <ScaledIcon color={active ? 'primary' : 'disabled'} icon={icon} size='large' />
-      <Typography color={active ? 'primary' : 'disabled'} level={4} noSelect>
-        {label}
+      <ScaledIcon>
+        <Icons color={active ? 'primary' : 'disabled'} forceTheme={ThemeMode.DARK} icon={icon} size={Size.X_MEDIUM} />
+      </ScaledIcon>
+      <Typography
+        color={active ? 'primary' : 'disabled'}
+        forceTheme={ThemeMode.DARK}
+        mono
+        selectable={false}
+        size={TypographySize.CAPTION}
+      >
+        {label.toUpperCase()}
       </Typography>
     </DrawerBlockContainer>
   );
@@ -105,14 +114,8 @@ export default function MobileFilterDrawer() {
     }
   ];
   return (
-    <Drawer hideDrawer={hideDrawer} noSelect={true} show={show}>
+    <Drawer hideDrawer={hideDrawer} selectable={false} show={show} title='Filter emails'>
       <DrawerOptionsContentContainer>
-        <Typography level={1} type='heading'>
-          Filter emails
-        </Typography>
-        <Typography color='disabled' level={3}>
-          Adjust the mailbox to only show certain messages
-        </Typography>
         <DrawerBlocksContainer>
           {drawerBlocks.map((blockProps) => (
             <DrawerBlock {...blockProps} key={blockProps.label} />

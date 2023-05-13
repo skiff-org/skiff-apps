@@ -1,62 +1,141 @@
-import { Editor } from '@tiptap/core';
+import { Editor } from '@tiptap/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
+import { Icon, Icons, getThemedColor, ThemeMode, ACCENT_COLOR_VALUES } from 'nightwatch-ui';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import { TEXT_COLORS, HIGHLIGHT_COLORS } from 'skiff-front-utils';
 import { insertIf } from 'skiff-utils';
 import styled from 'styled-components';
 
-import { isSelectionNotEmpty } from '../mailEditorUtils';
+import { isSelectionNotEmpty, toggleColor } from '../mailEditorUtils';
 
 import { allListCommandsGroup, allMarkCommandsGroup, allNodeCommandsGroup, ToolBarCommandGroup } from './commands';
+import { toggleLinkCommandGroup } from './commands/link';
 import ToolBarGroup from './ToolBarGroup';
 
-const ToolBarOuterContainer = styled(motion.div)`
-  position: fixed;
+const ToolBarOuterContainer = styled.div`
   width: 100%;
-  height: 0px;
-  justify-content: center;
-  align-items: center;
-  transition: all 0 ease-out;
+  position: relative;
+`;
+
+const ToolBarContainerAbsolute = styled(motion.div)`
+  position: absolute;
+  z-index: 1;
 `;
 
 const ToolBarContainer = styled.div`
   display: flex;
   width: fit-content;
-  height: 39px;
-
+  height: fit-content;
+  box-sizing: border-box;
   border-radius: 8px;
   transform: translateY(calc(-100% - 10px));
   background: var(--bg-emphasis);
-  padding: 0px 4px;
+  padding: 2px;
   align-items: center;
+  border: 1px solid ${getThemedColor('var(--border-primary)', ThemeMode.DARK)};
+  box-shadow: var(--shadow-l2);
 
-  -webkit-backdrop-filter: blur(72px);
-  backdrop-filter: blur(72px);
   & .icon-button {
     border-radius: 4px !important;
   }
 `;
 
+const CurrentTextColorCircle = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const CurrentTextColor = styled.span<{ $textColor: string }>`
+  height: 18px;
+  width: 18px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  border: 1px solid ${getThemedColor('var(--border-primary)', ThemeMode.DARK)};
+  ${(props) => `background: ${props.$textColor}`};
+`;
+
 const ToolBarGroupDivider = styled.div`
   width: 1px;
-  margin-top: 6px;
-  margin-bottom: 6px;
+  height: 24px;
+  margin: 4px;
   box-sizing: border-box;
-  background: var(--border-secondary);
+  background: ${getThemedColor('var(--border-primary)', ThemeMode.DARK)};
 `;
 
 const CommandsGroupContainer = styled.div`
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 0px;
 `;
 
-const getToolbarCommands = (editor): ToolBarCommandGroup[] => {
-  const insideListItem = editor && editor.isActive('listItem');
+const ColorSelect = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 6px;
+  box-sizing: border-box;
+  gap: 2px;
+  height: 32px;
 
-  return insideListItem
-    ? [...insertIf(isMobile, allNodeCommandsGroup), allListCommandsGroup, allMarkCommandsGroup]
-    : [...insertIf(isMobile, allNodeCommandsGroup), allMarkCommandsGroup];
+  cursor: pointer;
+  border-radius: 6px;
+  &:hover {
+    background: ${getThemedColor('var(--bg-overlay-secondary)', ThemeMode.DARK)};
+  }
+`;
+
+const getToolbarCommands = (editor: Editor): ToolBarCommandGroup[] => {
+  const insideListItem = editor && editor.isActive('listItem');
+  const insideLink = editor && editor.isActive('link');
+
+  return [
+    allNodeCommandsGroup,
+    ...insertIf(insideListItem, allListCommandsGroup),
+    allMarkCommandsGroup,
+    ...insertIf(!insideLink, toggleLinkCommandGroup)
+  ];
+};
+
+export const getColor = (editor: Editor) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const activeColors = Object.keys(TEXT_COLORS).filter((color) =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    editor.isActive('textStyle', { color: TEXT_COLORS?.[color] })
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  let color = 'var(--text-always-white)';
+
+  if (activeColors.length === 1) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-assignment
+    color = TEXT_COLORS[activeColors[0] ?? ''] ?? 'var(--text-always-white)';
+  }
+  return {
+    value: color,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    name: Object.keys(ACCENT_COLOR_VALUES).find((key) => ACCENT_COLOR_VALUES?.[key]?.[0] === color) || ''
+  };
+};
+
+export const getHighlightColor = (editor: Editor) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const activeColors = Object.keys(HIGHLIGHT_COLORS).filter((color) =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    editor.isActive('highlight', { color: HIGHLIGHT_COLORS?.[color] })
+  );
+  let color = 'transparent';
+  if (activeColors.length === 1) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+    color = HIGHLIGHT_COLORS[activeColors[0] ?? ''] ?? 'transparent';
+  }
+  return {
+    value: color,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    name: Object.keys(ACCENT_COLOR_VALUES).find((key) => ACCENT_COLOR_VALUES?.[key]?.[1] === color) || ''
+  };
 };
 
 interface ToolBarProps {
@@ -65,15 +144,37 @@ interface ToolBarProps {
   preventFloating?: boolean;
 }
 
+export const TOOLBAR_COLOR_CMDS = 'toolbar-color-cmds';
+export const TOOLBAR_CONTAINER = 'toolbar-container';
+const TOOLBAR_MAX_WIDTH = 480;
+const TOOLBAR_MAX_HEIGHT = 48;
+const TOOLBAR_INCREMENT = TOOLBAR_MAX_HEIGHT / 4;
+
 const ToolBar: FC<ToolBarProps> = ({ editor, editorBoundingRect, preventFloating = false }) => {
-  const [position, setPosition] = useState<{ bottom: number | string; left: number | string }>({ bottom: 65, left: 0 });
+  const [position, setPosition] = useState<{
+    top?: number | string;
+    bottom?: number | string;
+    left?: number | string;
+    right?: number | string;
+  }>({
+    top: 0,
+    bottom: 65,
+    left: 0
+  });
 
   const calculatePosition = useCallback(
     (_editor: Editor, _editorBoundingRect: DOMRect | undefined, _preventFloating = false) => {
       const selectionCoords = _editor.view.coordsAtPos(_editor.view.state.selection.from);
+      const verticalOffset = 100;
+      const rightOverflow = selectionCoords.right + TOOLBAR_MAX_WIDTH > window.innerWidth;
+      const topOverflow = selectionCoords.top - TOOLBAR_MAX_HEIGHT < (_editorBoundingRect?.top || 0);
+      const top = selectionCoords.top - (_editorBoundingRect?.top || 0);
+
       return {
-        bottom: (_editorBoundingRect?.bottom || 0) - selectionCoords.bottom + 100,
-        left: `calc(${selectionCoords.left - (_editorBoundingRect?.left || 0)}px)`
+        top: top + (topOverflow ? TOOLBAR_INCREMENT * 5 : -TOOLBAR_INCREMENT),
+        bottom: (_editorBoundingRect?.bottom || 0) - selectionCoords.bottom + verticalOffset,
+        left: rightOverflow ? undefined : `calc(${selectionCoords.left - (_editorBoundingRect?.left || 0)}px)`,
+        right: rightOverflow ? '8px' : undefined
       };
     },
     []
@@ -89,23 +190,37 @@ const ToolBar: FC<ToolBarProps> = ({ editor, editorBoundingRect, preventFloating
   const showFormatBar = isSelectionNotEmpty(editor) && !preventFloating;
   if (!showFormatBar || isMobile) return null;
 
+  const commands = getToolbarCommands(editor);
+  const [textType, ...rest] = commands;
+
   return (
     <AnimatePresence>
-      <ToolBarOuterContainer
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        initial={{ opacity: 0 }}
-        style={position}
-        transition={{ duration: 0.15 }}
-      >
-        <ToolBarContainer>
-          {getToolbarCommands(editor).map((commandGroup, index) => (
-            <CommandsGroupContainer key={index}>
-              {index > 0 && <ToolBarGroupDivider />}
-              <ToolBarGroup commands={commandGroup.commands} editor={editor} type={commandGroup.type} />
+      <ToolBarOuterContainer>
+        <ToolBarContainerAbsolute style={position}>
+          <ToolBarContainer id={TOOLBAR_CONTAINER}>
+            {textType && (
+              <CommandsGroupContainer>
+                <ToolBarGroup commands={textType.commands} editor={editor} type={textType.type} />
+              </CommandsGroupContainer>
+            )}
+            <CommandsGroupContainer>
+              <ToolBarGroupDivider />
+              <ColorSelect onClick={() => toggleColor(editor)}>
+                <CurrentTextColorCircle>
+                  {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
+                  <CurrentTextColor $textColor={getColor(editor).value} />
+                </CurrentTextColorCircle>
+                <Icons color='secondary' forceTheme={ThemeMode.DARK} icon={Icon.ChevronDown} />
+              </ColorSelect>
             </CommandsGroupContainer>
-          ))}
-        </ToolBarContainer>
+            {rest.map((commandGroup, index) => (
+              <CommandsGroupContainer key={index}>
+                <ToolBarGroupDivider />
+                <ToolBarGroup commands={commandGroup.commands} editor={editor} type={commandGroup.type} />
+              </CommandsGroupContainer>
+            ))}
+          </ToolBarContainer>
+        </ToolBarContainerAbsolute>
       </ToolBarOuterContainer>
     </AnimatePresence>
   );

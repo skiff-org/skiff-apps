@@ -1,5 +1,6 @@
-import { ButtonGroupItem, Dialog, Icon } from 'nightwatch-ui';
+import { Editor } from '@tiptap/react';
 import React, { useEffect, useState, useRef } from 'react';
+import { isMobile } from 'react-device-detect';
 import {
   generateSymmetricKey,
   encryptSymmetric,
@@ -7,16 +8,16 @@ import {
   stringDecryptAsymmetric,
   decryptSymmetric
 } from 'skiff-crypto';
-import { useToast, TitleActionSection } from 'skiff-front-utils';
 import {
   useGetUserSignatureQuery,
   GetUserSignatureDocument,
   useDeleteUserSignatureMutation,
   useSetUserSignatureMutation,
   UserSignatureDatagram
-} from 'skiff-mail-graphql';
+} from 'skiff-front-graphql';
+import { useToast, ConfirmModal, TitleActionSection, requireCurrentUserData } from 'skiff-front-utils';
+import { MAX_SIGNATURE_SIZE_KB } from 'skiff-utils';
 
-import { requireCurrentUserData } from '../../../apollo/currentUser';
 import { SettingTextArea } from '../SettingTextArea';
 
 export const SignatureManagerSetting = () => {
@@ -37,7 +38,7 @@ export const SignatureManagerSetting = () => {
   const [setUserSignature] = useSetUserSignatureMutation();
   const [deleteUserSignature] = useDeleteUserSignatureMutation();
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const mailEditorRef = useRef<Editor>(null);
 
   // reset to initial values
   const reset = () => {
@@ -57,10 +58,7 @@ export const SignatureManagerSetting = () => {
     try {
       await deleteUserSignature({ refetchQueries: [{ query: GetUserSignatureDocument }] });
       reset();
-      enqueueToast({
-        body: 'Signature deleted',
-        icon: Icon.Trash
-      });
+      enqueueToast({ title: 'Signature deleted' });
     } catch {
       setErrorMsg('Failed to delete signature');
     }
@@ -69,6 +67,7 @@ export const SignatureManagerSetting = () => {
   // save new user signature
   const onSave = async (e?: React.MouseEvent) => {
     e?.stopPropagation();
+    mailEditorRef.current?.commands.blur();
     // do not save if no signature was added
     // or if the new signature is the same as the current signature
     if (newSignature === undefined || currentSignature === newSignature) {
@@ -100,15 +99,29 @@ export const SignatureManagerSetting = () => {
         refetchQueries: [{ query: GetUserSignatureDocument }]
       });
       reset();
-    } catch {
+    } catch (err: any) {
       setErrorMsg(`Failed to ${!!currentSignature ? 'update' : 'add'} signature`);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (!err.message || typeof err.message !== 'string') {
+        return;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      const msg = err.message;
+      const body =
+        typeof msg === 'string' && msg.includes('too large')
+          ? `Signature must be under ${MAX_SIGNATURE_SIZE_KB} kb`
+          : undefined;
+      enqueueToast({
+        title: `Failed to ${!!currentSignature ? 'update' : 'add'} signature`,
+        body
+      });
     }
   };
 
   // confirm signature deletion
   const onConfirm = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onDelete();
+    void onDelete();
     setIsConfirmOpen(false);
     if (isDropdownOpen) setIsDropdownOpen(false);
     else if (isEditing) setIsEditing(false);
@@ -117,7 +130,7 @@ export const SignatureManagerSetting = () => {
   const editClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsEditing(true);
-    inputRef.current?.focus();
+    mailEditorRef.current?.commands.focus();
   };
 
   // decrypt current signature
@@ -153,44 +166,37 @@ export const SignatureManagerSetting = () => {
             type: 'button'
           }
         ]}
-        subtitle='Add a signature to be appended at the end of your outgoing emails.'
-        title='Email signature'
+        subtitle='Add a signature to be appended at the end of your outgoing emails'
+        title={isMobile ? '' : 'Email signature'}
       />
-      {(!!currentSignature || isEditing) && (
+      {(!!currentSignature || isEditing || isMobile) && (
         <SettingTextArea
           errorMsg={errorMsg}
-          innerRef={inputRef}
+          innerRef={mailEditorRef}
           isEditing={isEditing}
           onDelete={() => setIsConfirmOpen(true)}
           onFocus={() => {
             setIsEditing(true);
             setErrorMsg(undefined);
           }}
-          onSave={onSave}
+          onSave={() => void onSave()}
           placeholder='Add signature here'
           setValue={setNewSignature}
           value={newSignature ?? currentSignature}
         />
       )}
-      <Dialog
+      <ConfirmModal
+        confirmName='Delete'
         description='Are you sure you want to delete this signature?'
+        destructive
         onClose={(e?: React.MouseEvent) => {
           e?.stopPropagation();
           setIsConfirmOpen(false);
         }}
+        onConfirm={onConfirm}
         open={isConfirmOpen}
         title='Delete'
-      >
-        <ButtonGroupItem key='delete' label='Delete' onClick={onConfirm} />
-        <ButtonGroupItem
-          key='cancel'
-          label='Cancel'
-          onClick={(e: React.MouseEvent) => {
-            e.stopPropagation();
-            setIsConfirmOpen(false);
-          }}
-        />
-      </Dialog>
+      />
     </>
   );
 };

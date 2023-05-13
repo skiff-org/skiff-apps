@@ -1,6 +1,7 @@
-import { Tooltip, Typography } from 'nightwatch-ui';
+import { Typography, TypographySize } from 'nightwatch-ui';
 import { FC, useRef, useState } from 'react';
-import { formatEmailAddress, getAddrDisplayName, getAddressTooltipLabel } from 'skiff-front-utils';
+import { isMobile } from 'react-device-detect';
+import { formatEmailAddress, getAddrDisplayName } from 'skiff-front-utils';
 import { AddressObject } from 'skiff-graphql';
 import styled from 'styled-components';
 
@@ -21,15 +22,7 @@ const NameBlock = styled.div<{ indent?: number }>`
   flex-wrap: wrap;
 `;
 
-// Un-setting min-width to make sure the address
-// field label is not hidden
-const AddressFieldLabel = styled(Typography)`
-  &.outerText {
-    min-width: unset;
-  }
-`;
-
-const Address = styled(Typography)`
+const Address = styled.div`
   margin-left: 8px;
 `;
 
@@ -50,34 +43,34 @@ const FullContactRow: FC<FullContactRowProps> = ({ address: addrObj, index, labe
   return (
     <>
       <FullContactRowContainer key={address}>
-        {index === 0 && <AddressFieldLabel color='secondary'>{label}</AddressFieldLabel>}
+        {index === 0 && (
+          <Typography color='secondary' minWidth='unset' size={isMobile ? TypographySize.SMALL : undefined}>
+            {label}
+          </Typography>
+        )}
         {/* indent so names aligned (depends on CC or BCC, num characters) */}
         <NameBlock indent={index !== 0 ? label.length : undefined}>
-          <Tooltip hidden={!!name} label={getAddressTooltipLabel(address)}>
-            <span ref={ref}>
-              <Typography
-                color='link'
-                onClick={() => {
-                  setShowActionDropdown((prev) => !prev);
-                }}
-              >
-                {formattedDisplayName}
-              </Typography>
-            </span>
-          </Tooltip>
+          <span ref={ref}>
+            <Typography
+              color='link'
+              onClick={() => {
+                setShowActionDropdown((prev) => !prev);
+              }}
+              size={isMobile ? TypographySize.SMALL : undefined}
+            >
+              {formattedDisplayName}
+            </Typography>
+          </span>
           {!!name && (
-            <Tooltip hidden={displayAddress === address} label={address}>
-              <div>
-                <Address color='secondary'>{`<${displayAddress}>`}</Address>
-              </div>
-            </Tooltip>
+            <Typography color='secondary' size={isMobile ? TypographySize.SMALL : undefined}>
+              <Address>{`<${displayAddress}>`}</Address>
+            </Typography>
           )}
         </NameBlock>
       </FullContactRowContainer>
       <ContactActionDropdown
         address={addrObj}
         buttonRef={ref}
-        displayAddress={false}
         setShowActionDropdown={setShowActionDropdown}
         show={showActionDropdown}
       />

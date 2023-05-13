@@ -5,7 +5,7 @@ import styled from 'styled-components';
 interface MailForwardingConfig {
   label: string;
   icon: Icon;
-  instructions: React.ReactNode[];
+  instructions: { key: string; value: React.ReactNode }[];
 }
 
 export enum MailType {
@@ -28,51 +28,120 @@ export const MAIL_FORWARDING_CONFIGS: { [mailType in MailType]: MailForwardingCo
     label: 'Gmail',
     icon: Icon.Gmail,
     instructions: [
-      <span key='settings'>
-        In the top right, click <Bold>Settings</Bold> &gt; <Bold>See all settings</Bold>.
-      </span>,
-      <span key='tab'>
-        Click the <Bold>Forwarding and POP/IMAP</Bold> tab.
-      </span>,
-      <span key='add-address'>
-        Under &quot;Forwarding&quot;, click <Bold>Add a forwarding address</Bold>.
-      </span>,
-      <span key='enter-address'>
-        Enter your Skiff email address and select <Bold>Next</Bold>.
-      </span>,
-      'A verification message will be sent to your Skiff address. Click the verification link in the message.',
-      'Go back to the Gmail settings page and refresh the page.',
-      <span key='tab-2'>
-        Click the <Bold>Forwarding and POP/IMAP</Bold> tab.
-      </span>,
-      <span key='forward'>
-        In the &quot;Forwarding&quot; section, select <Bold>Forward a copy of incoming mail to</Bold>.
-      </span>,
-      <span key='save'>
-        Click <Bold>Save</Bold> at the bottom of the page.
-      </span>
+      {
+        key: 'settings',
+        value: (
+          <span>
+            In the top right, click <Bold>Settings</Bold> &gt; <Bold>See all settings</Bold>.
+          </span>
+        )
+      },
+      {
+        key: 'tab',
+        value: (
+          <span>
+            Click the <Bold>Forwarding and POP/IMAP</Bold> tab.
+          </span>
+        )
+      },
+      {
+        key: 'add-address',
+        value: (
+          <span>
+            Under &quot;Forwarding&quot;, click <Bold>Add a forwarding address</Bold>.
+          </span>
+        )
+      },
+      {
+        key: 'enter-skiff-address',
+        value: (
+          <span>
+            Enter your Skiff email address and select <Bold>Next</Bold>.
+          </span>
+        )
+      },
+      {
+        key: 'verify',
+        value: 'A verification message will be sent to your Skiff address. Click the verification link in the message.'
+      },
+      {
+        key: 'refresh',
+        value: 'Go back to the Gmail settings page and refresh the page.'
+      },
+      {
+        key: 'tab-2',
+        value: (
+          <span>
+            Click the <Bold>Forwarding and POP/IMAP</Bold> tab.
+          </span>
+        )
+      },
+      {
+        key: 'forward',
+        value: (
+          <span>
+            In the &quot;Forwarding&quot; section, select <Bold>Forward a copy of incoming mail to</Bold>.
+          </span>
+        )
+      },
+      {
+        key: 'save',
+        value: (
+          <span>
+            Click <Bold>Save</Bold> at the bottom of the page.
+          </span>
+        )
+      }
     ]
   },
   [MailType.Outlook]: {
     label: 'Outlook',
-    icon: Icon.Outlook,
+    icon: Icon.Envelope,
     instructions: [
-      <span key='settings'>
-        In the top right, click <Bold>Settings</Bold>.
-      </span>,
-      <span key='all-settings'>
-        Select <Bold>View all Outlook settings</Bold> at the bottom of the Settings pane.
-      </span>,
-      <span key='tab'>
-        Click the <Bold>Forwarding</Bold> tab on the left sidebar.
-      </span>,
-      <span key='enable'>
-        In the &quot;Forwarding&quot; section, select <Bold>Enable forwarding</Bold>.
-      </span>,
-      'Enter your Skiff email address in the "Forward my email to" field.',
-      <span key='save'>
-        Click <Bold>Save</Bold> at the bottom of the screen.
-      </span>
+      {
+        key: 'settings',
+        value: (
+          <span>
+            In the top right, click <Bold>Settings</Bold>.
+          </span>
+        )
+      },
+      {
+        key: 'all-settings',
+        value: (
+          <span>
+            Select <Bold>View all Outlook settings</Bold> at the bottom of the Settings pane.
+          </span>
+        )
+      },
+      {
+        key: 'tab',
+        value: (
+          <span>
+            Click the <Bold>Forwarding</Bold> tab on the left sidebar.
+          </span>
+        )
+      },
+      {
+        key: 'enable',
+        value: (
+          <span>
+            In the &quot;Forwarding&quot; section, select <Bold>Enable forwarding</Bold>.
+          </span>
+        )
+      },
+      {
+        key: 'enter-skiff-address',
+        value: 'Enter your Skiff email address in the "Forward my email to" field.'
+      },
+      {
+        key: 'save',
+        value: (
+          <span>
+            Click <Bold>Save</Bold> at the bottom of the screen.
+          </span>
+        )
+      }
     ]
   }
 };

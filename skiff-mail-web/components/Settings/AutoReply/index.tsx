@@ -10,6 +10,6 @@ export const autoReplySettings: Setting[] = [
     component: <AutoReplySetting key='auto-reply' />,
     label: SETTINGS_LABELS[SettingValue.AutoReply],
     icon: Icon.Reply,
-    color: 'green'
+    color: 'blue'
   }
 ];

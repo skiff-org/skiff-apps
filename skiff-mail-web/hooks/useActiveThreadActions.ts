@@ -1,20 +1,20 @@
 import { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { useGetThreadFromIdQuery } from 'skiff-mail-graphql';
+import { useGetThreadFromIdQuery } from 'skiff-front-graphql';
+import { useDefaultEmailAlias, useRequiredCurrentUserData, useCurrentUserEmailAliases } from 'skiff-front-utils';
 
 import { skemailModalReducer } from '../redux/reducers/modalReducer';
-import { UserLabel, userLabelFromGraphQL } from '../utils/label';
+import { UserLabelPlain, userLabelFromGraphQL } from '../utils/label';
 
-import { useCurrentUserEmailAliases } from './useCurrentUserEmailAliases';
-import { useDefaultEmailAlias } from './useDefaultEmailAlias';
 import { useDrafts } from './useDrafts';
 import { useThreadActions } from './useThreadActions';
 import { useUserSignature } from './useUserSignature';
 
 export function useActiveThreadActions() {
   const dispatch = useDispatch();
+  const { userID } = useRequiredCurrentUserData();
   const { composeNewDraft } = useDrafts();
-  const [defaultEmailAlias] = useDefaultEmailAlias();
+  const [defaultEmailAlias] = useDefaultEmailAlias(userID);
   const emailAliases = useCurrentUserEmailAliases();
   const userSignature = useUserSignature();
 
@@ -68,7 +68,7 @@ export function useActiveThreadActions() {
   };
 
   const activeThreadLabels = (threadData?.userThread?.attributes.userLabels.map(userLabelFromGraphQL) ||
-    []) as UserLabel[];
+    []) as UserLabelPlain[];
 
   return {
     reply,

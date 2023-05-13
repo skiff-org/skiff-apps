@@ -1,6 +1,6 @@
 import { ApolloError } from '@apollo/client';
 import { GraphQLError } from 'graphql';
-import { isString } from 'lodash';
+import isString from 'lodash/isString';
 import { useRouter } from 'next/router';
 import {
   ButtonGroup,
@@ -8,35 +8,28 @@ import {
   Dialog,
   DialogTypes,
   InputField,
+  Layout,
   Typography,
-  accentColorToPrimaryColor
+  accentColorToPrimaryColor,
+  TypographySize,
+  Size
 } from 'nightwatch-ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
+import { useCreateUserLabelMutation, useDeleteUserLabelMutation, useEditUserLabelMutation } from 'skiff-front-graphql';
 import { ColorSelector } from 'skiff-front-utils';
 import { UserLabelVariant } from 'skiff-graphql';
-import {
-  useApplyLabelsMutation,
-  useCreateUserLabelMutation,
-  useDeleteUserLabelMutation,
-  useEditUserLabelMutation
-} from 'skiff-mail-graphql';
 import { PaywallErrorCode, isPaywallErrorCode } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
 import { useCurrentLabel } from '../../hooks/useCurrentLabel';
-import { skemailMailboxReducer } from '../../redux/reducers/mailboxReducer';
-import { skemailMobileDrawerReducer } from '../../redux/reducers/mobileDrawerReducer';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { isCreateOrEditLabelOrFolderModal, ModalType } from '../../redux/reducers/modalTypes';
 import { AppDispatch } from '../../redux/store/reduxStore';
-import {
-  removeUserLabelFromCache,
-  updateThreadsWithModifiedLabels,
-  updateUserLabelsOnCreateOrEdit
-} from '../../utils/cache/cache';
+import { removeUserLabelFromCache, updateUserLabelsOnCreateOrEdit } from '../../utils/cache/cache';
+import { isFolder, isPlainLabel, UserLabelFolder, userLabelFromGraphQL, UserLabelPlain } from '../../utils/label';
 
 const LabelInput = styled.div`
   width: 100%;
@@ -45,12 +38,20 @@ const LabelInput = styled.div`
   gap: 8px;
 `;
 
+const ColorContainer = styled.div`
+  width: 214px;
+`;
+
+const ErrorContainer = styled.div`
+  height: 20px;
+  margin: -10px 0px -10px 0px;
+`;
+
 export const CreateOrEditLabelOrFolderModal = () => {
-  const routeLabel = useCurrentLabel();
+  const { label: routeLabel } = useCurrentLabel();
   const router = useRouter();
   const [createLabel] = useCreateUserLabelMutation();
   const [editLabel] = useEditUserLabelMutation();
-  const [applyLabel] = useApplyLabelsMutation();
   const [deleteLabel] = useDeleteUserLabelMutation();
 
   const { openModal } = useAppSelector((state) => state.modal);
@@ -58,12 +59,13 @@ export const CreateOrEditLabelOrFolderModal = () => {
   // Threads that a newly created label will be applied to
   const {
     label: existingLabel,
-    threadIDs,
     folder: folderModal,
-    initialName
+    initialName,
+    addLabelOrFolder,
+    onClose: onCloseModal
   } = isCreateOrEditLabelOrFolderModal(openModal)
     ? openModal
-    : { label: undefined, threadIDs: undefined, folder: false, initialName: '' };
+    : { label: undefined, folder: false, initialName: '', addLabelOrFolder: () => {}, onClose: () => {} };
 
   // If the modal type is Edit, this will be populated with the label being edited
   // if it's a Create modal, this will be empty
@@ -75,7 +77,7 @@ export const CreateOrEditLabelOrFolderModal = () => {
   const [errors, setErrors] = useState<readonly GraphQLError[]>([]);
   const [paywallErrorCode, setPaywallErrorCode] = useState<PaywallErrorCode | null>(null);
 
-  const onClose = () => {
+  const onClose = (userLabel?: UserLabelPlain | UserLabelFolder) => {
     setLabelName('');
     setColor('red');
     setErrors([]);
@@ -85,15 +87,13 @@ export const CreateOrEditLabelOrFolderModal = () => {
       dispatch(
         skemailModalReducer.actions.setOpenModal({
           type: ModalType.Paywall,
-          paywallErrorCode: paywallErrorCode
+          paywallErrorCode: paywallErrorCode,
+          onClose: onCloseModal
         })
       );
     } else {
       dispatch(skemailModalReducer.actions.setOpenModal(undefined));
-      // If on mobile open the label drawer again
-      if (isMobile) {
-        dispatch(skemailMobileDrawerReducer.actions.setShowApplyLabelDrawer(UserLabelVariant.Plain));
-      }
+      if (onCloseModal) onCloseModal(userLabel);
     }
   };
 
@@ -127,29 +127,20 @@ export const CreateOrEditLabelOrFolderModal = () => {
     return data;
   };
 
-  const applyUserLabel = async (labelID: string) => {
-    // If not on mobile add the newly created label to selected threads and reset selected threads
-    if (!threadIDs || isMobile) return;
-    await applyLabel({
-      variables: { request: { threadIDs, userLabels: [labelID] } },
-      update: (cache, response) => {
-        void updateThreadsWithModifiedLabels({
-          cache,
-          updatedThreads: response.data?.applyLabels?.updatedThreads,
-          errors: response.errors
-        });
-        dispatch(skemailMailboxReducer.actions.setSelectedThreadIDs({ selectedThreadIDs: [] }));
-      }
-    });
-  };
-
   const editUserLabel = async () => {
     if (!existingLabel) {
       console.error(`Failed to edit, no existing ${folderModal ? 'folder' : 'label'} found`);
       return;
     }
     const { data } = await editLabel({
-      variables: { request: { labelID: existingLabel?.value, labelName, color } },
+      variables: {
+        request: {
+          labelID: existingLabel?.value,
+          labelName,
+          color,
+          variant: folderModal ? UserLabelVariant.Folder : UserLabelVariant.Plain
+        }
+      },
       onError: (error) => setErrors(error.graphQLErrors),
       update: (cache, response) => {
         updateUserLabelsOnCreateOrEdit(cache, response?.data?.editUserLabel, response?.errors);
@@ -194,8 +185,15 @@ export const CreateOrEditLabelOrFolderModal = () => {
     const data = await createUserLabel();
     if (!!data?.createUserLabel?.labelID) {
       // request succeeded
-      await applyUserLabel(data.createUserLabel.labelID);
-      onClose();
+      const userLabel = userLabelFromGraphQL(data.createUserLabel);
+      if (!isPlainLabel(userLabel) && !isFolder(userLabel)) {
+        console.error(`Attempting to create a non folder or label user label.`);
+        return;
+      }
+      if (addLabelOrFolder) {
+        await addLabelOrFolder(userLabel);
+      }
+      onClose(userLabel);
     } else {
       setLoading(false);
     }
@@ -251,41 +249,69 @@ export const CreateOrEditLabelOrFolderModal = () => {
         <InputField
           autoFocus
           innerRef={inputRef}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleChange(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.value)}
           onKeyPress={(e) => {
             if (isReadyToSubmit && !loading && e.key === 'Enter') {
               submit();
             }
           }}
           placeholder={`${folderModal ? 'Folder' : 'Label'} name`}
-          size='small'
+          size={Size.SMALL}
           value={labelName}
         />
       </LabelInput>
-      <ColorSelector
-        colorToStyling={accentColorToPrimaryColor}
-        handleChange={(profileAccentColor) => {
-          setColor(profileAccentColor);
-          // Focus to allow us to keep editing label name + press enter
-          inputRef.current?.focus();
-        }}
-        value={color}
-      />
-      {!!errors.length && <Typography color='destructive'>{errors.map((e) => e.message).join('. ')}</Typography>}
+      <ColorContainer>
+        <ColorSelector
+          colorToStyling={accentColorToPrimaryColor}
+          handleChange={(profileAccentColor) => {
+            setColor(profileAccentColor);
+            // Focus to allow us to keep editing label name + press enter
+            inputRef.current?.focus();
+          }}
+          value={color}
+        />
+      </ColorContainer>
+      <ErrorContainer>
+        {!!errors.length && (
+          <Typography color='destructive' size={TypographySize.SMALL}>
+            {errors.map((e) => e.message).join('. ')}
+          </Typography>
+        )}
+      </ErrorContainer>
       {/* When on mobile and editing a label, also show delete button*/}
       {isMobile && (
-        <ButtonGroup>
+        <ButtonGroup fullWidth layout={Layout.STACKED}>
           <ButtonGroupItem key='submit' label={!!existingLabel ? 'Save' : 'Create'} onClick={submit} />
-          <ButtonGroupItem destructive key='delete' label='Delete' onClick={() => void onDelete()} />
-          <ButtonGroupItem key='cancel' label='Cancel' onClick={onClose} />
+          <ButtonGroupItem
+            destructive
+            hidden={!existingLabel}
+            key='delete'
+            label='Delete'
+            onClick={() => void onDelete()}
+          />
+          <ButtonGroupItem
+            key='cancel'
+            label='Cancel'
+            onClick={() => {
+              onClose();
+            }}
+          />
         </ButtonGroup>
       )}
       {!isMobile && (
         <ButtonGroup>
           <ButtonGroupItem key='submit' label={!!existingLabel ? 'Save' : 'Create'} onClick={submit} />
-          <ButtonGroupItem key='cancel' label='Cancel' onClick={onClose} />
+          <ButtonGroupItem
+            key='cancel'
+            label='Cancel'
+            onClick={() => {
+              onClose();
+            }}
+          />
         </ButtonGroup>
       )}
     </Dialog>
   );
 };
+
+export default CreateOrEditLabelOrFolderModal;

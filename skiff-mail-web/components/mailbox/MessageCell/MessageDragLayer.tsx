@@ -1,4 +1,4 @@
-import { Icon, IconText, Typography } from 'nightwatch-ui';
+import { Icon, IconText, TypographyWeight } from 'nightwatch-ui';
 import { DragLayerMonitor, useDragLayer, XYCoord } from 'react-dnd';
 import styled from 'styled-components';
 
@@ -38,15 +38,12 @@ export const MessageDragLayer = () => {
   }));
 
   if (isDragging && type === DNDItemTypes.MESSAGE_CELL) {
+    const numberOfThreadsLabel = new Set(selectedThreadIDs).size ? new Set(selectedThreadIDs).size.toString() : '1';
+    const descriptionLabel = selectedThreadIDs.length > 1 ? 'Message threads' : 'Message thread';
+    const label = numberOfThreadsLabel + ' ' + descriptionLabel;
     return (
       <Container offset={currentOffset}>
-        <IconText
-          color='white'
-          endIcon={Icon.Envelope}
-          label={selectedThreadIDs.length ? selectedThreadIDs.length.toString() : '1'}
-          type='paragraph'
-        />
-        <Typography color='white'>{selectedThreadIDs.length > 1 ? 'Message threads' : 'Message thread'}</Typography>
+        <IconText color='white' label={label} startIcon={Icon.Envelope} weight={TypographyWeight.REGULAR} />
       </Container>
     );
   }

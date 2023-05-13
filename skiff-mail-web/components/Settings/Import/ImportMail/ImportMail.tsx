@@ -1,53 +1,56 @@
-import { ApolloCache } from '@apollo/client';
+import { ApolloCache, ApolloError } from '@apollo/client';
 import { GraphQLError } from 'graphql';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import { useRouter } from 'next/router';
-import { Button, ButtonGroup, ButtonGroupItem, Dialog, DialogTypes, Icon, Icons, Typography } from 'nightwatch-ui';
-import { ChangeEvent, useCallback, useRef } from 'react';
+import { ButtonGroup, ButtonGroupItem, Icon, Typography } from 'nightwatch-ui';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
-import { GoogleLoginButton, ImportSelect, useToast } from 'skiff-front-utils';
-import { isMobileApp, TitleActionSection } from 'skiff-front-utils';
-import { CreditTransactionReason, ImportClients } from 'skiff-graphql';
 import {
-  GetGoogleAuthUrlQuery,
+  GetGmailAutoImportStatusDocument,
   GetGoogleAuthUrlDocument,
-  ImportGmailEmailsMutation,
-  ImportGmailEmailsMutationVariables,
-  ImportGmailEmailsDocument,
-  ImportEmlEmailMutation,
-  ImportEmlEmailMutationVariables,
-  ImportEmlEmailDocument,
-  ImportMboxEmailsMutation,
-  ImportMboxEmailsMutationVariables,
-  ImportMboxEmailsDocument,
+  GetGoogleAuthUrlQuery,
   GetOutlookAuthUrlDocument,
   GetOutlookAuthUrlQuery,
+  ImportEmlEmailDocument,
+  ImportEmlEmailMutation,
+  ImportEmlEmailMutationVariables,
+  ImportGmailEmailsDocument,
+  ImportGmailEmailsMutation,
+  ImportGmailEmailsMutationVariables,
+  ImportMboxEmailsDocument,
+  ImportMboxEmailsMutation,
+  ImportMboxEmailsMutationVariables,
   ImportOutlookEmailsDocument,
   ImportOutlookEmailsMutation,
   ImportOutlookEmailsMutationVariables,
-  GetGmailAutoImportStatusDocument,
   useGetGmailAutoImportStatusQuery,
-  useUnsubscribeFromGmailImportMutation,
-  useGrantCreditsMutation
-} from 'skiff-mail-graphql';
+  useGrantCreditsMutation,
+  useUnsubscribeFromGmailImportMutation
+} from 'skiff-front-graphql';
+import { ConfirmModal, ImportSelect, isMobileApp, TitleActionSection, useToast } from 'skiff-front-utils';
+import { CreditTransactionReason, ImportClients } from 'skiff-graphql';
+import { gbToBytes } from 'skiff-utils';
 import styled from 'styled-components';
 
 import client from '../../../../apollo/client';
 import {
   GENERAL_MAIL_IMPORT_PARAMS,
-  OUTLOOK_MAIL_IMPORT_PARAMS,
-  GOOGLE_MAIL_IMPORT_PARAMS
+  GOOGLE_MAIL_IMPORT_PARAMS,
+  OUTLOOK_MAIL_IMPORT_PARAMS
 } from '../../../../constants/settings.constants';
 import { useAppSelector } from '../../../../hooks/redux/useAppSelector';
 import { skemailModalReducer } from '../../../../redux/reducers/modalReducer';
-import { isImportModal, Modals, ModalType } from '../../../../redux/reducers/modalTypes';
-import { getOutlookCodeInURL, getGoogleOAuth2CodeInURL } from '../../../../utils/importEmails';
+import { Modals, ModalType } from '../../../../redux/reducers/modalTypes';
+import { getGoogleOAuth2CodeInURL, getOutlookCodeInURL } from '../../../../utils/importEmails';
 import { extractHashParamFromURL } from '../../../../utils/navigation';
 import { MESSAGE_MAX_SIZE_IN_BYTES, MESSAGE_MAX_SIZE_IN_MB } from '../../../MailEditor/Plugins/MessageSizePlugin';
 
+import { GmailImportDialog } from './GmailImportDialog';
+import { ProtonImportDialog } from './ProtonImportDialog';
+
 const MBOX_FILE_MAX_SIZE_IN_GB = 1;
-const MBOX_FILE_MAX_SIZE_IN_BYTES = MBOX_FILE_MAX_SIZE_IN_GB * 1024 * 1024 * 1024; // 1 GB
+const MBOX_FILE_MAX_SIZE_IN_BYTES = gbToBytes(MBOX_FILE_MAX_SIZE_IN_GB); // 1 GB
 
 const ImportClientsList = styled.div`
   width: 100%;
@@ -83,12 +86,8 @@ type ConfirmImportModalProps = {
 const ConfirmImportModal = ({ onClose, handleImport, clientName }: ConfirmImportModalProps) => {
   return (
     <>
-      <Typography type='paragraph' wrap>
-        Import mail from {clientName}?
-      </Typography>
-      <Typography type='paragraph' wrap>
-        We will notify you when the import finished.
-      </Typography>
+      <Typography wrap>Import mail from {clientName}?</Typography>
+      <Typography wrap>We will notify you when the import finished.</Typography>
       <ButtonGroup>
         <ButtonGroupItem key='import' label='Import mail' onClick={handleImport} />
         <ButtonGroupItem key='cancel' label='Cancel' onClick={onClose} />
@@ -97,104 +96,32 @@ const ConfirmImportModal = ({ onClose, handleImport, clientName }: ConfirmImport
   );
 };
 
-type AutoImportConsentProps = {
-  onClose: () => void;
-  handleGmailImport: () => void;
-};
-
-const AutoImportConsent = ({ onClose, handleGmailImport }: AutoImportConsentProps) => {
-  return (
-    <>
-      <Typography color='secondary' wrap>
-        Skiff will import your Gmail inbox every five minutes. You can cancel the sync any time you want.
-      </Typography>
-      <ButtonGroup>
-        <ButtonGroupItem key='import' label='Start' onClick={handleGmailImport} />
-        <ButtonGroupItem key='cancel' label='Cancel' onClick={onClose} />
-      </ButtonGroup>
-    </>
-  );
-};
-
-type GmailLoginProps = {
-  setGoogleLogin: (value: boolean) => void;
-  handleGmailAuth: () => void;
-};
-
-const GoogleLogin = ({ setGoogleLogin, handleGmailAuth }: GmailLoginProps) => {
-  const { data } = useGetGmailAutoImportStatusQuery();
-  const [unsubscribe] = useUnsubscribeFromGmailImportMutation();
-  const { enqueueToast, closeToast } = useToast();
-
-  const handleUnsubscribe = async () => {
-    await unsubscribe({
-      update: (cache: ApolloCache<any>) => {
-        cache.writeQuery({
-          query: GetGmailAutoImportStatusDocument,
-          data: {
-            getGmailAutoImportStatus: {
-              subscribed: false
-            }
-          }
-        });
-      }
-    });
-
-    enqueueToast({
-      body: `Successfully unsubscribed`,
-      actions: [{ label: 'Dismiss', onClick: (key) => closeToast(key) }]
-    });
-  };
-
-  if (data?.getGmailAutoImportStatus.subscribed) {
-    return (
-      <>
-        <Typography color='secondary' wrap>
-          You are already subscribed to auto import, your mail synced every five minutes
-        </Typography>
-        <ButtonGroup>
-          <ButtonGroupItem destructive key='cancel' label='Cancel Auto Import' onClick={handleUnsubscribe} />
-          <ButtonGroupItem
-            key='return'
-            label='Back to import options'
-            onClick={() => setTimeout(() => setGoogleLogin(false), 0)}
-          />
-        </ButtonGroup>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <Typography color='secondary' wrap>
-        Securely import email and contacts from Gmail.
-      </Typography>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Icons color='source' icon={Icon.Gmail} size='xlarge' />
-        <Icons color='tertiary' icon={Icon.ArrowLeft} size='xlarge' />
-        <Icons icon={Icon.Skiff} size='xlarge' />
-      </div>
-      <div style={{ display: 'flex', gap: 15, alignItems: 'center' }}>
-        <Button onClick={() => void setTimeout(() => setGoogleLogin(false), 0)} type='navigation'>
-          Back to import options
-        </Button>
-        <GoogleLoginButton onClick={handleGmailAuth} style={{ cursor: 'pointer', height: 42 }} />
-      </div>
-    </>
-  );
-};
-
-type ImportMailProps = {
+interface ImportMailProps {
   setGoogleLogin: (login: boolean) => void;
   googleLogin: boolean;
-};
+}
 
-export const ImportMail = (props: ImportMailProps) => {
-  const { setGoogleLogin, googleLogin } = props;
+export const ImportMail: React.FC<ImportMailProps> = ({ setGoogleLogin, googleLogin }: ImportMailProps) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const { openModal: openSharedModal } = useAppSelector((state) => state.modal);
-  const { enqueueToast, closeToast } = useToast();
+  const { enqueueToast } = useToast();
+  const { data: gmailData, loading: gmailDataLoading } = useGetGmailAutoImportStatusQuery();
+  const [unsubscribe] = useUnsubscribeFromGmailImportMutation();
+  // Show modal before disabling gmail auto import
+  const [showDisableGmail, setShowDisableGmail] = useState(false);
+  const [protonImport, setProtonImport] = useState(false);
+  const [isGmailConnected, setIsGmailConnected] = useState(
+    gmailData?.getGmailAutoImportStatus.subscribed && !gmailDataLoading
+  );
+
+  useEffect(() => {
+    // Update isGmailConnected value once the data is loaded
+    if (!gmailDataLoading && gmailData) {
+      setIsGmailConnected(gmailData.getGmailAutoImportStatus.subscribed);
+    }
+  }, [gmailData, gmailDataLoading]);
+
   const showSettingsDrawer = useCallback(
     () =>
       dispatch(
@@ -214,6 +141,27 @@ export const ImportMail = (props: ImportMailProps) => {
   const featureFlags = useFlags();
   const gmailImportFlag = featureFlags.gmailImport as boolean;
 
+  const handleUnsubscribe = async () => {
+    await unsubscribe({
+      update: (cache: ApolloCache<any>) => {
+        cache.writeQuery({
+          query: GetGmailAutoImportStatusDocument,
+          data: {
+            getGmailAutoImportStatus: {
+              subscribed: false
+            }
+          }
+        });
+      }
+    });
+
+    enqueueToast({
+      title: `Successfully unsubscribed`,
+      body: 'Google account no longer connected.'
+    });
+    setIsGmailConnected(false);
+  };
+
   const onClose = useCallback(() => {
     // clean code query params
     if (googleAuthClientCode || outlookAuthClientCode) {
@@ -222,7 +170,7 @@ export const ImportMail = (props: ImportMailProps) => {
       const paramsToDelete = getParamsToDelete(provider);
       paramsToDelete.forEach((param) => delete newQuery[param]);
       const hash = extractHashParamFromURL(router.asPath);
-      router.replace({ query: newQuery, hash, pathname: router.pathname }, undefined, { shallow: true });
+      void router.replace({ query: newQuery, hash, pathname: router.pathname }, undefined, { shallow: true });
     }
 
     dispatch(skemailModalReducer.actions.setOpenModal(undefined));
@@ -249,6 +197,22 @@ export const ImportMail = (props: ImportMailProps) => {
     window.location.replace(loginUrl.data.getOutlookAuthUrl);
   }, []);
 
+  const handleImportError = useCallback(
+    (errorMsg: string, retryAuth: () => Promise<void>) => {
+      enqueueToast({
+        title: 'Import failed',
+        body: errorMsg,
+        actions: [
+          {
+            label: 'Try again',
+            onClick: retryAuth
+          }
+        ]
+      });
+    },
+    [enqueueToast]
+  );
+
   const handleGmailImport = useCallback(async () => {
     if (!googleAuthClientCode) return;
     onClose();
@@ -268,16 +232,48 @@ export const ImportMail = (props: ImportMailProps) => {
           }
         }
       });
-    } catch (err: any) {
-      err.graphQLErrors?.some((graphError: GraphQLError) => {
-        if (graphError.extensions?.code === 'IMPORT_ERROR') {
-          dispatch(skemailModalReducer.actions.setOpenModal({ type: ModalType.ImportMail, error: graphError.message }));
-          return true;
-        }
-        return false;
+      enqueueToast({
+        title: 'Google account connected',
+        body: 'Emails will be automatically imported every 5 minutes.'
       });
+      setIsGmailConnected(true);
+      // Grant one-time credit
+      void grantCredits({
+        variables: {
+          request: {
+            creditTransactionReason: CreditTransactionReason.GmailImport,
+            creditAmount: { cents: 0, skemailStorageBytes: '0', editorStorageBytes: '0' } // one-time credit reward handled by backend
+          }
+        },
+        refetchQueries: ['getCredits']
+      });
+    } catch (err) {
+      if (err instanceof ApolloError) {
+        err.graphQLErrors?.some((graphError: GraphQLError) => {
+          if (graphError.extensions?.code === 'IMPORT_ERROR') {
+            handleImportError(graphError.message, handleGmailAuth);
+            return true;
+          }
+          return false;
+        });
+      }
     }
-  }, [dispatch, googleAuthClientCode, onClose, showSettingsDrawer]);
+  }, [
+    enqueueToast,
+    googleAuthClientCode,
+    grantCredits,
+    handleGmailAuth,
+    handleImportError,
+    onClose,
+    showSettingsDrawer
+  ]);
+
+  // auto consent to complete sign up
+  useEffect(() => {
+    if (googleAuthClientCode) {
+      void handleGmailImport();
+    }
+  }, [googleAuthClientCode, handleGmailImport]);
 
   const handleOutlookImport = useCallback(async () => {
     if (!outlookAuthClientCode) return;
@@ -302,38 +298,32 @@ export const ImportMail = (props: ImportMailProps) => {
         variables: {
           request: {
             creditTransactionReason: CreditTransactionReason.OutlookImport,
-            creditAmount: { cents: 0, skemailStorageBytes: '0', editorStorageBytes: '0' } // handled by backend.
+            creditAmount: { cents: 0, skemailStorageBytes: '0', editorStorageBytes: '0' } // one-time credit reward handled by backend
           }
         },
         refetchQueries: ['getCredits']
       });
-    } catch (err: any) {
-      err.graphQLErrors?.some((graphError: GraphQLError) => {
-        if (graphError.extensions?.code === 'IMPORT_ERROR') {
-          dispatch(skemailModalReducer.actions.setOpenModal({ type: ModalType.ImportMail, error: graphError.message }));
-          return true;
-        }
-        return false;
-      });
+    } catch (err) {
+      if (err instanceof ApolloError) {
+        err.graphQLErrors?.some((graphError: GraphQLError) => {
+          if (graphError.extensions?.code === 'IMPORT_ERROR') {
+            handleImportError(graphError.message, handleOutlookAuth);
+            return true;
+          }
+          return false;
+        });
+      }
     }
-  }, [dispatch, onClose, outlookAuthClientCode, showSettingsDrawer]);
-
-  const enqueueWarning = useCallback(
-    (body: string) => {
-      enqueueToast({
-        body,
-        icon: Icon.Warning,
-        actions: [{ label: 'Dismiss', onClick: (key) => closeToast(key) }]
-      });
-    },
-    [closeToast, enqueueToast]
-  );
+  }, [grantCredits, handleImportError, handleOutlookAuth, onClose, outlookAuthClientCode, showSettingsDrawer]);
 
   const enqueueMaxSizeExceeded = useCallback(
     (maxSize: string) => {
-      enqueueWarning(`File is too big. The maximum size is ${maxSize}`);
+      enqueueToast({
+        title: 'Import failed',
+        body: `File is too big. The maximum size is ${maxSize}`
+      });
     },
-    [enqueueWarning]
+    [enqueueToast]
   );
 
   const handleFileImport = useCallback(
@@ -342,15 +332,14 @@ export const ImportMail = (props: ImportMailProps) => {
       if (event.target.files?.item(0)) {
         const file = event.target.files[0];
         try {
-          if (file.name.endsWith('.eml')) {
+          if (file?.name.endsWith('.eml')) {
             const oversizedFiles = Array.from(event.target.files).some(
               (emlFile) => emlFile.size > MESSAGE_MAX_SIZE_IN_BYTES
             );
             if (oversizedFiles) {
               enqueueToast({
-                body: `Some of the files are to big. The maximum size is ${MESSAGE_MAX_SIZE_IN_MB}mb`,
-                icon: Icon.Warning,
-                actions: [{ label: 'Dismiss', onClick: (key) => closeToast(key) }]
+                title: 'Files too big',
+                body: `The maximum size is ${MESSAGE_MAX_SIZE_IN_MB}mb.`
               });
               return;
             }
@@ -364,7 +353,7 @@ export const ImportMail = (props: ImportMailProps) => {
                 }
               }
             });
-          } else if (file.name.endsWith('.mbox')) {
+          } else if (file?.name.endsWith('.mbox')) {
             if (file.size > MBOX_FILE_MAX_SIZE_IN_BYTES) {
               enqueueMaxSizeExceeded(`${MBOX_FILE_MAX_SIZE_IN_GB}gb`);
               onClose();
@@ -381,99 +370,108 @@ export const ImportMail = (props: ImportMailProps) => {
             });
           } else {
             enqueueToast({
-              body: 'Pick .eml or .mbox file',
-              icon: Icon.Warning,
-              actions: [{ label: 'Dismiss', onClick: (key) => closeToast(key) }]
+              title: 'Invalid file type',
+              body: 'You can import .eml or .mbox files.'
             });
             return;
           }
           enqueueToast({
-            body: 'Emails import started.',
-            icon: Icon.Plus,
-            actions: [{ label: 'Dismiss', onClick: (key) => closeToast(key) }]
+            title: 'Import started',
+            body: 'Emails are being added into your inbox.'
           });
-        } catch (err: any) {
-          err.graphQLErrors?.some((graphError: GraphQLError) => {
-            if (graphError.extensions?.code === 'IMPORT_ERROR') {
-              enqueueToast({
-                body: err.message,
-                icon: Icon.Warning,
-                actions: [{ label: 'Dismiss', onClick: (key) => closeToast(key) }]
-              });
-              return true;
-            }
-            if (graphError.extensions?.code === 'RATE_LIMIT_EXCEEDED') {
-              enqueueToast({
-                body: 'Something went wrong, please try again later',
-                icon: Icon.Warning,
-                actions: [{ label: 'Dismiss', onClick: (key) => closeToast(key) }]
-              });
-              return true;
-            }
-            return false;
-          });
-          enqueueToast({
-            body: 'Email import failed.',
-            icon: Icon.Warning,
-            actions: [{ label: 'Dismiss', onClick: (key) => closeToast(key) }]
-          });
+        } catch (err) {
+          if (err instanceof ApolloError) {
+            err.graphQLErrors?.some((graphError: GraphQLError) => {
+              if (graphError.extensions?.code === 'IMPORT_ERROR') {
+                enqueueToast({
+                  title: 'Import failed',
+                  body: (err as Error).message
+                });
+                return true;
+              }
+              if (graphError.extensions?.code === 'RATE_LIMIT_EXCEEDED') {
+                enqueueToast({
+                  title: 'Import failed',
+                  body: 'Could not add emails to inbox.'
+                });
+                return true;
+              }
+              return false;
+            });
+            enqueueToast({
+              title: 'Import failed',
+              body: 'Could not add emails to inbox.'
+            });
+          }
         }
         onClose();
       }
     },
-    [closeToast, enqueueToast, enqueueMaxSizeExceeded, onClose]
+    [enqueueToast, enqueueMaxSizeExceeded, onClose]
   );
 
-  if (isImportModal(openSharedModal) && openSharedModal.error) {
+  if (outlookAuthClientCode) {
     return (
-      <Dialog
-        customContent
+      <ConfirmImportModal
+        clientName='Outlook'
+        handleImport={() => {
+          void handleOutlookImport();
+        }}
         onClose={onClose}
-        open={openSharedModal?.type === ModalType.ImportMail}
-        title='Import mail'
-        type={DialogTypes.Input}
-      >
-        <>
-          <Typography type='paragraph' wrap>
-            {openSharedModal.error}
-          </Typography>
-          <ButtonGroup>
-            <ButtonGroupItem key='auth' label='Try again' onClick={() => void handleOutlookAuth()} />
-            <ButtonGroupItem key='cancel' label='Cancel' onClick={onClose} />
-          </ButtonGroup>
-        </>
-      </Dialog>
+        openSharedModal={openSharedModal}
+      />
     );
   }
 
-  let content = (
+  return (
     <>
-      <TitleActionSection subtitle='Securely import email from Gmail or other webmail accounts.' />
+      <TitleActionSection subtitle='Securely import email from Gmail or other webmail accounts' />
       <ImportClientsList>
         {gmailImportFlag && (
           <ImportSelect
             dataTest='gmail-mail-import'
+            destructive={isGmailConnected}
             icon={Icon.Gmail}
             iconColor='source'
             label='Gmail'
-            onClick={() => setTimeout(() => setGoogleLogin(true), 0)}
-            sublabel='Earn $15 of credit when you import from Gmail.'
+            onClick={() => {
+              if (!isGmailConnected) {
+                setTimeout(() => setGoogleLogin(true), 0);
+              } else {
+                setShowDisableGmail(true);
+              }
+            }}
+            onClickLabel={isGmailConnected ? 'Disable' : 'Import'}
+            sublabel={
+              isGmailConnected
+                ? 'Your account is connected to Skiff.'
+                : 'Earn $10 of credit when you import from Gmail.'
+            }
             wrap
           />
         )}
         <ImportSelect
           dataTest='outlook-mail-import'
-          icon={Icon.Outlook}
-          iconColor='source'
+          icon={Icon.Envelope}
+          iconColor='secondary'
           label='Outlook'
-          onClick={handleOutlookAuth}
-          sublabel='Earn $15 of credit when you import from Outlook.'
+          onClick={() => {
+            void handleOutlookAuth();
+          }}
+          sublabel='Earn $10 of credit when you import from Outlook.'
           wrap
+        />
+        <ImportSelect
+          icon={Icon.Parcel}
+          iconColor='secondary'
+          label='ProtonMail'
+          onClick={() => setProtonImport(true)}
+          sublabel='Start with the Import/Export app.'
         />
         <ImportSelect
           icon={Icon.Mailbox}
           iconColor='secondary'
-          label='Mbox file'
+          label='MBOX file'
           onClick={() => mboxInputRef.current?.click()}
           sublabel='Upload a .mbox file to get started.'
         />
@@ -485,10 +483,37 @@ export const ImportMail = (props: ImportMailProps) => {
           sublabel='Upload a .eml file to get started.'
         />
       </ImportClientsList>
+      <GmailImportDialog
+        handleGmailAuth={handleGmailAuth}
+        onClose={() => void setTimeout(() => setGoogleLogin(false), 0)}
+        open={googleLogin}
+      />
+      <ProtonImportDialog
+        emlRef={emlInputRef}
+        mboxRef={mboxInputRef}
+        onClose={() => {
+          setProtonImport(false);
+        }}
+        open={protonImport}
+      />
+      <ConfirmModal
+        confirmName='Disable'
+        description='You will no longer automatically receive emails from your Gmail account.'
+        destructive
+        onClose={() => setShowDisableGmail(false)}
+        onConfirm={async () => {
+          await handleUnsubscribe();
+          setShowDisableGmail(false);
+        }}
+        open={showDisableGmail}
+        title='Disable Gmail auto-import?'
+      />
       <input
         accept='.eml'
         multiple={true}
-        onChange={handleFileImport}
+        onChange={(event) => {
+          void handleFileImport(event);
+        }}
         ref={emlInputRef}
         style={{ display: 'none' }}
         type='file'
@@ -496,44 +521,13 @@ export const ImportMail = (props: ImportMailProps) => {
       <input
         accept='.mbox'
         multiple={false}
-        onChange={handleFileImport}
+        onChange={(event) => {
+          void handleFileImport(event);
+        }}
         ref={mboxInputRef}
         style={{ display: 'none' }}
         type='file'
       />
     </>
   );
-
-  if (outlookAuthClientCode) {
-    content = (
-      <ConfirmImportModal
-        clientName={'Outlook'}
-        handleImport={handleOutlookImport}
-        onClose={onClose}
-        openSharedModal={openSharedModal}
-      />
-    );
-  }
-
-  if (isImportModal(openSharedModal) && openSharedModal.error) {
-    content = (
-      <>
-        <Typography wrap>{openSharedModal.error}</Typography>
-        <ButtonGroup>
-          <ButtonGroupItem key='auth' label='Try again' onClick={handleGmailAuth} />
-          <ButtonGroupItem key='cancel' label='Cancel' onClick={onClose} />
-        </ButtonGroup>
-      </>
-    );
-  }
-
-  if (googleAuthClientCode) {
-    content = <AutoImportConsent handleGmailImport={handleGmailImport} onClose={onClose} />;
-  }
-
-  if (googleLogin) {
-    content = <GoogleLogin handleGmailAuth={handleGmailAuth} setGoogleLogin={setGoogleLogin} />;
-  }
-
-  return content;
 };

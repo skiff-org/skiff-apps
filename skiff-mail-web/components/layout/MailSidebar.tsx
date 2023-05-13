@@ -1,33 +1,41 @@
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import { Icon } from 'nightwatch-ui';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useUserLabelsQuery } from 'skiff-front-graphql';
 import {
-  DEFAULT_WEB_SETTING_INDICES,
-  TabPage,
-  SettingValue,
-  SidebarSectionType,
-  ActionSidebarItemProps,
   ActionSidebarItem,
+  ActionSidebarItemProps,
+  DEFAULT_WEB_SETTING_INDICES,
+  DEFAULT_WORKSPACE_EVENT_VERSION,
+  SettingValue,
+  Sidebar,
   SidebarSectionProps,
-  useToast
+  SidebarSectionType,
+  TabPage,
+  useDefaultEmailAlias,
+  useRequiredCurrentUserData,
+  getEnvironment,
+  MAIL_MOBILE_APP_DOWNLOAD_LINK
 } from 'skiff-front-utils';
-import { Sidebar } from 'skiff-front-utils';
-import { useUserLabelsQuery } from 'skiff-mail-graphql';
+import { WorkspaceEventType } from 'skiff-graphql';
 import styled from 'styled-components';
 
-import { useRequiredCurrentUserData } from '../../apollo/currentUser';
 import { useDrafts } from '../../hooks/useDrafts';
-import { skemailModalReducer } from '../../redux/reducers/modalReducer';
+import { useShowAliasInboxes } from '../../hooks/useShowAliasInboxes';
+import { ComposeExpandTypes, skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { ModalType } from '../../redux/reducers/modalTypes';
 import { RootState } from '../../redux/store/reduxStore';
 import { DNDItemTypes } from '../../utils/dragAndDrop';
 import {
   isDefaultSidebarLabel,
+  orderAliasLabels,
   sortByName,
+  splitUserLabelsByVariant,
   SYSTEM_LABELS,
-  userLabelFromGraphQL,
-  splitUserLabelsAndFolders
+  userLabelFromGraphQL
 } from '../../utils/label';
+import { storeWorkspaceEvent } from '../../utils/userUtils';
 import AppSwitcher from '../modals/AppSwitcher';
 import { useSettings } from '../Settings/useSettings';
 
@@ -39,7 +47,9 @@ const BottomContainer = styled.div`
   flex: 1;
   gap: 4px;
   flex-grow: 0;
+  padding: 6px 0;
   justify-content: flex-end;
+  border-top: 1px solid var(--border-tertiary);
 `;
 
 export const SidebarDataTest = {
@@ -47,22 +57,33 @@ export const SidebarDataTest = {
 };
 
 export const MailSidebar: React.FC = () => {
+  const { showAliasInboxes } = useShowAliasInboxes();
+
   const user = useRequiredCurrentUserData();
   const dispatch = useDispatch();
-  const { composeOpen, isComposeCollapsed } = useSelector((state: RootState) => state.modal);
+  const { composeOpen, composeCollapseState } = useSelector((state: RootState) => state.modal);
   const { composeNewDraft } = useDrafts();
   const { openSettings } = useSettings();
   const { data } = useUserLabelsQuery();
-  const [userLabels, userFolders] = splitUserLabelsAndFolders(
+  const { labels, folders, aliasLabels } = splitUserLabelsByVariant(
     data?.userLabels?.map(userLabelFromGraphQL).sort(sortByName) ?? []
   );
-  const { enqueueToast } = useToast();
+  const [defaultEmailAlias] = useDefaultEmailAlias(user.userID);
+  const flags = useFlags();
+  const env = getEnvironment(new URL(window.location.origin));
+  const showMailAppFooterButton = env === 'local' || env === 'vercel' || (flags.showMailAppFooterButton as boolean);
 
   const openCommandPalette = () =>
     dispatch(skemailModalReducer.actions.setOpenModal({ type: ModalType.CommandPalette }));
   const openSettingsModal = () => openSettings(DEFAULT_WEB_SETTING_INDICES);
   const expand = () => dispatch(skemailModalReducer.actions.expand());
-  const openImportSettings = () => openSettings({ tab: TabPage.Import, setting: SettingValue.ImportMail });
+  const openImportSettings = () => {
+    openSettings({ tab: TabPage.Import, setting: SettingValue.ImportMail });
+    void storeWorkspaceEvent(WorkspaceEventType.MailImportOpen, '', DEFAULT_WORKSPACE_EVENT_VERSION);
+  };
+  const openContactSettings = () => {
+    openSettings({ tab: TabPage.Contacts, setting: SettingValue.Contacts });
+  };
   // open invite users modal
   const openInviteUsersModal = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -72,17 +93,8 @@ export const MailSidebar: React.FC = () => {
 
   const openCompose = () => {
     if (composeOpen) {
-      if (isComposeCollapsed) {
+      if (composeCollapseState === ComposeExpandTypes.Collapsed) {
         expand();
-      } else {
-        enqueueToast({
-          body: 'You are already composing a message',
-          icon: Icon.Warning,
-          position: {
-            vertical: 'top',
-            horizontal: 'center'
-          }
-        });
       }
       return;
     }
@@ -111,12 +123,14 @@ export const MailSidebar: React.FC = () => {
     }
   ];
 
+  const orderedAliasLabels = orderAliasLabels(aliasLabels, defaultEmailAlias);
+
   const sections: SidebarSectionProps[] = [
     {
       id: 'system-inbox',
       content: {
         type: SidebarSectionType.NonCollapsible,
-        label: 'General',
+        label: 'Mail',
         items: SYSTEM_LABELS.filter(isDefaultSidebarLabel).map((label) => ({
           SectionItem: () => <LabelSidebarItem key={label.value} label={label} variant={LabelVariants.System} />,
           key: label.value
@@ -125,33 +139,48 @@ export const MailSidebar: React.FC = () => {
         noItemsLabel: 'No inboxes found'
       }
     },
-    {
-      id: 'more-inbox',
-      content: {
-        type: SidebarSectionType.Collapsible,
-        label: 'More',
-        items: SYSTEM_LABELS.filter((label) => !isDefaultSidebarLabel(label)).map((label) => ({
-          SectionItem: () => <LabelSidebarItem key={label.value} label={label} variant={LabelVariants.System} />,
-          key: label.value
-        })),
-        acceptedDragType: DNDItemTypes.MESSAGE_CELL,
-        noItemsLabel: 'No inboxes found'
-      }
-    },
+    ...(showAliasInboxes
+      ? [
+          {
+            id: 'alias-inboxes',
+            canDragToSection: false, // cannot drag threads into alias inboxes
+            content: {
+              type: SidebarSectionType.Collapsible,
+              label: 'Aliases',
+              items: orderedAliasLabels.map((aliasLabel) => ({
+                SectionItem: () => (
+                  <LabelSidebarItem key={aliasLabel.value} label={aliasLabel} variant={LabelVariants.Alias} />
+                ),
+                key: aliasLabel.value
+              })),
+              acceptedDragType: DNDItemTypes.MESSAGE_CELL,
+              noItemsLabel: 'No alias inboxes',
+              titleButton: {
+                onClick: (e?: React.MouseEvent<Element, MouseEvent>) => {
+                  e?.stopPropagation();
+                  openSettings({ tab: TabPage.Aliases, setting: SettingValue.AddEmailAlias });
+                },
+                tooltip: 'Add alias'
+              }
+            },
+            defaultIsOpenVal: true
+          }
+        ]
+      : []),
     {
       id: 'mail-folders',
       content: {
         type: SidebarSectionType.Collapsible,
         label: 'Folders',
-        items: userFolders.map((folder) => ({
+        items: folders.map((folder) => ({
           SectionItem: () => <LabelSidebarItem key={folder.value} label={folder} variant={LabelVariants.Folder} />,
           key: folder.value
         })),
         acceptedDragType: DNDItemTypes.MESSAGE_CELL,
         noItemsLabel: 'No folders created',
         titleButton: {
-          onClick: (e) => {
-            e.stopPropagation();
+          onClick: (e?: React.MouseEvent<Element, MouseEvent>) => {
+            e?.stopPropagation();
             dispatch(
               skemailModalReducer.actions.setOpenModal({
                 type: ModalType.CreateOrEditLabelOrFolder,
@@ -168,15 +197,15 @@ export const MailSidebar: React.FC = () => {
       content: {
         type: SidebarSectionType.Collapsible,
         label: 'Labels',
-        items: userLabels.map((folder) => ({
+        items: labels.map((folder) => ({
           SectionItem: () => <LabelSidebarItem key={folder.value} label={folder} variant={LabelVariants.Folder} />,
           key: folder.value
         })),
         acceptedDragType: DNDItemTypes.MESSAGE_CELL,
         noItemsLabel: 'No labels created',
         titleButton: {
-          onClick: (e) => {
-            e.stopPropagation();
+          onClick: (e?: React.MouseEvent<Element, MouseEvent>) => {
+            e?.stopPropagation();
             dispatch(skemailModalReducer.actions.setOpenModal({ type: ModalType.CreateOrEditLabelOrFolder }));
           },
           tooltip: 'New label'
@@ -185,7 +214,33 @@ export const MailSidebar: React.FC = () => {
     }
   ];
 
+  const contactAction = {
+    label: 'Contacts',
+    icon: Icon.UserCircle,
+    onClick: openContactSettings
+  };
+
+  const mobileQrAction = {
+    label: 'Download app',
+    icon: Icon.Mobile,
+    onClick: () => {
+      dispatch(
+        skemailModalReducer.actions.setOpenModal({
+          type: ModalType.QrCode,
+          title: 'Get the Skiff Mail app',
+          description: 'Available on iOS, Android, and macOS',
+          link: MAIL_MOBILE_APP_DOWNLOAD_LINK,
+          buttonProps: {
+            label: 'View all downloads',
+            onClick: () => window.open(MAIL_MOBILE_APP_DOWNLOAD_LINK, '_blank')
+          }
+        })
+      );
+    }
+  };
+
   const footerActions: ActionSidebarItemProps[] = [
+    showMailAppFooterButton ? mobileQrAction : contactAction,
     {
       label: 'Import mail',
       icon: Icon.MoveMailbox,
@@ -218,3 +273,5 @@ export const MailSidebar: React.FC = () => {
     />
   );
 };
+
+export default MailSidebar;

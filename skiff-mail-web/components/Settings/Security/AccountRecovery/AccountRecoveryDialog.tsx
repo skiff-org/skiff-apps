@@ -1,22 +1,18 @@
 import { Dialog } from 'nightwatch-ui';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { uploadRecoveryData } from 'skiff-front-graphql';
 import {
   AccountRecoveryInstruction,
-  AccountRecoveryPDF,
   DEFAULT_WORKSPACE_EVENT_VERSION,
+  exportRecoveryKeyToClient,
   getRecoveryPDFNameFromUsername,
-  PDF_ID,
-  TOP_CLASS,
-  BOTTOM_CLASS,
-  AccountRecoveryAction,
-  exportRecoveryKeyToClient
+  setBrowserRecoveryShare,
+  useDefaultEmailAlias,
+  useRequiredCurrentUserData
 } from 'skiff-front-utils';
 import { WorkspaceEventType } from 'skiff-graphql';
-import { uploadRecoveryData } from 'skiff-mail-graphql';
 
 import client from '../../../../apollo/client';
-import { setBrowserRecoveryShare, useRequiredCurrentUserData } from '../../../../apollo/currentUser';
-// eslint-disable-next-line import/no-cycle
 import { useIosKeyboardHeight } from '../../../../hooks/useIosKeyboardHeight';
 import { storeWorkspaceEvent } from '../../../../utils/userUtils';
 
@@ -33,12 +29,12 @@ type AccountRecoveryDialogProps = {
 export default function AccountRecoveryDialog({ isOpen, closeDialog }: AccountRecoveryDialogProps) {
   const keyboardHeight = useIosKeyboardHeight('recoverykey');
   const userData = useRequiredCurrentUserData();
-  const { email, username } = userData;
+  const { username, userID, recoveryEmail } = userData;
+  const [defaultEmailAlias] = useDefaultEmailAlias(userID);
 
   // Recovery key
   const [recoveryPaperShare, setRecoveryPaperShare] = useState('');
 
-  // Exports the recovery key component (referenced by PDF_ID) as a PDF and adds the recovery key text as an overlay.
   const onDownloadPDF = async () => {
     // Get file name from username.
     const exportedFilename: string = getRecoveryPDFNameFromUsername(username);
@@ -52,9 +48,10 @@ export default function AccountRecoveryDialog({ isOpen, closeDialog }: AccountRe
       maxLen: 6
     };
     await exportRecoveryKeyToClient(
-      PDF_ID as string,
-      TOP_CLASS as string,
-      BOTTOM_CLASS as string,
+      'Skiff Recovery Key',
+      'Secret key',
+      defaultEmailAlias,
+      recoveryEmail,
       exportedFilename,
       overlayText
     );
@@ -63,9 +60,9 @@ export default function AccountRecoveryDialog({ isOpen, closeDialog }: AccountRe
 
   // Fetch and upload recovery data
   const getRecoveryData = useCallback(async () => {
-    const recoveryData = await uploadRecoveryData(userData, AccountRecoveryAction.UPLOAD, client);
-    setRecoveryPaperShare(recoveryData.recoveryBrowserShare);
-    setBrowserRecoveryShare(recoveryData.recoveryPaperShare);
+    const recoveryData = await uploadRecoveryData(userData, client);
+    setRecoveryPaperShare(recoveryData.recoveryPaperShare);
+    setBrowserRecoveryShare(recoveryData.recoveryBrowserShare, client);
   }, [userData]);
 
   useEffect(() => {
@@ -81,7 +78,6 @@ export default function AccountRecoveryDialog({ isOpen, closeDialog }: AccountRe
         onDownloadPDF={onDownloadPDF}
         recoveryPaperShare={recoveryPaperShare}
       />
-      <AccountRecoveryPDF displayName={email ?? username} />
     </Dialog>
   );
 }

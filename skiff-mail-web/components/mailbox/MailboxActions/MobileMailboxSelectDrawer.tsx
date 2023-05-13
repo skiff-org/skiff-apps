@@ -1,22 +1,26 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { DropdownItem, Icon, Icons, Typography, Drawer } from 'nightwatch-ui';
+import { DropdownItem, Icon, Icons, Size, ThemeMode, Typography, Drawer, TypographySize } from 'nightwatch-ui';
 import { FC, useCallback, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { useTheme, DrawerOption, DrawerOptions } from 'skiff-front-utils';
-import { SystemLabels } from 'skiff-graphql';
-import { useGetNumUnreadQuery, useUserLabelsQuery } from 'skiff-mail-graphql';
+import { useGetNumUnreadQuery, useUserLabelsQuery } from 'skiff-front-graphql';
+import { DrawerOption, DrawerOptions, useDefaultEmailAlias, useRequiredCurrentUserData } from 'skiff-front-utils';
+import { SystemLabels, UserLabelVariant } from 'skiff-graphql';
 import { POLL_INTERVAL_IN_MS } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useRouterLabelContext } from '../../../context/RouterLabelContext';
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
+import { useShowAliasInboxes } from '../../../hooks/useShowAliasInboxes';
 import { skemailMobileDrawerReducer } from '../../../redux/reducers/mobileDrawerReducer';
 import {
+  getLabelDisplayName,
   getLabelFromPathParams,
+  getURLFromLabel,
   Label,
   LabelType,
-  splitUserLabelsAndFolders,
+  orderAliasLabels,
+  splitUserLabelsByVariant,
   SYSTEM_LABELS,
   userLabelFromGraphQL
 } from '../../../utils/label';
@@ -25,12 +29,11 @@ const Spacer = styled.div`
   height: 4px;
 `;
 
-const LabelHeader = styled(Typography)`
-  user-select: none;
+const LabelHeader = styled.div`
   margin: 16px 0px 6px 12px;
 `;
 
-const CheckIcon = styled(Icons)`
+const CheckIconContainer = styled.div`
   transform: translateX(8px);
 `;
 
@@ -52,11 +55,12 @@ const Badge = styled.div<{ active: boolean }>`
 
 const LabelItem: FC<{ label: Label }> = ({ label }) => {
   const router = useRouter();
-  const { theme } = useTheme();
   const routeLabel = getLabelFromPathParams(router.query ? (router.query.label as string) : '');
   const routeLabelRef = useRef(routeLabel);
   routeLabelRef.current = routeLabel;
-  const { name: labelName } = useRouterLabelContext();
+  const { name: routerLabelName } = useRouterLabelContext();
+
+  const displayLabelName = getLabelDisplayName(label.name);
 
   const { data } = useGetNumUnreadQuery({
     variables: { label: label.value },
@@ -66,27 +70,29 @@ const LabelItem: FC<{ label: Label }> = ({ label }) => {
   const numUnread = data?.unread ?? 0;
   const dispatch = useDispatch();
 
-  const getStartIcon = (label: Label) => {
-    switch (label.type) {
-      case LabelType.SYSTEM:
-        return label.icon;
-      case LabelType.USER:
-        return <Icons color={label.color} icon={Icon.Dot} />;
-      default:
-        return undefined;
-    }
+  const getStartElement = () =>
+    label.type === LabelType.USER && label.variant !== UserLabelVariant.Alias ? (
+      <Icons color={label.color} forceTheme={ThemeMode.DARK} icon={Icon.Dot} />
+    ) : undefined;
+
+  const getStartIcon = () => {
+    if (label.type === LabelType.SYSTEM) return label.icon;
+    if (label.type === LabelType.USER && label.variant === UserLabelVariant.Alias) return Icon.UserCircle;
+    return undefined;
   };
 
-  // Follows pattern used in SidebarItem.tsx
-  const encodedLabelName = encodeURIComponent(
-    label.type === LabelType.SYSTEM ? label.value.toLowerCase() : label.name.toLowerCase()
-  );
-  const href = `${label.type === LabelType.SYSTEM ? '/' : '/label#'}${encodedLabelName}`;
+  const href = getURLFromLabel(label);
   const forwardAndCount = (
     <ForwardAndCount>
       <Badge active>
-        {label.name === labelName && <CheckIcon icon={Icon.Check} size='large' />}
-        {label.name !== labelName && numUnread > 0 && <Typography color='primary'>{numUnread}</Typography>}
+        {label.name === routerLabelName && (
+          <CheckIconContainer>
+            <Icons forceTheme={ThemeMode.DARK} icon={Icon.Check} size={Size.X_MEDIUM} />
+          </CheckIconContainer>
+        )}
+        {label.name !== routerLabelName && numUnread > 0 && (
+          <Typography forceTheme={ThemeMode.DARK}>{numUnread}</Typography>
+        )}
       </Badge>
     </ForwardAndCount>
   );
@@ -101,10 +107,9 @@ const LabelItem: FC<{ label: Label }> = ({ label }) => {
       >
         <DropdownItem
           endElement={forwardAndCount}
-          icon={getStartIcon(label)}
-          label={label.name}
-          noSelect
-          themeMode={theme}
+          icon={getStartIcon()}
+          label={displayLabelName}
+          startElement={getStartElement()}
         />
       </DrawerOption>
     </Link>
@@ -114,6 +119,7 @@ const LabelItem: FC<{ label: Label }> = ({ label }) => {
 export default function MobileMailboxSelectDrawer() {
   const dispatch = useDispatch();
   const show = useAppSelector((state) => state.mobileDrawer.showMailboxSelectDrawer);
+  const { showAliasInboxes } = useShowAliasInboxes();
 
   const hideDrawer = useCallback(() => {
     dispatch(skemailMobileDrawerReducer.actions.setShowMailboxSelectDrawer(false));
@@ -121,32 +127,41 @@ export default function MobileMailboxSelectDrawer() {
 
   const { data: userLabelsData } = useUserLabelsQuery();
   const userLabelsAndFolders = userLabelsData?.userLabels?.map(userLabelFromGraphQL) ?? [];
-  const [userLabels, userFolderLabels] = splitUserLabelsAndFolders(userLabelsAndFolders);
+  const { labels, folders, aliasLabels } = splitUserLabelsByVariant(userLabelsAndFolders);
+
+  const user = useRequiredCurrentUserData();
+  const [defaultEmailAlias] = useDefaultEmailAlias(user.userID);
+
+  const renderLabelHeader = (title: string) => (
+    <Typography color='secondary' forceTheme={ThemeMode.DARK} mono selectable={false} size={TypographySize.SMALL}>
+      <LabelHeader>{title.toUpperCase()}</LabelHeader>
+    </Typography>
+  );
+
+  const orderedAliasLabels = orderAliasLabels(aliasLabels, defaultEmailAlias);
 
   return (
     <Drawer hideDrawer={hideDrawer} show={show}>
       <Spacer />
       <DrawerOptions>
-        <LabelHeader color='secondary' level={1}>
-          Mailbox
-        </LabelHeader>
+        {renderLabelHeader('Mailbox')}
         {SYSTEM_LABELS.map((label) => (
           <LabelItem key={label.value} label={label} />
         ))}
-        {userFolderLabels.length > 0 && (
-          <LabelHeader color='secondary' level={1}>
-            Folders
-          </LabelHeader>
+        {showAliasInboxes && (
+          <>
+            {orderedAliasLabels.length > 0 && renderLabelHeader('Aliases')}
+            {orderedAliasLabels.map((label) => (
+              <LabelItem key={label.value} label={label} />
+            ))}
+          </>
         )}
-        {userFolderLabels.map((label) => (
+        {folders.length > 0 && renderLabelHeader('Folders')}
+        {folders.map((label) => (
           <LabelItem key={label.value} label={label} />
         ))}
-        {userLabels.length > 0 && (
-          <LabelHeader color='secondary' level={1}>
-            Labels
-          </LabelHeader>
-        )}
-        {userLabels.map((label) => (
+        {labels.length > 0 && renderLabelHeader('Labels')}
+        {labels.map((label) => (
           <LabelItem key={label.value} label={label} />
         ))}
       </DrawerOptions>

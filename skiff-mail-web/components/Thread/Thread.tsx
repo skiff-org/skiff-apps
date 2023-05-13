@@ -1,33 +1,45 @@
-import { isEqual, last } from 'lodash';
-import { Icon, Icons, Typography } from 'nightwatch-ui';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { isMobile, MobileView } from 'react-device-detect';
+import isEqual from 'lodash/isEqual';
+import last from 'lodash/last';
+import { Button, Icon, IconButton, Icons, ThemeMode, Type, Typography, TypographyWeight } from 'nightwatch-ui';
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { BrowserView, MobileView, isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
-import { useTheme } from 'skiff-front-utils';
+import { useGetThreadFromIdQuery, useIsCustomDomainQuery } from 'skiff-front-graphql';
+import {
+  splitEmailToAliasAndDomain,
+  useCurrentUserEmailAliases,
+  useDefaultEmailAlias,
+  useRequiredCurrentUserData,
+  useTheme
+} from 'skiff-front-utils';
 import { SystemLabels } from 'skiff-graphql';
-import { useGetThreadFromIdQuery } from 'skiff-mail-graphql';
+import { getMailDomain } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { NO_SUBJECT_TEXT } from '../../constants/mailbox.constants';
 import { useRouterLabelContext } from '../../context/RouterLabelContext';
-import { useCurrentUserEmailAliases } from '../../hooks/useCurrentUserEmailAliases';
-import { useDefaultEmailAlias } from '../../hooks/useDefaultEmailAlias';
+import { useAppSelector } from '../../hooks/redux/useAppSelector';
+import { useDrafts } from '../../hooks/useDrafts';
 import { useThreadActions } from '../../hooks/useThreadActions';
+import { useUserLabelsToRenderAsChips } from '../../hooks/useUserLabelsToRenderAsChips';
+import { useUserSignature } from '../../hooks/useUserSignature';
 import { MailboxEmailInfo } from '../../models/email';
 import { skemailMobileDrawerReducer } from '../../redux/reducers/mobileDrawerReducer';
-import { getActiveSystemLabel, isUserLabel, userLabelFromGraphQL } from '../../utils/label';
-import { updateThreadAsReadUnread } from '../../utils/mailboxUtils';
-import { isSkiffAddress } from '../../utils/userUtils';
+import { skemailModalReducer } from '../../redux/reducers/modalReducer';
+import { getActiveSystemLabel } from '../../utils/label';
+import { getScheduledSendAtDateForThread, updateThreadAsReadUnread } from '../../utils/mailboxUtils';
 import { BOTTOM_NAVIGATION_HEIGHT, THREAD_BODY_ID } from '../mailbox/consts';
 
 import ApplyUserLabelDrawer from './ApplyUserLabelDrawer';
 import MoveThreadDrawer from './MoveThreadMobileDrawer';
-import { ReplayDrawer } from './ReplayDrawer';
+import { ReplyDrawer } from './ReplyDrawer';
 import ReportThreadBlockDrawer from './ReportThreadBlockDrawer';
 import { ThreadNavigationIDs } from './Thread.types';
 import ThreadBlock from './ThreadBlock';
 import ThreadHeader from './ThreadHeader';
 import { useThreadOptions } from './useThreadOptions';
+
+const Compose = React.lazy(() => import('../Compose/Compose'));
 
 const ThreadBody = styled.div`
   overflow-y: auto;
@@ -35,8 +47,8 @@ const ThreadBody = styled.div`
   ${!isMobile
     ? 'padding: 12px 24px 64px 24px;'
     : `
-    padding: 0px 12px;
-    background: var(--bg-l0-solid);
+    padding: 0px;
+    background: var(--bg-main-container);
     padding-bottom: calc(${BOTTOM_NAVIGATION_HEIGHT}px + 32px + env(safe-area-inset-bottom, 0px));
     height: unset;
     flex: 1;
@@ -56,14 +68,37 @@ const ThreadCollapsedDivider = styled.div<{ expanded: boolean; isDarkMode?: bool
   border-radius: 8px;
   justify-content: space-between;
   margin: 16px 0px;
-  box-shadow: ${(props) => (!props.isDarkMode ? 'var(--shadow-l1)' : '')};
-  border: 1px solid ${(props) => (!props.isDarkMode ? 'transparent' : 'var(--border-secondary)')};
+  border: 1px solid var(--border-secondary);
   background: var(--bg-l2-solid);
-  transition: all 0.15s ease-in;
   &:hover {
-    box-shadow: ${(props) => (!props.expanded ? 'var(--shadow-l2)' : 'var(--shadow-l1)')};
+    box-shadow: var(--shadow-l1);
     background: ${(props) => (props.isDarkMode && !props.expanded ? 'var(--bg-l3-solid)' : 'var(--bg-l2-solid)')};
   }
+`;
+
+const MobileReplyContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+  padding: 32px 16px;
+  box-sizing: border-box;
+`;
+
+const ReplyComposeContainer = styled.div`
+  background: var(--bg-l2-solid);
+  margin-top: 12px;
+  border: 1px solid var(--border-secondary);
+  border-radius: 12px;
+`;
+
+const ThreadSkeleton = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  border-radius: 8px;
+  background: var(--bg-l2-solid);
+  border: 1px solid var(--border-secondary);
 `;
 
 // The maximum number of emails shown initially (rest are collapsed)
@@ -85,6 +120,8 @@ type ThreadProps = {
   emailAliases: string[];
 };
 
+const EMPTY_REPLY_HEIGHT = 440;
+
 /**
  * Component for rendering a thread of emails.
  */
@@ -99,13 +136,94 @@ function Thread({
   emailAliases
 }: ThreadProps) {
   const { data, loading: isThreadDataLoading } = useGetThreadFromIdQuery({ variables: { threadID } });
-  const emails = data?.userThread?.emails ?? [];
+  const emails = useMemo(() => data?.userThread?.emails ?? [], [data]);
   const thread = data?.userThread || undefined;
   const attributes = data?.userThread?.attributes;
+  const userLabels = attributes?.userLabels ?? [];
+  const labelsToRender = useUserLabelsToRenderAsChips(userLabels, true);
   const dispatch = useDispatch();
   const { theme } = useTheme();
-  const threadHeaderRef = useRef<HTMLDivElement>(null);
   const threadBodyRef = useRef<HTMLDivElement>(null);
+  const replyRef = useRef<HTMLDivElement>(null);
+  const userSignature = useUserSignature();
+  const { replyComposeOpen } = useAppSelector((state) => state.modal);
+
+  const { composeNewDraft } = useDrafts();
+
+  const allThreadParticipantDomains: string[] = [
+    ...new Set(
+      emails.flatMap(({ from, to, cc, bcc }) =>
+        [from, ...to, ...cc, ...bcc].map(({ address }) => {
+          const { domain } = splitEmailToAliasAndDomain(address);
+          return domain;
+        })
+      )
+    )
+  ].sort();
+
+  const isSkiffDomain = (domain: string) => {
+    return domain === getMailDomain();
+  };
+
+  const allRecipientsAreSkiffDomain = allThreadParticipantDomains.every((domain) => isSkiffDomain(domain));
+
+  const { data: isCustomDomainData } = useIsCustomDomainQuery({
+    variables: {
+      domains: allThreadParticipantDomains
+    },
+    skip: allRecipientsAreSkiffDomain
+  });
+
+  const isSkiffInternal = allRecipientsAreSkiffDomain || !!isCustomDomainData?.isCustomDomain;
+
+  const lastEmail = emails[emails.length - 1];
+  const reply = React.useCallback(() => {
+    if (!lastEmail) {
+      console.error('Could not reply, no recent email found');
+      return;
+    }
+
+    composeNewDraft();
+    if (!data?.userThread) return;
+    dispatch(
+      skemailModalReducer.actions.replyCompose({
+        email: lastEmail,
+        thread: data.userThread,
+        emailAliases,
+        defaultEmailAlias,
+        signature: userSignature
+      })
+    );
+  }, [composeNewDraft, defaultEmailAlias, dispatch, lastEmail, emailAliases, thread, userSignature]);
+
+  const replyAll = () => {
+    if (!lastEmail) {
+      console.error('Could not reply all, no recent email found');
+      return;
+    }
+
+    composeNewDraft();
+    if (!data?.userThread) return;
+    dispatch(
+      skemailModalReducer.actions.replyAllCompose({
+        email: lastEmail,
+        thread: data.userThread,
+        emailAliases,
+        defaultEmailAlias,
+        signature: userSignature
+      })
+    );
+  };
+
+  const forward = () => {
+    if (!lastEmail) {
+      console.error('Could not forward, no recent email found');
+      return;
+    }
+
+    composeNewDraft();
+    dispatch(skemailModalReducer.actions.forwardCompose({ email: lastEmail, emailAliases, defaultEmailAlias }));
+  };
 
   const emailRefs = emails.reduce((acc, val) => {
     acc[val.id] = React.createRef<HTMLDivElement | null>();
@@ -127,7 +245,6 @@ function Thread({
   const initialCollapsedState =
     !isMobile && emails.length > MAXIMUM_INITIAL_EMAILS_SHOWN && !(activeEmailID && activeEmailID in isExpanded);
   const [threadIsCollapsed, setThreadIsCollapsed] = useState(initialCollapsedState);
-  const [threadHeaderHeight, setThreadHeaderHeight] = useState(0);
 
   const { value: labelFromRouter } = useRouterLabelContext() ?? {};
   const activeThreadSystemLabels = data?.userThread?.attributes.systemLabels ?? [];
@@ -139,18 +256,8 @@ function Thread({
     thread,
     emails[emails.length - 1],
     activeThreadLabel,
-    onClose,
     defaultEmailAlias,
     emailAliases
-  );
-
-  // initialize empty array of customDomains, will update once query in useEffect returns
-  const isSkiffInternal = emails.every(
-    (email) =>
-      isSkiffAddress(email.from.address) &&
-      email.to.every((addr) => isSkiffAddress(addr.address)) &&
-      email.cc.every((addr) => isSkiffAddress(addr.address)) &&
-      email.bcc.every((addr) => isSkiffAddress(addr.address))
   );
 
   useEffect(() => {
@@ -158,6 +265,11 @@ function Thread({
     // active email is opened
     setHasScrolled(false);
     setIsExpanded(initialIsExpanded);
+
+    if (replyComposeOpen) {
+      // close reply compose when thread changes
+      dispatch(skemailModalReducer.actions.closeReplyCompose());
+    }
 
     // Only run when the active email ID has changed
     // Including initialIsExpanded will cause infinite rerenders
@@ -170,12 +282,6 @@ function Thread({
       void updateThreadAsReadUnread([thread.threadID], true, thread.attributes.systemLabels);
     }
   }, [thread]);
-
-  useEffect(() => {
-    if (threadHeaderRef.current) {
-      setThreadHeaderHeight(threadHeaderRef.current.getBoundingClientRect().height);
-    }
-  }, [threadHeaderRef.current]);
 
   useEffect(() => {
     // Prevent infinite loop from when ref changes
@@ -192,10 +298,10 @@ function Thread({
           threadBodyRef.current?.scrollBy({ top: shrinkedThreadsHeight, behavior: 'smooth' });
           setHasScrolled(true);
         }
-      } else if (threadBodyRef.current && activeEmailID && emailRefs[activeEmailID]?.current && threadHeaderHeight) {
-        const offsetTop = emailRefs[activeEmailID].current?.offsetTop ?? threadHeaderHeight;
+      } else if (threadBodyRef.current && activeEmailID && emailRefs[activeEmailID]?.current) {
+        const offsetTop = emailRefs[activeEmailID]?.current?.offsetTop;
         threadBodyRef.current.scrollTo({
-          top: offsetTop - threadHeaderHeight,
+          top: offsetTop,
           left: 0,
           behavior: 'smooth'
         });
@@ -203,7 +309,23 @@ function Thread({
         setHasScrolled(true);
       }
     }, 100);
-  }, [activeEmailID, emailRefs, emails, hasScrolled, threadHeaderHeight]);
+  }, [activeEmailID, emailRefs, emails, hasScrolled]);
+
+  // scroll to bottom when opening a reply
+  useEffect(() => {
+    if (!replyComposeOpen) {
+      return;
+    }
+    setTimeout(() => {
+      if (threadBodyRef.current && replyRef.current) {
+        // scroll to reply
+        replyRef.current.scrollIntoView();
+        const replyHeight = replyRef.current.getBoundingClientRect().height;
+        // align to top based on height (if too short, e.g. reply, scroll to bottom)
+        threadBodyRef.current.scrollBy(0, replyHeight > EMPTY_REPLY_HEIGHT ? -200 : 1000);
+      }
+    }, 100);
+  }, [replyComposeOpen]);
 
   useEffect(() => {
     // Wait for thread from ID query to load
@@ -217,7 +339,7 @@ function Thread({
   // Set the first selected emails as the most recent
   useEffect(() => {
     dispatch(skemailMobileDrawerReducer.actions.setCurrentEmail(last(emails) as MailboxEmailInfo));
-  }, [dispatch]);
+  }, [dispatch, emails]);
 
   // make sure that all incoming mails in the thread get default expanded value
   useEffect(() => {
@@ -249,15 +371,10 @@ function Thread({
   const onThreadBlockClick = useCallback(
     (id: string, evt?: React.MouseEvent) => {
       evt?.stopPropagation();
-      // On mobile do not collapse
-      if (!isMobile || !isExpanded[id]) toggleExpanded(id);
+      toggleExpanded(id);
     },
-    [isExpanded, toggleExpanded]
+    [toggleExpanded]
   );
-
-  if (!emails.length) {
-    return null;
-  }
 
   // Last block will always be expanded by default, so we check for > 1
   const someBlocksAreExpanded = Object.values(isExpanded).filter(Boolean).length > 1;
@@ -277,7 +394,7 @@ function Thread({
 
   const renderThreadBlock = (email: MailboxEmailInfo, index: number) => {
     const numCollapsed = emails.length - MAXIMUM_INITIAL_EMAILS_SHOWN;
-    let divider = <ThreadSpacer height={index === 0 ? 0 : 16} />;
+    let divider = !isMobile ? <ThreadSpacer height={index === 0 ? 0 : 12} /> : <></>;
     if (threadIsCollapsed) {
       if (index > 0 && index <= emails.length - MAXIMUM_INITIAL_EMAILS_SHOWN) {
         // If we're collapsed and the email should be hidden
@@ -289,10 +406,10 @@ function Thread({
         divider = (
           <ThreadCollapsedDivider
             expanded={!threadIsCollapsed}
-            isDarkMode={theme === 'dark'}
+            isDarkMode={theme === ThemeMode.DARK}
             onClick={() => setThreadIsCollapsed(false)}
           >
-            <Typography color='link' type='heading'>
+            <Typography color='link' weight={TypographyWeight.BOLD}>
               {numCollapsed} more {numCollapsed > 1 ? 'messages' : 'message'}
             </Typography>
             <Icons color='link' icon={Icon.ExpandV} />
@@ -311,13 +428,12 @@ function Thread({
               currentLabel={activeThreadLabel}
               // Disable on last thread and on mobile disable click once expanded
               defaultEmailAlias={defaultEmailAlias}
-              disableOnClick={index === emails.length - 1 || (isMobile && isExpanded[email.id])}
+              disableOnClick={index === emails.length - 1}
               email={email}
               emailAliases={emailAliases}
-              expanded={isExpanded[email.id]}
+              expanded={!!isExpanded[email.id]}
               key={email.id}
               onClick={onThreadBlockClick}
-              onClose={onClose}
               thread={data.userThread}
             />
           </>
@@ -328,6 +444,10 @@ function Thread({
 
   const scrollToTopOfThreadBody = () => threadBodyRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
 
+  const scheduledSendAtDate = attributes?.systemLabels.includes(SystemLabels.ScheduleSend)
+    ? getScheduledSendAtDateForThread(emails)
+    : undefined;
+
   return (
     <>
       <ThreadHeader
@@ -335,32 +455,63 @@ function Thread({
         emailRefs={emailRefs}
         isExpanded={someBlocksAreExpanded}
         isSkiffSender={isSkiffInternal}
+        loading={!emails.length}
         nextThreadAndEmail={nextThreadAndEmail}
         onClick={isMobile ? scrollToTopOfThreadBody : undefined}
         onClose={onClose}
         onExpand={emails.length > 1 ? onExpand : undefined}
         prevThreadAndEmail={prevThreadAndEmail}
-        ref={threadHeaderRef}
-        schedualSendAt={
-          attributes?.systemLabels.includes(SystemLabels.ScheduleSend) ? emails[0].scheduleSendAt : undefined
-        }
+        scheduledSendAt={scheduledSendAtDate ?? undefined}
         setActiveThreadAndEmail={setActiveThreadAndEmail}
-        text={emails[0].decryptedSubject || NO_SUBJECT_TEXT}
+        text={emails[0]?.decryptedSubject || NO_SUBJECT_TEXT}
         threadBodyRef={threadBodyRef}
         threadId={threadID}
-        userLabels={(attributes?.userLabels ?? []).map(userLabelFromGraphQL).filter(isUserLabel)}
+        userLabels={labelsToRender}
       />
       <ThreadBody id={THREAD_BODY_ID} ref={threadBodyRef}>
-        {/* add spacing for header, to allow for glass effect */}
-        <ThreadSpacer height={threadHeaderHeight} />
+        {!emails.length && <ThreadSkeleton />}
         {emails.map((email, index) => (
-          <div key={`${email.id}-${isExpanded[email.id]}`} ref={emailRefs[email.id]}>
+          <div key={`${email.id}-thread-block`} ref={emailRefs[email.id]}>
             {renderThreadBlock(email, index)}
           </div>
         ))}
+        <BrowserView>
+          {replyComposeOpen && (
+            <ReplyComposeContainer ref={replyRef}>
+              <Suspense fallback={null}>
+                <Compose />
+              </Suspense>
+            </ReplyComposeContainer>
+          )}
+        </BrowserView>
+        <MobileView>
+          <MobileReplyContainer>
+            <Button fullWidth onClick={reply} startIcon={Icon.Reply}>
+              Reply
+            </Button>
+            <div>
+              <IconButton
+                dataTest='mobile-reply-all'
+                filled
+                icon={Icon.ReplyAll}
+                onClick={replyAll}
+                type={Type.SECONDARY}
+              />
+            </div>
+            <div>
+              <IconButton
+                dataTest='mobile-forward'
+                filled
+                icon={Icon.ForwardEmail}
+                onClick={forward}
+                type={Type.SECONDARY}
+              />
+            </div>
+          </MobileReplyContainer>
+        </MobileView>
       </ThreadBody>
       <MobileView>
-        {options && <ReplayDrawer reportSubOptions={options.reportSubOptions} threadOptions={options.threadOptions} />}
+        {options && <ReplyDrawer reportSubOptions={options.reportSubOptions} threadOptions={options.threadOptions} />}
         <MoveThreadDrawer threadID={threadID} />
         <ReportThreadBlockDrawer />
         <ApplyUserLabelDrawer currentSystemLabels={attributes?.systemLabels || []} threadID={threadID} />
@@ -380,7 +531,8 @@ const ThreadMemo = React.memo(Thread, (prev, next) => {
   return true; // should not re-render component
 });
 export default function ThreadMemoWrapper(props: Omit<ThreadProps, 'defaultEmailAlias' | 'emailAliases'>) {
-  const [defaultEmailAlias] = useDefaultEmailAlias();
+  const { userID } = useRequiredCurrentUserData();
+  const [defaultEmailAlias] = useDefaultEmailAlias(userID);
   const emailAliases = useCurrentUserEmailAliases();
   return <ThreadMemo {...props} defaultEmailAlias={defaultEmailAlias} emailAliases={emailAliases} />;
 }

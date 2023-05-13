@@ -1,7 +1,6 @@
-import { noop } from 'lodash';
+import noop from 'lodash/noop';
 import { createContext, useEffect, useState } from 'react';
 
-import { SearchModifierType } from './searchModifiers';
 import { SearchResult, SkemailResultIDs } from './searchTypes';
 
 // Search categories are used to represent the different types that can show up in search
@@ -16,8 +15,6 @@ export enum SearchCategory {
 
 interface SearchContextProps {
   category: SearchCategory;
-  modifierType?: SearchModifierType;
-  modifierValue?: string;
   fullView: boolean;
   query: string;
   searchResults: SearchResult[] | undefined;
@@ -27,7 +24,6 @@ interface SearchContextProps {
   setSearchResults: (results: SearchResult[] | undefined) => void;
   setFullView: (fv: boolean) => void;
   setCategory: (category: SearchCategory) => void;
-  setModifier: (value?: { type: SearchModifierType; value: string }) => void;
   setActiveResult: (activeResult?: SkemailResultIDs) => void;
   activeResult?: SkemailResultIDs;
   setIsNewSearch: (isNew: boolean) => void;
@@ -50,7 +46,6 @@ export const SearchContext = createContext<SearchContextProps>({
   setSearchResults: noop,
   setFullView: noop,
   setCategory: noop,
-  setModifier: noop,
   setActiveResult: noop,
   setIsNewSearch: noop
 });
@@ -58,8 +53,6 @@ export const SearchContext = createContext<SearchContextProps>({
 // Components that need access to the search provider should be wrapped in the SearchProvider
 export const SearchProvider = ({ children, config }: { children?: React.ReactNode; config?: SearchConfig }) => {
   const [category, setCategory] = useState<SearchCategory>(config?.defaultCategory ?? SearchCategory.SKEMAIL);
-  const [type, setType] = useState<SearchModifierType | undefined>();
-  const [value, setValue] = useState<string | undefined>();
   const [fullView, setFullView] = useState(config?.fullView ?? false);
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[] | undefined>([]);
@@ -67,7 +60,7 @@ export const SearchProvider = ({ children, config }: { children?: React.ReactNod
   const [isNewSearch, setIsNewSearch] = useState(true);
 
   // full view is only meant for skemails, so we should only allow the user to enter full view search when they are looking for skemails
-  const showFullViewButton = category === SearchCategory.SKEMAIL && type !== undefined && !!value;
+  const showFullViewButton = category === SearchCategory.SKEMAIL;
 
   // if changing from fullView -> cmdpalette, the query and search results should reset
   useEffect(() => {
@@ -83,8 +76,6 @@ export const SearchProvider = ({ children, config }: { children?: React.ReactNod
       value={{
         activeResult,
         category,
-        modifierType: type,
-        modifierValue: value,
         fullView,
         showFullViewButton,
         isNewSearch,
@@ -94,10 +85,6 @@ export const SearchProvider = ({ children, config }: { children?: React.ReactNod
         setSearchResults,
         setFullView,
         setCategory,
-        setModifier: (val) => {
-          setType(val?.type);
-          setValue(val?.value);
-        },
         setActiveResult,
         setIsNewSearch
       }}

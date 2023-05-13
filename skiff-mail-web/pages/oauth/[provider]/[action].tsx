@@ -41,4 +41,21 @@ const Oauth = () => {
   return null;
 };
 
+export function getStaticPaths() {
+  return {
+    paths: [
+      { params: { provider: 'google', action: Actions.IMPORT } },
+      { params: { provider: 'outlook', action: Actions.IMPORT } }
+    ],
+    fallback: false
+  };
+}
+
+// Required for getStaticPaths
+export function getStaticProps() {
+  return {
+    props: {}
+  };
+}
+
 export default Oauth;

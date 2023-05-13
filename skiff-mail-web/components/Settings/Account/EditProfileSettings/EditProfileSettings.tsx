@@ -1,11 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { EditProfile, getDisplayPictureDataFromUser, TitleActionSection } from 'skiff-front-utils';
-import { DisplayPictureData, RequestStatus } from 'skiff-graphql';
-import { useCreateUploadAvatarLinkMutation, useUpdateDisplayPictureMutation } from 'skiff-mail-graphql';
+import {
+  useUserProfile,
+  useUpdateDisplayPictureMutation,
+  useCreateUploadAvatarLinkMutation
+} from 'skiff-front-graphql';
+import {
+  EditProfile,
+  getDisplayPictureDataFromUser,
+  TitleActionSection,
+  useRequiredCurrentUserData
+} from 'skiff-front-utils';
+import { CreateUploadAvatarLinkResponse, DisplayPictureData, RequestStatus } from 'skiff-graphql';
 
-import { useRequiredCurrentUserData } from '../../../../apollo/currentUser';
 import { useCurrentUserDefinedDisplayName } from '../../../../hooks/useCurrentUserDefinedDisplayName';
-import { useUserProfile } from '../../../../hooks/useUserProfile';
 import { setDisplayName } from '../../../../utils/userUtils';
 
 /**
@@ -15,26 +22,17 @@ function EditProfileSettings() {
   const { userID } = useRequiredCurrentUserData();
 
   const displayName = useCurrentUserDefinedDisplayName();
-  /** Whether error occurred in request */
-  const [hasError, setHasError] = useState(false);
+  /** Request error message */
+  const [errorMsg, setErrorMsg] = useState('');
   /** Text content inside text field */
   const [displayNameStateField, setDisplayNameStateField] = useState(displayName || '');
   const { data: userProfileData } = useUserProfile(userID);
 
+  const [createUploadAvatarLinkMutation] = useCreateUploadAvatarLinkMutation();
+
   const displayPictureData = getDisplayPictureDataFromUser(userProfileData);
 
-  const [createUploadAvatarLinkMutation] = useCreateUploadAvatarLinkMutation();
   const [setDisplayPictureMutation] = useUpdateDisplayPictureMutation();
-
-  // Handlers for EditProfile
-  const createUploadAvatarLink = useCallback(async () => {
-    const { data, errors } = await createUploadAvatarLinkMutation();
-    if (!data?.createUploadAvatarLink || !!errors?.length) {
-      throw new Error('Error creating upload avatar link');
-    }
-    return data.createUploadAvatarLink;
-  }, [createUploadAvatarLinkMutation]);
-
   const setDisplayPictureData = useCallback(
     async (updatedDisplayPictureData: DisplayPictureData) => {
       const { profileAccentColor, profileCustomURI, profileIcon } = updatedDisplayPictureData;
@@ -63,14 +61,14 @@ function EditProfileSettings() {
     if (!setCurrentUserDisplayName) return;
     const status = await setCurrentUserDisplayName(displayNameStateField);
     if (inputRef?.current) inputRef.current.blur();
-    setHasError(status !== RequestStatus.Success);
+    if (status !== RequestStatus.Success) setErrorMsg('Invalid character included.');
   };
 
-  const onChange = (evt: { target: { value: string } }) => setDisplayNameStateField(evt.target.value);
+  const onChange = (evt: { target: { value: string } }) => {
+    if (!!errorMsg.length) setErrorMsg('');
+    setDisplayNameStateField(evt.target.value);
+  };
 
-  const errorMsg = hasError
-    ? 'Could not set display name, try limiting punctuation to ,.`&apos;-_ and no double spaces.'
-    : '';
   const onBlur = () => {
     setTimeout(() => {
       if (document.activeElement?.id === 'edit-profile-btn') {
@@ -86,10 +84,21 @@ function EditProfileSettings() {
     }
   };
 
+  const createUploadAvatarLink = async (): Promise<CreateUploadAvatarLinkResponse | undefined> => {
+    const { data: avatarLink, errors } = await createUploadAvatarLinkMutation();
+
+    if (errors || !avatarLink?.createUploadAvatarLink) {
+      console.error('Error creating upload avatar link', errors);
+      return;
+    }
+
+    return avatarLink?.createUploadAvatarLink;
+  };
+
   return (
     <>
       <EditProfile
-        createUploadAvatarLink={createUploadAvatarLink}
+        createUploadLink={createUploadAvatarLink}
         displayName={displayName}
         displayPictureData={displayPictureData}
         key='edit-profile'
@@ -105,13 +114,13 @@ function EditProfileSettings() {
             onChange,
             onBlur,
             onKeyDown,
-            errorMsg: errorMsg,
+            errorMsg,
             value: displayNameStateField,
             placeholder: displayNameStateField || 'Display name',
             type: 'input'
           }
         ]}
-        subtitle='The name others in your workspace will see you as.'
+        subtitle='The name others in your workspace will see you as'
         title='Display name'
       />
     </>

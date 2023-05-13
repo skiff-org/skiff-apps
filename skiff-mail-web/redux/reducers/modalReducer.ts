@@ -1,26 +1,32 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { isMobile } from 'react-device-detect';
+import { BannerTypes, isDesktopApp } from 'skiff-front-utils';
 import { AddressObject, DecryptedAttachment } from 'skiff-graphql';
 
 import { isInline } from '../../components/Attachments';
-import { createReplyInitialContent, getEmailBody } from '../../components/MailEditor/mailEditorUtils';
-import { MailboxEmailInfo } from '../../models/email';
-import { MailboxThreadInfo } from '../../models/thread';
+import {
+  createReplyInitialContent,
+  getEmailBody,
+  createForwardContent
+} from '../../components/MailEditor/mailEditorUtils';
+import { MailboxEmailInfo, ThreadViewEmailInfo } from '../../models/email';
+import { MailboxThreadInfo, ThreadDetailInfo } from '../../models/thread';
 import { excludeEmailAliases, filterPopulatedToAddresses } from '../../utils/composeUtils';
 import { getReplyOrForwardFromAddress } from '../../utils/mailboxUtils';
 
 import { Modals } from './modalTypes';
-
-export enum BannerTypes {
-  Mobile = 'MOBILE',
-  Notification = 'NOTIFICATION'
-}
 
 export enum PopulateComposeTypes {
   Reply,
   ReplyAll,
   Forward,
   EditDraft
+}
+
+export enum ComposeExpandTypes {
+  Collapsed,
+  Expanded,
+  FullExpanded
 }
 
 export interface PopulateComposeContent {
@@ -49,22 +55,28 @@ const emptyComposeContent: PopulateComposeContent = {
 
 export interface SkemailModalReducerState {
   openModal?: Modals;
-  // See above comment on if we should keep this separate
   composeOpen: boolean;
+  // Compose at the bottom of a thread. Mutually exclusive with composeOpen
+  replyComposeOpen: boolean;
   bannersOpen: Array<BannerTypes>;
   // See above comment on if we should keep this separate
-  isComposeCollapsed: boolean;
+  composeCollapseState: ComposeExpandTypes;
   // Forward, reply, or draft message that will populate the compose window
   populateComposeContent: PopulateComposeContent;
   // Whether an email is being sent
   isSending: boolean;
 }
 
+const defaultExpandState = ComposeExpandTypes.Expanded;
+
+const isSS = typeof window !== 'object'; // Is on server side
+
 export const initialSkemailDialogState: SkemailModalReducerState = {
   openModal: undefined,
   composeOpen: false,
-  bannersOpen: !isMobile ? [BannerTypes.Mobile] : [],
-  isComposeCollapsed: false,
+  replyComposeOpen: false,
+  bannersOpen: !isMobile && !isSS && !isDesktopApp() ? [BannerTypes.Mobile] : [],
+  composeCollapseState: defaultExpandState,
   populateComposeContent: emptyComposeContent,
   isSending: false
 };
@@ -87,26 +99,31 @@ export const skemailModalReducer = createSlice({
     openEmptyCompose: (state) => {
       state.populateComposeContent = emptyComposeContent;
       state.composeOpen = true;
-      state.isComposeCollapsed = false;
+      state.replyComposeOpen = false;
+      state.composeCollapseState = defaultExpandState;
     },
     replyCompose: (
       state,
       action: PayloadAction<{
-        email: MailboxEmailInfo;
-        thread: MailboxThreadInfo;
+        email: ThreadViewEmailInfo;
+        thread: ThreadDetailInfo;
         emailAliases: string[];
         defaultEmailAlias?: string;
         signature?: string;
       }>
     ) => {
       const { email, thread, emailAliases, defaultEmailAlias, signature } = action.payload;
-      const { decryptedSubject = '', from, to, decryptedAttachmentMetadata } = email;
-      state.populateComposeContent.subject = `RE: ${decryptedSubject as string}`;
+      const { decryptedSubject = '', from, to, decryptedAttachmentMetadata, replyTo } = email;
+      const subjectStr = decryptedSubject ?? '';
+      // if starts with 're', do not append re
+      state.populateComposeContent.subject = subjectStr.toLowerCase().startsWith('re: ')
+        ? subjectStr
+        : `RE: ${subjectStr}`;
 
       if (emailAliases.includes(from.address)) {
         state.populateComposeContent.toAddresses = to;
       } else {
-        state.populateComposeContent.toAddresses = [from];
+        state.populateComposeContent.toAddresses = [replyTo || from];
       }
       state.populateComposeContent.ccAddresses = [];
       state.populateComposeContent.bccAddresses = [];
@@ -117,8 +134,15 @@ export const skemailModalReducer = createSlice({
 
       state.populateComposeContent.attachmentMetadata = decryptedAttachmentMetadata?.filter(isInline) ?? [];
 
-      state.composeOpen = true;
-      state.isComposeCollapsed = false;
+      if (isMobile) {
+        state.composeOpen = true;
+        state.replyComposeOpen = false;
+      } else {
+        state.composeOpen = false;
+        state.replyComposeOpen = true;
+      }
+
+      state.composeCollapseState = defaultExpandState;
     },
     replyAllCompose: (
       state,
@@ -131,9 +155,13 @@ export const skemailModalReducer = createSlice({
       }>
     ) => {
       const { email, thread, emailAliases, defaultEmailAlias, signature } = action.payload;
-      const { decryptedSubject, to, cc, bcc, from, decryptedAttachmentMetadata } = email;
-      state.populateComposeContent.subject = `RE: ${decryptedSubject || ''}`;
-      state.populateComposeContent.toAddresses = filterPopulatedToAddresses([from, ...to], emailAliases);
+      const { decryptedSubject, to, cc, bcc, from, decryptedAttachmentMetadata, replyTo } = email;
+      const subjectStr = decryptedSubject ?? '';
+      // if starts with 're', do not append re
+      state.populateComposeContent.subject = subjectStr.toLowerCase().startsWith('re: ')
+        ? subjectStr
+        : `RE: ${subjectStr}`;
+      state.populateComposeContent.toAddresses = filterPopulatedToAddresses([replyTo || from, ...to], emailAliases);
       state.populateComposeContent.ccAddresses = excludeEmailAliases(cc, emailAliases);
       state.populateComposeContent.bccAddresses = excludeEmailAliases(bcc, emailAliases);
       state.populateComposeContent.fromAddress = getReplyOrForwardFromAddress(email, emailAliases, defaultEmailAlias);
@@ -144,8 +172,15 @@ export const skemailModalReducer = createSlice({
 
       state.populateComposeContent.attachmentMetadata = decryptedAttachmentMetadata ?? [];
 
-      state.composeOpen = true;
-      state.isComposeCollapsed = false;
+      if (isMobile) {
+        state.composeOpen = true;
+        state.replyComposeOpen = false;
+      } else {
+        state.composeOpen = false;
+        state.replyComposeOpen = true;
+      }
+
+      state.composeCollapseState = defaultExpandState;
     },
     editDraftCompose: (state, action: PayloadAction<MailboxEmailInfo>) => {
       const email = action.payload;
@@ -158,7 +193,8 @@ export const skemailModalReducer = createSlice({
       state.populateComposeContent.messageBody = getEmailBody(email);
 
       state.composeOpen = true;
-      state.isComposeCollapsed = false;
+      state.replyComposeOpen = false;
+      state.composeCollapseState = defaultExpandState;
     },
     forwardCompose: (
       state,
@@ -173,11 +209,18 @@ export const skemailModalReducer = createSlice({
       state.populateComposeContent.subject = `FWD: ${decryptedSubject || ''}`;
       state.populateComposeContent.fromAddress = getReplyOrForwardFromAddress(email, emailAliases, defaultEmailAlias);
 
-      state.populateComposeContent.messageBody = getEmailBody(email);
+      state.populateComposeContent.messageBody = createForwardContent(email);
       state.populateComposeContent.attachmentMetadata = decryptedAttachmentMetadata ?? [];
 
-      state.composeOpen = true;
-      state.isComposeCollapsed = false;
+      if (isMobile) {
+        state.composeOpen = true;
+        state.replyComposeOpen = false;
+      } else {
+        state.composeOpen = false;
+        state.replyComposeOpen = true;
+      }
+
+      state.composeCollapseState = defaultExpandState;
     },
     directMessageCompose: (state, action: PayloadAction<AddressObject>) => {
       const dmTo = action.payload;
@@ -185,18 +228,27 @@ export const skemailModalReducer = createSlice({
       state.populateComposeContent.toAddresses = [dmTo];
 
       state.composeOpen = true;
-      state.isComposeCollapsed = false;
+      state.composeCollapseState = defaultExpandState;
     },
     closeCompose: (state) => {
       state.composeOpen = false;
-      state.isComposeCollapsed = false;
+      state.replyComposeOpen = false;
+      state.composeCollapseState = defaultExpandState;
+      state.populateComposeContent = emptyComposeContent;
+    },
+    closeReplyCompose: (state) => {
+      state.replyComposeOpen = false;
+      state.composeCollapseState = defaultExpandState;
       state.populateComposeContent = emptyComposeContent;
     },
     collapse: (state) => {
-      state.isComposeCollapsed = true;
+      state.composeCollapseState = ComposeExpandTypes.Collapsed;
     },
     expand: (state) => {
-      state.isComposeCollapsed = false;
+      state.composeCollapseState = ComposeExpandTypes.Expanded;
+    },
+    fullExpand: (state) => {
+      state.composeCollapseState = ComposeExpandTypes.FullExpanded;
     },
     setIsSending: (state, action: PayloadAction<boolean>) => {
       state.isSending = action.payload;

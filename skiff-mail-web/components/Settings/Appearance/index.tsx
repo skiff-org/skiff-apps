@@ -6,6 +6,7 @@ import { insertIf } from 'skiff-utils';
 
 import DateHourFormat from './DateHourFormat/DateHourFormat';
 import { MailboxViewMode } from './MailboxViewMode/MailboxViewMode';
+import { SwipeSettings } from './Swipe/SwipeSettings';
 import ThemeSelectSettings from './ThemeSelect/ThemeSelectSettings';
 
 export const useAppearanceSettings: () => Setting[] = () => {
@@ -34,6 +35,14 @@ export const useAppearanceSettings: () => Setting[] = () => {
         icon: Icon.SplitView,
         color: 'dark-blue',
         component: <MailboxViewMode key='layout' />
+      }),
+      ...insertIf<Setting>(isMobile, {
+        type: SettingType.Custom,
+        label: SETTINGS_LABELS[SettingValue.SwipeSettings],
+        value: SettingValue.SwipeSettings,
+        icon: Icon.ArrowRight,
+        color: 'dark-blue',
+        component: <SwipeSettings key='swipe' />
       })
     ],
     []

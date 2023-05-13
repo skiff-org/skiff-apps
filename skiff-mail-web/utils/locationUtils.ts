@@ -26,8 +26,12 @@ export function getSettingsParams() {
   const settingsQuery: {
     [TABS_QUERY_PARAM]?: TabPage;
     [SETTINGS_QUERY_PARAM]?: SettingValue;
+    fullsize?: boolean;
   } = {};
 
+  if (params.fullsize) {
+    settingsQuery.fullsize = !!params.fullsize;
+  }
   if (params[TABS_QUERY_PARAM]) {
     settingsQuery[TABS_QUERY_PARAM] = params[TABS_QUERY_PARAM] as TabPage;
     if (params[SETTINGS_QUERY_PARAM])

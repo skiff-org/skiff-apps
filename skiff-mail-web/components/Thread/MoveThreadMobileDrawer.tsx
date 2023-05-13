@@ -1,4 +1,4 @@
-import { Drawer, Icon, IconText } from 'nightwatch-ui';
+import { Drawer, DropdownItem, Icon } from 'nightwatch-ui';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { DrawerOption, DrawerOptions } from 'skiff-front-utils';
@@ -47,17 +47,15 @@ export default function MoveThreadMobileDrawer({ threadID }: MoveThreadMobileDra
                 hideDrawer();
               }}
             >
-              <IconText
+              <DropdownItem
+                icon={systemLabel.icon}
                 key={systemLabel.value}
                 label={'Move to ' + upperCaseFirstLetter(systemLabel.value)}
-                level={1}
-                startIcon={systemLabel.icon}
-                type='paragraph'
               />
             </DrawerOption>
           ))}
         <DrawerOption onClick={showMoveToDrawer}>
-          <IconText label='Move to folder' level={1} startIcon={Icon.FolderArrow} type='paragraph' />
+          <DropdownItem icon={Icon.FolderArrow} label='Move to folder' />
         </DrawerOption>
       </DrawerOptions>
     </Drawer>

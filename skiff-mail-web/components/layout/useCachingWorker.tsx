@@ -2,9 +2,10 @@ import { ToastProps } from 'nightwatch-ui';
 import { SnackbarKey } from 'notistack';
 import { useEffect } from 'react';
 import { isIOS } from 'react-device-detect';
-import { getEnvironment, useToast } from 'skiff-front-utils';
+import { getEnvironment, registerNotificationServiceWorker, useToast } from 'skiff-front-utils';
 import { Workbox } from 'workbox-window';
 
+import client from '../../apollo/client';
 import {
   RELOAD_BROWSER,
   RELOAD_NEW_WORKER_MESSAGE,
@@ -43,6 +44,9 @@ const updateIfWaiting = (registration: ServiceWorkerRegistration) => {
 
 const registerServiceWorker = async () => {
   console.log('Loading service worker');
+  // This is used to ensure we've properly cleaned up the legacy notification service worker.
+  await registerNotificationServiceWorker(client);
+
   if (serviceWorkerSupported) {
     console.log('Browser supports service worker!');
     try {
@@ -74,10 +78,7 @@ const registerServiceWorker = async () => {
  *
  * see https://whatwebcando.today/articles/handling-service-worker-updates/
  */
-const listenForServiceWorkerUpdates = async (
-  enqueueToast: (toastProps: ToastProps) => SnackbarKey,
-  closeToast: (toastKey: SnackbarKey | undefined) => void
-) => {
+const listenForServiceWorkerUpdates = async (enqueueToast: (toastProps: ToastProps) => SnackbarKey) => {
   const registration = await getRegistration();
 
   if (!registration) return;
@@ -101,27 +102,8 @@ const listenForServiceWorkerUpdates = async (
       if (registration?.waiting && navigator.serviceWorker.controller) {
         if (forceUpdate) {
           enqueueToast({
-            body: 'Important update found, reloading',
-            persist: false
-          });
-        } else {
-          enqueueToast({
-            body: 'New version available',
-            persist: true,
-            actions: [
-              {
-                label: 'Reload page',
-                onClick: (key) => {
-                  closeToast(key);
-                  // post message to the service worker to skipWaiting and refresh the page
-                  if (registration?.waiting) registration.waiting.postMessage({ message: RELOAD_NEW_WORKER_MESSAGE });
-                  enqueueToast({
-                    body: 'Reloading...',
-                    persist: false
-                  });
-                }
-              }
-            ]
+            title: 'Important update',
+            body: 'Reloading app...'
           });
         }
       }
@@ -130,7 +112,7 @@ const listenForServiceWorkerUpdates = async (
 };
 
 export default function useCachingWorker() {
-  const { enqueueToast, closeToast } = useToast();
+  const { enqueueToast } = useToast();
 
   const handleServiceWorkerMessage = (event: MessageEvent) => {
     const message = event.data.message;
@@ -166,6 +148,6 @@ export default function useCachingWorker() {
     if (!enabled || !serviceWorkerSupported) return; // Disable on local and when not supported
     navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
     registerServiceWorker();
-    listenForServiceWorkerUpdates(enqueueToast, closeToast);
+    void listenForServiceWorkerUpdates(enqueueToast);
   }, []);
 }

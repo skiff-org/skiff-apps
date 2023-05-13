@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { isArray } from 'lodash';
+import isArray from 'lodash/isArray';
 import { MailboxFilters } from 'skiff-graphql';
 
 import { MailboxThreadInfo } from '../../models/thread';
@@ -99,7 +99,7 @@ export const skemailMailboxReducer = createSlice({
     selectDeselectThreadsBetween: (state, action: PayloadAction<{ threads: MailboxThreadInfo[]; index: number }>) => {
       const { threads, index } = action.payload;
       const lastSelectedIndex = state.lastSelectedIndex;
-      const isSelected = state.selectedThreadIDs.includes(threads[index].threadID);
+      const isSelected = state.selectedThreadIDs.includes(threads[index]?.threadID ?? '');
       if (typeof lastSelectedIndex !== 'number' || lastSelectedIndex === index) return;
       // Grab all threads in between the two recently selected threads]
       const startIndex = Math.min(lastSelectedIndex, index);

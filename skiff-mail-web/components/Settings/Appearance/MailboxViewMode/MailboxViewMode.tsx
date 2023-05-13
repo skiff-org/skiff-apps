@@ -1,9 +1,9 @@
-import { Icon, Icons, Typography } from 'nightwatch-ui';
+import { Typography } from 'nightwatch-ui';
 import React from 'react';
-import { TitleActionSection } from 'skiff-front-utils';
+import { RadioCheckbox, TitleActionSection, useUserPreference } from 'skiff-front-utils';
+import { ThreadDisplayFormat } from 'skiff-graphql';
+import { StorageTypes } from 'skiff-utils';
 import styled from 'styled-components';
-
-import useLocalSetting, { ThreadDisplayFormat } from '../../../../hooks/useLocalSetting';
 
 const ViewRow = styled.div`
   display: flex;
@@ -19,21 +19,21 @@ const ViewRow = styled.div`
  * Component for changing the mailbox view format.
  */
 export const MailboxViewMode: React.FC = () => {
-  const [threadFormat, setThreadFormat] = useLocalSetting('threadFormat');
+  const [threadFormat, setThreadFormat] = useUserPreference(StorageTypes.THREAD_FORMAT);
 
   const rightModeOnClick = () => setThreadFormat(ThreadDisplayFormat.Right);
   const fullModeOnClick = () => setThreadFormat(ThreadDisplayFormat.Full);
 
   return (
     <>
-      <TitleActionSection subtitle='Select a display format for viewing threads.' title='Inbox format' />
+      <TitleActionSection subtitle='Select a display format for viewing threads' title='Inbox format' />
       <ViewRow key='right-mode' onClick={rightModeOnClick}>
-        <Typography type='paragraph'>Split view</Typography>
-        <Icons icon={threadFormat === ThreadDisplayFormat.Right ? Icon.RadioFilled : Icon.RadioEmpty} />
+        <Typography>Split view</Typography>
+        <RadioCheckbox checked={threadFormat === ThreadDisplayFormat.Right} />
       </ViewRow>
       <ViewRow key='full-mode' onClick={fullModeOnClick}>
-        <Typography type='paragraph'>Full view</Typography>
-        <Icons icon={threadFormat === ThreadDisplayFormat.Full ? Icon.RadioFilled : Icon.RadioEmpty} />
+        <Typography>Full view</Typography>
+        <RadioCheckbox checked={threadFormat === ThreadDisplayFormat.Full} />
       </ViewRow>
     </>
   );

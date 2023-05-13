@@ -1,9 +1,19 @@
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
-import Link from 'next/link';
-import { Chip, Facepile, Icon, Icons, IconText, Typography } from 'nightwatch-ui';
+import {
+  Chip,
+  Facepile,
+  Icon,
+  Icons,
+  IconText,
+  Layout,
+  Size,
+  ThemeMode,
+  Typography,
+  TypographySize,
+  TypographyWeight
+} from 'nightwatch-ui';
 import React, { useCallback, useEffect, useState } from 'react';
-import { isMobile } from 'react-device-detect';
 import { ConnectDragSource } from 'react-dnd';
 import { useResizeDetector } from 'react-resize-detector';
 import { useTheme } from 'skiff-front-utils';
@@ -13,9 +23,12 @@ import styled from 'styled-components';
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
 import { useDate } from '../../../hooks/useDate';
 import { MailboxThreadInfo } from '../../../models/thread';
-import { getUrlFromUserLabelAndThreadID, UserLabel } from '../../../utils/label';
+import { UserLabelAlias, UserLabelPlain } from '../../../utils/label';
+import { getScheduledSendAtDateForThread } from '../../../utils/mailboxUtils';
 import Checkbox from '../../Checkbox';
+import { LinkedLabelChips } from '../../labels/LinkedLabelChips';
 
+import { useDisplayNameFromAddress } from '../../../hooks/useDisplayNameFromAddress';
 import {
   ActionsContainer,
   AvatarContainer,
@@ -23,28 +36,29 @@ import {
   EmailBlock,
   EmailContentTop,
   EmailInfo,
-  EmailMessage,
   EmailSender,
-  EmailSubject,
   LabelsContainer,
   MessageCellContainer,
-  Senders,
   StartBlock,
   UnreadIndicator,
   UnreadIndicatorWrapper
 } from './MessageCell.styles';
 import { MessageCellActions } from './MessageCellActions';
 import { MessageCellAvatar } from './MessageCellAvatar';
-import { getSenders } from './utils';
+import { getSenders, getStackedFacepileSize } from './utils';
 
 dayjs.extend(isToday);
 
-const DraftLabel = styled(Typography)<{ includeMargin: boolean }>`
-  ${(props) => (props.includeMargin ? 'margin-left: 8px;' : '')}
+const DraftLabel = styled.div<{ $includeMargin: boolean }>`
+  ${(props) => (props.$includeMargin ? 'margin-left: 8px;' : '')}
 `;
 
 const SearchText = styled.span`
   color: var(--icon-link);
+`;
+
+const ScheduledSendLinkContainer = styled.div`
+  order: 1;
 `;
 
 interface MessageCellProps {
@@ -53,7 +67,7 @@ interface MessageCellProps {
   displayNames: string[];
   addresses: string[];
   facepileNames: string[];
-  userLabels: Array<UserLabel> | null | undefined;
+  userLabels: Array<UserLabelPlain | UserLabelAlias> | null | undefined;
   subject: string | null | undefined;
   message: string | null | undefined;
   hasAttachment: boolean;
@@ -102,7 +116,14 @@ export const MessageCell = ({
 
   const hoveredThreadID = useAppSelector((state) => state.mailbox.hoveredThreadID);
   const [hover, setHover] = useState(false);
-
+  const contactDisplayName = useDisplayNameFromAddress(addresses[0]);
+  // repalce first address with contact name if it exists
+  const displayNamesWithContact = displayNames.map((displayName, index) => {
+    if (index === 0) {
+      return contactDisplayName ?? displayName;
+    }
+    return displayName;
+  });
   const { getMonthAndDay, getTime, getTimeAndDate } = useDate();
 
   const onHover = useCallback(() => {
@@ -119,7 +140,7 @@ export const MessageCell = ({
     }
   }, [hoveredThreadID]);
 
-  const getCellDate = () => (dayjs(date as Date).isToday() ? getTime(date as Date) : getMonthAndDay(date as Date));
+  const getCellDate = () => (dayjs(date).isToday() ? getTime(date) : getMonthAndDay(date));
 
   const getFacepileColor = (isDarkMode: boolean) => {
     if (active) {
@@ -133,7 +154,7 @@ export const MessageCell = ({
     }
     return isDarkMode ? '#1f1f1f' : 'var(--bg-l1-solid)';
   };
-  const facepileColor = getFacepileColor(theme === 'dark');
+  const facepileColor = getFacepileColor(theme === ThemeMode.DARK);
 
   const renderTextWithQueryMatch = (text: string) => {
     const matchIndex = text.toLowerCase().indexOf(query?.toLowerCase() ?? '');
@@ -148,6 +169,24 @@ export const MessageCell = ({
       text
     );
   };
+
+  const renderScheduledSendLink = () => {
+    const sendAtDate = getScheduledSendAtDateForThread(emails);
+
+    return (
+      <ScheduledSendLinkContainer>
+        {systemLabels.includes(SystemLabels.ScheduleSend) && sendAtDate && (
+          <IconText
+            color='link'
+            label={getTimeAndDate(sendAtDate)}
+            startIcon={<Icons color='link' icon={Icon.Clock} />}
+            weight={TypographyWeight.REGULAR}
+          />
+        )}
+      </ScheduledSendLinkContainer>
+    );
+  };
+
   const messageCellContent = (
     <>
       <EmailBlock transition={!!multiSelectOpen}>
@@ -159,110 +198,82 @@ export const MessageCell = ({
               e.stopPropagation();
               onSelectToggle(e);
             }}
+            padding
           />
         )}
         <StartBlock>
           <AvatarContainer hide={!facepileNames.length}>
-            <Facepile background={facepileColor} isMobile>
+            <Facepile
+              background={facepileColor}
+              layout={Layout.STACKED}
+              size={getStackedFacepileSize(facepileNames.length)}
+            >
               {facepileNames.map((senderName, index) => (
                 <MessageCellAvatar
                   address={addresses[index]}
                   key={`${addresses[index]}-${emailID || threadID}`}
-                  numAvatars={facepileNames.length}
                   senderName={senderName}
                 />
               ))}
             </Facepile>
           </AvatarContainer>
           <EmailSender>
-            <Senders color={read ? 'secondary' : 'primary'} level={2} type={read ? 'paragraph' : 'label'}>
-              {renderTextWithQueryMatch(getSenders(displayNames))}
-            </Senders>
+            <Typography
+              color={read ? 'secondary' : 'primary'}
+              weight={read ? TypographyWeight.REGULAR : TypographyWeight.MEDIUM}
+            >
+              {renderTextWithQueryMatch(getSenders(displayNamesWithContact))}
+            </Typography>
             {renderDraftLabel && (
-              <DraftLabel color='link' includeMargin={!!displayNames.length} level={2}>
-                Draft
-              </DraftLabel>
+              <Typography color='link'>
+                <DraftLabel $includeMargin={!!displayNames.length}>Draft</DraftLabel>
+              </Typography>
             )}
           </EmailSender>
         </StartBlock>
         {/* Prevent layout shift */}
         <UnreadIndicatorWrapper>
-          <UnreadIndicator
-            $cellTransition={false}
-            $read={false}
-            animate={{
-              opacity: !read ? [0, 1, 1] : 0,
-              scale: !read ? [1, 1.2, 1] : 1
-            }}
-            exit={{
-              opacity: 0,
-              scale: 0.5
-            }}
-            initial={false}
-            transition={{
-              type: 'spring',
-              stiffness: 300,
-              damping: 30,
-              duration: 0.5
-            }}
-          />
+          <UnreadIndicator $cellTransition={false} $read={read} />
         </UnreadIndicatorWrapper>
         <ContentPreview>
           {subject && (
-            <EmailSubject color={read ? 'secondary' : 'primary'} type={read ? 'paragraph' : 'label'}>
+            <Typography
+              color={read ? 'secondary' : 'primary'}
+              minWidth='auto'
+              weight={read ? TypographyWeight.REGULAR : TypographyWeight.MEDIUM}
+            >
               {renderTextWithQueryMatch(subject)}
-            </EmailSubject>
+            </Typography>
           )}
           {message && (
-            <EmailMessage color={read ? 'disabled' : 'secondary'}>
+            <Typography color={read ? 'disabled' : 'secondary'}>
               <span>&nbsp;–&nbsp;</span>
               {renderTextWithQueryMatch(message)}
-            </EmailMessage>
+            </Typography>
           )}
         </ContentPreview>
         <EmailInfo>
           <LabelsContainer>
             {hasAttachment && (
-              <Icons color='disabled' dataTest='message-cell-attachment-icon' icon={Icon.PaperClip} size='small' />
+              <Icons color='disabled' dataTest='message-cell-attachment-icon' icon={Icon.PaperClip} size={Size.SMALL} />
             )}
-            {userLabels?.map((userLabel) => {
-              const encodedLabelName = encodeURIComponent(userLabel.name.toLowerCase());
-              // clicking on the label should
-              // - redirect to label inbox on mobile
-              // - redirect to label inbox with opened thread on desktop
-              const mobileUrl = `/label#${encodedLabelName}`;
-              const desktopUrl = getUrlFromUserLabelAndThreadID(userLabel.name, threadID);
-              return (
-                <Link href={isMobile ? mobileUrl : desktopUrl} key={userLabel.value} passHref>
-                  <Chip
-                    key={userLabel.value}
-                    label={userLabel.name}
-                    onClick={(e: React.MouseEvent) => {
-                      e.stopPropagation();
-                      console.log('hit');
-                    }}
-                    size='small'
-                    startIcon={<Icons color={userLabel.color} icon={Icon.Dot} />}
-                  />
-                </Link>
-              );
-            })}
-            <div style={{ order: 1 }}>
-              {systemLabels.includes(SystemLabels.ScheduleSend) && (
-                <IconText
-                  color='link'
-                  label={getTimeAndDate(emails[0].scheduleSendAt as Date)}
-                  startIcon={<Icons color='link' icon={Icon.Clock} />}
-                  type='paragraph'
-                />
-              )}
-            </div>
+            {!!userLabels?.length && (
+              <LinkedLabelChips
+                onClick={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                }}
+                size={Size.SMALL}
+                threadID={threadID}
+                userLabels={userLabels}
+              />
+            )}
+            {renderScheduledSendLink()}
             {emails.length > 1 && (
-              <Chip label={emails.length} size='small' startIcon={<Icons color='secondary' icon={Icon.Reply} />} />
+              <Chip label={emails.length} size={Size.SMALL} startIcon={<Icons color='secondary' icon={Icon.Reply} />} />
             )}
           </LabelsContainer>
           <EmailContentTop $hide={hover}>
-            <Typography color='disabled' dataTest='message-cell-date' level={3} mono>
+            <Typography color='disabled' dataTest='message-cell-date' mono size={TypographySize.SMALL}>
               {getCellDate()}
             </Typography>
           </EmailContentTop>
@@ -288,7 +299,7 @@ export const MessageCell = ({
       <MessageCellContainer
         active={active}
         hover={hover}
-        isDarkMode={theme === 'dark'}
+        isDarkMode={theme === ThemeMode.DARK}
         onClick={onClick}
         read={read}
         ref={ref}

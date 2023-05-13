@@ -1,4 +1,5 @@
-import { concat } from 'lodash';
+import dayjs from 'dayjs';
+import concat from 'lodash/concat';
 import {
   SetReadStatusDocument,
   SetReadStatusMutation,
@@ -6,9 +7,9 @@ import {
   SetAllThreadsReadStatusDocument,
   SetAllThreadsReadStatusMutation,
   SetAllThreadsReadStatusMutationVariables,
-  ThreadFragment,
-  ThreadFragmentDoc
-} from 'skiff-mail-graphql';
+  ThreadWithoutContentFragment,
+  ThreadWithoutContentFragmentDoc
+} from 'skiff-front-graphql';
 import { filterExists } from 'skiff-utils';
 
 import client from '../apollo/client';
@@ -67,8 +68,8 @@ export const updateThreadAsReadUnread = async (threadIDs: Array<string>, read: b
       const updatedThreadIDs = response?.data?.setReadStatus?.updatedThreadIDs ?? [];
       updatedThreadIDs.forEach((threadID) => {
         const cacheID = cache.identify({ __typename: 'UserThread', threadID });
-        cache.updateFragment<ThreadFragment>(
-          { id: cacheID, fragment: ThreadFragmentDoc, fragmentName: 'Thread' },
+        cache.updateFragment<ThreadWithoutContentFragment>(
+          { id: cacheID, fragment: ThreadWithoutContentFragmentDoc, fragmentName: 'ThreadWithoutContent' },
           (existingThread) => {
             if (!existingThread) {
               return null;
@@ -110,23 +111,6 @@ export const updateThreadAsReadUnread = async (threadIDs: Array<string>, read: b
   });
 };
 
-export const handleMarkAsReadUnreadClick = (threads: Array<MailboxThreadInfo>, read: boolean) => {
-  // Group threadIds by label
-  const labelsToUpdate = threads.reduce((allLabels, thread) => {
-    thread.attributes.systemLabels.forEach((label) => {
-      if (!allLabels.includes(label)) allLabels.push(label);
-    });
-    return allLabels;
-  }, [] as string[]);
-
-  // For each label, update the relevant threads IDs as read/unread
-  return updateThreadAsReadUnread(
-    threads.map((t) => t.threadID),
-    read,
-    labelsToUpdate
-  );
-};
-
 // Get the previous senders of the current thread, in order of depth
 export const getThreadSenders = (thread: MailboxThreadInfo) =>
   thread.emails
@@ -163,7 +147,7 @@ export const threadsEqual = (a: MailboxThreadInfo[] | SearchSkemail[], b: Mailbo
   if (a.length !== b.length) return false;
 
   for (let i = 0; i < a.length; ++i) {
-    if (a[i].threadID !== b[i].threadID) return false;
+    if (a[i]?.threadID !== b[i]?.threadID) return false;
   }
   return true;
 };
@@ -176,4 +160,13 @@ export const userLabelsEqual = (a: string[], b: string[]) => {
     if (a[i] !== b[i]) return false;
   }
   return true;
+};
+
+export const getScheduledSendAtDateForThread = (emails: MailboxEmailInfo[]) => {
+  const now = dayjs();
+
+  // get the first email in the thread that has a scheduled send date that is in the future
+  // first email = one with that earliest date in the future
+  const emailToSend = emails.find((email) => email.scheduleSendAt && dayjs(email.scheduleSendAt).isAfter(now));
+  return emailToSend?.scheduleSendAt;
 };

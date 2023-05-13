@@ -1,21 +1,25 @@
 import { ApolloCache, useApolloClient } from '@apollo/client';
 import { NormalizedCacheObject } from '@apollo/client/cache';
 import { GraphQLError } from 'graphql';
-import { difference, forEach } from 'lodash';
-import { SystemLabels, UserLabelVariant } from 'skiff-graphql';
-import { UpdatedThreadLabels, UserLabel } from 'skiff-graphql';
-import { ApplyLabelsMutation, GetNumUnreadDocument, RemoveLabelsMutation } from 'skiff-mail-graphql';
+import difference from 'lodash/difference';
+import forEach from 'lodash/forEach';
 import {
-  GetCurrentUserEmailAliasesDocument,
-  GetCurrentUserEmailAliasesQuery,
+  ApplyLabelsMutation,
+  GetNumUnreadDocument,
+  RemoveLabelsMutation,
+  ThreadWithoutContentFragment,
+  ThreadWithoutContentFragmentDoc
+} from 'skiff-front-graphql';
+import {
   MailboxDocument,
   MailboxQuery,
   MailboxQueryVariables,
   ThreadFragment,
-  ThreadFragmentDoc,
   UserLabelsDocument,
   UserLabelsQuery
-} from 'skiff-mail-graphql';
+} from 'skiff-front-graphql';
+import { SystemLabels, UserLabelVariant } from 'skiff-graphql';
+import { UpdatedThreadLabels, UserLabel } from 'skiff-graphql';
 import { filterExists } from 'skiff-utils';
 
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
@@ -25,7 +29,7 @@ import { ModifyLabelsActions } from '../label';
 import { addThreadsToMailboxQuery, removeThreadsFromMailboxQuery } from './mailbox';
 
 /**
- * Updates unread count of the given labels wth their paired unread diff, in the given cache
+ * Updates the unread count of the given labels wth their paired unread diff, in the given cache
  * @param cache cache to read and update
  * @param diffByLabelMap a map of label and unread diff (for this label's unread counter) pairs
  */
@@ -91,7 +95,11 @@ export function removeThreadsFromCache(params: {
     .map((threadID) => {
       const cacheID = cache.identify({ __typename: 'UserThread', threadID });
 
-      return cache.readFragment<ThreadFragment>({ id: cacheID, fragment: ThreadFragmentDoc, fragmentName: 'Thread' });
+      return cache.readFragment<ThreadWithoutContentFragment>({
+        id: cacheID,
+        fragment: ThreadWithoutContentFragmentDoc,
+        fragmentName: 'ThreadWithoutContent'
+      });
     })
     .filter(filterExists);
 
@@ -102,7 +110,7 @@ export function removeThreadsFromCache(params: {
   removeThreadsFromMailboxQuery(cache, label, fragments);
 }
 
-export async function updateThreadsWithModifiedLabels(params: {
+export function updateThreadsWithModifiedLabels(params: {
   cache: ApolloCache<any>;
   updatedThreads: UpdatedThreadLabels[] | null | undefined;
   errors?: readonly GraphQLError[];
@@ -113,8 +121,8 @@ export async function updateThreadsWithModifiedLabels(params: {
     return;
   }
 
-  const threadsToRemoveByLabel: Map<string, ThreadFragment[]> = new Map();
-  const threadsToAddByLabel: Map<string, ThreadFragment[]> = new Map();
+  const threadsToRemoveByLabel: Map<string, ThreadWithoutContentFragment[]> = new Map();
+  const threadsToAddByLabel: Map<string, ThreadWithoutContentFragment[]> = new Map();
 
   const unreadMap: Map<string, number> = new Map();
 
@@ -125,8 +133,8 @@ export async function updateThreadsWithModifiedLabels(params: {
     const threadID = thread.threadID;
     const cacheID = cache.identify({ __typename: 'UserThread', threadID });
     if (cacheID) {
-      cache.updateFragment<ThreadFragment>(
-        { id: cacheID, fragment: ThreadFragmentDoc, fragmentName: 'Thread' },
+      cache.updateFragment<ThreadWithoutContentFragment>(
+        { id: cacheID, fragment: ThreadWithoutContentFragmentDoc, fragmentName: 'ThreadWithoutContent' },
         (existing) => {
           if (!existing) {
             return null;
@@ -177,7 +185,7 @@ export async function updateThreadsWithModifiedLabels(params: {
             labelsToAddThreadTo = updatedLabels;
           }
 
-          const updatedThreadFragment: ThreadFragment = {
+          const updatedThreadFragment: ThreadWithoutContentFragment = {
             ...existing,
             attributes: {
               ...existing.attributes,
@@ -335,40 +343,19 @@ export function removeUserLabelFromCache(cache: ApolloCache<any>, labelID: strin
   });
 }
 
-export function updateEmailAliases(cache: ApolloCache<any>, userID: string, emailAliases: string[]) {
-  cache.updateQuery<GetCurrentUserEmailAliasesQuery>({ query: GetCurrentUserEmailAliasesDocument }, (existingCache) => {
-    if (!existingCache || !existingCache.currentUser) {
-      return {
-        currentUser: {
-          userID,
-          emailAliases
-        }
-      };
-    }
-    const { currentUser } = existingCache;
-    return {
-      ...existingCache,
-      currentUser: {
-        ...currentUser,
-        emailAliases
-      }
-    };
-  });
-}
-
-export function useGetCachedThreads(threadIDs: string[]): ThreadFragment[] {
+export function useGetCachedThreads(threadIDs: string[]): ThreadWithoutContentFragment[] {
   const client = useApolloClient();
   const cacheIDs = threadIDs.map((threadID) => client.cache.identify({ __typename: 'UserThread', threadID }));
   const threadFragments = cacheIDs.map((cacheID) =>
-    client.cache.readFragment<ThreadFragment>(
-      { id: cacheID, fragment: ThreadFragmentDoc, fragmentName: 'Thread' },
+    client.cache.readFragment<ThreadWithoutContentFragment>(
+      { id: cacheID, fragment: ThreadWithoutContentFragmentDoc, fragmentName: 'ThreadWithoutContent' },
       true
     )
   );
   return threadFragments.filter(filterExists);
 }
 
-export function useGetCachedSelectedThreads(): ThreadFragment[] {
+export function useGetCachedSelectedThreads(): ThreadWithoutContentFragment[] {
   const selectedThreadIDs = useAppSelector((state) => state.mailbox.selectedThreadIDs);
   return useGetCachedThreads(selectedThreadIDs);
 }

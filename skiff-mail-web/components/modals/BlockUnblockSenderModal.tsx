@@ -1,7 +1,7 @@
-import { ButtonGroupItem, Dialog, DialogTypes, Icon } from 'nightwatch-ui';
+import { ButtonGroupItem, Dialog, DialogTypes } from 'nightwatch-ui';
 import { useDispatch } from 'react-redux';
+import { useBlockEmailAddressMutation, useUnblockEmailAddressMutation } from 'skiff-front-graphql';
 import { useToast } from 'skiff-front-utils';
-import { useBlockEmailAddressMutation, useUnblockEmailAddressMutation } from 'skiff-mail-graphql';
 
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
@@ -32,10 +32,10 @@ export const BlockUnblockSenderModal = () => {
     }
     const sender = senderDisplayName.split(' ')[0];
     if (isBlockSender) {
-      return `Block ${sender}?`;
+      return `Block ${sender ?? ''}?`;
     }
     if (isUnblockSender) {
-      return `Unblock ${sender}?`;
+      return `Unblock ${sender ?? ''}?`;
     }
     return '';
   };
@@ -84,15 +84,12 @@ export const BlockUnblockSenderModal = () => {
       } else {
         await unblockSender(from.address);
       }
-      enqueueToast({
-        body: `${senderDisplayName} ${isBlockSender ? 'blocked' : 'unblocked'}.`,
-        icon: Icon.Check
-      });
+      enqueueToast({ title: `${senderDisplayName} ${isBlockSender ? 'blocked' : 'unblocked'}.` });
     } catch (error) {
       console.log(error);
       enqueueToast({
-        body: `Could not ${isBlockSender ? 'block' : 'unblock'} ${senderDisplayName}. Please try again.`,
-        icon: Icon.Warning
+        title: 'Failed to block',
+        body: `Could not ${isBlockSender ? 'block' : 'unblock'} ${senderDisplayName}. Please try again.`
       });
     }
   };
@@ -104,3 +101,5 @@ export const BlockUnblockSenderModal = () => {
     </Dialog>
   );
 };
+
+export default BlockUnblockSenderModal;

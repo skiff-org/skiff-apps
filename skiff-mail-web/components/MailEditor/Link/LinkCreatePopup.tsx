@@ -1,32 +1,40 @@
 import { Editor } from '@tiptap/core';
-import { Button, InputField, useOnClickOutside } from 'nightwatch-ui';
-import { FC, useEffect, useRef, useState } from 'react';
+import {
+  getThemedColor,
+  InputField,
+  Portal,
+  ThemeMode,
+  useOnClickOutside,
+  DROPDOWN_CALLER_CLASSNAME
+} from 'nightwatch-ui';
+import { FC, useEffect, useRef, useState, ChangeEvent } from 'react';
 import styled from 'styled-components';
 
 import { useGetPopupPosition } from '../mailEditorUtils';
+import { TOOLBAR_CONTAINER } from '../ToolBar/ToolBar';
 
 const Container = styled.div`
   position: absolute;
+  z-index: 999999999999;
+
+  box-sizing: border-box;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: fit-content;
-
-  padding: 5px 10px;
-
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 4px;
   gap: 10px;
 
-  border-radius: 30px;
-  opacity: 1;
-  background: var(--bg-l1-solid);
-  box-shadow: var(--shadow-l2);
-  border: 1px solid var(--border-secondary);
+  background: var(--bg-emphasis);
+  border: 1px solid ${getThemedColor('var(--border-tertiary)', ThemeMode.DARK)};
+  border-radius: 14px;
 `;
 
 interface LinkCreatePopupProps {
   editor: Editor;
   editorContainerRef: React.RefObject<HTMLDivElement>;
 }
+
+const LINK_WIDTH = 206;
 
 /**
  * This is the create link popup that opens when clicking the link button
@@ -40,6 +48,7 @@ const LinkCreatePopup: FC<LinkCreatePopupProps> = ({ editor, editorContainerRef 
 
   const closePopup = () => {
     editor.commands.closeLinkCreatePopup();
+    editor.commands.focus('end');
   };
 
   const createLink = () => {
@@ -48,7 +57,7 @@ const LinkCreatePopup: FC<LinkCreatePopupProps> = ({ editor, editorContainerRef 
 
   useOnClickOutside(containerRef, closePopup);
 
-  const position = useGetPopupPosition(editor, containerRef, editorContainerRef);
+  const position = useGetPopupPosition(editor, containerRef, editorContainerRef, TOOLBAR_CONTAINER);
 
   useEffect(() => {
     // Instead of autoFocus, Focus without scroll
@@ -58,39 +67,35 @@ const LinkCreatePopup: FC<LinkCreatePopupProps> = ({ editor, editorContainerRef 
   }, [inputRef.current]);
 
   return (
-    <Container ref={containerRef} style={{ top: position.top, left: position.left }}>
-      <InputField
-        innerRef={inputRef}
-        onChange={(e) => {
-          setHref(e.target.value);
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-        onFocus={(e) => {
-          e.preventDefault();
-        }}
-        onKeyPress={(e) => {
-          if (e.key === 'Enter') {
-            createLink();
-            closePopup();
-          }
-        }}
-        showErrorMessages={false}
-        size='small'
-        value={href}
-      />
-      <Button
-        disabled={!href.trim()}
-        onClick={() => {
-          createLink();
-          closePopup();
-        }}
-        size='small'
+    <Portal>
+      <Container
+        className={DROPDOWN_CALLER_CLASSNAME}
+        ref={containerRef}
+        style={{ top: position.top, left: position.left + (position.width - LINK_WIDTH) }}
       >
-        Link
-      </Button>
-    </Container>
+        <InputField
+          forceTheme={ThemeMode.DARK}
+          innerRef={inputRef}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            setHref(e.target.value);
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          onFocus={(e) => {
+            e.preventDefault();
+          }}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              createLink();
+              closePopup();
+            }
+          }}
+          placeholder='Website link'
+          value={href}
+        />
+      </Container>
+    </Portal>
   );
 };
 

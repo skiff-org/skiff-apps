@@ -1,8 +1,6 @@
 import { ButtonGroupItem, Dialog, DialogTypes } from 'nightwatch-ui';
 import { FC } from 'react';
 
-import Illustration, { Illustrations } from 'skemail-web/svgs/Illustration';
-
 export interface ReferralSplashModalProps {
   creditBytes: number;
   referralCount: number;
@@ -31,7 +29,6 @@ export const ReferralSplashModal: FC<ReferralSplashModalProps> = ({
         referralCount +
         ' friends to Skiff. Thanks for promoting privacy.'
       }
-      icon={<Illustration illustration={Illustrations.Blur} />}
       onClose={onClose}
       open={isOpen}
       title={'Congrats! You earned ' + formattedCreditBytes + '.'}
@@ -41,3 +38,5 @@ export const ReferralSplashModal: FC<ReferralSplashModalProps> = ({
     </Dialog>
   );
 };
+
+export default ReferralSplashModal;

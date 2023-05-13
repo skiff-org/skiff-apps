@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone'; // dependent on utc plugin
 import utc from 'dayjs/plugin/utc';
-import { Dropdown, DropdownItem, Typography, Icon, InputField } from 'nightwatch-ui';
+import { DropdownItem, InputField, Select, Size } from 'nightwatch-ui';
 import { Dispatch, FC, SetStateAction, useRef, useState } from 'react';
+import { uniqueTimezones, renderCustomLabel, stringifyTimeZone } from 'skiff-front-utils';
 import styled from 'styled-components';
 import timezones from 'timezones-list';
 
@@ -11,7 +12,7 @@ dayjs.extend(timezone);
 
 const FormContainer = styled.div`
   gap: 15px;
-  width: 200px;
+  width: 300px;
   display: flex;
   flex-direction: column;
 `;
@@ -39,24 +40,16 @@ const DateTimeForm: FC<DateTimeFormProps> = ({
   updateDate,
   updateTime
 }) => {
-  const [timezoneFilter, setTimezoneFilter] = useState<string | null>(null);
   const [timeZoneFieldValue, setTimeZoneFieldValue] = useState(
-    timezones.find(({ label }) => label.includes(dayjs.tz.guess()))?.name
+    timezones.find((t) => t.label.includes(dayjs.tz.guess()))?.tzCode
   );
-  const [timeZoneDropdownOpen, setTimeZoneDropdownOpen] = useState(false);
-
   const dateFieldRef = useRef<HTMLInputElement>(null);
   const timeFieldRef = useRef<HTMLInputElement>(null);
   const timeZoneFieldRef = useRef<HTMLInputElement>(null);
 
-  const filteredTimezones = timezoneFilter
-    ? timezones.filter(({ name }) => name.toUpperCase().includes(timezoneFilter.toUpperCase()))
-    : timezones;
-
   return (
     <FormContainer>
       <LabeledField>
-        <Typography>Date</Typography>
         <InputField
           error={!!dateFieldError}
           errorMsg={dateFieldError}
@@ -73,12 +66,11 @@ const DateTimeForm: FC<DateTimeFormProps> = ({
               timeFieldRef.current?.focus();
             }
           }}
-          size='medium'
+          size={Size.SMALL}
           value={dateFieldValue}
         />
       </LabeledField>
       <LabeledField>
-        <Typography>Time</Typography>
         <InputField
           error={!!timeFieldError}
           errorMsg={timeFieldError}
@@ -93,51 +85,34 @@ const DateTimeForm: FC<DateTimeFormProps> = ({
               updateTime(timeFieldValue);
             }
           }}
-          size='medium'
+          placeholder='Time'
+          size={Size.SMALL}
           value={timeFieldValue}
         />
       </LabeledField>
-      <LabeledField>
-        <Typography>Timezone</Typography>
-        <InputField
-          icon={Icon.ChevronDown}
-          innerRef={timeZoneFieldRef}
-          onChange={(e) => {
-            setTimeZoneFieldValue(e.target.value);
-            setTimezoneFilter(e.target.value);
-          }}
-          onClick={() => {
-            timeZoneFieldRef.current?.select();
-          }}
-          onFocus={() => {
-            setTimeZoneDropdownOpen(true);
-          }}
-          size='medium'
-          value={timeZoneFieldValue}
-        />
-        <Dropdown
-          buttonRef={timeZoneFieldRef}
-          className='styled-dropdown'
-          maxHeight={220}
-          portal
-          setShowDropdown={setTimeZoneDropdownOpen}
-          showDropdown={timeZoneDropdownOpen}
-        >
-          {filteredTimezones.map(({ name, tzCode }) => (
+      <Select
+        filled
+        maxHeight={400}
+        onChange={(value) => {
+          setTimeZoneFieldValue(value);
+        }}
+        placeholder='Timezone'
+        size={Size.SMALL}
+        value={timeZoneFieldValue}
+      >
+        {uniqueTimezones.map((tz) => {
+          const isActive = timeZoneFieldValue === tz.name;
+          return (
             <DropdownItem
-              key={tzCode}
-              label={name}
-              onClick={(e) => {
-                timeFieldRef.current?.blur();
-                setTimeZoneFieldValue(name);
-                setTimezoneFilter(null);
-                setTimeZoneDropdownOpen(false);
-                e?.stopPropagation();
-              }}
+              customLabel={renderCustomLabel(tz)}
+              key={tz.name}
+              label={stringifyTimeZone(tz)}
+              ref={isActive ? timeZoneFieldRef : undefined}
+              value={tz.name}
             />
-          ))}
-        </Dropdown>
-      </LabeledField>
+          );
+        })}
+      </Select>
     </FormContainer>
   );
 };

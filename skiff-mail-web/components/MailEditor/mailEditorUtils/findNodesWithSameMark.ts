@@ -13,7 +13,12 @@ type Result = {
 }; // If nodes within the same range have the same mark, returns
 // the first node.
 
-export default function findNodesWithSameMark(doc: Node, from: number, to: number, markType: MarkType): Result | null {
+export default function findNodesWithSameMark(
+  doc: Node,
+  from: number,
+  to: number,
+  markType: MarkType | undefined
+): Result | null {
   let ii = from;
 
   const finder = (mark: Mark) => mark.type === markType;

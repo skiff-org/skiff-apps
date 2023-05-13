@@ -6,7 +6,7 @@ declare module '*.svg' {
   export default content;
 }
 
-import { Window as KeplrWindow } from '@keplr-wallet/types';
+import { Window as KeplrWindow } from '@keplr-wallet/types/build/window';
 import { Editor, Node } from '@tiptap/react';
 import { Node as ProseMirrorNode } from 'prosemirror-model';
 import { Decoration } from 'prosemirror-view';
@@ -27,7 +27,8 @@ declare module '@tiptap/react' {
 declare global {
   interface Window extends KeplrWindow {
     ReactNativeWebView: any;
-    rnIosKeyboardCbs: any;
+    rnIosKeyboardCbs: any; // A global CB array that react-native can trigger when keyboard height change
+    lastIosKeyboardHeight: number; // A global param that react-native can set when ios keyboard is open
     touchesCb: any;
     statusBarHeight: number;
     ethereum: any;
@@ -38,5 +39,6 @@ declare global {
       ethereum: any;
       solana: any;
     };
+    IsSkiffWindowsDesktop: boolean;
   }
 }

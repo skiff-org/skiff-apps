@@ -1,8 +1,9 @@
 import { ApolloError } from '@apollo/client';
-import { Keplr } from '@keplr-wallet/types';
-import { Button, Dialog, DialogTypes, Icon, IconButton, Typography } from 'nightwatch-ui';
+import { Keplr } from '@keplr-wallet/types/build/wallet/keplr';
+import { Button, Dialog, DialogTypes, Icon, IconButton, Type, Typography } from 'nightwatch-ui';
 import { FC, useState } from 'react';
-import { useToast } from 'skiff-front-utils';
+import { useVerifyWalletAddressCreateAliasMutation } from 'skiff-front-graphql';
+import { updateEmailAliases, useToast } from 'skiff-front-utils';
 import {
   WalletProviderInfo,
   WALLET_PROVIDERS,
@@ -14,13 +15,11 @@ import {
   isCosmosProvider,
   SolanaProvider,
   CosmosProvider,
-  WalletProvider
+  WalletProvider,
+  useRequiredCurrentUserData
 } from 'skiff-front-utils';
-import { useVerifyWalletAddressCreateAliasMutation } from 'skiff-mail-graphql';
 import styled from 'styled-components';
 
-import { useRequiredCurrentUserData } from '../../../apollo/currentUser';
-import { updateEmailAliases } from '../../../utils/cache/cache';
 import { resolveAndSetENSDisplayName } from '../../../utils/userUtils';
 import { connectCosmosWallet, connectEthWallet, connectSolWallet } from '../../../utils/walletUtils/walletUtils';
 
@@ -174,8 +173,8 @@ export const ConnectWalletModal: FC<ConnectWalletModalProps> = ({
 
       closeParentModal();
       enqueueToast({
-        body: `Connected ${WALLET_PROVIDERS[providerName].walletName} wallet.`,
-        icon: Icon.Check
+        title: `Connected wallet`,
+        body: `${WALLET_PROVIDERS[providerName].walletName} connected to account.`
       });
     } catch (e: any) {
       handleAddWalletError(e as ApolloError);
@@ -193,7 +192,6 @@ export const ConnectWalletModal: FC<ConnectWalletModalProps> = ({
     const { walletName, icon } = providerInfo;
     return (
       <Button
-        align='center'
         dataTest={`${ConnectWalletModalDataTest.addWalletBtn}-${walletName}`}
         disabled={isAddingWallet[provider]}
         fullWidth
@@ -201,7 +199,7 @@ export const ConnectWalletModal: FC<ConnectWalletModalProps> = ({
         key={`add-${walletName}`}
         onClick={onClick}
         startIcon={icon}
-        type='secondary'
+        type={Type.SECONDARY}
       >
         {isAddingWallet[provider] ? `Check ${walletName} Wallet` : walletName}
       </Button>
