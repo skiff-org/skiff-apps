@@ -1,9 +1,7 @@
 # Skiff Mail
 Private, end-to-end encrypted, wallet native mail. Sign up for a free Skiff Mail account at [skiff.com](https://skiff.com).
 
-
-
-<img width="1200" alt="Skiff Mail – Inbox" src="https://user-images.githubusercontent.com/1927690/166291826-bf21933f-f637-4756-9951-ac5a1e69be0f.png">
+![skiff-mail-header](https://github.com/skiff-org/skiff-mail/assets/3527315/9b8b7ee9-9daa-4e4c-b6bc-9a869d574757)
 
 ## Welcome to Skiff Mail!
 
