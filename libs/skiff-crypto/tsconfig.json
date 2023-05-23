@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+      "declarationDir": "dist/",
+      "tsBuildInfoFile": "dist/.tsbuildinfo",
+      "types": ["jest", "node"]
+    },
+    "references": [
+      { "path" :"../../libs/skiff-utils"},
+    ]
+}

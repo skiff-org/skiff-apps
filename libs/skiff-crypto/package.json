@@ -1,0 +1,56 @@
+{
+  "name": "skiff-crypto",
+  "version": "0.0.1",
+  "description": "Cryptographic related functions and helpers",
+  "main": "./dist/cjs/index.js",
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "types": "dist/src/index.d.ts",
+  "packageManager": "yarn@3.5.0",
+  "private": true,
+  "scripts": {
+    "emit-ts": "yarn tsc --build",
+    "clean": "rm -rf dist/",
+    "build": "yarn node build.js",
+    "watch": "WATCH=1 yarn build",
+    "test": "yarn jest",
+    "lint": "yarn run -T eslint ./src --cache --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "yarn lint --fix"
+  },
+  "devDependencies": {
+    "@types/argon2-browser": "^1",
+    "@types/jest": "^28.1.1",
+    "@types/lodash": "^4",
+    "@types/node": "17.0.45",
+    "@types/randombytes": "^2",
+    "@types/semver": "^7",
+    "@types/varint": "^6.0.0",
+    "esbuild": "^0.15.6",
+    "esbuild-jest": "^0.5.0",
+    "esbuild-node-externals": "^1.5.0",
+    "eslint-config-skiff-eslint": "workspace:*",
+    "jest": "^28.1.1",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@stablelib/chacha20poly1305": "^1.0.1",
+    "argon2-browser": "^1.18.0",
+    "base64-js": "^1.5.1",
+    "buffer": "^6.0.3",
+    "fflate": "^0.7.3",
+    "futoin-hkdf": "^1.5.0",
+    "lodash": "^4.17.21",
+    "randombytes": "^2.1.0",
+    "semver": "^7.3.4",
+    "skiff-utils": "workspace:libs/skiff-utils",
+    "tslib": "^2.4.0",
+    "tweetnacl": "^1.0.3",
+    "varint": "^6.0.0"
+  }
+}
