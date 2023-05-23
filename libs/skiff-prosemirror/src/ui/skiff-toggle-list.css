@@ -1,0 +1,109 @@
+.ProseMirror .toggle-item {
+  padding-left: 30px;
+}
+
+.toggle-item-content {
+  min-height: 35px;
+  display: block;
+}
+
+.toggle-item .item-toggle-button {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  padding-left: 2px;
+  margin-left: 1px;
+  border-radius: 3px;
+  width: 21px;
+  height: 24px;
+  filter: var(--filter-white-icon-dark);
+}
+
+.ProseMirror .toggle-item-title p {
+  padding-left: 36pt;
+  margin-left: -36pt;
+}
+
+.toggle-body {
+  padding-top: 2px;
+}
+
+.toggle-item .item-toggle-button:hover {
+  background: var(--drag-handle-hover);
+}
+
+.toggle-item .item-toggle-button:active {
+  background: var(--drag-handle-active);
+}
+
+.toggle-item .item-toggle-button::before {
+  content: '▼';
+  display: inline-block;
+  width: 15px;
+  transition-duration: 0.3s;
+  transform: rotate(0deg);
+  color: var(--text-primary);
+}
+
+.toggled.toggle-item .item-toggle-button::before {
+  transition-duration: 0.3s;
+  transform: rotate(-90deg);
+}
+
+.empty-content.toggle-item .item-toggle-button::before {
+  color: var(--text-disabled);
+}
+
+.empty-content .item-toggle-button {
+  filter: none;
+}
+
+.empty-content .toggle-content-placeholder-button {
+  display: block;
+}
+
+.toggle-content-placeholder-button {
+  z-index: 1;
+  font-size: 15px;
+  line-height: var(--skiff-content-line-height);
+  height: fit-content;
+  padding: 8px 10px;
+  margin-top: 7px;
+  margin-bottom: 4px;
+  color: var(--text-disabled);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.toggle-content-placeholder-button:hover {
+  background: var(--bg-l0-solid);
+}
+
+.toggle-content-placeholder-button:focus {
+  outline: none;
+}
+
+.toggle-content-placeholder-button,
+.toggled .toggle-content-placeholder-button,
+.toggled .toggle-item-content {
+  display: none;
+}
+
+.empty-title > .toggle-title-placeholder {
+  display: inline;
+}
+
+.toggle-title-placeholder {
+  line-height: var(--skiff-content-line-height);
+  border: none;
+  font-size: 17px;
+  margin-top: 2px;
+  position: absolute;
+  display: none;
+  color: var(--text-disabled);
+}

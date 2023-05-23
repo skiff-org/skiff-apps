@@ -1,0 +1,14 @@
+.skiff-table-cell-menu.use-icon {
+  box-shadow: 0 0 0 1px var(--border-secondary);
+  font-weight: 380;
+  height: 20px !important;
+  line-height: 22px !important;
+  margin: 5px 5px 0 0;
+  text-align: center;
+  padding: 1px !important;
+  width: 20px;
+}
+
+.skiff-table-cell-menu .skiff-icon {
+  font-size: 12px;
+}

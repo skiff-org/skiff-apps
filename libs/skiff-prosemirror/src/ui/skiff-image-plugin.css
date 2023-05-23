@@ -1,0 +1,76 @@
+placeholder {
+  color: #ccc;
+  position: relative;
+  top: 6px;
+  width: 100%;
+  display: flex;
+}
+
+placeholder:after {
+  content: '☁';
+  font-size: 200%;
+  line-height: 0.1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.imagePluginRoot {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-radius: 0.25rem;
+}
+
+.imagePluginRoot img {
+  align-self: center;
+  width: 100%;
+}
+
+.downloadBtnOverlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1000000;
+  opacity: 0;
+  user-select: none;
+}
+
+.downloadBtnOverlay:hover {
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.downloadBtnOverlayContainer {
+  pointer-events: auto;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  box-sizing: border-box;
+  cursor: pointer;
+  user-select: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  margin: 8px;
+}
+
+.imagePluginOverlay {
+  width: 100%;
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+.imagePluginRoot .text {
+  text-align: center;
+}
+
+.imageResizeBox.active {
+  background: transparent !important;
+}

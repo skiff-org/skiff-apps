@@ -1,0 +1,133 @@
+.ProseMirror p,
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6 {
+  position: relative;
+  /* padding-left: var(--drag-handle-left-margin);
+  margin-left: -25px;
+  padding-right: 0;
+  margin-right: 0; */
+  outline: none;
+}
+
+.ProseMirror h1 .drag-handle-container {
+  top: 13.5pt;
+}
+
+.ProseMirror h2 .drag-handle-container {
+  top: 11.5pt;
+}
+
+.ProseMirror h3 .drag-handle-container {
+  top: 9.5pt;
+}
+
+.ProseMirror .tableWrapper ul[data-indent='0'],
+.ProseMirror .tableWrapper ol[data-indent='0'] {
+  padding-left: 22px;
+  margin-left: 0;
+}
+
+.ProseMirror .tableWrapper ul .drag-handle-container,
+.ProseMirror .tableWrapper ol .drag-handle-container {
+  left: -12px;
+}
+
+.ProseMirror .tableWrapper ul.todo-list .drag-handle-container {
+  left: 0px;
+}
+
+.ProseMirror .tableWrapper ul.todo-list[data-indent='0'] {
+  padding-left: unset;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  position: relative;
+}
+
+.ProseMirror blockquote .drag-handle-container {
+  left: -4px;
+}
+
+.drag-handle-container {
+  position: absolute;
+  vertical-align: super;
+  cursor: grab;
+  user-select: none;
+  filter: var(--filter-white-icon-dark);
+}
+
+mention + .drag-handle-container {
+  display: none;
+}
+
+.skiff-drag-handle:hover {
+  background: var(--drag-handle-hover);
+}
+
+.skiff-drag-handle:active {
+  background: var(--drag-handle-active);
+}
+
+.mobile .skiff-drag-handle {
+  display: none;
+}
+
+.skiff-drag-handle {
+  width: 18px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0px;
+  left: -20px;
+  border-radius: 2px;
+}
+
+.skiff-drag-handle.light:hover {
+  background: var(--accent-blue-secondary);
+}
+
+.skiff-drag-handle.dark:hover {
+  background: var(--accent-blue-secondary);
+}
+
+ul .drag-handle-container,
+ol .drag-handle-container {
+  z-index: 1;
+}
+
+.toggle-body > .drag-handle-container .skiff-drag-handle {
+  left: -50px;
+}
+
+/* ---- ------------ ---- */
+
+/* ---- placeholders ---- */
+
+/* ---- ------------ ---- */
+.textBlock-placeholder {
+  display: block;
+  min-height: 20px;
+  background: var(--skiff-text-block-placeholder-dark) !important;
+  opacity: 0.2;
+  color: transparent;
+  width: 100%;
+  background-clip: content-box;
+  border-radius: 3px;
+  box-shadow: var(--shadow-l2);
+}
+
+table .textBlock-placeholder {
+  width: calc(100% - 25px);
+}
+
+.image-placeholder {
+  min-width: 100px !important;
+  min-height: 70px !important;
+}

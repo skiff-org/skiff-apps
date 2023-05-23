@@ -1,0 +1,62 @@
+@import './skiff-vars.css';
+@import 'skiff-table-vars.css';
+
+.add-label,
+.label-title,
+.remove-label,
+.labels-search {
+  color: var(--text-primary) !important;
+}
+
+.labels-chooser-container,
+.headersMenu,
+.ProseMirror-menu-dropdown-menu.columnTypeDropdown {
+  background: var(--bg-l1-solid) !important;
+  color: var(--text-primary) !important;
+  border: 1px var(--border-secondary) solid;
+  box-shadow: var(--shadow-l2);
+}
+
+.labels-search,
+.headerInputField {
+  box-shadow: none;
+  background: var(--bg-l1-solid);
+  color: var(--text-primary) !important;
+  outline: none;
+  border: 1px solid var(--border-active);
+  padding: 4px 6px;
+  border-radius: 2px;
+  font-family: 'Skiff Sans Text';
+}
+
+.label-option-checkbox,
+.typeIcon,
+.menuIcon,
+.cell-checkbox .checkbox,
+.remove-label-icon {
+  filter: var(--filter-white-icon-dark);
+}
+
+.headersMenu .ProseMirror-menuitem:hover,
+.columnTypeDropdown .ProseMirror-menu-dropdown-item:hover {
+  background: var(--cta-secondary-hover);
+}
+
+.label-container,
+.add-label {
+  background: var(--bg-l2-solid);
+}
+
+.date-picker .MuiSvgIcon-root {
+  filter: none !important;
+}
+
+.mobile .headersMenu {
+  left: calc(50vw) !important;
+  transform: translateX(-50%) !important;
+}
+
+.mobile .ProseMirror-menu-dropdown-menu.columnTypeDropdown {
+  left: calc(50vw) !important;
+  transform: translateX(-100%) !important;
+}

@@ -1,0 +1,38 @@
+.skiff-table-grid-size-editor {
+  background: var(--bg-l2-solid);
+  box-shadow: var(--skiff-overlay-shadow);
+  font-family: var(--skiff-font-family);
+  font-size: var(--skiff-font-size);
+}
+
+.skiff-table-grid-size-editor-body {
+  position: relative;
+}
+
+.skiff-table-grid-size-editor-body::after {
+  background: rgba(0, 0, 0, 0);
+  bottom: -50px;
+  content: '';
+  left: 0;
+  position: absolute;
+  right: -50px;
+  top: -50px;
+}
+
+.skiff-table-grid-size-editor-cell {
+  border: var(--border-secondary);
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 2;
+}
+
+.skiff-table-grid-size-editor-cell.selected {
+  background: var(--skiff-selection-highlight-color);
+  border-color: var(--skiff-selection-highlight-color-dark);
+}
+
+.skiff-table-grid-size-editor-footer {
+  padding-bottom: 5px;
+  color: var(--text-secondary);
+  text-align: center;
+}

@@ -1,0 +1,224 @@
+.floating-toolbar-container .ProseMirror-menuitem {
+  width: fit-content;
+  height: fit-content;
+}
+
+.menu-item {
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 6px;
+  max-height: 32px;
+  cursor: pointer;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.ProseMirror-menuitem .menu-tooltip,
+.ProseMirror-menu-dropdown-item .menu-tooltip {
+  background: var(--bg-emphasis);
+  border-radius: 24px;
+  bottom: 100%;
+  color: #fff;
+  display: flex;
+  font-size: 13px;
+  left: 50%;
+  opacity: 0;
+  padding: 4px 12px;
+  position: absolute;
+  text-align: center;
+  transform: translate(-50%, -20px);
+  transition: opacity 0.5s;
+  width: max-content;
+  visibility: hidden;
+  z-index: 1;
+  gap: 4px;
+}
+
+.ProseMirror-menuitem:hover .menu-tooltip,
+.ProseMirror-menu-dropdown-item:hover .menu-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.floating-toolbar-container .menu-item .icon {
+  /* TODO: dont use important - will need to add after dropdown refactor that use important */
+  height: 20px !important;
+  width: 20px !important;
+  margin-right: 0px !important;
+  filter: var(--filter-white-icon);
+}
+
+.ProseMirror-menu-disabled {
+  cursor: default !important;
+}
+
+.ProseMirror-menu-active.menu-item,
+.cell-background-color-item.ProseMirror-menu-active,
+.menu-item:hover:not(.check-box-icon) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ProseMirror-menu-active.menu-item * {
+  fill: #75b8ff !important;
+}
+
+.text-color-item,
+.text-highlight-color-item,
+.cell-background-color-item {
+  justify-content: center;
+}
+
+.ProseMirror-menu-dropdown-menu.text-color-dropdown .ProseMirror-menu-dropdown-item,
+.text-color-item,
+.text-highlight-color-item {
+  width: 36px !important;
+  height: 36px !important;
+}
+
+.text-color-item-icon-toolbar {
+  height: 18px;
+  width: 18px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.text-color-item-icon {
+  height: 24px;
+  width: 24px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.text-highlight-color-item-icon {
+  border-radius: 20px;
+  height: 24px;
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.text-highlight-color-item-icon {
+  border-radius: 20px;
+  height: 24px;
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ProseMirror-menu-active .text-highlight-color-item-icon.transparent-toolbar-icon{
+  background: none !important;
+}
+
+.cell-background-color-item-icon {
+  border-radius: 20px;
+  width: 20px;
+  height: 20px;
+  border: 1px var(--border-secondary) solid;
+}
+
+.ProseMirror-menu-dropdown.text-color-dropdown {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.ProseMirror-menu-dropdown.text-item-dropdown {
+  color: white;
+  font-family: 'Skiff Sans Text';
+  display: flex;
+  -webkit-font-smoothing: antialiased;
+  align-items: center;
+  font-size: 15px;
+  line-height: 24px;
+  font-weight: 560;
+  cursor: pointer;
+}
+
+.ProseMirror-menu-dropdown.cell-background-color-dropdown {
+  filter: var(--filter-white-icon);
+  width: 20px;
+  height: 20px;
+  content: url(./svgs/palette.svg);
+  cursor: pointer;
+}
+
+.menu-item.columns-count,
+.menu-item.rows-count {
+  color: var(--text-always-white);
+  filter: none;
+  width: 32px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-item.columns-count:hover,
+.menu-item.rows-count:hover {
+  background: var(--bg-emphasis);
+  cursor: default;
+}
+
+.menu-item.columns-count:hover *,
+.menu-item.rows-count:hover * {
+  background: var(--bg-emphasis);
+  cursor: default;
+}
+
+.columns-count-text,
+.rows-count-text {
+  font-size: 15px;
+  width: fit-content;
+  height: fit-content;
+}
+
+.delete-image-hover {
+  border: var(--accent-red-primary) 3px solid;
+  box-sizing: border-box;
+}
+
+.menu-item.toggle-headers .icon {
+  content: url(./svgs/toggle-header.svg);
+  width: 20px;
+  height: 20px;
+}
+
+.menu-item.delete-cells .icon {
+  content: url(./svgs/trash.svg);
+  width: 20px;
+  height: 20px;
+}
+
+.mark-delete-cells .inRowSelection .tableRowHandle::before,
+.mark-delete-cells .inColSelection .tableColHandle::before,
+.mark-delete-cells .selectedCell::before {
+  border-color: var(--accent-red-primary);
+}
+
+.mark-delete-cells .inColSelection .tableColHandleButton,
+.mark-delete-cells .inRowSelection .tableRowHandleButton .buttonContent {
+  background: var(--accent-red-primary);
+}
+
+.ProseMirror-menu-disabled {
+  opacity: 40%;
+}
+
+.toggle-list .icon {
+  width: 22px;
+  height: 22px;
+  content: url(./svgs/toggle_list.svg);
+}

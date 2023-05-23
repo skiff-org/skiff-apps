@@ -1,0 +1,46 @@
+@import './skiff-vars.css';
+@import './skiff-animations.css';
+
+.skiff-tooltip-surface.skiff-animation-fade-in {
+  display: contents;
+}
+
+.skiff-tooltip-view {
+  background: #393939;
+  border-radius: 5px;
+  box-sizing: border-box;
+  color: #fff;
+  font-family: var(--skiff-font-family);
+  font-size: var(--skiff-font-size);
+  margin: 20px 0 0 0;
+  min-width: 100px;
+  padding: 6px 8px;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  text-align: center;
+}
+
+@media only print {
+  .skiff-tooltip-view {
+    display: none;
+  }
+}
+
+.skiff-tooltip-view.skiff-animation-fade-in {
+  animation-duration: 250ms;
+  animation-delay: 150ms;
+}
+
+.skiff-tooltip-view::after {
+  background: #393939;
+  content: '';
+  height: 8px;
+  left: var(--skiff-pop-up-anchor-offset-left);
+  margin-left: -6px;
+  position: absolute;
+  top: 16px;
+  transform: rotate(45deg);
+  width: 8px;
+  z-index: -1;
+}

@@ -1,0 +1,14 @@
+@import './skiff-vars.css';
+
+.skiff-body-layout-editor {
+  box-shadow: var(--skiff-overlay-shadow);
+  font-family: var(--skiff-font-family);
+  font-size: var(--skiff-font-size);
+  padding: 4px 10px;
+  background: var(--bg-l1-solid);
+}
+
+.skiff-body-layout-editor .skiff-form {
+  width: 300px;
+  background: var(--bg-l1-solid);
+}

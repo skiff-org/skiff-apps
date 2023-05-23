@@ -1,0 +1,50 @@
+.mentions-menu {
+  min-width: 185px;
+  max-width: 95vw;
+  box-shadow: var(--shadow-l2);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: var(--bg-emphasis);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0px !important;
+  box-sizing: border-box;
+  padding: 4px;
+}
+
+.mention-suggestions {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-l1-solid);
+  border: 1px solid var(--border-secondary);
+  border-radius: 12px;
+
+  height: fit-content;
+  max-height: 300px;
+  overflow: scroll;
+}
+
+.mentions-input-decoration {
+  display: inline-block;
+}
+
+.mention-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  height: 30px;
+  width: 200px;
+  padding: 10px 10px;
+
+  cursor: pointer;
+}
+
+.marked-option {
+  background: var(--bg-l0-solid);
+}
+
+.invisible-cursor {
+  caret-color: transparent;
+}

@@ -1,0 +1,32 @@
+# ignore DS_Store
+.DS_Store
+
+# yarn v2 and zero install list
+# https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# ignore build files
+dist/
+!.yarn/**/dist
+
+# ignore npm files
+package-lock.json
+
+node_modules/
+!.yarn/unplugged/**/node_modules/
+
+# Coverage directory used by tools like istanbul
+coverage
+
+.vscode/*.log
+
+.env
+
+# ignore eslint cache
+.eslintcache

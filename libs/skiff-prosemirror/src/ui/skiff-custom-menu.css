@@ -1,0 +1,27 @@
+.skiff-custom-menu {
+  box-shadow: var(--shadow-l2);
+  border: 1px var(--border-secondary) solid;
+  font-family: var(--skiff-font-family);
+  font-size: var(--skiff-font-size);
+  max-height: 98vh;
+  overflow: auto;
+  border-radius: 8px;
+  min-width: 80px;
+  margin-top: 10px;
+  background: var(--bg-l2-solid);
+}
+
+@supports (backdrop-filter: blur(20px)) {
+  .skiff-custom-menu {
+    box-shadow: var(--shadow-l2);
+    border: 1px var(--border-secondary) solid;
+    font-family: var(--skiff-font-family);
+    font-size: var(--skiff-font-size);
+    max-height: 98vh;
+    overflow: auto;
+    border-radius: 8px;
+    margin-top: 10px;
+    backdrop-filter: blur(20px);
+    background: var(--bg-l2-solid);
+  }
+}

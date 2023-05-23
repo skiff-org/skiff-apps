@@ -1,0 +1,40 @@
+.skiff-subpage-tooltip {
+  font-family: 'Skiff Sans Text', sans-serif !important;
+  background: var(--bg-l2-solid);
+  display: flex;
+  justify-content: center;
+  z-index: 2;
+  border: 1px solid var(--border-secondary);
+  border-radius: 6px;
+  box-shadow: var(--skiff-comment-shadow);
+  font-size: var(--skiff-font-size);
+  width: 260px;
+  height: 38px;
+  overflow: hidden;
+  padding: 5px;
+  pointer-events: auto;
+}
+
+.skiff-subpage-tooltip input {
+  font-family: 'Skiff Sans Text', sans-serif !important;
+  font-weight: 560;
+  background: var(--bg-l2-solid);
+  color: var(--text-secondary);
+  padding: 10px 18px;
+  border: none;
+  outline: none;
+  width: 210px;
+}
+
+.skiff-subpage-tooltip input::placeholder {
+  color: var(--text-secondary);
+}
+
+.skiff-subpage-tooltip input textarea {
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+}
+.skiff-subpage-tooltip input textarea::placeholder {
+  color: var(--text-disabled);
+}

@@ -1,0 +1,26 @@
+@import 'skiff-table-vars.css';
+
+.tablePopup {
+  background: var(--skiff-table-toolbar);
+}
+
+.ProseMirror-menu-dropdown-menu.cellColorDropDown {
+  background: var(--bg-l1-solid);
+}
+
+.colorItemContainer .colorItemButton {
+  padding: 0;
+}
+
+.colorItemButton:hover {
+  box-shadow: 0 3px 8px var(--border-primary);
+}
+
+.popup-tooltip {
+  background: var(--skiff-table-toolbar);
+  border: 1px solid var(--border-primary);
+}
+
+.popup-tooltip::after {
+  border-color: var(--skiff-table-toolbar) transparent transparent transparent;
+}

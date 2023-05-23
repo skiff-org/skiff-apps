@@ -1,0 +1,68 @@
+/* Indent */
+
+/* The 12 pt value is 4 times the width of a space */
+
+.ProseMirror *[data-indent='1'] {
+  padding-left: calc(12pt + var(--drag-handle-left-margin));
+}
+
+.ProseMirror *[data-indent='2'] {
+  padding-left: calc(24pt + var(--drag-handle-left-margin));
+}
+
+.ProseMirror *[data-indent='3'] {
+  padding-left: calc(36pt + var(--drag-handle-left-margin));
+}
+
+.ProseMirror *[data-indent='4'] {
+  padding-left: calc(48pt + var(--drag-handle-left-margin));
+}
+
+.ProseMirror *[data-indent='5'] {
+  padding-left: calc(60pt + var(--drag-handle-left-margin));
+}
+
+.ProseMirror *[data-indent='6'] {
+  padding-left: calc(72pt + var(--drag-handle-left-margin));
+}
+
+.ProseMirror *[data-indent='7'] {
+  padding-left: calc(84pt + var(--drag-handle-left-margin));
+}
+
+/* list item indents */
+
+.ProseMirror ol[data-indent='1'],
+.ProseMirror ul[data-indent='1'] {
+  padding-left: calc(12pt + var(--drag-handle-left-margin));
+}
+
+.ProseMirror ol[data-indent='2'],
+.ProseMirror ul[data-indent='2'] {
+  padding-left: calc(24pt + var(--drag-handle-left-margin));
+}
+
+.ProseMirror ol[data-indent='3'],
+.ProseMirror ul[data-indent='3'] {
+  padding-left: calc(36pt + var(--drag-handle-left-margin));
+}
+
+.ProseMirror ol[data-indent='4'],
+.ProseMirror ul[data-indent='4'] {
+  padding-left: calc(48pt + var(--drag-handle-left-margin));
+}
+
+.ProseMirror ol[data-indent='5'],
+.ProseMirror ul[data-indent='5'] {
+  padding-left: calc(60pt + var(--drag-handle-left-margin));
+}
+
+.ProseMirror ol[data-indent='6'],
+.ProseMirror ul[data-indent='6'] {
+  padding-left: calc(72pt + var(--drag-handle-left-margin));
+}
+
+.ProseMirror ol[data-indent='7'],
+.ProseMirror ul[data-indent='7'] {
+  padding-left: calc(84pt + var(--drag-handle-left-margin));
+}

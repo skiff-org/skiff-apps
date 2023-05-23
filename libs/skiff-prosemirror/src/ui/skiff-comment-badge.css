@@ -1,0 +1,40 @@
+@import './skiff-vars.css';
+
+.skiff-comment-badge {
+  position: absolute;
+  height: var(--skiff-comment-badge-height);
+  display: flex;
+  padding: 3.5px 13px;
+  align-items: center;
+  background: var(--skiff-comment-badge-reg);
+  border-radius: 17px;
+  cursor: pointer;
+  transition: transform 0.15s, top 0.15s;
+  outline: none;
+  box-sizing: border-box;
+  opacity: 0;
+  margin-top: calc(var(--skiff-comment-badge-height) * -0.5);
+}
+
+.skiff-comment-badge.active {
+  background: var(--skiff-comment-badge-act);
+}
+
+.skiff-comment-badge-count {
+  border-radius: 10px;
+  height: 20px;
+  line-height: 18px;
+  text-align: center;
+  color: white;
+  font-weight: 560;
+  background: var(--skiff-comment-badge-reg-count);
+  font-family: 'Skiff Sans Text' !important;
+  font-size: 10pt;
+  box-sizing: border-box;
+  padding: 1px 6px 0 6px;
+  margin-right: 7px;
+}
+
+.skiff-comment-badge.active .skiff-comment-badge-count {
+  background: var(--skiff-comment-badge-act-count);
+}

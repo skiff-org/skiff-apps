@@ -1,0 +1,31 @@
+@import './skiff-vars.css';
+
+.skiff-cursor-placeholder {
+  display: inline-block;
+  position: relative;
+  vertical-align: text-bottom;
+}
+
+.skiff-cursor-placeholder::after {
+  background: var(--skiff-selection-highlight-color-dark);
+  bottom: 0;
+  content: '';
+  height: 1.2em;
+  left: -1px;
+  position: absolute;
+  width: 3px;
+  -webkit-animation-name: skiff_cursor_blink;
+  -webkit-animation-duration: 0.5s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: ease-in-out;
+  -webkit-animation-direction: alternate;
+}
+
+@-webkit-keyframes skiff_cursor_blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

@@ -1,0 +1,235 @@
+.skiff-comments-tooltip {
+  width: 350px;
+  height: 312px;
+  border-radius: 12px;
+  background: var(--bg-l2-solid);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-secondary);
+  box-shadow: var(--skiff-comment-shadow);
+}
+
+.skiff-comments-tooltip button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.skiff-comments-toolbar {
+  flex-basis: 40px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-secondary);
+  display: flex;
+  align-items: center;
+  padding: 2px 10px;
+  justify-content: space-between;
+}
+
+.skiff-comments-tabs {
+  display: inline-flex;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+.skiff-comments-actions {
+  display: inline-flex;
+  justify-content: flex-end;
+  height: 100%;
+  align-items: center;
+  gap: 4px;
+}
+
+.skiff-comments-btn-resolve {
+  margin-right: 10px;
+  background: transparent !important;
+  border: 1px solid var(--border-secondary) !important;
+  color: var(--cta-primary-default) !important;
+  padding: 0.225em 0.5em !important;
+  border-radius: 4px !important;
+}
+
+.skiff-comments-btn-resolve:hover {
+  border-color: var(--cta-primary-default) !important;
+}
+
+.skiff-comments-btn-delete:hover {
+  filter: var(--filter-red-icon);
+}
+
+.skiff-comments-tab {
+  font-weight: 600;
+  font-size: 15px;
+  font-family: 'Skiff Sans Text', sans-serif;
+  height: 100%;
+  background: none;
+  border: none;
+  box-sizing: content-box;
+  color: var(--text-secondary);
+  outline: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+  cursor: pointer;
+  padding: 1px 10px !important;
+}
+
+/* overrides nightwatch-ui active */
+.skiff-comments-tab.active {
+  border-color: var(--cta-primary-default);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 1px 10px !important;
+}
+
+.skiff-comments-tab span {
+  font-size: 14px;
+  background: var(--bg-l0-solid);
+  font-weight: 560;
+  border-radius: 4px;
+  padding: 2px 7.5px;
+  margin-left: 2.5px;
+}
+
+.skiff-comments-body {
+  overflow: auto;
+  min-height: 0;
+  margin-top: auto;
+}
+
+.skiff-comments-input {
+  position: relative;
+  margin: 8px 10px 10px 10px;
+  flex-shrink: 0;
+}
+
+/* impt overrides inlines from nightwatch-ui */
+.skiff-comments-dropdown-button {
+  padding: 6px 3px !important;
+  border-radius: 5px !important;
+  margin: 0 !important;
+}
+
+.skiff-comments-dropdown-button:hover {
+  background: var(--cta-secondary-hover) !important;
+}
+
+.skiff-comment-dropdown {
+  margin-top: -30px;
+}
+
+.skiff-comment-dropdown > div {
+  border-color: var(--border-secondary) !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.skiff-comment-dropdown > div > div {
+  display: flex;
+  align-items: center;
+  padding: 3px 10px;
+  background: var(--bg-l2-solid);
+  transition: background-color 0.15s;
+  color: var(--text-secondary);
+  font-size: 15px !important;
+}
+
+.skiff-comment-dropdown > div > div:hover {
+  filter: brightness(0.94);
+}
+
+.skiff-comment-dropdown > div > div:first-child {
+  padding-top: 5px;
+}
+
+.skiff-comment-dropdown > div > div:last-child {
+  padding-bottom: 5px;
+}
+
+.skiff-comment-dropdown img {
+  margin-right: 5px;
+}
+
+.skiff-comment-dropdown-edit img {
+  padding: 1px;
+}
+
+.skiff-comment-item {
+  padding: 0 14px 8px;
+  transition: background 0.15s;
+}
+
+.skiff-comment-item:hover {
+  background: var(--cta-secondary-default);
+}
+
+.skiff-comment-item:first-child {
+  padding-top: 12px;
+}
+
+.skiff-comment-item:not(:first-child)::before {
+  content: '';
+  height: 1px;
+  width: 100%;
+  background: var(--border-secondary);
+  margin-bottom: 8px;
+  display: flex;
+}
+
+.skiff-comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.skiff-comment-title {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.skiff-comment-title-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-family: 'Skiff Sans Text', sans-serif;
+  min-width: 0;
+}
+
+.skiff-comment-title-stack-name {
+  font-size: 11pt;
+  line-height: 16px;
+  color: var(--text-primary);
+  font-weight: 560;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding-right: 2.5px;
+}
+
+.skiff-comment-title-stack-time {
+  font-size: 11pt;
+  line-height: 16px;
+  color: var(--text-secondary);
+  font-weight: 560;
+}
+
+.skiff-comment-actions {
+  display: inline-flex;
+  align-items: center;
+}
+
+.skiff-comment-body {
+  overflow-wrap: break-word;
+  color: var(--text-primary);
+  overflow: hidden;
+  font-size: 11pt;
+  line-height: 16px;
+  margin: -2px;
+  padding: 2px;
+  border: 1px solid transparent;
+  transition: border-color 0.15s;
+  border-radius: 4px;
+  outline: none;
+}
+
+.skiff-comment-body[contenteditable='true'] {
+  border-color: var(--cta-primary-default);
+}

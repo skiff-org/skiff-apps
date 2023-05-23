@@ -1,0 +1,60 @@
+@import './skiff-vars.css';
+
+.skiff-color-editor {
+  background: var(--bg-l2-solid);
+  box-shadow: var(--skiff-overlay-shadow);
+  font-family: var(--skiff-font-family);
+  font-size: var(--skiff-font-size);
+  border: 1px solid var(--border-secondary);
+  padding: 8px 2px 2px 10px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.skiff-color-editor .skiff-custom-button {
+  border: solid 1px var(--bg-l2-solid);
+  height: 22px;
+  width: 22px;
+  margin: 0.5px;
+  padding: 0;
+}
+
+.skiff-color-editor .skiff-custom-button.skiff-color-editor-color-transparent {
+  display: block;
+  height: 26px;
+  margin: 2px;
+  margin-bottom: 6px;
+  padding: 6px;
+  border-radius: 0 !important;
+  border: none !important;
+  text-align: center;
+  width: auto;
+  color: var(--text-secondary) !important;
+}
+
+.skiff-color-editor .skiff-custom-button.skiff-color-editor-color-transparent:hover {
+  background: var(--cta-secondary-hover-background-color);
+}
+
+.skiff-color-editor .skiff-custom-button.active,
+.skiff-color-editor .skiff-custom-button:hover {
+  font-weight: normal;
+  border-radius: 8px;
+  box-shadow: 0 0 4px 0 #aaa;
+}
+
+.skiff-color-editor .skiff-custom-button.skiff-color-editor-color-transparent.active {
+  border: none !important;
+  border-radius: 3px !important;
+  outline: none !important;
+  color: var(--text-secondary) !important;
+}
+
+.skiff-color-editor-section {
+  margin: 0 0;
+  width: 242px;
+}
+
+.skiff-color-editor-section .skiff-color-editor-cell {
+  border-radius: 8px;
+}

@@ -1,0 +1,34 @@
+.selectionAroundNode,
+.selectionAroundNode tr {
+  background: var(--accent-blue-secondary) !important;
+  -webkit-transition: background-color 200ms linear;
+  -ms-transition: background-color 200ms linear;
+  transition: background-color 200ms linear;
+}
+
+.tableScrollWrapper.selectionAroundNode {
+  background: transparent !important;
+}
+
+.tableScrollWrapper {
+  padding: 0 !important;
+}
+
+/* margins between the element in the document, to make the .selectionAroundNode separate */
+.ProseMirror p,
+.ProseMirror ul,
+.ProseMirror ol,
+.ProseMirror blockquote {
+  margin-bottom: 4px;
+}
+
+.selectionAroundNode .selection-marker {
+  background: transparent;
+}
+
+.comments-thread ::selection {
+  background: var(--accent-blue-secondary) !important;
+  -webkit-transition: background-color 200ms linear;
+  -ms-transition: background-color 200ms linear;
+  transition: background-color 200ms linear;
+}

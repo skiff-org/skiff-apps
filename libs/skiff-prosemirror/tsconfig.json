@@ -1,0 +1,27 @@
+{
+  "extends": "../tsconfig.json",
+
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "module": "esnext",
+    "lib": ["dom", "esnext"],
+    "target": "esnext",
+    "declarationDir": "./dist",
+    "esModuleInterop": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    // TODO: Remove this, being deprecated in TS 5.5
+    "suppressImplicitAnyIndexErrors": true,
+    // Used for error for above flag
+    "ignoreDeprecations": "5.0",
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+  },
+  "include": ["src/**/*", "custom.d.ts", "scripts/"],
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path" : "../nightwatch-ui"},
+    { "path" : "../skiff-front-utils"},
+    { "path" : "../skiff-graphql"},
+    { "path" : "../skiff-utils"}
+  ]
+}

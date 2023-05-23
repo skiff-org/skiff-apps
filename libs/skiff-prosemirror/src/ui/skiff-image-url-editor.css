@@ -1,0 +1,68 @@
+@import './skiff-vars.css';
+
+.skiff-image-url-editor {
+  background: transparent;
+  box-shadow: var(--shadow-l2);
+  font-family: var(--skiff-font-family);
+  -webkit-font-smoothing: antialiased;
+  font-size: var(--skiff-font-size);
+  border-radius: 36px;
+}
+
+.skiff-image-url-editor .skiff-form {
+  max-width: 30vw;
+  min-width: 21vw;
+  width: 264px;
+  /* Auto layout */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 4px;
+  background: var(--bg-emphasis);
+  border-radius: 8px;
+}
+
+.skiff-image-url-editor .skiff-form .skiff-form-buttons {
+  border-radius: 4px;
+  text-align: center;
+  margin: 2px 0 2px 8px;
+}
+
+.skiff-image-url-editor .skiff-form .skiff-form-buttons .skiff-submit-button:hover {
+  filter: brightness(95%);
+}
+
+.skiff-image-url-editor-src-input {
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 15px;
+  line-height: 20px;;
+  height: 36px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.skiff-image-url-editor-src-input-row {
+  position: relative;
+  margin: 0 0 10px;
+}
+
+.skiff-image-url-editor-src-input-row input.skiff-image-url-editor-src-input {
+  padding-right: 40px;
+}
+
+.skiff-image-url-editor-input-preview {
+  background: #fff;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: solid 1px #fff;
+  box-sizing: border-box;
+  outline: solid 1px #80bdff;
+  position: absolute;
+  right: 0;
+  top: 2px;
+  bottom: 1px;
+  width: 36px;
+}

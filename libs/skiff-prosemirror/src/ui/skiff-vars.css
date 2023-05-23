@@ -1,0 +1,68 @@
+:root {
+  --skiff-blockquote-background: rgba(0, 0, 0, 0.05);
+  --skiff-blockquote-border: solid 4px var(--border-primary);
+  --skiff-blockquote-color: #555;
+  --skiff-blockquote-font-family: 'Open Sans';
+  --skiff-border-blue: solid 1px #5882eb;
+  --skiff-button-radius: 5px;
+  --skiff-color-grey-200: rgba(0, 0, 0, 0.46);
+  --skiff-font-family: 'Skiff Sans Text', sans-serif;
+  --skiff-font-size-small: 13px;
+  --skiff-font-size: 16px;
+  --skiff-overlay-radius: 3px;
+  --skiff-overlay-shadow: 0 0 32px 13px rgba(0, 0, 0, 0.07);
+  --skiff-page-background: #e6e6e6;
+  --skiff-placeholder-text-color: #dedede;
+  --skiff-selection-highlight-color-dark: rgba(152, 204, 253, 0.8);
+  --skiff-selection-highlight-color: rgba(152, 204, 253, 0.4);
+  --skiff-doc-padding-default: 14.5mm;
+  --mobile-doc-padding-default: 2mm;
+  --edtior-toolbar-shadow: 0 1px 1px rgba(25, 25, 25, 0.1);
+  --skiff-editor-menu-width: 200px;
+  --skiff-mention-menu-height: 300px;
+  --skiff-comment-shadow: 0 0 9px -4px #adb7c0;
+  --skiff-dropdown-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 2px 0 inset;
+  --editor-page-shadow: rgb(60 64 67 / 15%) 0 1px 3px 1px;
+  --skiff-font-size-shadow: rgba(225, 228, 232, 0.2) 0 2px 0 inset;
+  --skiff-doc-width-us-letter-portrait: 216mm;
+  --skiff-doc-width-us-letter-landscape: 279mm;
+  --skiff-doc-width-us-desktop-screen-4-3: 120vh;
+  --skiff-doc-width-us-desktop-screen-16-9: 142vh;
+  --skiff-doc-width-a4: 210mm;
+  --skiff-doc-width-a4_landscape: 297mm;
+  --skiff-doc-width-mobile-screen: 100vw;
+
+  /* content styles */
+  --skiff-content-font-family: 'Skiff Sans Text', 'Roboto', ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Helvetica, 'Apple Color Emoji', Arial, sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol';
+  --skiff-content-font-size-h1: 32px;
+  --skiff-content-font-size-h2: 28px;
+  --skiff-content-font-size-h3: 24px;
+
+  /* this should map to FONT_PX_SIZE_DEFAULT in findActiveFontSize.js */
+  --skiff-content-font-size: 17px;
+
+  /* This maps to the default line spacing value of 1.5 in Google Doc */
+  --skiff-content-line-height: 138%;
+
+  /* custom */
+  --skiff-divider-gray: #e1e5ee;
+  --skiff-context-border: var(--border-secondary);
+  --skiff-select-tooltip: #99a3b1;
+  --skiff-comment-badge-height: 35px;
+  --skiff-comment-badge-reg: rgba(131, 137, 145, 0.3);
+  --skiff-comment-badge-reg-count: rgba(131, 137, 145, 1);
+  --skiff-comment-badge-act: rgba(255, 169, 0, 0.3);
+  --skiff-comment-badge-act-count: rgba(255, 169, 0, 1);
+
+  /* placeholders */
+  --skiff-text-block-placeholder-dark: rgba(120, 139, 243, 0.5);
+  --drag-handle-left-margin: 25px;
+  --drag-handle-hover: rgba(55, 53, 47, 0.08);
+  --drag-handle-active: rgba(55, 53, 47, 0.16);
+
+  /* todo-list */
+  --skiff-list-checked-mark-color: white;
+  --skiff-checked-task-color: rgb(2, 122, 255);
+  --skiff-checkbox-hover-color: rgba(55, 53, 37, 0.08);
+}

@@ -1,0 +1,59 @@
+@import './skiff-custom-button.css';
+@import './skiff-vars.css';
+
+.skiff-link-tooltip {
+  display: flex;
+  justify-content: center;
+  left: -150px;
+  pointer-events: none;
+  position: absolute;
+  top: -54px;
+  width: 400px;
+}
+
+.skiff-link-tooltip-href {
+  border: none;
+  color: rgb(255, 142, 120);
+  display: inline-block;
+  flex: 1;
+  max-width: 200px;
+  overflow: hidden;
+  position: relative;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.skiff-link-tooltip-row {
+  direction: row;
+  display: flex;
+  position: relative;
+  align-items: center;
+  z-index: 2;
+}
+
+.skiff-link-tooltip-body {
+  padding: 4px;
+  background: linear-gradient(0deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.16)), #000000;
+  border-radius: 8px;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+  display: inline-block;
+  font-family: 'Skiff Sans Text, sans-serif';
+  font-size: 15px;
+  line-height: 20px;
+  box-shadow: var(--shadow-l2);
+  max-width: 400px;
+  pointer-events: auto;
+}
+
+.skiff-link-tooltip-row .skiff-custom-button:hover {
+  filter: brightness(84%);
+}
+
+@media only print {
+  .skiff-link-tooltip {
+    display: none;
+  }
+}

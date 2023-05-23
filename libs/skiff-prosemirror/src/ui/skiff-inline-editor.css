@@ -1,0 +1,20 @@
+@import './skiff-vars.css';
+
+.skiff-inline-editor {
+  background: var(--bg-l2-solid);
+  box-shadow: var(--skiff-overlay-shadow);
+  display: flex;
+  flex-direction: row;
+  margin-top: 6px;
+  padding: 4px 10px;
+}
+
+.skiff-inline-editor .skiff-custom-button {
+  border: none;
+}
+
+@media only print {
+  .skiff-inline-editor {
+    display: none;
+  }
+}

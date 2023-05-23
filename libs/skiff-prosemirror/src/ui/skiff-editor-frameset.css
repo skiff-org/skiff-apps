@@ -1,0 +1,97 @@
+.skiff-editor-frameset {
+  position: relative;
+  overflow: auto;
+  background: var(--transparent-background);
+}
+
+.skiff-editor-frame-main {
+  position: relative;
+  z-index: 0;
+  background: var(--transparent-background);
+}
+
+.skiff-editor-frameset.embedded .skiff-editor-frame-body {
+  background: var(--transparent-background);
+}
+
+.skiff-editor-frame-body-scroll {
+  box-sizing: border-box;
+  background: var(--transparent-background);
+}
+
+.skiff-editor-frameset.embedded .skiff-editor-frame-body-scroll {
+  padding-top: unset;
+  background: var(--transparent-background);
+}
+
+@media print {
+  .skiff-editor-frame-head {
+    display: none;
+  }
+}
+
+.skiff-editor-frameset.with-fixed-layout .skiff-editor-frame-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--transparent-background);
+}
+
+.skiff-editor-frame-head {
+  position: relative;
+  z-index: 5;
+  background: var(--transparent-background);
+}
+
+.skiff-editor-frameset.with-fixed-layout .skiff-editor-frame-body {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  background: var(--transparent-background);
+}
+
+.skiff-editor-frameset.with-fixed-layout .skiff-editor-frame-body-scroll {
+  bottom: 0;
+  left: 0;
+  overflow: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 0;
+  background: var(--transparent-background);
+}
+
+.skiff-editor-frame-footer {
+  display: flex;
+  background: var(--transparent-background);
+}
+
+@media only print {
+  .skiff-editor-frame-body {
+    background: transparent;
+    background: var(--transparent-background);
+  }
+
+  .skiff-editor-frameset.with-fixed-layout {
+    height: auto !important;
+    width: auto !important;
+    background: var(--transparent-background);
+  }
+
+  .skiff-editor-frameset.with-fixed-layout .skiff-editor-frameset {
+    height: auto;
+    background: var(--transparent-background);
+  }
+
+  .skiff-editor-frameset.with-fixed-layout .skiff-editor-frame-body-scroll {
+    position: relative;
+    background: var(--transparent-background);
+  }
+
+  .skiff-editor-frameset.with-fixed-layout .skiff-editor-frame-body {
+    height: auto !important;
+    max-height: auto !important;
+    overflow: visible;
+    background: var(--transparent-background);
+  }
+}

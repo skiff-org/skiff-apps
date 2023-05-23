@@ -1,0 +1,92 @@
+@import './skiff-vars.css';
+
+.skiff-form {
+  background: var(--bg-emphasis);
+  border: 1px solid var(--border-secondary);
+  font-family: var(--skiff-font-family);
+  font-size: var(--skiff-font-size);
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.skiff-form legend {
+  border: none;
+  margin: 0 0 16px 0;
+  padding: 0;
+  font-size: var(--skiff-content-font-size-h2);
+  user-select: none;
+}
+
+.skiff-form hr {
+  background: var(--bg-l2-solid);
+  border: var(--border-secondary);
+  border-width: 1px 0 0 0;
+  height: 1px;
+  margin: 20px 0;
+}
+
+.skiff-form fieldset {
+  border: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.skiff-form input[type='text'] {
+  padding: 8px 12px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+  color: white;
+  display: block;
+  font-family: var(--skiff-font-family);
+  font-size: 15px;
+  line-height: 20px;
+  outline: none;
+  width: 100%;
+}
+
+.skiff-form em {
+  color: var(--skiff-color-grey-200);
+  display: block;
+  font-size: var(--skiff-font-size-small);
+  font-style: normal;
+  margin: 0 0 8px 0;
+  user-select: none;
+}
+
+.skiff-form-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  height: fit-content;
+}
+
+.skiff-form-buttons .skiff-custom-button {
+  margin: 0 5px;
+}
+
+.input-field {
+  display: inline-flex;
+  -webkit-box-align: stretch;
+  align-items: stretch;
+  height: 26px;
+  width: 36px;
+  margin-right: 5px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background: var(--bg-l1-solid);
+  border: 1px solid var(--border-secondary);
+  border-radius: 6px;
+  box-sizing: border-box;
+  outline: none;
+  box-shadow: var(--skiff-font-size-shadow);
+  padding: 0 0 0 6px;
+}

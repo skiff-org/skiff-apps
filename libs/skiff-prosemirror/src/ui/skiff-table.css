@@ -1,0 +1,193 @@
+@import './skiff-vars.css';
+@import 'skiff-table-vars.css';
+
+.ProseMirror .tableWrapper {
+  margin-top: 36px;
+  position: relative;
+  width: 100%;
+}
+
+.ProseMirror table {
+  border-color: var(--border-primary);
+  margin: 28px 0 0 0 !important;
+}
+
+.ProseMirror td,
+.ProseMirror th {
+  background: var(--bg-l1-solid);
+  border-color: var(--border-primary);
+}
+
+.ProseMirror table p {
+  padding-left: var(--skiff-paragraph-left-padding);
+}
+
+.ProseMirror table h1,
+.ProseMirror table h2,
+.ProseMirror table h3,
+.ProseMirror table h4,
+.ProseMirror table h5,
+.ProseMirror table h6 {
+  padding-left: var(--skiff-heading-left-padding);
+}
+
+.ProseMirror th {
+  background: var(--bg-l0-solid);
+}
+
+.ProseMirror .column-resize-handle {
+  border: solid 1px var(--bg-l1-solid);
+}
+
+.ProseMirror .tableAddRightColumn {
+  background: var(--bg-l0-solid);
+  border-left: 1px solid var(--border-primary);
+}
+
+.ProseMirror .tableAddBottomRow,
+.ProseMirror .tableAddRightColumn {
+  color: var(--border-primary);
+}
+
+.ProseMirror .tableAddBottomRow {
+  background: var(--skiff-table-handles, #f7f9fa);
+  border-top: 1px solid var(--border-secondary);
+}
+
+.ProseMirror .tableAddBottomRow:hover,
+.ProseMirror .tableAddBottomRow:active,
+.ProseMirror .tableAddRightColumn:hover,
+.ProseMirror .tableAddRightColumn:active {
+  background: var(--cta-secondary-active);
+  border-color: var(--cta-secondary-active);
+}
+
+.ProseMirror .tableAddBottomRow {
+  background: var(--bg-l0-solid);
+  border-top: 1px solid var(--border-primary);
+}
+
+.tableRowHandleButton,
+.tableColHandleButton {
+  background: var(--bg-l0-solid);
+}
+
+.tableRowHandleButton {
+  border-top: 1px solid var(--border-primary);
+}
+
+.tableColHandleButton {
+  border-left: 1px solid var(--border-primary);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.tableRowHandleButton .buttonContent {
+  background: var(--cta-secondary-active);
+}
+
+.tableColHandleButton:hover .buttonContent {
+  background: var(--cta-secondary-active);
+}
+
+.mobile .addAfterButton {
+  display: none;
+}
+
+.addAfterButton:hover {
+  background: var(--icon-link);
+}
+
+/* rules for small dot in the addButton place */
+.addAfterButton .addRowButtonContent,
+.addAfterButton .addColButtonContent {
+  background: var(--border-primary);
+}
+
+/* rules for the markers */
+.rowRearrangement tr:hover .addRowAfterMarker,
+.addAfterButton:hover ~ .addRowAfterMarker,
+.addAfterButton:hover ~ .addColAfterMarker {
+  background: var(--icon-link);
+}
+
+.addRowAfterMarker,
+.addColAfterMarker {
+  background: var(--border-primary);
+}
+
+/* rules for table main handle */
+.tableHandle {
+  border: 1px solid var(--border-primary);
+}
+
+.mobile .tableHandle {
+  left: -7px;
+}
+
+.tableHandle:hover {
+  background: var(--cta-secondary-active);
+}
+
+.inColSelection .tableColHandleButton,
+.inColSelection .tableColHandleButton:hover .buttonContent {
+  background: var(--icon-link);
+}
+
+/* rules for row handle in row selection */
+.inRowSelection .tableRowHandleButton {
+  background: var(--icon-link);
+}
+
+.inRowSelection .tableRowHandleButton .buttonContent {
+  background: var(--icon-link);
+}
+
+.inRowSelection .tableRowHandle::before,
+.inColSelection .tableColHandle::before {
+  border: 3px solid var(--icon-link);
+}
+
+.colHeader {
+  background: var(--bg-l0-solid, #f0f1f3) !important;
+}
+
+.ProseMirror .tableWrapper .drag-handle-container {
+  display: none;
+}
+
+/* TODO: change to css vars and dark mode */
+.colHeader:hover {
+  background: var(--skiff-header-hover) !important;
+}
+
+.colHeader:active {
+  background: var(--skiff-header-active) !important;
+}
+
+.selectedCell::before {
+  border-color: var(--icon-link) !important;
+}
+
+.mark-delete-cells .selectedCell::before {
+  border-color: var(--accent-red-primary) !important;
+}
+
+.focusTableSelected table::before {
+  border: 3px solid var(--icon-link);
+}
+
+.ProseMirror table .todo-list {
+  padding-left: 12px !important;
+}
+
+.tableHorizontalWrapper {
+  padding: 0px 16px 10px 38px;
+}
+
+.tableHandle {
+  left: 13px;
+}
+
+.filterStatusIndicator {
+  right: -5px;
+}

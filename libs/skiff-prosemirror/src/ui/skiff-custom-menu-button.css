@@ -1,0 +1,42 @@
+.skiff-custom-menu-button.expanded.expanded.expanded {
+  border-color: transparent;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+
+  /* box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7); */
+}
+
+.skiff-custom-menu-button.width-100 {
+  width: 155px;
+}
+
+.skiff-custom-menu-button.width-30 {
+  width: 35px;
+}
+
+.skiff-custom-menu-button.width-64 {
+  width: 64px;
+}
+
+.skiff-custom-menu-button.right-gutter {
+  margin-left: 4px;
+  padding-right: 20px !important;
+}
+
+.skiff-custom-menu-button {
+  line-height: 24px !important;
+  font-size: 14px !important;
+  height: 26px !important;
+  border-radius: 6px !important;
+  padding: 0 8px !important;
+}
+
+.skiff-custom-menu-dropdown-button {
+  border: 1px solid var(--border-secondary) !important;
+  box-shadow: var(--skiff-dropdown-shadow);
+  background: var(--bg-l1-solid) !important;
+}
+
+.skiff-custom-menu-button:hover {
+  filter: brightness(98%);
+}

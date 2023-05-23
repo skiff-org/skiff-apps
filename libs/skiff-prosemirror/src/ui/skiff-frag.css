@@ -1,0 +1,4 @@
+.skiff-frag {
+  display: contents;
+  background: var(--transparent-background);
+}

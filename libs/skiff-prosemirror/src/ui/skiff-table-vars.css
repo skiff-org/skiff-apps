@@ -1,0 +1,14 @@
+:root {
+  /* dark theme colors */
+  --skiff-table-border: #4a525f;
+  --skiff-table-handles: #212730;
+  --skiff-header-hover: rgba(55, 53, 47, 0.12);
+  --skiff-header-active: rgba(55, 53, 47, 0.16);
+
+  /* popup */
+  --skiff-table-toolbar: #1b2733;
+  --skiff-paragraph-left-padding: 12px;
+  --skiff-heading-left-padding: 37px;
+  --skiff-table-menu-input: #1b27334d;
+  --header-popup-hover-background: #3f3f3f;
+}

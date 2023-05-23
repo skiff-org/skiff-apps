@@ -1,0 +1,59 @@
+@import './skiff-custom-button.css';
+@import './skiff-vars.css';
+
+.skiff-select-tooltip {
+  display: flex;
+  align-items: center;
+  background: var(--skiff-select-tooltip);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  overflow: hidden;
+  transition: background 0.15s;
+}
+
+.skiff-select-tooltip:hover {
+  background: #798391;
+}
+
+.skiff-select-tooltip .skiff-custom-button {
+  background: transparent !important;
+}
+
+.new-comment-container {
+  height: 34px;
+  display: inline-flex;
+  background: var(--skiff-comment-badge-reg);
+  border-radius: 17px;
+}
+
+.skiff-select-tooltip.active .new-comment-container {
+  background: var(--skiff-comment-badge-act);
+}
+
+.skiff-select-tooltip-href {
+  border: none;
+  color: var(--text-link);
+  display: inline-block;
+  flex: 1;
+  margin: 0 6px 0 0;
+  max-width: 200px;
+  overflow: hidden;
+  padding: 6px 0;
+  position: relative;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+  z-index: 3;
+}
+
+.skiff-icon {
+  margin-left: 7px !important;
+  margin-top: 4px !important;
+}
+
+@media only print {
+  .skiff-select-tooltip {
+    display: none;
+  }
+}

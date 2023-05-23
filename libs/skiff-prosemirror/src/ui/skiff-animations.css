@@ -1,0 +1,15 @@
+.skiff-animation-fade-in {
+  animation-duration: 250ms;
+  animation-fill-mode: both;
+  animation-name: skiffAnimationFadeIn;
+  opacity: 0.6;
+}
+
+@keyframes skiffAnimationFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

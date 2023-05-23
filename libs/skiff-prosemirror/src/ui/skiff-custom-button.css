@@ -1,0 +1,79 @@
+/* <CustomButton /> */
+@import './skiff-vars.css';
+
+.skiff-custom-buttons {
+  white-space: nowrap;
+  margin: 0 8px;
+  box-shadow: none;
+}
+
+.skiff-custom-button {
+  background-clip: padding-box;
+  background: transparent;
+  border-radius: 5px;
+  border: none;
+  box-sizing: border-box;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: inline-block;
+  font-size: var(--skiff-font-size);
+  overflow: hidden;
+  padding: 6px 12px;
+  position: relative;
+  text-overflow: ellipsis;
+  user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
+  font-family: 'Skiff Sans Text', sans-serif !important;
+}
+
+.skiff-custom-button.use-icon {
+  border-color: transparent;
+  padding: 0;
+}
+
+.skiff-custom-button:focus,
+.skiff-custom-button:hover {
+  border-color: #555;
+  outline: none;
+}
+
+.skiff-custom-button.active {
+  color: var(--text-primary);
+  background: var(--cta-secondary-active);
+}
+
+.skiff-custom-button.pressed {
+  background: var(--border-secondary);
+}
+
+.skiff-custom-button.disabled,
+.skiff-custom-button.disabled:hover {
+  -webkit-text-stroke-width: 0;
+  background: transparent;
+  border-color: #ccc;
+  color: #c0c0c5;
+  opacity: 0.35;
+  cursor: unset;
+  pointer-events: none;
+}
+
+.skiff-custom-buttons .skiff-custom-button {
+  border-radius: 0;
+  margin-left: 0;
+}
+
+.skiff-custom-buttons > .skiff-custom-button:first-child {
+  border-top-left-radius: var(--skiff-button-radius);
+  border-bottom-left-radius: var(--skiff-button-radius);
+}
+
+.skiff-custom-buttons > .skiff-custom-button:last-child {
+  border-radius: 0;
+  border-top-right-radius: var(--skiff-button-radius);
+  border-bottom-right-radius: var(--skiff-button-radius);
+}
+
+.skiff-custom-buttons > .skiff-custom-button:only-child {
+  border-radius: var(--skiff-button-radius);
+}

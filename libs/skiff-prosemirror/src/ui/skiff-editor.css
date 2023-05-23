@@ -1,0 +1,573 @@
+@import './skiff-typography.css';
+@import './skiff-indent.css';
+@import './skiff-list.css';
+@import './skiff-toggle-list.css';
+@import './skiff-image-plugin.css';
+@import './skiff-codeblock.css';
+@import './skiff-floating-toolbar.css';
+@import './skiff-floating-toolbar-icons.css';
+@import './skiff-mentions.css';
+
+@import '@skiff-org/prosemirror-tables/style/tables.css';
+@import '@skiff-org/prosemirror-tables/style/table-popup.css';
+@import '@skiff-org/prosemirror-tables/style/table-types.css';
+@import '@skiff-org/prosemirror-tables/style/table-headers.css';
+@import '@skiff-org/prosemirror-tables/style/table-filters.css';
+
+/* Override for basic table design */
+@import './skiff-table.css';
+@import './skiff-table-types.css';
+@import './skiff-table-popup.css';
+@import './skiff-vars.css';
+@import './skiff-table-filters.css';
+
+.skiff-text-selection {
+  background: var(--transparent-background);
+}
+
+.ProseMirror-focused {
+  outline: none;
+  background: var(--transparent-background);
+}
+
+.ProseMirror {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  user-zoom: fixed;
+  border-radius: 1px;
+  box-sizing: border-box;
+  outline: none;
+  z-index: 1;
+  color: var(--text-primary);
+  font-family: 'Skiff Sans Text', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+  font-size: var(--skiff-content-font-size);
+  line-height: var(--skiff-content-line-height);
+  background: var(--transparent-background);
+}
+
+.ProseMirror nobr {
+  hyphens: none;
+  white-space: nowrap;
+  background: var(--transparent-background);
+}
+
+.ProseMirror .tableWrapper {
+  overflow-x: visible;
+  background: var(--transparent-background);
+}
+
+.ProseMirror.skiff-has-placeholder {
+  min-height: 100px;
+  background: var(--transparent-background);
+}
+
+.prosemirror-editor-wrapper {
+  position: relative;
+  overflow: visible;
+  background: var(--bg-main-container);
+}
+
+.skiff-editor-content-placeholder {
+  box-sizing: border-box;
+  color: var(--skiff-placeholder-text-color);
+  font-family: var(--skiff-content-font-family);
+  font-size: var(--skiff-content-font-size);
+  left: 0;
+  line-height: var(--skiff-content-line-height);
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 999;
+  background: var(--transparent-background);
+}
+
+.ProseMirror.skiff-prosemirror-editor,
+.ProseMirror[data-layout='full_width'] {
+  min-height: 100%;
+  padding: 90px 0;
+  margin: 0 auto;
+}
+
+.ProseMirror.skiff-prosemirror-editor > *,
+.ProseMirror[data-layout='full_width'] > * {
+  border-radius: 4px;
+  max-width: 768px;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ProseMirror.skiff-prosemirror-editor > .tableScrollWrapper,
+.ProseMirror[data-layout='full_width'] > .tableScrollWrapper {
+  max-width: 1300px;
+}
+
+.ProseMirror.skiff-prosemirror-editor > *:not(hr):not(ul):not(ol),
+.ProseMirror[data-layout='full_width'] > *:not(hr):not(ul):not(ol),
+.ProseMirror[data-layout='full_width'] .toggle-item-content > *:not(hr):not(ul):not(ol) {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.ProseMirror.skiff-prosemirror-editor
+  > *:not(hr):not(*[data-indent='1']):not(*[data-indent='2']):not(*[data-indent='3']):not(*[data-indent='4']):not(*[data-indent='5']):not(*[data-indent='6']):not(*[data-indent='7']),
+.ProseMirror[data-layout='full_width']
+  > *:not(ol):not(*[data-indent='1']):not(*[data-indent='2']):not(*[data-indent='3']):not(*[data-indent='4']):not(*[data-indent='5']):not(*[data-indent='6']):not(*[data-indent='7']),
+.ProseMirror[data-layout='full_width']
+  .toggle-item-content
+  > *:not(ol):not(*[data-indent='1']):not(*[data-indent='2']):not(*[data-indent='3']):not(*[data-indent='4']):not(*[data-indent='5']):not(*[data-indent='6']):not(*[data-indent='7']) {
+  padding-left: 18px;
+  padding-right: 8px;
+  border-radius: 4px;
+}
+
+.ProseMirror.skiff-prosemirror-editor .selectionAroundNode {
+  border-radius: 4px;
+}
+
+.skiff-prosemirror-editor {
+  width: 100%;
+  transition: width 0.2s ease-out;
+  transform-origin: left;
+}
+
+.push-editor-left .skiff-prosemirror-editor {
+  max-width: calc(100vw - 645px);
+  margin-left: 40px;
+}
+
+@media (max-width: 1160px) {
+  .ProseMirror.skiff-prosemirror-editor,
+  .ProseMirror[data-layout='full_width'] {
+    width: 80%;
+  }
+}
+
+.ProseMirror[data-layout='us_letter_portrait'] {
+  min-height: 279mm;
+  padding: var(--skiff-doc-padding-default);
+  padding: 1in;
+  background: var(--bg-main-editor);
+  width: var(--skiff-doc-width-us-letter-portrait);
+  box-shadow: var(--editor-page-shadow);
+}
+
+@media print {
+  .ProseMirror.skiff-prosemirror-editor,
+  .ProseMirror[data-layout='us_letter_portrait'] {
+    min-height: 279mm;
+    padding: var(--skiff-doc-padding-default);
+    padding: 0;
+    background: var(--bg-main-editor);
+    width: inherit;
+    box-shadow: var(--editor-page-shadow);
+  }
+}
+
+.mobile .ProseMirror.skiff-prosemirror-editor,
+.mobile .ProseMirror[data-layout='us_letter_portrait'] {
+  padding: var(--mobile-doc-padding-default);
+  width: var(--skiff-doc-width-mobile-screen);
+  background: var(--bg-main-editor);
+}
+
+.mobile .ProseMirror.skiff-prosemirror-editor.public {
+  padding-top: 100px
+}
+
+.mobile.public .ProseMirror.skiff-prosemirror-editor,
+.mobile.public .ProseMirror[data-layout='us_letter_portrait'] {
+  padding-top: 100px
+}
+
+
+.ProseMirror[data-layout='us_letter_landscape'] {
+  min-height: 216mm;
+  padding: var(--skiff-doc-padding-default);
+  width: var(--skiff-doc-width-us-letter-landscape);
+  background: var(--bg-main-editor);
+  box-shadow: var(--editor-page-shadow);
+}
+
+.ProseMirror[data-layout='desktop_screen_4_3'] {
+  min-height: 93vh;
+  padding: var(--skiff-doc-padding-default);
+  width: var(--skiff-doc-width-us-desktop-screen-4-3);
+  background: var(--bg-main-editor);
+  box-shadow: var(--editor-page-shadow);
+}
+
+.ProseMirror[data-layout='a4'] {
+  min-height: 297mm;
+  padding: var(--skiff-doc-padding-default);
+  width: var(--skiff-doc-width-a4);
+  background: var(--bg-main-editor);
+  box-shadow: var(--editor-page-shadow);
+}
+
+.ProseMirror[data-layout='a4_landscape'] {
+  min-height: 210mm;
+  padding: var(--skiff-doc-padding-default);
+  width: var(--skiff-doc-width-a4-landscape);
+  background: var(--bg-main-editor);
+  box-shadow: var(--editor-page-shadow);
+}
+
+.ProseMirror[data-layout='desktop_screen_16_9'] {
+  min-height: 80vh;
+  padding: var(--skiff-doc-padding-default);
+  width: var(--skiff-doc-width-us-desktop-screen-16-9);
+  background: var(--bg-main-editor);
+  box-shadow: var(--editor-page-shadow);
+}
+
+/* Cancel selection background on math block when cursor is inside */
+math-inline.selectionAroundNode {
+  background: none !important;
+}
+
+math-display.selectionAroundNode {
+  background: none !important;
+}
+
+/* Add the default browser selection background on math block when cursor is inside */
+math-display.selectionAroundNode *::selection, math-inline.selectionAroundNode *::selection {
+  background: var(--accent-blue-secondary) !important;
+  -webkit-transition: background-color 200ms linear;
+  -ms-transition: background-color 200ms linear;
+  transition: background-color 200ms linear;
+}
+
+math-display .math-src .ProseMirror {
+  width: 100%;
+  display: block;
+}
+
+math-inline .math-src .ProseMirror {
+  display: inline;
+}
+
+.prosemirror-editor-wrapper.embedded .ProseMirror {
+  border-radius: unset;
+  box-shadow: unset;
+  min-height: 50vh;
+  padding: unset;
+  width: unset;
+  background: var(--transparent-background);
+}
+
+@media only print {
+  .ProseMirror.ProseMirror[class] {
+    border-radius: unset;
+    box-shadow: unset;
+    max-width: 100vw;
+    min-height: unset;
+    background: var(--transparent-background);
+  }
+}
+
+/* Content Styles *************************************************************/
+
+.ProseMirror p {
+  line-height: var(--skiff-content-line-height);
+  margin: 0;
+  background: var(--transparent-background);
+}
+
+.ProseMirror .hidden {
+  display: none;
+}
+
+.ProseMirror a:link,
+.ProseMirror a:visited,
+.ProseMirror a:hover,
+.ProseMirror a:active {
+  color: var(--text-link);
+  background: var(--transparent-background);
+}
+
+/* Blockquote */
+.ProseMirror blockquote {
+  border-left: 4px solid var(--border-primary);
+  color: var(--text-primary);
+  font-family: var(--skiff-content-font-family);
+  font-size: calc(var(--skiff-content-font-size) * 0.95);
+  line-height: 1.2;
+  margin: 0 auto;
+  padding: 0 2em;
+  position: relative;
+  background: var(--transparent-background);
+}
+
+/* CodeBlock */
+.ProseMirror pre > code {
+  font-family: 'Skiff Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: slashed-zero;
+  border: 1px solid #999;
+  display: block;
+  padding: 20px;
+  background: var(--transparent-background);
+  overflow-x: auto;
+}
+
+/* Spacer */
+.ProseMirror span[data-spacer-size] {
+  display: inline-block;
+  letter-spacing: 12px;
+  background: var(--transparent-background);
+}
+
+.ProseMirror span[data-spacer-size='tab'] {
+  /* Google doc uses 50px as exact size for tab space. */
+
+  /* The `letter-spacing` used here is actually the width of the spacer */
+
+  /* Note that the actual rendered width will be 50px + width of the space */
+
+  /* we use 23pt letter spacing plus the 3pt space character to match the tab size to list item indentation */
+
+  /* the goal is to press tab under a list and have the text right under the list */
+
+  /* character. */
+  letter-spacing: 23pt;
+  background: var(--transparent-background);
+}
+
+.ProseMirror span[data-spacer-size='tab-large'] {
+  /* Google doc uses 50px as exact size for tab space. */
+
+  /* The `letter-spacing` used here is actually the width of the spacer */
+
+  /* Note that the actual rendered width will be 50px + width of the space */
+
+  /* character. */
+  letter-spacing: 280px;
+  background: var(--transparent-background);
+}
+
+.ProseMirror hr[data-page-break] {
+  height: 0;
+  margin: 0;
+  page-break-before: always;
+  visibility: hidden;
+  background: var(--transparent-background);
+}
+
+.ProseMirror .skiff-font-size-mark {
+  line-height: var(--skiff-content-line-height);
+  background: var(--transparent-background);
+}
+
+.ProseMirror-widget {
+  display: inline-block;
+}
+
+/* MATH PLUGIN CSS BELOW */
+
+/* ---------------------------------------------------------
+ *  Author: Benjamin R. Bray
+ *  License: MIT (see LICENSE in project root for details)
+ *-------------------------------------------------------- */
+
+.math-node {
+  min-width: 1em;
+  min-height: 1em;
+  font-size: 0.95em;
+  font-family: 'Consolas', 'Ubuntu Mono', monospace;
+  cursor: auto;
+}
+
+.math-node.empty-math .math-render::before {
+  content: '(empty)';
+  color: red;
+}
+
+.math-node .math-render.parse-error::before {
+  content: '(math error)';
+  color: red;
+  cursor: help;
+}
+
+math-inline .math-render {
+  display: inline-block;
+  font-size: 0.85em;
+  cursor: pointer;
+}
+
+math-display .math-render {
+  display: block;
+}
+
+math-inline.math-select .math-render {
+  padding-top: 2px;
+}
+
+.math-node.ProseMirror-selectednode {
+  outline: none;
+}
+
+.math-node .math-src {
+  display: none;
+  color: rgb(132, 33, 162);
+  tab-size: 4;
+}
+
+.math-node.ProseMirror-selectednode .math-src {
+  display: inline;
+}
+
+.math-node.ProseMirror-selectednode .math-render {
+  display: none;
+}
+
+/* -- Inline Math --------------------------------------- */
+
+math-inline {
+  display: inline;
+  white-space: nowrap;
+}
+
+math-inline .math-src::after,
+math-inline .math-src::before {
+  content: '$';
+  color: #b0b0b0;
+}
+
+/* -- Block Math ---------------------------------------- */
+
+math-display {
+  display: block;
+}
+
+math-display.ProseMirror-selectednode {
+  background: var(--border-secondary);
+}
+
+math-display .math-src::after,
+math-display .math-src::before {
+  content: '$$';
+  text-align: left;
+  color: #b0b0b0;
+}
+
+math-display .katex-display {
+  margin: 0;
+}
+
+/* -- Selection Plugin ---------------------------------- */
+
+p::selection,
+p > *::selection {
+  background: #c0c0c0;
+}
+
+.katex-html *::selection {
+  background: none !important;
+}
+
+.math-node.math-select .math-render {
+  background: #c0c0c0ff;
+}
+
+/* -- Watermark ----------------------------------------- */
+
+.skiff-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* -- Breadcrumb ----------------------------------------- */
+
+.skiff-breadcrumb {
+  margin: 0 auto 0 auto;
+  padding: 10px;
+  width: var(--skiff-doc-width-us-letter-portrait);
+}
+
+@media print {
+  .skiff-breadcrumb {
+    display: none;
+  }
+}
+
+/* -- Comment Badge Pane -------------------------------- */
+
+#skiff-comments-sidepane {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  left: 218px;
+  height: 100%;
+  width: 0;
+  padding-right: 30px;
+  box-sizing: border-box;
+}
+
+@media print {
+  #skiff-comments-sidepane {
+    display: none;
+  }
+}
+
+@keyframes sidepane-show {
+  from {
+    opacity: 0;
+    transform: translateX(-150px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sidepane-hide {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-150px);
+  }
+}
+
+.ProseMirror-selectednode {
+  outline: none !important;
+}
+
+code {
+  padding: 0px 4px;
+  border-radius: 4px;
+  color: var(--text-link);
+  background: var(--bg-overlay-tertiary);
+  box-shadow: var(--inset-empty);
+  font-family: 'Skiff Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: slashed-zero;
+}
+/* prosemirror-dev-toolkit css fix */
+.floating-dock .container {
+  display: block;
+  gap: normal;
+}
+
+.ProseMirror-gapcursor {
+  display: block;
+  margin-top: -20px;
+  margin-bottom: 4px;
+}
+
+div.upload-file-card-container {
+  display: block;
+}

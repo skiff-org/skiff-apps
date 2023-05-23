@@ -1,0 +1,65 @@
+.skiff-icon {
+  font-family: 'Material Icons', sans-serif;
+  font-weight: 380;
+  font-style: normal;
+  font-size: 24px; /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: subpixel-antialiased;
+
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+.skiff-icon.h1,
+.skiff-icon.h2,
+.skiff-icon.h3,
+.skiff-icon.hn {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.skiff-icon.hr {
+  font-size: 12px;
+  width: 20px;
+  height: 2px;
+  border-radius: 1px;
+  overflow: hidden;
+  background: #222;
+  margin-top: 2px;
+}
+
+.skiff-icon.hr::before {
+  content: '-';
+  font-size: 100px;
+  font-weight: 560;
+  line-height: 0;
+}
+
+.skiff-icon.superscript {
+  display: inline-block;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  height: 16px;
+  text-align: center;
+  width: 20px;
+}
+
+.skiff-icon .superscript-top {
+  margin: 0 2px;
+  vertical-align: super;
+}

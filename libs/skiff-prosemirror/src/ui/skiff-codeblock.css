@@ -1,0 +1,77 @@
+.codeblock-select {
+  position: absolute;
+  right: 0;
+  width: calc(100% - 36px);
+  display: flex;
+  margin: 6px 8px;
+}
+
+.dropdown-container {
+  position: absolute;
+  top: 28px;
+  left: 4px;
+}
+
+.select-lang-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.select-lang {
+  padding: 6px;
+  box-sizing: border-box;
+  border-radius: 8px;
+}
+
+.codeblock-root {
+  position: relative;
+}
+
+.select-lang-buttons {
+  margin-left: auto;
+  margin-right: 10px;
+  display: flex;
+}
+
+.codeblock-root .select-lang-buttons {
+  opacity: 0;
+}
+
+.codeblock-root:hover .select-lang-buttons {
+  opacity: 1;
+}
+.codeblock-root .drag-handle-container {
+  opacity: 0;
+}
+.codeblock-root:hover .drag-handle-container {
+  opacity: 1;
+}
+
+.codeblock-menu {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-l1-solid);
+  border: 1px solid var(--border-secondary);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.codeblock-list {
+  max-height: 255px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.codeblock-row {
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.codeblock-row:hover {
+  background: var(--bg-cell-hover);
+}

@@ -1,0 +1,86 @@
+/* Shared CSS between Editor Menus */
+
+.skiff-editor-menu {
+  height: fit-content;
+  max-height: var(--skiff-mention-menu-height);
+  overflow-y: scroll;
+  width: var(--skiff-editor-menu-width);
+  padding: 3px 0;
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.skiff-editor-menu-wrapper {
+  height: fit-content;
+  min-width: 185px;
+  max-width: 95vw;
+  box-shadow: var(--shadow-l2);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: var(--bg-emphasis);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0px !important;
+  box-sizing: border-box;
+  padding: 4px;
+}
+
+.skiff-editor-menu-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 8px;
+  gap: 6px;
+
+  width: 100%;
+  height: 35px;
+
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.skiff-editor-menu-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+}
+
+.skiff-editor-menu-selected-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 8px;
+  gap: 6px;
+
+  width: 100%;
+  height: 35px;
+
+  border-radius: 8px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.skiff-editor-menu-selected-item img {
+  filter: var(--filter-dark-icon);
+}
+
+.skiff-editor-menu-selected-item:hover {
+  background: var(--bg-cell-hover);
+}
+
+.skiff-editor-menu-arrow {
+  margin-left: auto;
+}
+
+.skiff-editor-menu-arrow img {
+  margin: 0;
+  width: 13px !important;
+  height: 13px !important;
+  padding: 0 !important;
+}
+
+.skiff-editor-menu-input {
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+}
