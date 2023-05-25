@@ -1,0 +1,44 @@
+{
+  "name": "skiff-mail-protos",
+  "version": "0.0.1",
+  "description": "Mail Proto Utils",
+  "main": "./dist/cjs/index.js",
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "types": "dist/src/index.d.ts",
+  "packageManager": "yarn@3.5.0",
+  "private": true,
+  "scripts": {
+    "emit-ts": "tsc --emitDeclarationOnly",
+    "clean": "rm -rf dist/",
+    "build": "yarn protogen && yarn node build.js",
+    "watch": "WATCH=1 yarn build",
+    "lint": "yarn run -T eslint . --cache --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "yarn lint --fix",
+    "protogen": "protoc --ts_proto_opt=esModuleInterop=true --experimental_allow_proto3_optional --proto_path=../../protos/ --ts_proto_out generated/protos com/skiff/skemail/encrypted/encrypted_data.proto com/skiff/skemail/filters/filters.proto"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.1",
+    "@types/node": "^18.7.18",
+    "esbuild": "^0.14.39",
+    "esbuild-jest": "^0.5.0",
+    "esbuild-node-externals": "^1.5.0",
+    "eslint-config-skiff-eslint": "workspace:*",
+    "jest": "^28.1.1",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.3.20",
+    "graphql": "16.5.0",
+    "long": "^5.2.0",
+    "protobufjs": "^6.11.3",
+    "skiff-graphql": "workspace:libs/skiff-graphql",
+    "ts-proto": "^1.105.1"
+  }
+}
