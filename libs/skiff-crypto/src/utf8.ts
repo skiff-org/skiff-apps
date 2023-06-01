@@ -7,3 +7,7 @@ export const utf8BytesToString = (data: Uint8Array) => {
   const utf8decoder = new TextDecoder();
   return utf8decoder.decode(data);
 };
+
+export function trimAndLowercase(str: string) {
+  return str.trim().toLowerCase();
+}

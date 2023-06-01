@@ -30,3 +30,6 @@ coverage
 
 # ignore eslint cache
 .eslintcache
+
+# typescript
+*.tsbuildinfo
