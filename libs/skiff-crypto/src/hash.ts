@@ -1,5 +1,5 @@
 import { fromByteArray } from 'base64-js';
-import { utf8StringToBytes } from 'skiff-utils';
+import { utf8StringToBytes } from './utf8';
 import nacl from 'tweetnacl';
 
 /**

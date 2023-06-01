@@ -49,7 +49,6 @@
     "lodash": "^4.17.21",
     "randombytes": "^2.1.0",
     "semver": "^7.3.4",
-    "skiff-utils": "workspace:libs/skiff-utils",
     "tslib": "^2.4.0",
     "tweetnacl": "^1.0.3",
     "varint": "^6.0.0"

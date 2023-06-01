@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
 
-import { trimAndLowercase } from 'skiff-utils';
+import { trimAndLowercase } from './utf8';
 
 import { reverseWordList, wordlist } from './wordlist';
 

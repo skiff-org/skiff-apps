@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import { Range } from 'semver';
-import { utf8BytesToString, utf8StringToBytes } from 'skiff-utils';
+import { utf8BytesToString, utf8StringToBytes } from '../utf8';
 
 import { concatUint8Arrays, extractVarintPrefixed, varintPrefixed } from './typedArraysUtils';
 

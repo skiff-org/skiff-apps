@@ -1,6 +1,6 @@
 import { fromByteArray, toByteArray } from 'base64-js';
 import memoize from 'lodash/memoize';
-import { utf8BytesToString, utf8StringToBytes } from 'skiff-utils';
+import { utf8BytesToString, utf8StringToBytes } from './utf8';
 import nacl from 'tweetnacl';
 
 /**
