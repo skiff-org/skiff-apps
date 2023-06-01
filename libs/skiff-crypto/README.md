@@ -55,6 +55,8 @@ console.log('Ciphertext:', encrypted);
 console.log('Expected to be true:', plaintext === decrypted);
 ```
 
+[![Edit Button](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/skiff-crypto-demo-kt7soo)
+
 Detailed usage instructions and more examples are available in the [API documentation](https://skiff.com/crypto).
 
 ## Documentation

@@ -1,6 +1,6 @@
 {
   "name": "@skiff-org/skiff-crypto",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Cryptographic related functions and helpers",
   "main": "./dist/cjs/index.js",
   "exports": {
