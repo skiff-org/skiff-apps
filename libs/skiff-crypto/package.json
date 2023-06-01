@@ -1,5 +1,5 @@
 {
-  "name": "skiff-crypto",
+  "name": "@skiff-org/skiff-crypto",
   "version": "0.0.1",
   "description": "Cryptographic related functions and helpers",
   "main": "./dist/cjs/index.js",
@@ -7,13 +7,14 @@
     "import": "./dist/esm/index.js",
     "require": "./dist/cjs/index.js"
   },
+  "author": "Skiff World Inc.",
+  "license": "MIT",
   "sideEffects": false,
   "files": [
     "dist"
   ],
   "types": "dist/src/index.d.ts",
   "packageManager": "yarn@3.5.0",
-  "private": true,
   "scripts": {
     "emit-ts": "yarn tsc --build",
     "clean": "rm -rf dist/",
