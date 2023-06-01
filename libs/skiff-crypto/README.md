@@ -42,6 +42,7 @@ yarn add @skiff-org/skiff-crypto
 
 ```javascript
 const skiffCrypto = require('@skiff-org/skiff-crypto');
+// or, `import * as skiffCrypto from '@skiff-org/skiff-crypto';`
 const plaintext = "Hello, skiff-crypto!";
 
 const keypair = skiffCrypto.generatePublicPrivateKeyPair();
