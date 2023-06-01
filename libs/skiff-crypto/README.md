@@ -1,3 +1,5 @@
+![Logo](./assets/skiff-crypto-header.png)
+
 # skiff-crypto
 
 Welcome! `skiff-crypto` is a versatile, open-source JavaScript cryptography library specifically designed to provide strong and efficient cryptographic functions for use in NodeJS or in the browser. This package powers cryptography inside Skiff's end-to-end encrypted, privacy-first product suite, including Mail, Pages, Drive, and Calendar applications. For more on Skiff, visit [skiff.com](https://skiff.com).
