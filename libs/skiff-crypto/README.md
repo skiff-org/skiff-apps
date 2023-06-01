@@ -10,10 +10,11 @@ Welcome! `skiff-crypto` is a versatile, open-source JavaScript cryptography libr
 
 skiff-crypto brings together a host of cryptographic functionalities:
 
-- **Symmetric Key Cryptography**: ChaCha20Poly1305.
-- **Asymmetric Key Cryptography**: TweetNaCl.
+- **Symmetric Key Cryptography**: ChaCha20Poly1305-based symmetric encryption functions.
+- **Asymmetric Key Cryptography**: TweetNaCl-based asymmetric encryption.
 - **Datagram Library**: Manage object versions and metadata in an efficient way.
 - **Integrity**: Support for checksum and data integrity verification.
+- **Utilities**: A collection of useful utilities for working with cryptographic data, such as utf8 and string conversion.
 
 ## Getting Started
 
