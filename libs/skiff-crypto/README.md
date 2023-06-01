@@ -46,7 +46,10 @@ const keypair = skiffCrypto.generatePublicPrivateKeyPair();
 const encrypted = skiffCrypto.stringEncryptAsymmetric(keypair.privateKey, { key: keypair.publicKey }, plaintext);
 const decrypted = skiffCrypto.stringDecryptAsymmetric(keypair.privateKey, { key: keypair.publicKey }, encrypted);
 
-expect(decrypted).toBe(plaintext);
+console.log('Plaintext:', plaintext);
+console.log('Ciphertext:', encrypted);
+
+console.log('Expected to be true:', plaintext === decrypted);
 ```
 
 Detailed usage instructions and more examples are available in the [API documentation](https://skiff.com/crypto).
