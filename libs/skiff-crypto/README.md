@@ -63,7 +63,7 @@ Comprehensive documentation is available in the [documentation site](https://ski
 
 ## Contributing
 
-Contributions to skiff-crypto are very much appreciated! Please see our [Contributing Guidelines](./CONTRIBUTING.md) for details on how you can contribute.
+Contributions to skiff-crypto are very much appreciated! Please see our [Contributing Guidelines](https://github.com/skiff-org/skiff-apps/blob/main/libs/skiff-crypto/CONTRIBUTING.md) for details on how you can contribute.
 
 ## Security
 
@@ -71,7 +71,7 @@ Cryptography is a sensitive domain. While skiff-crypto has been audited and buil
 
 ## License
 
-skiff-crypto is [MIT licensed](./LICENSE.txt). You're encouraged to use and adapt the code for your projects, given that you respect the original copyright and abide by the license terms.
+skiff-crypto is [MIT licensed](https://github.com/skiff-org/skiff-apps/blob/main/libs/skiff-crypto/LICENSE.txt). You're encouraged to use and adapt the code for your projects, given that you respect the original copyright and abide by the license terms.
 
 ## Contact
 
