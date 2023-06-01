@@ -1,6 +1,6 @@
 {
   "name": "@skiff-org/skiff-crypto",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Cryptographic related functions and helpers",
   "main": "./dist/cjs/index.js",
   "exports": {
@@ -24,6 +24,22 @@
     "lint": "yarn run -T eslint ./src --cache --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "yarn lint --fix"
   },
+  "keywords": [
+    "cryptography",
+    "chacha20poly1305",
+    "poly1305",
+    "utf8",
+    "crypto",
+    "curve25519",
+    "ed25519",
+    "encrypt",
+    "decrypt",
+    "hash",
+    "poly1305",
+    "salsa20",
+    "signatures",
+    "keypair"
+  ],
   "devDependencies": {
     "@types/argon2-browser": "^1",
     "@types/jest": "^28.1.1",
