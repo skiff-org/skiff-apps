@@ -1,4 +1,4 @@
-![Logo](./assets/skiff-crypto-header.png)
+![Logo](https://skiff-org.github.io/assets/updates/skiff-crypto-header.png)
 
 # skiff-crypto
 
