@@ -4,5 +4,6 @@
     "skiff-mail-web",
     "skiff-pages-drive",
     "skiff-calendar"
-  ]
+  ],
+  "packageManager": "yarn@3.5.0"
 }
