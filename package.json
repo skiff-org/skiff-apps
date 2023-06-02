@@ -1,0 +1,8 @@
+{
+  "workspaces": [
+    "libs",
+    "skiff-mail-web",
+    "skiff-pages-drive",
+    "skiff-calendar"
+  ]
+}
