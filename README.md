@@ -1,5 +1,6 @@
-# Skiff Apps
-Private, end-to-end encrypted, wallet native mail. Sign up for a free Skiff Mail account at [skiff.com](https://skiff.com). This monorepo contains all Skiff apps, libraries, and more.
+# End-to-end encrypted, private workspace
+
+Skiff is a privacy-first, end-to-end encrypted workspace with Mail, Calendar, Pages, and Drive product. Sign up for a free Skiff Mail account at [skiff.com](https://skiff.com). This monorepo contains all Skiff apps, libraries, and more. You can sign up, use, and even upgrade your account completely privately - even using an anonymous crypto wallet. Upgrade your account for more storage, custom domains, email aliases, version history, and much more.
 
 ![skiff-mail-header](https://github.com/skiff-org/skiff-mail/assets/3527315/9b8b7ee9-9daa-4e4c-b6bc-9a869d574757)
 
