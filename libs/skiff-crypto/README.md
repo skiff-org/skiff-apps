@@ -43,17 +43,30 @@ yarn add @skiff-org/skiff-crypto
 ```javascript
 const skiffCrypto = require('@skiff-org/skiff-crypto');
 // or, `import * as skiffCrypto from '@skiff-org/skiff-crypto';`
+
+// Asymmetric encryption example
 const plaintext = "Hello, skiff-crypto!";
-
 const keypair = skiffCrypto.generatePublicPrivateKeyPair();
-
 const encrypted = skiffCrypto.stringEncryptAsymmetric(keypair.privateKey, { key: keypair.publicKey }, plaintext);
 const decrypted = skiffCrypto.stringDecryptAsymmetric(keypair.privateKey, { key: keypair.publicKey }, encrypted);
 
 console.log('Plaintext:', plaintext);
 console.log('Ciphertext:', encrypted);
-
 console.log('Expected to be true:', plaintext === decrypted);
+
+// Symmetric encryption example
+const symmetricKey = skiffCrypto.generateSymmetricKey();
+// A datagram is used to manage object versions and metadata
+const TestDatagram = skiffCrypto.createJSONWrapperDatagram('ddl://test');
+const symmetricPlainText = "Hello, skiff-crypto (symmetric encryption)!";
+const symmetricEncrypted = skiffCrypto.encryptSymmetric(symmetricPlainText, symmetricKey, TestDatagram);
+const symmetricDecrypted = skiffCrypto.decryptSymmetric(symmetricEncrypted, symmetricKey, TestDatagram);
+console.log('Symmetric encrypted content', symmetricEncrypted);
+console.log('Symmetric decrypted content', symmetricDecrypted);
+console.log('Expected to be true:', symmetricPlainText === symmetricDecrypted);
+
+// Hash example
+console.log('SHA-512 hash example', skiffCrypto.generateHash('Hello, skiff-crypto!'));
 ```
 
 [![Edit Button](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/skiff-crypto-demo-kt7soo)
