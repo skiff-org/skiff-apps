@@ -26,7 +26,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/skiff-org/skiff-apps.git"
+    "url": "https://github.com/skiff-org/skiff-apps.git",
+    "directory": "libs/skiff-crypto"
   },
   "keywords": [
     "cryptography",
