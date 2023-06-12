@@ -1,0 +1,28 @@
+overwrite: true
+schema:
+  - ../../supergraph.graphql
+  - ./src/editorLocalState.graphql
+  - ./src/skemailLocalState.graphql
+generates:
+  src/types.ts:
+    plugins:
+      - 'typescript'
+      - add:
+          content: |
+            export type PublicKey = Scalars['PublicKey']
+            export type SocketEvent = Scalars['SocketEvent']
+            export type PublicKeyWithSignature = Scalars['PublicKeyWithSignature']
+    config:
+      scalars:
+        Date: 'Date'
+        JSON: 'Record<any, any>'
+        SocketEvent: '{ eventType: EventType, eventContent: any, token?: string }'
+        PublicKey: '{ key: string, signature?: string }'
+        PublicKeyWithSignature: '{ key: string, signature: string }'
+        Void: 'any'
+
+
+  # Recreate a schema with all types, including local types, which will be used by every other client codegen operations
+  src/completeSchema.graphql:
+    plugins:
+      - schema-ast

@@ -1,0 +1,2874 @@
+directive @join__field(external: Boolean, graph: join__Graph!, override: String, provides: join__FieldSet, requires: join__FieldSet, type: String, usedOverridden: Boolean) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(graph: join__Graph!, interface: String!) repeatable on INTERFACE | OBJECT
+
+directive @join__type(extension: Boolean! = false, graph: join__Graph!, key: join__FieldSet, resolvable: Boolean! = true) repeatable on ENUM | INPUT_OBJECT | INTERFACE | OBJECT | SCALAR | UNION
+
+directive @link(as: String, for: link__Purpose, import: [link__Import], url: String) repeatable on SCHEMA
+
+enum AccentColor {
+  BLUE
+  DARK_BLUE
+  GREEN
+  ORANGE
+  PINK
+  RED
+  YELLOW
+}
+
+input AcceptInviteStep1Request {
+  docID: String!
+  inviteID: String!
+}
+
+type AcceptInviteStep1Response {
+  encryptedPrivateHierarchicalKey: String!
+  encryptedSessionKey: String!
+  permissionLevel: PermissionLevel!
+  publicHierarchicalKey: String
+  salt: String!
+  serverEphemeralPublic: String!
+}
+
+input AcceptInviteStep2Request {
+  clientEphemeralPublic: String!
+  clientSessionProof: String!
+  docID: String!
+  inviteID: String!
+  newPermissionEntry: PermissionEntryInput!
+  publicHierarchicalKey: String
+  signature: String!
+}
+
+type AcceptInviteStep2Response {
+  serverSessionProof: String!
+}
+
+enum AccountRecovery {
+  EMAIL_SEND_FAILED
+  INVALID_RECOVERY_KEY
+  NOT_VERIFIED_EMAIL
+  SENT_EMAIL
+  VERIFIED_EMAIL
+  VERIFIED_RECOVERY_KEY
+}
+
+enum ActionType {
+  APPLY_LABEL
+  APPLY_SYSTEM_LABEL
+  MARK_AS_READ
+}
+
+input AddEmailRequest {
+  newEmail: String
+  token: String
+}
+
+type AddEmailResponse {
+  status: RequestStatus!
+}
+
+input AddPendingInviteRequest {
+  docID: String!
+  documentLink: String!
+  email: String!
+  permissionLevel: PermissionLevel!
+}
+
+type AddPendingInviteResponse {
+  status: RequestStatus!
+}
+
+enum AdditionalContext {
+  LAST_CHUNK
+  NOT_LAST_CHUNK
+  NO_CONTEXT
+}
+
+type AddressObject {
+  address: String!
+  blocked: Boolean
+  name: String
+}
+
+input AdjustBusinessPlanRequest {
+  requestedQuantity: Int!
+}
+
+type AdjustBusinessPlanResponse {
+  seats: Int
+  status: RequestStatus!
+}
+
+type AliasesOnDomainResponse {
+  domainAliases: [DomainAliasData!]!
+}
+
+enum AscDesc {
+  ASC
+  DESC
+}
+
+type Attachment {
+  attachmentID: String!
+  decryptedSessionKey: String
+  downloadLink: String!
+  encryptedSessionKey: EncryptedSessionKeyOutput!
+}
+
+type AttachmentMetadata {
+  checksum: String!
+  contentDisposition: String!
+  contentId: String!
+  contentType: String!
+  filename: String!
+  size: Int!
+}
+
+enum AttendeePermission {
+  OWNER
+  READ
+  WRITE
+}
+
+enum AttendeeStatus {
+  MAYBE
+  NO
+  PENDING
+  YES
+}
+
+type AutoImportStatus {
+  subscribed: Boolean!
+}
+
+type AutoReplyOutput {
+  encryptedHtml: EncryptedDataOutput!
+  encryptedSessionKey: EncryptedSessionKeyOutput!
+  encryptedSubject: EncryptedDataOutput!
+  encryptedText: EncryptedDataOutput!
+  encryptedTextAsHtml: EncryptedDataOutput!
+  encryptedTextSnippet: EncryptedDataOutput
+}
+
+type BatchError {
+  code: String!
+  extensions: JSON
+  message: String!
+}
+
+input BlockEmailAddressRequest {
+  emailAddressToBlock: String
+}
+
+enum BottomDrawerModes {
+  CLOSED
+  FEEDBACK
+  UPLOADS
+}
+
+enum CacheControlScope {
+  PRIVATE
+  PUBLIC
+}
+
+type Calendar {
+  calendarID: String!
+  publicKey: String!
+}
+
+type CalendarEvent {
+  calendarEventID: String!
+  calendarID: String!
+  creatorCalendarID: String!
+  deleted: Boolean!
+  encryptedByKey: String!
+  encryptedContent: String!
+  encryptedPreferences: String
+  encryptedPreferencesSessionKey: String
+  encryptedSessionKey: String!
+  endDate: Date!
+  externalCreator: String
+  externalID: String!
+  internalAttendeeList: [InternalAttendee!]!
+  lastUpdateKeyMap: LastUpdateKeyMap
+  parentEventID: String!
+  parentRecurrenceID: String
+  recurrenceDate: Date
+  recurrenceRule: RecurrenceRule
+  sequence: Int!
+  startDate: Date!
+  updatedAt: Date!
+}
+
+input CalendarEventData {
+  deleted: Boolean!
+  encryptedCalendarEventSessionKey: String
+  encryptedContent: String!
+  encryptedPreferences: String
+  endDate: Date!
+  externalID: String!
+  lastUpdateKeyMap: LastUpdateKeyMapInput
+  parentRecurrenceID: String
+  recurrenceDate: Date
+  recurrenceRule: RecurrenceRuleInput
+  startDate: Date!
+}
+
+input CalendarEventData2 {
+  deleted: Boolean!
+  encryptedCalendarEventSessionKey: String
+  encryptedContent: String!
+  encryptedPreferences: String
+  endDate: Date!
+  externalID: String!
+  lastUpdateKeyMap: LastUpdateKeyMapInput
+  parentRecurrenceID: String
+  recurrenceDate: Date
+  recurrenceRule: RecurrenceRuleInput
+  sequence: Int!
+  startDate: Date!
+}
+
+input ChangeLinkPermissionRequest {
+  docID: String!
+  permissionLevel: PermissionLevel!
+}
+
+type ChangeLinkPermissionResponse {
+  document: Document!
+}
+
+type CheckIfDomainsAvailableResponse {
+  domains: [Domain!]
+}
+
+type CheckoutSession {
+  downgradeProgress: DowngradeProgress
+  status: RequestStatus!
+  url: String
+}
+
+type ClearSessionCacheResponse {
+  status: RequestStatus!
+}
+
+input ConfirmCacheUploadRequest {
+  cacheID: String!
+}
+
+type ConfirmCacheUploadResponse {
+  ipfsPath: String
+  readUrl: String
+}
+
+type Contact {
+  displayPictureData: DisplayPictureDataSkemail
+  emailAddress: String!
+  firstName: String
+  lastName: String
+}
+
+type CreateBillingPortalSessionOutput {
+  url: String
+}
+
+input CreateCacheElementRequest {
+  dataSize: Float!
+  docID: String!
+  type: String!
+}
+
+type CreateCacheElementResponse {
+  cacheID: String!
+  writeUrl: String!
+}
+
+input CreateCalendarUserRequest {
+  calendarEncryptedPrivateKey: String
+  calendarPublicKey: String!
+  publicKey: PublicKeyWithSignature!
+  signingPublicKey: PublicKey!
+}
+
+input CreateCustomDomainAliasRequest {
+  customDomain: String!
+  emailAlias: String!
+  userID: String
+}
+
+type CreateCustomDomainAliasResponse {
+  emailAliases: [String!]!
+}
+
+input CreateEmailAliasRequest {
+  customDomain: String
+  emailAlias: String!
+}
+
+type CreateEmailAliasResponse {
+  emailAliases: [String!]!
+}
+
+input CreateMailFilterInput {
+  actions: [FilterActionInput!]!
+  encryptedByKey: String!
+  encryptedSessionKey: String!
+  filter: MailFilterInput!
+  name: String
+}
+
+input CreateOrUpdateContactRequest {
+  displayPictureData: UpdateDisplayPictureSkemailRequest
+  emailAddress: String!
+  firstName: String
+  lastName: String
+}
+
+input CreateOrUpdateDraftRequest {
+  draftID: String!
+  encryptedDraft: String!
+  encryptedKey: String!
+}
+
+input CreateSrpMetamaskRequest {
+  acceptInviteStep2Request: AcceptInviteStep2Request
+  captchaToken: String!
+  challengeJwt: String!
+  challengeSignature: String!
+  encryptedUserData: String!
+  platformInfo: PlatformInfo
+  publicKey: PublicKey!
+  salt: String!
+  signingPublicKey: String!
+  userAttributionData: UserAttributionInput!
+  verifier: String!
+  walletAddress: String!
+}
+
+input CreateSrpRequest {
+  acceptInviteStep2Request: AcceptInviteStep2Request
+  captchaToken: String!
+  encryptedUserData: String!
+  platformInfo: PlatformInfo
+  publicKey: PublicKey!
+  salt: String!
+  signingPublicKey: String!
+  skiffMailAlias: String
+  udToken: String
+  userAttributionData: UserAttributionInput!
+  verifier: String!
+}
+
+type CreateSrpResponse {
+  cacheKey: String
+  createdMailAccount: Boolean
+  email: String
+  jwt: String
+  recoveryEmail: String
+  rootOrgID: String
+  status: LoginMutationStatus!
+  userID: String
+  walletAddress: String
+}
+
+input CreateTeamRequest {
+  everyoneDocumentPermissionProxy: DocumentPermissionProxyInput!
+  icon: String!
+  name: String!
+  orgID: String!
+  rootDocument: NewDocRequest!
+}
+
+input CreateUdAliasRequest {
+  udToken: String!
+}
+
+type CreateUploadAvatarLinkResponse {
+  profileCustomURI: String!
+  writeUrl: String!
+}
+
+input CreateUploadContactAvatarLinkRequest {
+  contactEmail: String!
+}
+
+input CreateUserLabelRequest {
+  color: String!
+  labelName: String!
+  variant: UserLabelVariant!
+}
+
+input CreateWalletChallengeRequest {
+  walletAddress: String!
+}
+
+input CreateWalletChallengeRequestSkemail {
+  walletAddress: String!
+}
+
+type CreateWalletChallengeResponse {
+  token: String!
+}
+
+type CreateWalletChallengeResponseSkemail {
+  token: String!
+}
+
+type CreditAmount {
+  cents: Int!
+  editorStorageBytes: String!
+  skemailStorageBytes: String!
+}
+
+input CreditAmountInput {
+  cents: Int!
+  editorStorageBytes: String!
+  skemailStorageBytes: String!
+}
+
+enum CreditInfo {
+  CREDITS_FROM_ANDROID_APP
+  CREDITS_FROM_GMAIL_IMPORT
+  CREDITS_FROM_GOOGLE_DRIVE_IMPORTS
+  CREDITS_FROM_IOS_APP
+  CREDITS_FROM_MAC_APP
+  CREDITS_FROM_OUTLOOK_IMPORT
+  CREDITS_FROM_REFERRALS
+  CURRENT_CREDITS
+  TOTAL_CREDITS_EARNED
+}
+
+type CreditInfoResponse {
+  amount: CreditAmount!
+  count: Int!
+  info: CreditInfo!
+}
+
+enum CreditTransactionReason {
+  ANDROID_APP
+  GMAIL_IMPORT
+  GOOGLE_DRIVE_IMPORT
+  IOS_APP
+  MAC_APP
+  MANUAL
+  OUTLOOK_IMPORT
+  REDEEMED_STRIPE_COUPON
+  REFEREE
+  REFERRAL
+  REVERT_SKIFF_CREDIT_COUPON_PRORATION
+  SKIFF_CREDIT_COUPON_PRORATION
+  STRIPE_CREDIT
+  STRIPE_DEBIT
+}
+
+type CurrentlyEditingUser {
+  color: String!
+  displayPictureData: DisplayPictureData
+  name: String!
+  userID: String!
+}
+
+type CustomDomainRecord {
+  createdAt: Date!
+  dnsRecords: [DNSRecord!]!
+  domain: String!
+  domainID: String!
+  skiffManaged: Boolean!
+  verificationStatus: String!
+}
+
+type CustomDomainSubscriptionInfo {
+  cancelAtPeriodEnd: Boolean!
+  domainID: String!
+  supposedEndDate: Date!
+}
+
+type DNSRecord {
+  data: String!
+  error: DnsRecordStatusError
+  name: String!
+  type: DNSRecordType!
+}
+
+enum DNSRecordType {
+  CNAME
+  MX
+  TXT
+}
+
+scalar Date
+
+enum DateFormat {
+  DD_MM_YYYY
+  MM_DD_YYYY
+  YYYY_MM_DD
+}
+
+type DecryptedAttachment {
+  attachmentID: String!
+  decryptedMetadata: AttachmentMetadata
+}
+
+input DeleteAccountRequest {
+  loginSrpRequest: LoginSrpRequest!
+  signature: String!
+}
+
+type DeleteAccountResponse {
+  status: RequestStatus!
+}
+
+input DeleteContactRequest {
+  emailAddress: String!
+}
+
+input DeleteCustomDomainAliasRequest {
+  captchaToken: String!
+  emailAlias: String!
+  userID: String
+}
+
+input DeleteCustomDomainRequest {
+  domainID: String!
+}
+
+input DeleteDocRequest {
+  docsToDelete: [DocToDelete!]!
+}
+
+type DeleteDocResponse {
+  status: RequestStatus!
+}
+
+input DeleteDraftRequest {
+  draftID: String!
+}
+
+input DeleteInviteRequest {
+  docID: String!
+  email: String!
+}
+
+type DeleteInviteResponse {
+  status: RequestStatus!
+}
+
+input DeleteLinkRequest {
+  docID: String!
+}
+
+type DeleteLinkResponse {
+  status: RequestStatus!
+}
+
+input DeleteMailAccountRequest {
+  signature: String!
+}
+
+type DeleteMailAccountResponse {
+  status: RequestStatus!
+}
+
+input DeleteMailFilterInput {
+  mailFilterID: String!
+}
+
+input DeleteSnapshotRequest {
+  docID: String!
+  versions: [Int!]!
+}
+
+type DeleteSnapshotResponse {
+  document: Document
+}
+
+input DeleteTeamRequest {
+  teamID: String!
+}
+
+input DeleteThreadRequest {
+  threadIDs: [String!]!
+}
+
+input DeleteUserLabelRequest {
+  labelID: String!
+}
+
+input DeleteUserOrganizationMembershipRequest {
+  orgID: String!
+  userID: String!
+}
+
+input DisableMfaRequest {
+  credentialID: String
+  disableTotp: Boolean!
+  loginSrpRequest: LoginSrpRequest!
+}
+
+type DisableMfaResponse {
+  status: RequestStatus!
+}
+
+type DisplayPictureData {
+  profileAccentColor: String
+  profileCustomURI: String
+  profileIcon: String
+}
+
+type DisplayPictureDataSkemail {
+  profileAccentColor: String
+  profileCustomURI: String
+  profileIcon: String
+}
+
+type DnsRecordStatusError {
+  errorData: DnsRecordStatusErrorData
+  errorType: String!
+}
+
+type DnsRecordStatusErrorData {
+  retrievedRecord: SingleRetrievedRecord
+}
+
+input DocToDelete {
+  docID: String!
+  signature: String!
+}
+
+type Document {
+  collaborators: [DocumentCollaborator!]!
+  contents: EncryptedContentsOutput!
+  createdAt: Date
+  currentUserPermissionLevel: PermissionLevel!
+  currentlyEditingUsers: [CurrentlyEditingUser]!
+  decryptedContents: DocumentDecryptedContents!
+  decryptedMetadata: DocumentDecryptedMetadata!
+  decryptedPrivateHierarchicalKey: String
+  decryptedSessionKey: String!
+  docID: String!
+  documentType: NwContentType!
+  hasChildren: Boolean!
+  hierarchicalPermissionChain: [HierarchicalPermissionChainLink!]!
+  invites: [PendingUserInvite!]!
+  link: LinkOutput
+  metadata: EncryptedMetadataOutput!
+  newHierarchicalKeyRequired: Boolean!
+  newSessionKeyRequired: Boolean!
+  parentID: String
+  parentKeysClaim: String
+  parentKeysClaimEncryptedByKey: String
+  parentPublicHierarchicalKey: String
+  parentsBreadcrumb: [Document!]!
+  permissionProxies: [DocumentPermissionProxy!]!
+  previousParentID: String
+  publicHierarchicalKey: String
+  publicOrgData: [PublicOrgData]
+  snapshots: [DocumentSnapshot!]!
+  team: Team
+  trashedAt: String
+  updatedAt: Date
+}
+
+type DocumentCollaborator {
+  expiryDate: Date
+  permissionLevel: PermissionLevel!
+  sourceDocID: String!
+  user: User!
+}
+
+type DocumentDecryptedContents {
+  contentsArr: [DocumentDecryptedContentsChunk!]!
+}
+
+type DocumentDecryptedContentsChunk {
+  chunkData: JSON!
+  chunkNumber: Int!
+}
+
+type DocumentDecryptedMetadata {
+  color: String
+  description: String
+  fileSizeBytes: Int
+  icon: String
+  mimeType: String
+  timeLastModified: Date
+  title: String!
+}
+
+enum DocumentEventType {
+  COMMENT_REPLY
+  DOCUMENT_EDIT
+  DOCUMENT_SHARE
+  NEW_COMMENT
+  NEW_COMMENT_MENTION
+  NEW_MENTION
+}
+
+enum DocumentOperation {
+  DELETE
+  SAVE
+  SHARE
+  UNSHARE
+  UPGRADE_KEYS
+}
+
+type DocumentPermissionProxy {
+  sourceDocID: String!
+  sourceDocPublicHierarchicalKey: String!
+  sourceKeysClaim: String!
+  sourceTeam: Team!
+}
+
+input DocumentPermissionProxyInput {
+  sourceDocID: String!
+  sourceDocPublicHierarchicalKey: String!
+  sourceKeysClaim: String!
+  sourceKeysClaimEncryptedByKey: String!
+  targetDocID: String!
+  targetDocPublicHierarchicalKey: String!
+}
+
+type DocumentSnapshot {
+  createdAt: Date!
+  data: String!
+  decryptedData: JSON!
+  decryptedKey: String!
+  hierarchicalPermissionChain: [HierarchicalPermissionChainLink!]!
+  version: Int!
+}
+
+enum DocumentVisibility {
+  ALL
+  DRIVE
+  PAGES
+}
+
+type Domain {
+  available: Boolean!
+  currency: String
+  domain: String!
+  period: Int
+  price: Float
+}
+
+type DomainAliasData {
+  displayEmailAlias: String!
+  emailAlias: String
+  isCatchall: Boolean!
+  userID: String!
+}
+
+type DomainDetails {
+  domain: String!
+  expiresAt: String!
+  renewAuto: Boolean!
+  renewalDetails: RenewalDetails!
+  status: String!
+}
+
+type DowngradeProgress {
+  currentStorageInMb: Int!
+  customDomains: Int!
+  emailAliases: Int!
+  shortAliases: Int!
+  userFolders: Int!
+  userLabels: Int!
+  userMailFilters: Int!
+  workspaceUsers: Int!
+}
+
+type Draft {
+  draftID: String!
+  encryptedDraft: String!
+  encryptedKey: String!
+  updatedAt: Date
+}
+
+input EditOrganizationRequest {
+  displayPictureData: UpdateDisplayPictureRequest
+  name: String
+  orgID: String!
+}
+
+type EditOrganizationResponse {
+  organization: Organization!
+}
+
+input EditTeamRequest {
+  icon: String
+  name: String
+  teamID: String!
+}
+
+input EditUserLabelRequest {
+  color: String
+  labelID: String!
+  labelName: String
+  variant: UserLabelVariant
+}
+
+type Email {
+  attachmentMetadata: [EncryptedAttachmentMetadata!]!
+  bcc: [AddressObject!]!
+  cc: [AddressObject!]!
+  createdAt: Date!
+  decryptedAttachmentMetadata: [DecryptedAttachment!]
+  decryptedHtml: String
+  decryptedRawMime: String
+  decryptedSessionKey: String
+  decryptedSubject: String
+  decryptedText: String
+  decryptedTextAsHtml: String
+  decryptedTextSnippet: String
+  encryptedHtml: EncryptedDataOutput!
+  encryptedRawMimeUrl: String
+  encryptedSessionKey: EncryptedSessionKeyOutput!
+  encryptedSubject: EncryptedDataOutput!
+  encryptedText: EncryptedDataOutput!
+  encryptedTextAsHtml: EncryptedDataOutput!
+  encryptedTextSnippet: EncryptedDataOutput
+  from: AddressObject!
+  id: String!
+  replyTo: AddressObject
+  scheduleSendAt: Date
+  threadID: String
+  to: [AddressObject!]!
+}
+
+type EmailsWithUnreadICSResponse {
+  emails: [Email!]!
+  hasMore: Boolean!
+}
+
+input EncryptedAttachmentInput {
+  encryptedContent: EncryptedFileInput!
+  encryptedMetadata: EncryptedDataInput!
+}
+
+type EncryptedAttachmentMetadata {
+  attachmentID: String!
+  encryptedData: EncryptedDataOutput!
+  encryptedFileSizeBytes: Int
+}
+
+input EncryptedChunk {
+  chunkNumber: Int!
+  content: String!
+  signature: String!
+  signedBy: String!
+}
+
+type EncryptedChunkOutput {
+  chunkNumber: Int!
+  content: String!
+  signature: String!
+  signedBy: String!
+}
+
+input EncryptedContents {
+  contentsArr: [EncryptedChunk!]!
+}
+
+type EncryptedContentsOutput {
+  contentsArr: [EncryptedChunkOutput!]!
+}
+
+input EncryptedDataInput {
+  encryptedData: String!
+}
+
+type EncryptedDataOutput {
+  encryptedData: String!
+}
+
+input EncryptedFileInput {
+  encryptedFile: Upload!
+}
+
+input EncryptedMetadata {
+  encryptedMetadata: String!
+  signature: String!
+  signedBy: String!
+}
+
+type EncryptedMetadataOutput {
+  encryptedMetadata: String!
+  signature: String!
+  signedBy: String!
+}
+
+input EncryptedSessionKeyInput {
+  encryptedBy: PublicKey!
+  encryptedSessionKey: String!
+}
+
+type EncryptedSessionKeyOutput {
+  encryptedBy: PublicKey!
+  encryptedSessionKey: String!
+}
+
+input EnrollMfaRequest {
+  dataMFA: String!
+  signature: String!
+}
+
+type EnrollMfaResponse {
+  backupCodes: [String!]!
+  status: RequestStatus!
+}
+
+enum EntityType {
+  ORG
+  USER
+}
+
+input EventAroundDateInput {
+  calendarID: String!
+  date: Date!
+}
+
+enum EventType {
+  ACTIVE_STATUS
+  DELETE_DOCUMENT
+  DOCUMENT_RESTORE
+  DOCUMENT_UPDATE
+  FILESYSTEM_UPDATE
+  JOIN_DOCUMENT_ROOM
+  LEAVE_DOCUMENT_ROOM
+  LOGOUT
+  METADATA_UPDATE
+  SHARE_DOCUMENT
+  UNSHARE_DOCUMENT
+}
+
+enum EventUpdateType {
+  Content
+  Preferences
+  RSVP
+}
+
+input EventsInput {
+  calendarID: String!
+  eventsIDs: [String!]!
+}
+
+scalar ExternalAttendeeType
+
+input FilesystemNode {
+  docID: String!
+}
+
+type FilterAction {
+  actionType: ActionType!
+  serializedData: String
+}
+
+input FilterActionInput {
+  actionType: ActionType!
+  serializedData: String
+}
+
+enum FilterField {
+  CONTAINS
+}
+
+enum FilterType {
+  AND
+  BCC
+  BODY
+  CC
+  FROM
+  NOT
+  OR
+  RECIPIENT
+  SUBJECT
+  TO
+}
+
+input GenerateCustomDomainRecordsRequest {
+  domain: String!
+}
+
+type GenerateCustomDomainRecordsResponse {
+  dkimRecords: [DNSRecord!]!
+  dmarcRecord: DNSRecord!
+  domainID: String!
+  mxRecords: [DNSRecord!]!
+  spfRecords: DNSRecord!
+}
+
+input GenerateDocPublicLinkAuthTokenStep1Request {
+  docID: String!
+}
+
+type GenerateDocPublicLinkAuthTokenStep1Response {
+  salt: String!
+  serverEphemeralPublic: String!
+}
+
+input GenerateDocPublicLinkAuthTokenStep2Request {
+  clientEphemeralPublic: String!
+  clientSessionProof: String!
+  docID: String!
+  serverEphemeralPublic: String!
+}
+
+type GenerateDocPublicLinkAuthTokenStep2Response {
+  encryptedPrivateHierarchicalKey: String!
+  jwt: String!
+  serverSessionProof: String!
+}
+
+type GenerateWebAuthnChallengeResponse {
+  options: JSON!
+}
+
+type GenerateWebAuthnRegistrationResponse {
+  options: JSON!
+}
+
+input GetAliasValidRequest {
+  alias: String!
+}
+
+input GetBillingPortalSessionRequest {
+  redirectURL: String
+}
+
+input GetCheckoutSessionRequest {
+  interval: SubscriptionInterval!
+  redirectURL: String
+  subscriptionPlan: SubscriptionPlan!
+}
+
+input GetCoinbaseCheckoutIDRequest {
+  plan: SubscriptionPlan!
+}
+
+type GetCoinbaseCheckoutIDResponse {
+  coinbaseCheckoutID: String!
+}
+
+input GetContactsRequest {
+  emailAddresses: [String!]!
+}
+
+input GetCreditsRequest {
+  entityID: String!
+  entityType: EntityType!
+  include: [CreditInfo!]!
+}
+
+type GetCreditsResponse {
+  credits: [CreditInfoResponse!]!
+}
+
+type GetCurrentUserCustomDomainsResponse {
+  domains: [CustomDomainRecord!]!
+}
+
+input GetCustomDomainCheckoutSessionRequest {
+  customDomain: String!
+  redirectURL: String
+}
+
+input GetDocumentRequest {
+  docID: String!
+}
+
+input GetDocumentsRequest {
+  activeProductApp: ProductApp!
+  docIDs: [String!]
+  manuallySharedOnRootDocumentsOfOrgRootDocumentID: String
+  parentID: String
+  personalRootDocuments: Boolean
+  sharedOnRootDocuments: Boolean
+  trashedChildren: Boolean
+}
+
+type GetDomainSuggestionsResponse {
+  domains: [String!]
+}
+
+input GetMailFiltersInput {
+  clientside: Boolean
+}
+
+input GetRecoveryPublicKeysAndDataRequest {
+  username: String!
+}
+
+input GetSearchIndexProgressRequest {
+  newestThreadUpdatedAtInIndex: Date!
+  oldestThreadUpdatedAtInIndex: Date!
+}
+
+input GetTemplatesRequest {
+  templatesIDs: [String!]
+}
+
+input GetUserRequest {
+  challengeJwt: String
+  challengeSignature: String
+  emailPasscode: String
+  isNotLoggedIn: Boolean
+  paperShareHash: String
+  userID: String
+  username: String
+}
+
+input GetUsersRequest {
+  userIDs: [String!]!
+}
+
+input GetValidPaperShareHashRequest {
+  paperShareHash: String!
+  username: String!
+}
+
+input GrantCreditsRequest {
+  creditAmount: CreditAmountInput!
+  creditTransactionReason: CreditTransactionReason!
+}
+
+type GrantCreditsResponse {
+  creditsGranted: CreditAmount!
+  remainingCreditsToEarnForReason: CreditAmount!
+}
+
+type HierarchicalPermissionChainLink {
+  docID: String!
+  encryptedSessionKey: String
+  encryptedSessionKeyEncryptedByKey: String
+  keysClaim: String
+  keysClaimEncryptedByKey: String
+  permission: PermissionEntry
+  previousLinkDocID: String
+}
+
+enum ImportClients {
+  Gmail
+  Outlook
+}
+
+input ImportEmlEmailRequest {
+  emlFiles: [Upload!]!
+  role: Role
+}
+
+input ImportGmailRequest {
+  code: String!
+  subscribeToAutoImport: Boolean
+}
+
+input ImportMboxRequest {
+  fileSizeInBytes: Int!
+  mboxFile: Upload!
+}
+
+type IndexableDocument {
+  docID: String!
+  updatedAt: Date!
+}
+
+type InternalAttendee {
+  calendarID: String!
+  deleted: Boolean!
+  displayName: String
+  email: String!
+  encryptedByKey: String!
+  encryptedSessionKey: String!
+  optional: Boolean!
+  permission: AttendeePermission!
+  status: AttendeeStatus!
+  updatedAt: Date!
+}
+
+input InternalAttendeeInput {
+  calendarID: String!
+  deleted: Boolean!
+  displayName: String
+  email: String!
+  encryptedByKey: String!
+  encryptedSessionKey: String!
+  optional: Boolean!
+  permission: AttendeePermission!
+  status: AttendeeStatus!
+  updatedAt: Date!
+}
+
+scalar InternalAttendeeType
+
+type Invoice {
+  amountDue: Int
+  created: Date
+  invoiceTiers: [String!]
+  status: String
+  url: String
+}
+
+type InvoiceHistory {
+  invoiceHistory: [Invoice]
+}
+
+scalar JSON
+
+type LastUpdateKeyMap {
+  deleted: Date
+  endDate: Date
+  parentRecurrenceID: Date
+  recurrenceDate: Date
+  recurrenceRule: Date
+  sequence: Date
+  startDate: Date
+}
+
+input LastUpdateKeyMapInput {
+  deleted: Date
+  endDate: Date
+  parentRecurrenceID: Date
+  recurrenceDate: Date
+  recurrenceRule: Date
+  sequence: Date
+  startDate: Date
+}
+
+type LastViewedReferralCreditResponse {
+  amount: CreditAmount!
+  count: Int!
+}
+
+type LinkOutput {
+  decryptedLinkKey: String!
+  encryptedLinkKey: String!
+  permissionLevel: PermissionLevel!
+  salt: String!
+}
+
+enum LoginMutationStatus {
+  AUTHENTICATED
+  AUTH_FAILURE
+  CHANGE_TEMPORARY_PASSWORD
+  CREATED
+  INVALID_JWT
+  REJECTED
+  TOKEN_NEEDED
+  UPDATED
+  USERNAME_INVALID
+  WEBAUTHN_TOKEN_NEEDED
+}
+
+input LoginSrpRequest {
+  captchaToken: String
+  clientEphemeralPublic: String
+  clientSessionProof: String
+  platformInfo: PlatformInfo
+  step: Int!
+  tokenMFA: String
+  username: String!
+  verifyWebAuthnData: JSON
+}
+
+type LoginSrpResponse {
+  cacheKey: String
+  email: String
+  encryptedDocumentData: String
+  encryptedMetamaskSecret: String
+  encryptedUserData: String
+  jwt: String
+  mfaTypes: [String!]
+  publicData: PublicData
+  publicKey: PublicKey
+  recoveryEmail: String
+  rootOrgID: String
+  salt: String
+  serverEphemeralPublic: String
+  serverSessionProof: String
+  signingPublicKey: String
+  status: LoginMutationStatus
+  unverifiedRecoveryEmail: String
+  userID: String
+  walletAddress: String
+  webAuthnChallengeResponse: GenerateWebAuthnChallengeResponse
+}
+
+type MFAFactors {
+  backupCodes: [String!]
+  totpData: String
+  webAuthnKeys: [WebAuthnKey!]
+}
+
+enum MFATypes {
+  BACKUP_CODE
+  TOTP
+  WEBAUTHN
+}
+
+type MailFilter {
+  actions: [FilterAction!]!
+  clientside: Boolean!
+  encryptedByKey: String
+  encryptedSessionKey: String
+  filter: MailFilterField!
+  mailFilterID: String!
+  name: String
+}
+
+type MailFilterField {
+  filterField: FilterField
+  filterType: FilterType!
+  serializedData: String
+  subFilter: [MailFilterField!]
+}
+
+input MailFilterInput {
+  filterField: FilterField
+  filterType: FilterType!
+  serializedData: String
+  subFilter: [MailFilterInput!]
+}
+
+type Mailbox {
+  pageInfo: MailboxPageInfo!
+  threads: [UserThread!]!
+}
+
+input MailboxCursor {
+  date: Date!
+  threadID: String!
+}
+
+type MailboxCursorResponse {
+  date: Date!
+  threadID: String!
+}
+
+input MailboxFilters {
+  attachments: Boolean
+  read: Boolean
+}
+
+type MailboxPageInfo {
+  cursor: MailboxCursorResponse
+  hasNextPage: Boolean!
+}
+
+input MailboxRequest {
+  clientsideFiltersApplied: Boolean
+  cursor: MailboxCursor
+  emailsUpdatedAfterDate: Date @deprecated(reason: "Use lastUpdatedDate instead")
+  emailsUpdatedBeforeDate: Date @deprecated(reason: "Use lastUpdatedDate instead")
+  filters: MailboxFilters
+  isAliasInbox: Boolean
+  label: String
+  lastUpdatedDate: Date
+  limit: Int
+  noExcludedLabel: Boolean
+  platformInfo: PlatformInfo
+  polling: Boolean
+  refetching: Boolean
+  updatedAtOrderDirection: AscDesc
+  useUpdatedAtField: Boolean
+}
+
+input ManageOrganizationPaymentDetailsRequest {
+  orgID: String!
+}
+
+type ManageOrganizationPaymentDetailsResponse {
+  redirectURL: String!
+}
+
+input MarkEmailAsReadICSRequest {
+  emailIDs: [String!]!
+  reason: String
+}
+
+input MarkThreadsAsClientsideFilteredInput {
+  threadIDs: [String!]!
+}
+
+input ModifyLabelsRequest {
+  systemLabels: [SystemLabels!]
+  threadIDs: [String!]!
+  userLabels: [String!]
+}
+
+type ModifyLabelsResponse {
+  updatedThreads: [UpdatedThreadLabels!]!
+}
+
+input MoveDocRequest {
+  activeProductApp: ProductApp!
+  currentEncryptedSessionKey: String!
+  currentPublicHierarchicalKey: String!
+  docID: String!
+  newParentID: String!
+  newParentKeysClaim: String!
+  newParentKeysClaimEncryptedByKey: String!
+  publicHierarchicalKeyOfParent: String!
+}
+
+type MoveDocResponse {
+  document: Document!
+}
+
+type Mutation {
+  acceptInviteStep1(request: AcceptInviteStep1Request!): AcceptInviteStep1Response!
+  addEmail(request: AddEmailRequest!): AddEmailResponse!
+  addPendingInvite(request: AddPendingInviteRequest!): AddPendingInviteResponse!
+  adjustBusinessPlan(request: AdjustBusinessPlanRequest!): AdjustBusinessPlanResponse!
+  applyLabels(request: ModifyLabelsRequest): ModifyLabelsResponse
+  blockEmailAddress(request: BlockEmailAddressRequest): Void
+  changeLinkPermission(request: ChangeLinkPermissionRequest!): ChangeLinkPermissionResponse!
+  clearSessionCache: ClearSessionCacheResponse!
+  confirmCacheUpload(request: ConfirmCacheUploadRequest!): ConfirmCacheUploadResponse!
+  createCacheElement(request: CreateCacheElementRequest!): CreateCacheElementResponse!
+  createCalendarUser(request: CreateCalendarUserRequest!): Void
+  createCustomDomainAlias(request: CreateCustomDomainAliasRequest): CreateCustomDomainAliasResponse
+  createEmailAlias(request: CreateEmailAliasRequest): CreateEmailAliasResponse
+  createMailFilter(input: CreateMailFilterInput!): Void
+  createOrUpdateContact(request: CreateOrUpdateContactRequest!): Void
+  createOrUpdateDraft(request: CreateOrUpdateDraftRequest!): Void
+  createOrgUploadAvatarLink: CreateUploadAvatarLinkResponse!
+  createSrp(request: CreateSrpRequest!): CreateSrpResponse!
+  createSrpMetamask(request: CreateSrpMetamaskRequest!): CreateSrpResponse!
+  createTeam(request: CreateTeamRequest!): Team!
+  createUdAlias(request: CreateUdAliasRequest): CreateEmailAliasResponse
+  createUploadAvatarLink: CreateUploadAvatarLinkResponse!
+  createUploadContactAvatarLink(request: CreateUploadContactAvatarLinkRequest!): CreateUploadAvatarLinkResponse!
+  createUserLabel(request: CreateUserLabelRequest): UserLabel
+  createWalletChallenge(request: CreateWalletChallengeRequest!): CreateWalletChallengeResponse!
+  createWalletChallengeSkemail(request: CreateWalletChallengeRequestSkemail!): CreateWalletChallengeResponseSkemail!
+  deleteAccount(request: DeleteAccountRequest!): DeleteAccountResponse!
+  deleteAutoReply: Void
+  deleteContact(request: DeleteContactRequest!): Void
+  deleteCustomDomain(request: DeleteCustomDomainRequest!): Void
+  deleteCustomDomainAlias(request: DeleteCustomDomainAliasRequest): Void
+  deleteDoc(request: DeleteDocRequest!): DeleteDocResponse!
+  deleteDraft(request: DeleteDraftRequest!): Void
+  deleteInvite(request: DeleteInviteRequest!): DeleteInviteResponse!
+  deleteLink(request: DeleteLinkRequest!): DeleteLinkResponse!
+  deleteMailAccount(deleteRequest: DeleteMailAccountRequest!): DeleteMailAccountResponse!
+  deleteMailFilter(input: DeleteMailFilterInput!): Void
+  deleteRecoveryEmail: Boolean!
+  deleteSnapshot(request: DeleteSnapshotRequest!): DeleteSnapshotResponse!
+  deleteTeam(request: DeleteTeamRequest!): Boolean!
+  deleteThread(request: DeleteThreadRequest): Void
+  deleteUserLabel(request: DeleteUserLabelRequest): Void
+  deleteUserOrganizationMembership(request: DeleteUserOrganizationMembershipRequest!): Boolean!
+  deleteUserSignature: Void
+  disableMfa(request: DisableMfaRequest!): DisableMfaResponse!
+  editOrganization(request: EditOrganizationRequest!): EditOrganizationResponse!
+  editTeam(request: EditTeamRequest!): Team!
+  editUserLabel(request: EditUserLabelRequest): UserLabel
+  enrollMfa(request: EnrollMfaRequest!): EnrollMfaResponse!
+  generateCustomDomainRecords(request: GenerateCustomDomainRecordsRequest!): GenerateCustomDomainRecordsResponse!
+  generateDocPublicLinkAuthTokenStep1(request: GenerateDocPublicLinkAuthTokenStep1Request!): GenerateDocPublicLinkAuthTokenStep1Response!
+  generateDocPublicLinkAuthTokenStep2(request: GenerateDocPublicLinkAuthTokenStep2Request!): GenerateDocPublicLinkAuthTokenStep2Response!
+  generateWebAuthnChallenge: GenerateWebAuthnChallengeResponse
+  generateWebAuthnRegistration: GenerateWebAuthnRegistrationResponse!
+  grantCredits(request: GrantCreditsRequest!): GrantCreditsResponse!
+  importEmlEmail(importRequest: ImportEmlEmailRequest!): Void
+  importGmailEmails(request: ImportGmailRequest!): Void
+  importMboxEmails(importMboxRequest: ImportMboxRequest!): Void
+  importOutlookEmails(code: String!): Void
+  loginSrp(request: LoginSrpRequest!): LoginSrpResponse!
+  manageOrganizationPaymentDetails(request: ManageOrganizationPaymentDetailsRequest!): ManageOrganizationPaymentDetailsResponse!
+  markCurrentUserOnboardedWorkspaceMigration: Void
+  markEmailAsReadICS(request: MarkEmailAsReadICSRequest!): Void
+  markThreadsAsClientsideFiltered(input: MarkThreadsAsClientsideFilteredInput!): Void
+  moveDoc(request: MoveDocRequest!): MoveDocResponse!
+  moveMultipleDoc(request: [MoveDocRequest!]!): [MoveDocResponse!]!
+  newMultipleDocs(request: [NewDocRequest!]!): [NewDocResponse!]!
+  notificationClicked(request: NotificationClickedRequest!): Boolean
+  provisionSrp(request: ProvisionSrpRequest!): Boolean!
+  purchaseCustomDomain(request: PurchaseCustomDomainRequest!): PurchaseCustomDomainResponse!
+  referUser(request: ReferUserRequest!): ReferUserResponse!
+  regenerateMfaBackupCodes(request: RegenerateMfaBackupCodesRequest!): RegenerateMfaBackupCodesResponse!
+  removeLabels(request: ModifyLabelsRequest): ModifyLabelsResponse
+  replyToMessage(message: ReplyToEmailRequest): ReplyToEmailResponse
+  resetAccount(request: ResetAccountRequest!): Boolean
+  restoreTrashDoc(request: TrashDocRequest!): MoveDocResponse!
+  saveContents(request: SaveContentsRequest!): SaveContentsResponse!
+  saveCustomDomainRecords(request: SaveCustomDomainRequest!): Void
+  saveMetadata(request: SaveMetadataRequest!): SaveMetadataResponse!
+  sendAccessRequestEmail(request: SendAccessRequestEmailRequest!): Boolean!
+  sendDocumentEvent(request: SendDocumentEventRequest!): Boolean
+  sendFeedback(request: SendFeedbackRequest!): Boolean!
+  sendMessage(message: SendEmailRequest): SendEmailResponse
+  setAllThreadsReadStatus(request: SetAllThreadsReadStatusRequest!): Boolean!
+  setAutoReply(request: SetAutoReplyRequest): Void
+  setAutoSyncContactsSetting(value: Boolean!): Void
+  setCalendarPushToken(request: SetCalendarPushTokenRequest!): Void
+  setCatchallAddress(request: SetCatchallAddressRequest!): Boolean!
+  setDefaultEmailAlias(request: SetDefaultEmailAliasRequest): Boolean!
+  setLastViewedReferralCredit(request: SetLastViewedReferralCreditRequest!): Boolean!
+  setNotificationPreferences(request: SetNotificationPreferencesRequest!): Boolean
+  setPDSubscribeFlag(request: SetPDSubscribeFlagRequest): Void
+  setPushToken(request: SetPushTokenRequest): Void
+  setReadStatus(request: SetReadStatusRequest): SetReadStatusResponse
+  setUseIPFS(request: SetUseIPFSRequest!): SetUseIPFSResponse!
+  setUserPreferences(request: SetUserPreferencesRequest!): UserPreferences
+  setUserPublicKey(request: SetUserPublicKeyRequest): Void
+  setUserSignature(request: SetUserSignatureRequest): Void
+  setupLink(request: SetupLinkRequest!): SetupLinkResponse!
+  setupProvisionedUser(request: SetupProvisionedUserRequest!): LoginSrpResponse!
+  shareDoc(request: ShareDocRequest!): ShareDocResponse!
+  shareTeamDocWithOtherTeam(request: ShareTeamDocWithOtherTeamRequest!): Team!
+  storeUnauthenticatedWorkspaceEvent(request: WorkspaceEventRequest!): Boolean!
+  storeWorkspaceEvent(request: WorkspaceEventRequest!): Boolean!
+  subscribeNotification(request: SubscribeNotificationRequest): Void
+  sync(request: SyncRequest!): SyncResponse @deprecated(reason: "Added sequence, use sync2 instead")
+  sync2(request: SyncRequest2!): SyncResponse
+  trashDocs(request: [TrashDocRequest!]!): [MoveDocResponse!]!
+  unblockEmailAddress(request: UnblockEmailAddressRequest): Void
+  unsendMessage(message: UnsendEmailRequest): Email
+  unsetCalendarPushToken(request: UnsetCalendarPushTokenRequest!): Void
+  unsetPushToken(request: UnsetPushTokenRequest): Void
+  unshareDoc(request: UnshareDocRequest!): UnshareDocResponse!
+  unshareTeamDocWithOtherTeam(request: UnshareTeamDocWithOtherTeamRequest!): Team!
+  unsubscribeFromGmailImport: Void
+  unsubscribeNotification: Void
+  updateDisplayName(request: UpdateDisplayNameRequest!): UpdateDisplayNameResponse!
+  updateDisplayPicture(request: UpdateDisplayPictureRequest!): User!
+  updateDocumentData(request: UpdateDocumentDataRequest!): UpdateDocumentDataResponse!
+  updateEmailAliasActiveState(request: UpdateEmailAliasActiveStateRequest): UpdateEmailAliasActiveStateResponse
+  updateMailFilter(input: UpdateMailFilterInput!): Void
+  updateSrp(request: UpdateSrpRequest!): UpdateSrpResponse!
+  updateUploadContactAvatarLink(request: UpdateUploadContactAvatarLinkRequest!): UpdateUploadContactAvatarLinkResponse!
+  upgradeHierarchicalKeys(request: UpgradeHierarchicalKeysRequest!): UpgradeHierarchicalKeysResponse!
+  upgradeKey(request: UpgradeKeyRequest!): UpgradeKeyResponse!
+  uploadRecoveryData(request: UploadRecoveryDataRequest!): UploadRecoveryDataResponse!
+  uploadSpamReport(request: UploadSpamReportRequest!): Void
+  verifyCustomDomain(domainID: String!): Void
+  verifyWalletAddressCreateAlias(request: VerifyWalletAddressCreateAliasRequest!): CreateEmailAliasResponse!
+  verifyWebAuthnRegistration(request: VerifyWebAuthnRegistrationRequest!): VerifyWebAuthnRegistrationResponse!
+}
+
+type NativeMailbox {
+  pageInfo: MailboxPageInfo!
+  slimThreads: [SlimUserThread!]!
+  threads: [UserThread!]!
+}
+
+input NativeMailboxRequest {
+  cursor: MailboxCursor
+  lastUpdatedDate: Date
+  limit: Int
+  limitWithSlims: Int
+  onlySlimThreads: Boolean
+  platformInfo: PlatformInfo
+  returnDeleted: Boolean
+  updatedAtOrderDirection: AscDesc
+  useUpdatedAtField: Boolean
+}
+
+input NewDocRequest {
+  activeProductApp: ProductApp!
+  docID: ID!
+  documentType: NwContentType!
+  encryptedContents: EncryptedContents!
+  encryptedMetadata: EncryptedMetadata!
+  encryptedSessionKey: String!
+  encryptedSessionKeyEncryptedByKey: String!
+  parentDocID: String
+  parentKeysClaim: String
+  parentKeysClaimEncryptedByKey: String
+  parentSignature: String
+  permissions: [PermissionEntryInput!]!
+  publicHierarchicalKey: String!
+  publicHierarchicalKeyOfParent: String
+  signatures: [String!]!
+  templateID: String
+}
+
+type NewDocResponse {
+  docID: ID!
+  document: Document
+  error: BatchError
+}
+
+enum NotificationChannelType {
+  EMAIL
+}
+
+input NotificationClickedRequest {
+  notificationID: String!
+}
+
+enum NwContentType {
+  FILE
+  FOLDER
+  PDF
+  RICH_TEXT
+}
+
+type Organization {
+  displayPictureData: DisplayPictureData!
+  everyoneTeam: Team!
+  hasCustomized: Boolean!
+  name: String!
+  orgID: String!
+  personalTeam: Team!
+  rootDocID: String!
+  rootDocPublicHierarchicalKey: String
+  teams: [Team!]!
+}
+
+type PaidUpStatus {
+  downgradeProgress: DowngradeProgress!
+  paidUp: Boolean!
+}
+
+type PendingDocumentKeyUpgradesCollaborator {
+  publicKey: PublicKey!
+  userID: String!
+}
+
+type PendingDocumentKeyUpgradesNewHierarchicalKey {
+  collaboratorsIDs: [String!]!
+  currentPublicHierarchicalKey: String
+  docID: String!
+  encryptedLinkKey: String
+  hierarchicalPermissionChain: [HierarchicalPermissionChainLink!]!
+}
+
+type PendingDocumentKeyUpgradesNewKeysClaim {
+  currentKeysClaim: String
+  docID: String!
+  hierarchicalPermissionChain: [HierarchicalPermissionChainLink!]!
+  keysClaimSourceDocID: String!
+  keysClaimSourceDocPublicHierarchicalKey: String
+}
+
+type PendingDocumentKeyUpgradesOutput {
+  collaborators: [PendingDocumentKeyUpgradesCollaborator!]!
+  newHierarchicalKeys: [PendingDocumentKeyUpgradesNewHierarchicalKey!]!
+  newKeysClaims: [PendingDocumentKeyUpgradesNewKeysClaim!]!
+}
+
+input PendingDocumentKeyUpgradesRequest {
+  rootDocumentId: String!
+}
+
+type PendingUserInvite {
+  docID: String!
+  email: String!
+  permissionLevel: PermissionLevel!
+}
+
+type PermissionEntry {
+  encryptedBy: PublicKey!
+  encryptedKey: String
+  encryptedPrivateHierarchicalKey: String
+  expiryDate: Date
+  userID: String!
+}
+
+input PermissionEntryInput {
+  encryptedBy: PublicKey!
+  encryptedPrivateHierarchicalKey: String!
+  expiryDate: Date
+  permissionLevel: PermissionLevel!
+  userID: String!
+}
+
+enum PermissionLevel {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+input PlatformInfo {
+  browserName: String
+  isAndroid: Boolean!
+  isIos: Boolean!
+  isMacOs: Boolean!
+  isMobile: Boolean!
+  isReactNative: Boolean
+  isSkiffWindowsDesktop: Boolean
+  languageCode: String
+  manufacturer: String
+  timezone: String
+}
+
+type PrivateUserData {
+  documentKey: String
+  privateKey: String
+  signingPrivateKey: String
+}
+
+enum ProductApp {
+  CALENDAR
+  DRIVE
+  MAIL
+  PAGES
+}
+
+input ProvisionEmailDetails {
+  deliveryEmail: String!
+  temporaryPassword: String!
+}
+
+input ProvisionSrpRequest {
+  createSrpRequest: CreateSrpRequest!
+  emailAlias: String!
+  newUserID: String!
+  provisionEmailDetails: ProvisionEmailDetails
+  shareDocRequest: ShareDocRequest!
+}
+
+type PublicData {
+  displayName: String
+  displayPictureData: DisplayPictureData
+}
+
+scalar PublicKey
+
+scalar PublicKeyWithSignature
+
+type PublicOrgData {
+  displayPictureData: DisplayPictureData
+  name: String!
+  orgID: String!
+}
+
+input PurchaseCustomDomainRequest {
+  domain: String!
+}
+
+type PurchaseCustomDomainResponse {
+  domainID: String!
+}
+
+input PushCalendarEventInput {
+  calendarID: String!
+  creatorCalendarID: String!
+  eventData: CalendarEventData!
+  externalCreator: String
+  internalAttendeeList: [InternalAttendeeInput!]!
+  parentEventID: String!
+  updateTypes: [EventUpdateType!]!
+}
+
+input PushCalendarEventInput2 {
+  calendarID: String!
+  creatorCalendarID: String!
+  eventData: CalendarEventData2!
+  externalCreator: String
+  internalAttendeeList: [InternalAttendeeInput!]!
+  parentEventID: String!
+  updateTypes: [EventUpdateType!]!
+}
+
+type Query {
+  aliasValid(request: GetAliasValidRequest!): Boolean!
+  allContacts: [Contact!]!
+  allDrafts: [Draft!]!
+  allFolderDocuments: [Document!]!
+  apiVersion: String
+  attachments(ids: [String]): [Attachment]
+  autoReply: AutoReplyOutput
+  billingPortal(request: GetBillingPortalSessionRequest): CreateBillingPortalSessionOutput
+  browserPushNotificationsEnabled: Boolean!
+  calendar(calendarID: String!): Calendar!
+  checkIfDomainsAvailable(domains: [String!]!): CheckIfDomainsAvailableResponse!
+  checkoutPortal(request: GetCheckoutSessionRequest!): CheckoutSession!
+  contacts(request: GetContactsRequest!): [Contact!]!
+  credits(request: GetCreditsRequest!): GetCreditsResponse!
+  currentUser: User
+  currentUserAlterEgos: [UserAlterEgo!]!
+  customDomainCheckoutPortal(request: GetCustomDomainCheckoutSessionRequest!): CheckoutSession!
+  customDomains: [String!]!
+  decryptionServicePublicKey: PublicKey
+  document(request: GetDocumentRequest!): Document!
+  documents(request: GetDocumentsRequest!): [Document!]!
+  emailsWithUnreadICS: [Email!]! @deprecated(reason: "Added pagination, use emailsWithUnreadICS2 instead")
+  emailsWithUnreadICS2: EmailsWithUnreadICSResponse!
+  events(request: EventsInput!): [CalendarEvent!]!
+  eventsAroundDate(request: EventAroundDateInput!): [CalendarEvent!]!
+  getAliasesOnDomain(domainID: String!): AliasesOnDomainResponse!
+  getBonfidaNames(solanaAddress: String!): [String!]!
+  getCoinbaseCheckoutID(request: GetCoinbaseCheckoutIDRequest!): GetCoinbaseCheckoutIDResponse!
+  getCurrentUserCustomDomains: GetCurrentUserCustomDomainsResponse!
+  getDomainDetails(domain: String!): DomainDetails!
+  getDomainSuggestions(domain: String!, limit: Int): GetDomainSuggestionsResponse!
+  getENSName(ethereumAddress: String!): String
+  getGmailAutoImportStatus: AutoImportStatus!
+  getGoogleAuthURL: String!
+  getICNSName(cosmosAddress: String!): String
+  getOutlookAuthUrl: String!
+  getStargazeName(cosmosAddress: String!): String
+  isBlocked(senderAddress: String): Boolean!
+  isCustomDomain(domains: [String!]!): Boolean!
+  isHolderOfNFT(nftContractAddress: String!, userAddress: String!): Boolean!
+  lastViewedReferralCredit: LastViewedReferralCreditResponse!
+  mailFilters(request: GetMailFiltersInput): [MailFilter!]!
+  mailbox(request: MailboxRequest!): Mailbox
+  nativeMailbox(request: NativeMailboxRequest!): NativeMailbox
+  orgMemberDefaultEmailAlias(userID: String!): String
+  orgMemberEmailAliases(userID: String!): [String!]!
+  organization(id: String!): Organization!
+  pendingDocumentKeyUpgrades(request: PendingDocumentKeyUpgradesRequest!): PendingDocumentKeyUpgradesOutput!
+  recoveryPublicKeysAndData(request: GetRecoveryPublicKeysAndDataRequest!): RecoveryPublicKeysAndDataOutput
+  searchIndexProgress(request: GetSearchIndexProgressRequest!): SearchIndexProgress!
+  searchIndexableDocuments: [IndexableDocument!]!
+  sessionCache: SessionCacheOutput!
+  sessionCacheChallenge(req: SessionCacheInput!): SessionCacheChallengeResponse!
+  sessionCacheMobile(req: SessionCacheMobileRequest!): Void
+  status: String
+  team(id: String!): Team!
+  templates(request: GetTemplatesRequest!): [Template!]!
+  unread(label: String!): Int!
+  user(request: GetUserRequest!): User
+  userCalendar(calendarID: String!): UserCalendar!
+  userLabels: [UserLabel!]!
+  userPreferences: UserPreferences
+  userSignature: UserSignatureOutput
+  userThread(threadID: String): UserThread
+  userThreads(returnDeleted: Boolean, threadIDs: [String!]!): [UserThread!]!
+  users(request: GetUsersRequest!): [User!]
+  usersFromEmailAlias(emailAliases: [String!]!): [User]!
+  usersFromEmailAliasWithCatchall(emailAliases: [String!]!): [User]!
+  validPaperShareHash(request: GetValidPaperShareHashRequest!): Boolean!
+}
+
+type RecoveryPublicKeysAndDataOutput {
+  encryptedRecoveryData: String
+  publicKey: PublicKey!
+  recoveryServerShare: String
+  recoverySigningPublicKey: PublicKey
+}
+
+enum RecurrenceDay {
+  FRIDAY
+  MONDAY
+  SATURDAY
+  SUNDAY
+  THURSDAY
+  TUESDAY
+  WEDNESDAY
+}
+
+enum RecurrenceFrequency {
+  DAILY
+  HOURLY
+  MINUTELY
+  MONTHLY
+  SECONDLY
+  WEEKLY
+  YEARLY
+}
+
+type RecurrenceRule {
+  byDays: [RecurrenceDay!]
+  count: Int
+  excludeDates: [Date!]!
+  frequency: RecurrenceFrequency!
+  interval: Int
+  isAllDay: Boolean
+  startDate: Date!
+  timezone: String
+  until: Date
+}
+
+input RecurrenceRuleInput {
+  byDays: [RecurrenceDay!]
+  count: Int
+  excludeDates: [Date!]!
+  frequency: RecurrenceFrequency!
+  interval: Int
+  isAllDay: Boolean
+  startDate: Date!
+  timezone: String
+  until: Date
+}
+
+input ReferUserRequest {
+  email: String!
+  permissionLevel: PermissionLevel
+  referralTemplate: String!
+}
+
+type ReferUserResponse {
+  status: RequestStatus!
+}
+
+input RegenerateMfaBackupCodesRequest {
+  loginSrpRequest: LoginSrpRequest!
+  signature: String!
+}
+
+type RegenerateMfaBackupCodesResponse {
+  backupCodes: [String!]!
+  status: RequestStatus!
+}
+
+type RenewalDetails {
+  price: Float
+}
+
+input ReplyToEmailRequest {
+  attachments: [EncryptedAttachmentInput!]!
+  bcc: [SendAddressRequest!]!
+  captchaToken: String!
+  cc: [SendAddressRequest!]!
+  customMessageID: String
+  encryptedHtml: EncryptedDataInput!
+  encryptedSubject: EncryptedDataInput!
+  encryptedText: EncryptedDataInput!
+  encryptedTextAsHtml: EncryptedDataInput!
+  encryptedTextSnippet: EncryptedDataInput
+  externalEncryptedSessionKey: EncryptedSessionKeyInput
+  from: SendAddressRequest!
+  rawSubject: String!
+  replyID: String!
+  scheduleSendAt: Date
+  to: [SendAddressRequest!]!
+}
+
+type ReplyToEmailResponse {
+  messageID: String!
+  threadID: String!
+}
+
+enum RequestStatus {
+  FAILED
+  REJECTED
+  SAVED
+  SUCCESS
+}
+
+input ResetAccountRequest {
+  emailPasscode: String
+  encryptedUserData: String!
+  salt: String!
+  saltSignature: String!
+  userDataSignature: String!
+  username: String!
+  verifier: String!
+  verifierSignature: String!
+}
+
+enum Role {
+  BCC
+  CC
+  FROM
+  TO
+}
+
+input SaveContentsRequest {
+  createSnapshot: Boolean
+  docID: String!
+  encryptedContents: EncryptedContents!
+  previousEncryptedContentsHash: String!
+  restoringDocument: Boolean
+}
+
+type SaveContentsResponse {
+  document: Document!
+}
+
+input SaveCustomDomainRequest {
+  domain: String!
+  domainID: String!
+}
+
+input SaveMetadataRequest {
+  docID: String!
+  encryptedMetadata: EncryptedMetadata!
+  previousEncryptedMetadataHash: String!
+}
+
+type SaveMetadataResponse {
+  document: Document!
+}
+
+type SearchIndexProgress {
+  isIndexComplete: Boolean!
+  numIndexableThreads: Int!
+  numThreadsIndexed: Int!
+}
+
+input SendAccessRequestEmailRequest {
+  docID: String!
+}
+
+input SendAddressRequest {
+  address: String!
+  encryptedSessionKey: EncryptedSessionKeyInput
+  name: String
+}
+
+input SendDocumentEventRequest {
+  audience: [String!]!
+  docID: String!
+  nodeID: String
+  type: DocumentEventType!
+}
+
+input SendEmailRequest {
+  attachments: [EncryptedAttachmentInput!]!
+  bcc: [SendAddressRequest!]!
+  calendarInvite: Boolean
+  captchaToken: String!
+  cc: [SendAddressRequest!]!
+  encryptedHtml: EncryptedDataInput!
+  encryptedSubject: EncryptedDataInput!
+  encryptedText: EncryptedDataInput!
+  encryptedTextAsHtml: EncryptedDataInput!
+  encryptedTextSnippet: EncryptedDataInput
+  externalEncryptedSessionKey: EncryptedSessionKeyInput
+  from: SendAddressRequest!
+  rawSubject: String!
+  scheduleSendAt: Date
+  to: [SendAddressRequest!]!
+}
+
+type SendEmailResponse {
+  messageID: String!
+  threadID: String!
+}
+
+input SendFeedbackRequest {
+  feedback: String!
+  isMobile: Boolean!
+  isNative: Boolean!
+  origin: String!
+  zendeskUploadTokens: [String!]!
+}
+
+type SessionCacheChallengeResponse {
+  encryptedChallenge: String!
+  serverPublicKey: String!
+}
+
+input SessionCacheInput {
+  userID: String!
+}
+
+input SessionCacheMobileRequest {
+  challenge: String!
+  userID: String!
+}
+
+type SessionCacheOutput {
+  alternativeCacheKeys: [String!]!
+  cacheKey: String!
+}
+
+input SetAllThreadsReadStatusRequest {
+  label: String!
+  read: Boolean!
+}
+
+input SetAutoReplyRequest {
+  encryptedHtml: EncryptedDataInput!
+  encryptedSkiffSessionKey: EncryptedSessionKeyInput!
+  encryptedSubject: EncryptedDataInput!
+  encryptedText: EncryptedDataInput!
+  encryptedTextAsHtml: EncryptedDataInput!
+  encryptedTextSnippet: EncryptedDataInput
+  encryptedUserSessionKey: EncryptedSessionKeyInput!
+}
+
+input SetCalendarPushTokenRequest {
+  deviceID: String!
+  os: String!
+  token: String!
+}
+
+input SetCatchallAddressRequest {
+  domainID: String!
+  emailAlias: String
+}
+
+input SetDefaultEmailAliasRequest {
+  defaultAlias: String!
+}
+
+input SetLastViewedReferralCreditRequest {
+  amount: CreditAmountInput!
+  count: Int!
+}
+
+input SetNotificationPreferencesRequest {
+  email: Boolean!
+  inApp: Boolean!
+}
+
+input SetPDSubscribeFlagRequest {
+  subscribed: Boolean!
+}
+
+input SetPushTokenRequest {
+  deviceID: String!
+  os: String!
+  token: String!
+}
+
+input SetReadStatusRequest {
+  read: Boolean!
+  threadIDs: [String!]!
+}
+
+type SetReadStatusResponse {
+  updatedThreadIDs: [String!]!
+}
+
+input SetUseIPFSRequest {
+  useIPFS: Boolean!
+}
+
+type SetUseIPFSResponse {
+  status: RequestStatus!
+}
+
+input SetUserPreferencesRequest {
+  blockRemoteContent: Boolean
+  dateFormat: String
+  defaultCalendarColor: String
+  hideActivationChecklist: Boolean
+  hourFormat: String
+  leftSwipeGesture: SwipeSetting
+  rightSwipeGesture: SwipeSetting
+  securedBySkiffSigDisabled: Boolean
+  showAliasInboxes: Boolean
+  showPageIcon: Boolean
+  startDayOfTheWeek: Int
+  theme: String
+  threadFormat: ThreadDisplayFormat
+}
+
+input SetUserPublicKeyRequest {
+  publicKey: PublicKeyWithSignature!
+  signingPublicKey: PublicKey!
+}
+
+input SetUserSignatureRequest {
+  sessionKey: EncryptedSessionKeyInput!
+  userSignature: EncryptedDataInput!
+}
+
+input SetupLinkRequest {
+  currentEncryptedSessionKey: String!
+  currentPublicHierarchicalKey: String!
+  docID: String!
+  encryptedLinkKey: String!
+  encryptedPrivateHierarchicalKey: String!
+  encryptedSessionKey: String!
+  linkKeySignature: String!
+  permissionLevel: PermissionLevel!
+  salt: String!
+  sessionKeySignature: String!
+  verifier: String!
+}
+
+type SetupLinkResponse {
+  document: Document!
+}
+
+input SetupProvisionedUserRequest {
+  loginSrpRequest: LoginSrpRequest!
+  updateSrpRequest: UpdateSrpRequest!
+}
+
+type ShareDocEventData {
+  targetUser: String!
+}
+
+input ShareDocRequest {
+  currentPublicHierarchicalKey: String!
+  docID: String!
+  newPermissionEntries: [PermissionEntryInput!]!
+  signatures: [String!]!
+}
+
+type ShareDocResponse {
+  document: Document!
+}
+
+input SharePermissionInput {
+  expiryDate: Date
+  permissionLevel: PermissionLevel!
+}
+
+input ShareTeamDocWithOtherTeamRequest {
+  documentPermissionProxy: DocumentPermissionProxyInput!
+}
+
+enum SignatureContext {
+  DELETE_ACCOUNT
+  DELETE_DOC
+  DELETE_RECOVERY_DATA
+  DISABLE_MFA
+  DOCUMENT_CHUNK
+  DOCUMENT_DATA
+  DOCUMENT_METADATA
+  DOCUMENT_PARENT
+  ENROLL_MFA
+  LINKS_LINK_KEY
+  LINKS_SESSION_KEY
+  MOBILE_LOGIN
+  RECOVERY_DATA
+  REGENERATE_MFA_BACKUP_CODES
+  SESSION_KEY
+  SRP_SALT
+  SRP_VERIFIER
+  UNSHARE_DOC
+  UPDATE_USER_DATA
+  UPLOAD_RECOVERY_ENCRYPTED_USER_DATA
+  UPLOAD_RECOVERY_ENCRYPTION_PUBLIC_KEY
+  UPLOAD_RECOVERY_SERVER_SHARE
+  UPLOAD_RECOVERY_SIGNING_PUBLIC_KEY
+  USER_DATA
+  USER_PUBLIC_KEY
+}
+
+type SingleRetrievedRecord {
+  data: String!
+  priority: String
+}
+
+type SlimUserThread {
+  attributes: ThreadAttributes!
+  deletedAt: Date
+  emailsUpdatedAt: Date!
+  permanentlyDeleted: Boolean!
+  sentLabelUpdatedAt: Date
+  threadID: String!
+  updatedAt: Date!
+}
+
+scalar SocketEvent
+
+type StorageUsage {
+  attachmentUsageBytes: String!
+  messageUsageBytes: String!
+}
+
+input SubscribeNotificationRequest {
+  auth: String!
+  endpoint: String!
+  p256dh: String!
+}
+
+type SubscriptionInfo {
+  billingInterval: SubscriptionInterval
+  cancelAtPeriodEnd: Boolean!
+  isCryptoSubscription: Boolean!
+  quantity: Int
+  stripeStatus: String
+  subscriptionPlan: String!
+  supposedEndDate: Date
+}
+
+enum SubscriptionInterval {
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionPlan {
+  BUSINESS
+  ESSENTIAL
+  FREE
+  PRO
+}
+
+enum SwipeSetting {
+  ARCHIVE
+  DELETE
+  UNREAD
+}
+
+input SyncRequest {
+  calendarID: String!
+  checkpoint: Date
+  events: [PushCalendarEventInput!]!
+}
+
+input SyncRequest2 {
+  calendarID: String!
+  checkpoint: Date
+  events: [PushCalendarEventInput2!]!
+}
+
+type SyncResponse {
+  checkpoint: Date
+  events: [CalendarEvent]!
+  state: SyncState!
+}
+
+enum SyncState {
+  CONFLICT
+  SYNCED
+}
+
+enum SystemLabels {
+  ARCHIVE
+  DRAFTS
+  INBOX
+  SCHEDULE_SEND
+  SENT
+  SPAM
+  TRASH
+  VIRUS
+}
+
+type Team {
+  accessLevel: TeamAccess
+  icon: String!
+  name: String!
+  organization: Organization!
+  personal: Boolean!
+  rootDocument: Document
+  teamID: String!
+}
+
+enum TeamAccess {
+  EVERYONE
+  INVITE_ONLY
+  PERSONAL
+}
+
+type Template {
+  contents: TemplateContent!
+  createdAt: Date
+  group: String!
+  metadata: TemplateMetaData!
+  parentID: String
+  templateID: String!
+  updatedAt: Date
+}
+
+type TemplateContent {
+  pmDoc: JSON!
+}
+
+type TemplateMetaData {
+  color: String
+  description: String
+  icon: String
+  title: String!
+}
+
+type ThreadAttributes {
+  read: Boolean!
+  systemLabels: [String!]!
+  userLabels: [UserLabel!]!
+}
+
+enum ThreadDisplayFormat {
+  FULL
+  RIGHT
+}
+
+input TrashDocRequest {
+  activeProductApp: ProductApp!
+  currentEncryptedSessionKey: String!
+  currentPublicHierarchicalKey: String!
+  docID: String!
+  newParentKeysClaim: String!
+  newParentKeysClaimEncryptedByKey: String!
+  publicHierarchicalKeyOfParent: String!
+}
+
+input UnblockEmailAddressRequest {
+  emailAddressToUnblock: String
+}
+
+input UnsendEmailRequest {
+  messageID: String!
+  threadID: String!
+}
+
+input UnsetCalendarPushTokenRequest {
+  deviceID: String!
+}
+
+input UnsetPushTokenRequest {
+  deviceID: String!
+}
+
+type UnshareDocEventData {
+  targetUser: String!
+}
+
+input UnshareDocRequest {
+  docID: String!
+  signature: String!
+  usersToUnshare: [String!]!
+}
+
+type UnshareDocResponse {
+  document: Document!
+}
+
+input UnshareTeamDocWithOtherTeamRequest {
+  sourceTeamRootDocumentID: String!
+  targetTeamRootDocumentID: String!
+}
+
+input UpdateDisplayNameRequest {
+  displayName: String!
+}
+
+type UpdateDisplayNameResponse {
+  status: RequestStatus!
+}
+
+input UpdateDisplayPictureRequest {
+  profileAccentColor: String
+  profileCustomURI: String
+  profileIcon: String
+}
+
+input UpdateDisplayPictureSkemailRequest {
+  profileAccentColor: String
+  profileCustomURI: String
+  profileIcon: String
+}
+
+input UpdateDocumentDataRequest {
+  encryptedDocumentData: String!
+  signature: String!
+}
+
+type UpdateDocumentDataResponse {
+  status: RequestStatus!
+}
+
+input UpdateEmailAliasActiveStateRequest {
+  captchaToken: String!
+  emailAlias: String!
+  isActive: Boolean!
+}
+
+type UpdateEmailAliasActiveStateResponse {
+  status: RequestStatus!
+}
+
+input UpdateMailFilterInput {
+  actions: [FilterActionInput!]!
+  encryptedByKey: String
+  encryptedSessionKey: String
+  filter: MailFilterInput!
+  mailFilterID: String!
+  name: String
+}
+
+input UpdateSrpRequest {
+  encryptedMetamaskSecret: String
+  encryptedUserData: String!
+  loginSrpRequest: LoginSrpRequest
+  salt: String!
+  saltSignature: String!
+  userDataSignature: String!
+  verifier: String!
+  verifierSignature: String!
+}
+
+type UpdateSrpResponse {
+  status: LoginMutationStatus!
+}
+
+input UpdateUploadContactAvatarLinkRequest {
+  newContactEmail: String!
+  oldContactEmail: String!
+}
+
+type UpdateUploadContactAvatarLinkResponse {
+  newProfileCustomURI: String!
+}
+
+type UpdatedThreadLabels {
+  systemLabels: [SystemLabels!]!
+  threadID: String!
+  userLabels: [UserLabel!]!
+}
+
+input UpgradeHierarchicalKeysNewHierarchicalKeyItem {
+  docID: String!
+  encryptedPrivateHierarchicalKeyByLinkKey: String
+  encryptedSessionKey: String!
+  encryptedSessionKeyEncryptedByKey: String!
+  permissions: [UpgradeHierarchicalKeysRequestPermissionItem!]!
+  previousEncryptedLinkKey: String
+  previousEncryptedSessionKey: String
+  previousPublicHierarchicalKey: String
+  publicHierarchicalKey: String!
+}
+
+input UpgradeHierarchicalKeysNewKeysClaimItem {
+  docID: String!
+  keysClaim: String!
+  keysClaimEncryptedByKey: String!
+  keysClaimSourceDocID: String!
+  keysClaimSourceDocPublicHierarchicalKey: String!
+  previousKeysClaim: String
+}
+
+input UpgradeHierarchicalKeysRequest {
+  newHierarchicalKeys: [UpgradeHierarchicalKeysNewHierarchicalKeyItem!]!
+  newKeysClaims: [UpgradeHierarchicalKeysNewKeysClaimItem!]!
+}
+
+input UpgradeHierarchicalKeysRequestPermissionItem {
+  encryptedBy: PublicKey!
+  encryptedPrivateHierarchicalKey: String!
+  userID: String!
+}
+
+type UpgradeHierarchicalKeysResponse {
+  documents: [Document!]!
+}
+
+input UpgradeKeyRequest {
+  docID: String!
+  encryptedContents: EncryptedContents!
+  encryptedLinkKey: String
+  encryptedMetadata: EncryptedMetadata!
+  encryptedSessionKey: String!
+  encryptedSessionKeyEncryptedByKey: String!
+  previousEncryptedContentsHash: String!
+  previousEncryptedLinkKey: String
+  privateHierarchicalKeyEncryptedByLinkKey: String
+  publicHierarchicalKey: String!
+  sessionKeyEncryptedByLinkKey: String
+}
+
+type UpgradeKeyResponse {
+  document: Document!
+}
+
+scalar Upload
+
+input UploadRecoveryDataRequest {
+  browserShareHash: String!
+  encryptedRecoveryData: String!
+  encryptedRecoveryDataSignature: String!
+  paperShareHash: String!
+  recoveryEncryptionPublicKey: PublicKey!
+  recoveryServerShare: String!
+  recoveryServerShareSignature: String!
+  recoverySigningPublicKey: PublicKey!
+}
+
+type UploadRecoveryDataResponse {
+  status: RequestStatus!
+}
+
+input UploadSpamReportRequest {
+  emailID: String!
+  fromAddress: String!
+  rawMime: String
+  threadID: String!
+}
+
+type User {
+  accountTags: [String!]
+  autoSyncContactsSetting: Boolean
+  calendars: [UserCalendar!]
+  canDirectlyUpdateSrp: Boolean
+  createdAt: Date!
+  customDomainSubscriptionsInfo: [CustomDomainSubscriptionInfo!]
+  dataMFA: String
+  defaultEmailAlias: String
+  emailAliases: [String!]
+  encryptedMetamaskSecret: String
+  encryptedRecoveryData: String
+  hasTemporaryPassword: Boolean!
+  invoiceHistory: InvoiceHistory!
+  jwt: String
+  mfa: MFAFactors!
+  mfaTypes: [String!]
+  onboardedWorkspaceMigration: Boolean!
+  paidUpStatus: PaidUpStatus
+  passwordDerivedSecret: String
+  primaryCalendar: Calendar
+  privateDocumentData: UserPrivateDocumentData
+  privateUserData: PrivateUserData
+  publicData: PublicData!
+  publicKey: PublicKey!
+  recoveryEmail: String
+  recoveryServerShare: String
+  recoverySigningPublicKey: PublicKey
+  rootOrgID: String
+  rootOrganization: Organization!
+  signingPublicKey: String!
+  skemailStorageUsage: StorageUsage
+  storageUsed: String!
+  subscribedToPD: Boolean
+  subscriptionInfo: SubscriptionInfo!
+  unverifiedRecoveryEmail: String
+  userID: String!
+  userPreferences: UserPreferences
+  username: String!
+  walletAddress: String
+}
+
+type UserAlterEgo {
+  orgName: String!
+  userID: String!
+  username: String!
+}
+
+input UserAttributionInput {
+  attributionContent: String
+  attributionData: String
+  attributionSource: String
+  attributionTitle: String
+  attributionWallet: Boolean
+  referrerUsername: String
+}
+
+type UserCalendar {
+  calendarID: String!
+  encryptedByKey: String!
+  encryptedPrivateKey: String
+  publicKey: String!
+}
+
+enum UserFeature {
+  EMAIL_NOTIFICATION_DISABLED
+  IN_APP_NOTIFICATION_DISABLED
+  IPFS_ENABLED
+  LOG_MIME
+}
+
+type UserLabel {
+  color: String!
+  labelID: String!
+  labelName: String!
+  variant: UserLabelVariant!
+}
+
+enum UserLabelVariant {
+  ALIAS
+  FOLDER
+  PLAIN
+}
+
+type UserPreferences {
+  blockRemoteContent: Boolean
+  dateFormat: String
+  defaultCalendarColor: String
+  hideActivationChecklist: Boolean
+  hourFormat: String
+  leftSwipeGesture: SwipeSetting
+  rightSwipeGesture: SwipeSetting
+  securedBySkiffSigDisabled: Boolean
+  showAliasInboxes: Boolean
+  showPageIcon: Boolean
+  startDayOfTheWeek: Int
+  theme: String
+  threadFormat: ThreadDisplayFormat
+}
+
+type UserPrivateDocumentData {
+  documentData: JSON
+  recoveryBrowserShare: String
+  verifiedKeys: UserVerifiedKey
+}
+
+type UserSignatureOutput {
+  sessionKey: EncryptedSessionKeyOutput!
+  userSignature: EncryptedDataOutput!
+}
+
+enum UserTags {
+  PILOT_PROGRAM
+  USER_FEATURES
+}
+
+type UserThread {
+  attributes: ThreadAttributes!
+  deletedAt: Date
+  emails: [Email!]!
+  emailsUpdatedAt: Date!
+  permanentlyDeleted: Boolean!
+  sentLabelUpdatedAt: Date
+  threadID: String!
+  updatedAt: Date!
+  userID: String!
+}
+
+type UserVerifiedKey {
+  keys: JSON
+  lastVerifiedDate: Date
+}
+
+input VerifyWalletAddressCreateAliasRequest {
+  challenge: String!
+  challengeSignature: String!
+  isEditorOnboarding: Boolean!
+  source: String!
+  walletType: String!
+}
+
+input VerifyWebAuthnRegistrationRequest {
+  keyName: String
+  verificationData: JSON!
+}
+
+type VerifyWebAuthnRegistrationResponse {
+  status: RequestStatus!
+}
+
+scalar Void
+
+type WebAuthnKey {
+  credentialID: String!
+  keyName: String
+  lastSuccessfulChallenge: Date
+  transports: [String!]
+}
+
+input WorkspaceEventRequest {
+  data: String!
+  eventName: WorkspaceEventType!
+  platformInfo: PlatformInfo
+  version: String!
+}
+
+enum WorkspaceEventType {
+  ACCEPT_INVITE_FAIL
+  ACCOUNT_RECOVERY_FAILURE
+  ACCOUNT_RECOVERY_FORGOT_PASSWORD
+  ACCOUNT_RECOVERY_FORGOT_PASSWORD_MOBILE
+  ACCOUNT_RECOVERY_KEY_RESET
+  ACCOUNT_RECOVERY_NO_ACCOUNT_FOUND
+  ACCOUNT_RECOVERY_NO_BROWSER_SHARE
+  ACCOUNT_RECOVERY_SUCCESS
+  ACCOUNT_RECOVERY_TOGGLE
+  ACTIVATION_CHECKLIST_ITEM_CLICK
+  ACTIVATION_CHECKLIST_PERMANENTLY_HIDE
+  ACTIVATION_CHECKLIST_START_CHECKOUT
+  ACTIVATION_CHECKLIST_TOGGLE
+  ADD_ACCOUNT_START
+  ALIAS_INBOX_DISABLED
+  ALIAS_INBOX_ENABLED
+  ALIAS_NEXT
+  BACKGROUND_TASK_DURATION
+  BUY_CUSTOM_DOMAIN_CLICK
+  BUY_CUSTOM_DOMAIN_WITH_TRIAL_CLICK
+  CLOSE_BANNER
+  CLOSE_DOWNLOAD_CALENDAR_MOBILE_BANNER
+  CLOSE_SKEMAIL_BANNER
+  CREATE_MAIL_FILTER_CLICKED
+  CRYPTO_CHECKOUT_STARTED
+  CUSTOM_DOMAIN_PURCHASED
+  CUSTOM_DOMAIN_SUGGESTIONS_SHOWN
+  DASHBOARD_INVITE_SENT
+  DELINQUENCY_BANNER_CLICK
+  DELINQUENCY_BANNER_SHOWN
+  DELINQUENCY_MODAL_SHOWN
+  DELINQUENCY_MODAL_UPGRADE_CLICK
+  DIRECT_ONBOARDING_CALENDAR
+  DIRECT_ONBOARDING_DRIVE
+  DIRECT_ONBOARDING_MAIL
+  DIRECT_ONBOARDING_PAGES
+  DISABLE_DEFAULT_SIGNATURE
+  DRIVE_IMPORT
+  DRIVE_SIGN_IN_INITIATE
+  DRIVE_SIGN_IN_SUCCESS
+  DRIVE_START
+  ENABLE_DEFAULT_SIGNATURE
+  GENERATE_JITSI_LINK
+  GET_STARTED_CHECKLIST_ALL_COMPLETE
+  GET_STARTED_CHECKLIST_ITEM_CLICK
+  GET_STARTED_CHECKLIST_ITEM_COMPLETE
+  GET_STARTED_CHECKLIST_ITEM_SKIP
+  GET_STARTED_CHECKLIST_PARTIAL_COMPLETE
+  GET_STARTED_CHECKLIST_SKIP_ALL
+  GET_STARTED_STEP_COMPLETE
+  GET_STARTED_STEP_SKIP
+  IPFS_TOGGLE
+  JOYRIDE
+  JOYRIDE_REPLAY
+  JOYRIDE_SKIP
+  LOGIN_PAGE
+  LOGOUT
+  MAIL_IMPORT_OPEN
+  NEW_UPLOAD
+  ONBOARDING_DOWNLOAD_RECOVERY_KEY
+  ONBOARDING_PLAN_SELECT
+  ONBOARDING_RECOVERY_INSTRUCTION
+  ONBOARDING_SELECT_CALENDAR
+  ONBOARDING_SELECT_DRIVE
+  ONBOARDING_SELECT_LEARN_MORE
+  ONBOARDING_SELECT_MAIL
+  ONBOARDING_SELECT_PAGES
+  ONBOARDING_SET_RECOVERY_EMAIL
+  ONBOARDING_STEP_FINISHED
+  ONBOARDING_STEP_SHOWN
+  ONBOARDING_VIEW_PLAN_DETAILS_CLICK
+  ONBOARD_INVITE_SENT
+  OPEN_INBOX_FIRST_TIME_FROM_ORG_SELECT
+  OPEN_INBOX_FROM_BANNER
+  OPEN_INBOX_FROM_JOYRIDE
+  OPEN_SKEMAIL_ANDROID_APP_FROM_BANNER
+  OPEN_SKEMAIL_IPHONE_APP_FROM_BANNER
+  PERFORMED_BACKGROUND_TASK
+  PLAN_CHANGE_STARTED
+  PLAN_TABLE_SHOWN
+  PW_NEXT_BTN
+  SEARCH
+  SELECT_PERSONAL_WORKSPACE
+  SELECT_TEAMS_WORKSPACE
+  SELECT_THEME
+  SET_DISPLAY_NAME_ONBOARDING
+  SIGNUP_CONNECT_WALLET_START
+  SIGNUP_START
+  SKEMAIL_APP_CREATE_FOLDER
+  SKEMAIL_APP_CREATE_LABEL
+  SKEMAIL_APP_LOADING_TIME
+  SKEMAIL_APP_LOADING_TIMEOUT
+  SKEMAIL_APP_LOGIN
+  SKEMAIL_APP_LOGIN_ATTEMPT
+  SKEMAIL_APP_OPEN_COMPOSE
+  SKEMAIL_APP_SEND_CLICK
+  SKEMAIL_APP_THREAD_LOADING_TIME
+  SKIP_DISPLAY_NAME_ONBOARDING
+  SWITCH_FROM_EDITOR_TO_EMAIL
+  SWITCH_FROM_EMAIL_TO_EDITOR
+  TOAST_CTA_CLICK
+  TOAST_IMPRESSION
+  TWO_FACTOR_TOGGLE
+  UPGRADE_FROM_SEARCH
+  UPGRADE_FROM_STORAGE
+  UPGRADE_FROM_UPLOAD
+  UPGRADE_STARTED
+  USER_BROWSER
+  USER_MAC_DESKTOP
+  USER_OS
+  USER_PLATFORM
+  USER_REACT_NATIVE
+  USER_SKEMAIL_APP
+}
+
+scalar join__FieldSet
+
+enum join__Graph {
+  EDITOR
+  SKALENDAR
+  SKEMAIL
+}
+
+scalar link__Import
+
+enum link__Purpose {
+  """
+  `EXECUTION` features provide metadata necessary for operation execution.
+  """
+  EXECUTION
+
+  """
+  `SECURITY` features provide metadata necessary to securely resolve fields.
+  """
+  SECURITY
+}
