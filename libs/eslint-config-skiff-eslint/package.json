@@ -1,0 +1,30 @@
+{
+  "name": "eslint-config-skiff-eslint",
+  "version": "0.0.1",
+  "main": "index.js",
+  "description": "eslint dev tooling and configs",
+  "packageManager": "yarn@3.5.0",
+  "private": true,
+  "dependencies": {
+    "@rushstack/eslint-patch": "^1.1.4"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.*",
+    "@typescript-eslint/eslint-plugin": "^5.*",
+    "@typescript-eslint/parser": "^5.*",
+    "eslint": "^8.*",
+    "eslint-config-airbnb-typescript": "^17.*",
+    "eslint-config-prettier": "^8.*",
+    "eslint-plugin-diff": "patch:eslint-plugin-diff@^2.0.2-1#../.yarn/patches/eslint-plugin-diff-npm-2.0.2-1-ee53075d10.patch",
+    "eslint-plugin-import": "^2.*",
+    "eslint-plugin-jsx-a11y": "^6.*",
+    "eslint-plugin-lodash": "^7.*",
+    "eslint-plugin-no-unsanitized": "^4.*",
+    "eslint-plugin-node": "^11.*",
+    "eslint-plugin-prettier": "^4.*",
+    "eslint-plugin-react": "^7.*",
+    "eslint-plugin-react-hooks": "^4.*",
+    "eslint-plugin-simple-import-sort": "^7.*",
+    "eslint-plugin-unused-imports": "^2.*"
+  }
+}

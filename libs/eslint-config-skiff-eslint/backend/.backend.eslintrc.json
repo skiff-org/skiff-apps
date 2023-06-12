@@ -1,0 +1,14 @@
+{
+  "extends": ["airbnb-typescript/base", "../.eslintrc.json"],
+  "plugins": ["node"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "node/no-process-env": "warn"
+  }
+}
