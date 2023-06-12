@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "subversion": "1",
   "description": "rich text editor built with React and ProseMirror",
+  "author": "Skiff World Inc.",
+  "license": "CC-BY-NC-4.0",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/src/index.d.ts",

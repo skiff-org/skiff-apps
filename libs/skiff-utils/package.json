@@ -2,6 +2,8 @@
   "name": "skiff-utils",
   "version": "0.0.1",
   "description": "global utils function for backend and frontend",
+  "author": "Skiff World Inc.",
+  "license": "CC-BY-NC-4.0",
   "main": "./dist/cjs/index.js",
   "exports": {
     "import": "./dist/esm/index.js",
