@@ -1,3 +1,5 @@
+![skiff-utils](https://github.com/skiff-org/skiff-apps/assets/36896271/79b4940e-7d13-41cb-9a6f-0f8022cee01c)
+
 # skiff-utils
 
 `skiff-utils` is an open-source TypeScript library with NodeJS and browser-based utility functions. This package powers web, mobile, and server applications inside Skiff's end-to-end encrypted, privacy-first product suite, including Mail, Pages, Drive, and Calendar applications. For more on Skiff, visit [skiff.com](https://skiff.com).
