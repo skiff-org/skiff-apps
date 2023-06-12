@@ -1,0 +1,35 @@
+# This defines client-side only additionnal fields and types for Apollo
+# These are lazily computed from files in app/apollo/typePolicies and used in components and function anywhere in the app
+
+# EMAIL
+
+# Note: This is a GraphQL representation of the AttachmentMetadata datagram.
+# If you update this type, also update the corresponding proto definition in
+# protos/com/skiff/skemail/encrypted/encrypted_data.proto.
+type AttachmentMetadata {
+  contentType: String!
+  contentDisposition: String!
+  filename: String!
+  checksum: String!
+  size: Int!
+  contentId: String!
+}
+type DecryptedAttachment {
+  attachmentID: String!
+  # Can be null if attachment metadata fails to decrypt.
+  decryptedMetadata: AttachmentMetadata
+}
+extend type Email {
+  decryptedSessionKey: String
+  decryptedSubject: String
+  decryptedText: String
+  decryptedHtml: String
+  decryptedTextAsHtml: String
+  decryptedTextSnippet: String
+  decryptedAttachmentMetadata: [DecryptedAttachment!]
+  decryptedRawMime: String
+}
+
+extend type Attachment {
+  decryptedSessionKey: String
+}

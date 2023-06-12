@@ -1,0 +1,43 @@
+{
+  "name": "skiff-graphql",
+  "version": "0.0.1",
+  "description": "Graphql types",
+  "main": "./dist/cjs/index.js",
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "types": "dist/src/index.d.ts",
+  "packageManager": "yarn@3.5.0",
+  "private": true,
+  "scripts": {
+    "emit-ts": "yarn tsc --build",
+    "clean": "rm -rf dist/",
+    "build": "graphql-codegen --config codegen.yml && yarn node build.js",
+    "watch": "onchange -i ../../supergraph.graphql -- yarn build",
+    "lint": "yarn run -T eslint ./src --cache --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "yarn lint --fix"
+  },
+  "devDependencies": {
+    "@graphql-codegen/add": "^3.1.1",
+    "@graphql-codegen/schema-ast": "^2.4.1",
+    "esbuild": "^0.15.6",
+    "esbuild-node-externals": "^1.5.0",
+    "eslint-config-skiff-eslint": "workspace:*",
+    "onchange": "^7.1.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.6.9",
+    "@graphql-codegen/cli": "^2.6.2",
+    "@graphql-codegen/typescript": "^2.4.11",
+    "apollo-server-errors": "^3.3.1",
+    "graphql": "16.5.0",
+    "skiff-utils": "workspace:libs/skiff-utils",
+    "tslib": "^2.4.0"
+  }
+}

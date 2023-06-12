@@ -1,0 +1,36 @@
+{
+  "root": true,
+  "extends": ["plugin:diff/ci", "plugin:@typescript-eslint/recommended", "prettier", "plugin:@typescript-eslint/recommended-requiring-type-checking"],
+  "plugins": ["unused-imports", "import", "prettier", "@typescript-eslint"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "unused-imports/no-unused-imports": "error",
+    "import/extensions": "off",
+    "import/no-cycle": "warn",
+    "import/no-extraneous-dependencies": "error",
+    "import/order": ["warn", { "alphabetize": { "order": "asc", "caseInsensitive": true }, "newlines-between": "always" }],
+    "@typescript-eslint/comma-dangle": "off",
+    "@typescript-eslint/naming-convention": "warn",
+    "@typescript-eslint/no-shadow": "warn",
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": ["warn", {
+      "functions": false
+    }],
+    "@typescript-eslint/no-var-requires": "warn",
+    "@typescript-eslint/return-await": "warn",
+    "prettier/prettier": "warn"
+  },
+  "ignorePatterns": [
+    "**/.git",
+    "**/.git/objects/**",
+    "**/.git/subtree-cache/**",
+    "**/node_modules/**",
+    "**/tmp/**",
+    "**/bower_components/**",
+    "**/dist/**",
+    "**/.yarn/cache/**"
+  ]
+}

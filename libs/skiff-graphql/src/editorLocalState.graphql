@@ -1,0 +1,75 @@
+scalar Date
+scalar JSON
+
+# This defines client-side only additionnal fields and types for Apollo
+# These are lazily computed from files in app/apollo/typePolicies and used in components and function anywhere in the app
+
+# DOCUMENT
+
+type Document {
+  decryptedMetadata: DocumentDecryptedMetadata!
+  decryptedContents: DocumentDecryptedContents!
+  decryptedSessionKey: String!
+  decryptedPrivateHierarchicalKey: String
+  currentlyEditingUsers: [CurrentlyEditingUser]! # Set when editing a document by looking at awarness updates from the websocket
+}
+
+type CurrentlyEditingUser {
+  # User currently editing a document, set from the YJS awarness plugin
+  name: String!
+  userID: String!
+  color: String!
+  displayPictureData: DisplayPictureData
+}
+
+type LinkOutput {
+  decryptedLinkKey: String!
+}
+
+type DocumentDecryptedMetadata {
+  title: String!
+  description: String
+  icon: String
+  color: String
+  timeLastModified: Date
+  mimeType: String
+  fileSizeBytes: Int
+}
+
+type DocumentDecryptedContents {
+  contentsArr: [DocumentDecryptedContentsChunk!]!
+}
+type DocumentDecryptedContentsChunk {
+  chunkNumber: Int!
+  chunkData: JSON!
+}
+
+type DocumentSnapshot {
+  decryptedKey: String!
+  decryptedData: JSON!
+}
+
+# USER
+
+type User {
+  jwt: String
+  passwordDerivedSecret: String
+  signingPublicKey: String
+  privateUserData: PrivateUserData
+  privateDocumentData: UserPrivateDocumentData
+}
+
+type PrivateUserData {
+  documentKey: String
+  privateKey: String
+  signingPrivateKey: String
+}
+type UserPrivateDocumentData {
+  documentData: JSON
+  recoveryBrowserShare: String
+  verifiedKeys: UserVerifiedKey
+}
+type UserVerifiedKey {
+  lastVerifiedDate: Date
+  keys: JSON
+}

@@ -1,0 +1,48 @@
+{
+  "extends": [
+
+    "airbnb-typescript",
+
+    "plugin:react/recommended",
+
+    "plugin:react-hooks/recommended",
+
+    "plugin:jsx-a11y/recommended",
+
+    "plugin:react/jsx-runtime",
+
+    "../.eslintrc.json"
+
+  ],
+  "plugins": ["unused-imports", "import", "prettier", "@typescript-eslint", "no-unsanitized", "react", "eslint-plugin-lodash"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "env": {
+    "es6": true
+  },
+  "rules": {
+    "lodash/import-scope": ["error", "method"],
+    "no-unsanitized/method": ["error", { "escape": { "methods": ["DOMPurify.sanitize"] } }],
+    "no-unsanitized/property": ["error", { "escape": { "methods": ["DOMPurify.sanitize"] } }],
+    "eslint-plugin-jsx-a11y/no-autofocus": ["off"],
+    "react/jsx-uses-react": "error",
+    "react/jsx-uses-vars": "error",
+
+    "jsx-a11y/click-events-have-key-events": "warn",
+    "jsx-a11y/no-static-element-interactions": "warn",
+    "jsx-a11y/no-noninteractive-element-interactions": "warn",
+    "jsx-a11y/mouse-events-have-key-events": "warn",
+    "jsx-a11y/alt-text": "warn",
+    "jsx-a11y/iframe-has-title": "warn",
+    "jsx-a11y/media-has-caption": "warn",
+    "jsx-a11y/interactive-supports-focus": "warn",
+    "jsx-a11y/no-autofocus": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}
