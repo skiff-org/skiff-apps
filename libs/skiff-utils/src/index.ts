@@ -5,8 +5,6 @@ export * from './dateUtils';
 export * from './desktopNotificationsUtils';
 export * from './discoveryToast.constants';
 export * from './emailUtils';
-export * from './featureFlag.constants';
-export * from './featureFlag.types';
 export * from './fileSizeUtils';
 export * from './freeTrialUtils';
 export * from './jsUtils';
