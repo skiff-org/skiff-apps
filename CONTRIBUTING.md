@@ -84,10 +84,6 @@ The core team will promptly review your Pull Request and either merge it or requ
 - Self-reviewing and commenting on your own code is highly appreciated.
 - The branch should be up-to-date with the target branch `main`.
 
-### Documentation
-
-Skiff UI's documentation is hosted separately on (https://skiff.com/crypto). Any changes should tag the core team to update the site.
-
 ### Code style
 
 Make sure to enable lint on-save. You can also run the commands `yarn prettier` and `yarn lint`. This will be checked by CI when you open a Pull request.

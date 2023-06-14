@@ -71,11 +71,11 @@ console.log('SHA-512 hash example', skiffCrypto.generateHash('Hello, skiff-crypt
 
 [![Edit Button](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/skiff-crypto-demo-kt7soo)
 
-Detailed usage instructions and more examples are available in the [API documentation](https://skiff.com/crypto).
+Detailed usage instructions and more examples are available in the [API documentation](https://skiff.com/skiff-crypto).
 
 ## Documentation
 
-Comprehensive documentation is available in the [documentation site](https://skiff.com/crypto) for the repository.
+Comprehensive documentation is available in the [documentation site](https://skiff.com/skiff-crypto) for the repository.
 
 ## Contributing
 

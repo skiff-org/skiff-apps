@@ -86,7 +86,7 @@ The core team will promptly review your Pull Request and either merge it or requ
 
 ### Documentation
 
-Skiff UI's documentation is hosted separately on (https://skiff.com/crypto). Any changes should tag the core team to update the site.
+Skiff UI's documentation is hosted separately on (https://skiff.com/skiff-crypto). Any changes should tag the core team to update the site.
 
 ### Code style
 
