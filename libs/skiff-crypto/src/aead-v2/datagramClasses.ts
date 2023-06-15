@@ -1,9 +1,9 @@
 /* eslint-disable max-classes-per-file */
 
 import { Range } from 'semver';
+import { utf8BytesToString, utf8StringToBytes } from 'skiff-utils';
 
 import { DatagramV2 } from './common';
-import { utf8BytesToString, utf8StringToBytes } from 'src/utf8';
 
 /**
  * Create a datagram that encode and decode any JSON.stringify-able data
@@ -27,12 +27,12 @@ export const createRawJSONDatagramV2 = <Header, Body>(
       return utf8StringToBytes(JSON.stringify(data));
     },
     deserializeBody(data) {
-      return JSON.parse(utf8BytesToString(data));
+      return JSON.parse(utf8BytesToString(data)) as Body;
     },
     serializeHeader(header) {
       return utf8StringToBytes(JSON.stringify(header));
     },
-    deserializeHeader: (header) => JSON.parse(utf8BytesToString(header))
+    deserializeHeader: (header) => JSON.parse(utf8BytesToString(header)) as Header
   };
   return datagram;
 };

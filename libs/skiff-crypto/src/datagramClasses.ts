@@ -4,7 +4,7 @@ import { Range } from 'semver';
 import { DatagramV2 } from './aead-v2/common';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export const createProtoWrapperDatagram = <Header, Body>(
+export const createProtoWrapperDatagramV2 = <Header, Body>(
   type: string,
   headerClass: { encode(input: Header, writer: Writer): Writer; decode(input: Reader, lenght?: number): Header },
   bodyClass: { encode(input: Body, writer: Writer): Writer; decode(input: Reader, lenght?: number): Body },

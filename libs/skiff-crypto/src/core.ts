@@ -67,7 +67,7 @@ export function signEncryptedSessionKey(encryptedKey: string, mySigningPrivateKe
  * @param {string} signingPrivateKey - User's signing private key to generate signature.
  * @returns {EncryptedDataOutput} Promise that resolves to encrypted data.
  */
-export function encryptDatagram<Header, Body>(
+export function encryptDatagramV2<Header, Body>(
   datagram: DatagramV2<Header, Body>,
   header: Header,
   body: Body,
@@ -86,7 +86,7 @@ export function encryptDatagram<Header, Body>(
  * @param {string} sessionKey - Symmetric document encryption key.
  * @returns {{header: Header, body: Body, metadata: AADMeta}} Decrypted header, body, and other metadata from the datagram.
  */
-export function decryptDatagram<Header, Body>(
+export function decryptDatagramV2<Header, Body>(
   datagram: DatagramV2<Header, Body>,
   sessionKey: string,
   encryptedDatagram: string
