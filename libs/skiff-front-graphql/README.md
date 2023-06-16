@@ -10,7 +10,7 @@ Contributions to skiff-front-graphql are very much appreciated! Please see our [
 
 ## License
 
-skiff-front-graphql is [MIT licensed](https://github.com/skiff-org/skiff-apps/blob/main/LICENSE). You're encouraged to use and adapt the code for your projects, given that you respect the original copyright and abide by the license terms.
+skiff-front-graphql is [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 licensed](https://github.com/skiff-org/skiff-apps/blob/main/libs/skiff-front-graphql/LICENSE).
 
 ## Contact
 

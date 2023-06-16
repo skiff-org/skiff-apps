@@ -1,7 +1,9 @@
 {
   "name": "skiff-front-utils",
   "version": "0.0.1",
-  "description": "frontend server utils",
+  "description": "Skiff Frontend Utils",
+  "author": "Skiff World Inc.",
+  "license": "CC-BY-NC-4.0",
   "main": "./dist/cjs/index.js",
   "exports": {
     ".": {

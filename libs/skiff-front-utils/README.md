@@ -10,7 +10,7 @@ Contributions to skiff-front-utils are very much appreciated! Please see our [Co
 
 ## License
 
-skiff-front-utils is [MIT licensed](https://github.com/skiff-org/skiff-apps/blob/main/LICENSE). You're encouraged to use and adapt the code for your projects, given that you respect the original copyright and abide by the license terms.
+skiff-front-utils is [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 licensed](https://github.com/skiff-org/skiff-apps/blob/main/libs/skiff-front-utils/LICENSE).
 
 ## Contact
 

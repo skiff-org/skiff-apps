@@ -1,7 +1,9 @@
 {
   "name": "skiff-front-graphql",
   "version": "0.0.1",
-  "description": "Mail GQL Utils",
+  "description": "Frontend GQL Utils",
+  "author": "Skiff World Inc.",
+  "license": "CC-BY-NC-4.0",
   "main": "./dist/cjs/index.js",
   "exports": {
     "import": "./dist/esm/index.js",
