@@ -19,7 +19,8 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "skipLibCheck": true,
-    "composite": true
+    "composite": true,
+    "jsx": "react"
   },
   "exclude": [
     "**/.git",

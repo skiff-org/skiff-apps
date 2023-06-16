@@ -1,5 +1,4 @@
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import {
   Divider,
   Icon,
@@ -14,13 +13,10 @@ import {
   TypographySize,
   TypographyWeight
 } from 'nightwatch-ui';
-import React, { useEffect, useState } from 'react';
-import { useStoreWorkspaceEventMutation } from 'skiff-front-graphql';
-import { SubscriptionInterval, SubscriptionPlan, WorkspaceEventType } from 'skiff-graphql';
-import { OnboardingUpsellFeatureFlag } from 'skiff-utils';
+import React, { useState } from 'react';
+import { SubscriptionInterval, SubscriptionPlan } from 'skiff-graphql';
 import styled from 'styled-components';
 
-import { DEFAULT_WORKSPACE_EVENT_VERSION } from '../../../../constants';
 import {
   FEATURE_TABLE_RESPONSIVE_BREAKPOINT,
   FeatureData,
@@ -314,20 +310,7 @@ function FeatureTable({
   // if user has a paid plan with a billing interval, default to the view for that interval to ensure they can see their current plan
   const [subInterval, setSubInterval] = useState(activeSubscriptionBillingInterval || SubscriptionInterval.Yearly);
   const { theme } = useTheme();
-  const [storeWorkspaceEvent] = useStoreWorkspaceEventMutation();
-  const flags = useFlags();
-  const onboardingCohort = flags.onboardingUpsell as OnboardingUpsellFeatureFlag;
-  useEffect(() => {
-    void storeWorkspaceEvent({
-      variables: {
-        request: {
-          eventName: WorkspaceEventType.PlanTableShown,
-          data: JSON.stringify({ onboardingCohort }),
-          version: DEFAULT_WORKSPACE_EVENT_VERSION
-        }
-      }
-    });
-  }, [storeWorkspaceEvent, onboardingCohort]);
+
   const showEssential = true;
   const supportedTiers = showEssential
     ? [...subscriptionTiers.slice(0, 1), SubscriptionPlan.Essential, ...subscriptionTiers.slice(1)]
