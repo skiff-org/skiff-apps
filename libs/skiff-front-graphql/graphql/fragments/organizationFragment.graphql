@@ -1,0 +1,37 @@
+fragment OrganizationFullInfo on Organization {
+  orgID
+  name
+  teams {
+    accessLevel
+    teamID
+    name
+    icon
+    rootDocument {
+      ...DocumentDecryptedMetadata
+      ...DocumentBasicInfoWithoutTeamOrOrg
+      ...DocumentPermissionProxies
+    }
+  }
+  everyoneTeam {
+    teamID
+    rootDocument {
+      ...DocumentDecryptedMetadata
+      ...DocumentBasicInfoWithoutTeamOrOrg
+      ...DocumentInvites
+      ...DocumentCollaborators
+    }
+  }
+  personalTeam {
+    teamID
+    rootDocument {
+      docID
+    }
+  }
+  displayPictureData {
+    profileAccentColor
+    profileCustomURI
+    profileIcon
+  }
+  rootDocID
+  hasCustomized
+}

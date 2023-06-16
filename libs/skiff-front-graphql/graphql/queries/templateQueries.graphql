@@ -1,0 +1,5 @@
+query getTemplates($request: GetTemplatesRequest!) {
+  templates(request: $request) {
+    ...TemplateData
+  }
+}

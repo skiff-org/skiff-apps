@@ -2,7 +2,7 @@
 
 # skiff-graphql
 
-`skiff-graphql` is an open-source TypeScript library  global GraphQL API and custom error types that are shared between the Skiff's applications and servers. This package powers web, mobile, and server applications inside Skiff's end-to-end encrypted, privacy-first product suite, including Mail, Pages, Drive, and Calendar applications. For more on Skiff, visit [skiff.com](https://skiff.com).
+`skiff-graphql` is an open-source TypeScript library for a global GraphQL API and custom error types that are shared between the Skiff's applications and servers. This package powers web, mobile, and server applications inside Skiff's end-to-end encrypted, privacy-first product suite, including Mail, Pages, Drive, and Calendar applications. For more on Skiff, visit [skiff.com](https://skiff.com).
 
 ## Contributing
 
@@ -10,7 +10,7 @@ Contributions to skiff-graphql are very much appreciated! Please see our [Contri
 
 ## License
 
-skiff-utils is [MIT licensed](https://github.com/skiff-org/skiff-apps/blob/main/LICENSE). You're encouraged to use and adapt the code for your projects, given that you respect the original copyright and abide by the license terms.
+skiff-graphql is [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 licensed](https://github.com/skiff-org/skiff-apps/blob/main/libs/skiff-graphql/LICENSE).
 
 ## Contact
 

@@ -1,0 +1,3 @@
+mutation notificationClicked($request: NotificationClickedRequest!) {
+  notificationClicked(request: $request)
+}

@@ -1,0 +1,74 @@
+mutation createTeam($request: CreateTeamRequest!) {
+  createTeam(request: $request) {
+    teamID
+    name
+    icon
+    rootDocument {
+      ...DocumentBasicInfo
+      ...DocumentDecryptedMetadata
+    }
+    organization {
+      orgID
+      teams {
+        teamID
+        name
+      }
+    }
+  }
+}
+
+mutation shareTeamDocWithOtherTeam($request: ShareTeamDocWithOtherTeamRequest!) {
+  shareTeamDocWithOtherTeam(request: $request) {
+    teamID
+    name
+    icon
+    rootDocument {
+      ...DocumentBasicInfo
+      ...DocumentDecryptedMetadata
+    }
+  }
+}
+
+mutation unshareTeamDocWithOtherTeam($request: UnshareTeamDocWithOtherTeamRequest!) {
+  unshareTeamDocWithOtherTeam(request: $request) {
+    teamID
+    name
+    icon
+    rootDocument {
+      ...DocumentBasicInfo
+      ...DocumentDecryptedMetadata
+    }
+  }
+}
+
+mutation deleteTeam($request: DeleteTeamRequest!) {
+  deleteTeam(request: $request)
+}
+
+mutation editOrganization($request: EditOrganizationRequest!) {
+  editOrganization(request: $request) {
+    organization {
+      orgID
+      name
+      hasCustomized
+    }
+  }
+}
+
+mutation editTeam($request: EditTeamRequest!) {
+  editTeam(request: $request) {
+    teamID
+    name
+    icon
+  }
+}
+
+mutation deleteUserOrganizationMembership($request: DeleteUserOrganizationMembershipRequest!) {
+  deleteUserOrganizationMembership(request: $request)
+}
+
+mutation manageOrganizationPaymentDetails($request: ManageOrganizationPaymentDetailsRequest!) {
+  manageOrganizationPaymentDetails(request: $request) {
+    redirectURL
+  }
+}

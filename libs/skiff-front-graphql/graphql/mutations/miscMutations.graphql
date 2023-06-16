@@ -1,0 +1,42 @@
+mutation sendFeedback($request: SendFeedbackRequest!) {
+  sendFeedback(request: $request)
+}
+
+mutation storeWorkspaceEvent($request: WorkspaceEventRequest!) {
+  storeWorkspaceEvent(request: $request)
+}
+
+mutation storeUnauthenticatedWorkspaceEvent($request: WorkspaceEventRequest!) {
+  storeUnauthenticatedWorkspaceEvent(request: $request)
+}
+
+mutation addPendingInvite($request: AddPendingInviteRequest!) {
+  addPendingInvite(request: $request) {
+    status
+  }
+}
+
+mutation deleteInvite($request: DeleteInviteRequest!) {
+  deleteInvite(request: $request) {
+    status
+  }
+}
+
+mutation acceptInviteStep1($request: AcceptInviteStep1Request!) {
+  acceptInviteStep1(request: $request) {
+    salt
+    serverEphemeralPublic
+    encryptedSessionKey
+    encryptedPrivateHierarchicalKey
+    permissionLevel
+    publicHierarchicalKey
+  }
+}
+
+mutation deleteCustomDomainAlias($request: DeleteCustomDomainAliasRequest!) {
+  deleteCustomDomainAlias(request: $request)
+}
+
+mutation uploadSpamReport($request: UploadSpamReportRequest!) {
+  uploadSpamReport(request: $request)
+}

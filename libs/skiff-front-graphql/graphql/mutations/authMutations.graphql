@@ -1,0 +1,109 @@
+fragment CreateSrpResponseData on CreateSrpResponse {
+  userID
+  status
+  jwt
+  cacheKey
+  recoveryEmail
+  walletAddress
+  rootOrgID
+  createdMailAccount
+}
+
+mutation createSrp($request: CreateSrpRequest!) {
+  createSrp(request: $request) {
+    ...CreateSrpResponseData
+  }
+}
+
+mutation updateSrp($request: UpdateSrpRequest!) {
+  updateSrp(request: $request) {
+    status
+  }
+}
+
+mutation provisionSrp($request: ProvisionSrpRequest!) {
+  provisionSrp(request: $request)
+}
+
+fragment LoginSrpResponseData on LoginSrpResponse {
+  userID
+  status
+  serverSessionProof
+  publicKey
+  signingPublicKey
+  encryptedUserData
+  encryptedDocumentData
+  jwt
+  cacheKey
+  encryptedMetamaskSecret
+  publicData {
+    displayName
+  }
+  recoveryEmail
+  unverifiedRecoveryEmail
+  walletAddress
+  rootOrgID
+  webAuthnChallengeResponse {
+    options
+  }
+  mfaTypes
+}
+
+mutation setupProvisionedUser($request: SetupProvisionedUserRequest!) {
+  setupProvisionedUser(request: $request) {
+    ...LoginSrpResponseData
+  }
+}
+
+mutation loginSrpStep1($request: LoginSrpRequest!) {
+  loginSrp(request: $request) {
+    salt
+    serverEphemeralPublic
+  }
+}
+
+mutation loginSrpStep2($request: LoginSrpRequest!) {
+  loginSrp(request: $request) {
+    ...LoginSrpResponseData
+  }
+}
+
+mutation clearSessionCache {
+  clearSessionCache {
+    status
+  }
+}
+
+mutation sendAccessRequestEmail($request: SendAccessRequestEmailRequest!) {
+  sendAccessRequestEmail(request: $request)
+}
+
+mutation createWalletChallenge($request: CreateWalletChallengeRequest!) {
+  createWalletChallenge(request: $request) {
+    token
+  }
+}
+
+mutation createWalletChallenge($request: CreateWalletChallengeRequest!) {
+  createWalletChallenge(request: $request) {
+    token
+  }
+}
+
+mutation createSrpMetamask($request: CreateSrpMetamaskRequest!) {
+  createSrpMetamask(request: $request) {
+    ...CreateSrpResponseData
+  }
+}
+
+mutation verifyWalletAddressCreateAlias($request: VerifyWalletAddressCreateAliasRequest!) {
+  verifyWalletAddressCreateAlias(request: $request) {
+    emailAliases
+  }
+}
+
+mutation createWalletChallengeSkemail($request: CreateWalletChallengeRequestSkemail!) {
+  createWalletChallengeSkemail(request: $request) {
+    token
+  }
+}

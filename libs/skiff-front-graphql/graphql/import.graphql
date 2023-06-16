@@ -1,0 +1,33 @@
+mutation importEmlEmail($importRequest: ImportEmlEmailRequest!) {
+  importEmlEmail(importRequest: $importRequest)
+}
+
+mutation importMboxEmails($importMboxRequest: ImportMboxRequest!) {
+  importMboxEmails(importMboxRequest: $importMboxRequest)
+}
+
+mutation importGmailEmails($request: ImportGmailRequest!) {
+  importGmailEmails(request: $request)
+}
+
+mutation unsubscribeFromGmailImport {
+  unsubscribeFromGmailImport
+}
+
+query getGmailAutoImportStatus {
+  getGmailAutoImportStatus {
+    subscribed
+  }
+}
+
+mutation importOutlookEmails($code: String!) {
+  importOutlookEmails(code: $code)
+}
+
+query getGoogleAuthURL {
+  getGoogleAuthURL
+}
+
+query getOutlookAuthUrl {
+  getOutlookAuthUrl
+}

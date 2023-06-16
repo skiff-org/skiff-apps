@@ -1,0 +1,191 @@
+query getUserID($request: GetUserRequest!) {
+  user(request: $request) {
+    userID
+  }
+}
+
+query getUserStorageUsed($request: GetUserRequest!) {
+  user(request: $request) {
+    userID
+    storageUsed
+  }
+}
+
+query getUserMailStorageUsed {
+  currentUser {
+    ...UserWithMailStorageUsed
+  }
+}
+
+query getUsersProfileData($request: GetUsersRequest!) {
+  users(request: $request) {
+    ...UserProfileData
+  }
+}
+
+query getUserProfileData($request: GetUserRequest!) {
+  user(request: $request) {
+    ...UserProfileData
+  }
+}
+
+query getPublicKey($request: GetUserRequest!) {
+  user(request: $request) {
+    userID
+    publicKey
+    signingPublicKey
+  }
+}
+
+query getPublicKeys($request: GetUsersRequest!) {
+  users(request: $request) {
+    userID
+    publicKey
+    signingPublicKey
+  }
+}
+
+query getUserMfa($request: GetUserRequest!) {
+  user(request: $request) {
+    userID
+    mfa {
+      webAuthnKeys {
+        keyName
+        credentialID
+        lastSuccessfulChallenge
+        transports
+      }
+      totpData
+      backupCodes
+    }
+  }
+}
+
+query getRecoveryData($request: GetUserRequest!) {
+  user(request: $request) {
+    userID
+    encryptedRecoveryData
+  }
+}
+
+query getRecoveryShare($request: GetUserRequest!) {
+  user(request: $request) {
+    userID
+    username
+    publicKey
+    recoverySigningPublicKey
+    recoveryServerShare
+  }
+}
+
+query getUserTags($request: GetUserRequest!) {
+  user(request: $request) {
+    accountTags
+    userID
+  }
+}
+
+query getSubscriptionInfo {
+  currentUser {
+    userID
+    subscriptionInfo {
+      subscriptionPlan
+      isCryptoSubscription
+      cancelAtPeriodEnd
+      supposedEndDate
+      stripeStatus
+      billingInterval
+      quantity
+    }
+  }
+}
+
+query getInvoiceHistory {
+  currentUser {
+    userID
+    invoiceHistory {
+      invoiceHistory {
+        amountDue
+        created
+        url
+        invoiceTiers
+        status
+      }
+    }
+  }
+}
+
+query getUserMetamaskSecret($request: GetUserRequest!) {
+  user(request: $request) {
+    userID
+    encryptedMetamaskSecret
+  }
+}
+
+query currentUser {
+  currentUser {
+    ...UserProfileDataWithKeys
+  }
+}
+
+query currentUserEmailAliases {
+  currentUser {
+    ...UserWithEmailAliases
+  }
+}
+
+query getRecoveryPublicKeysAndData($request: GetRecoveryPublicKeysAndDataRequest!) {
+  recoveryPublicKeysAndData(request: $request) {
+    recoverySigningPublicKey
+    publicKey
+    encryptedRecoveryData
+    recoveryServerShare
+  }
+}
+
+query validatePaperShareHash($request: GetValidPaperShareHashRequest!) {
+  validPaperShareHash(request: $request)
+}
+
+query validateMailAlias($request: GetAliasValidRequest!) {
+  aliasValid(request: $request)
+}
+
+query orgMemberEmailAliases($userId: String!) {
+  orgMemberEmailAliases(userID: $userId)
+}
+
+query currentUserDefaultEmailAlias {
+  currentUser {
+    userID
+    defaultEmailAlias
+  }
+}
+
+query orgMemberDefaultEmailAlias($userId: String!) {
+  orgMemberDefaultEmailAlias(userID: $userId)
+}
+
+query getUserPreferences {
+  userPreferences {
+    ...UserPreferencesData
+  }
+}
+
+query canDirectlyUpdateSrp {
+  currentUser {
+    userID
+    canDirectlyUpdateSrp
+  }
+}
+
+query browserPushNotificationsEnabled {
+  browserPushNotificationsEnabled
+}
+
+query currentUserSubscribedToPD {
+  currentUser {
+    userID
+    subscribedToPD
+  }
+}

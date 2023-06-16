@@ -60,6 +60,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@stablelib/base64": "^1.0.1",
     "@stablelib/chacha20poly1305": "^1.0.1",
     "argon2-browser": "^1.18.0",
     "base64-js": "^1.5.1",
@@ -67,8 +68,10 @@
     "fflate": "^0.7.3",
     "futoin-hkdf": "^1.5.0",
     "lodash": "^4.17.21",
+    "protobufjs": "^6.11.3",
     "randombytes": "^2.1.0",
     "semver": "^7.3.4",
+    "skiff-graphql": "workspace:libs/skiff-graphql",
     "tslib": "^2.4.0",
     "tweetnacl": "^1.0.3",
     "varint": "^6.0.0"

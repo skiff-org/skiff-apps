@@ -1,0 +1,42 @@
+query getNumUnread($label: String!) {
+  unread(label: $label)
+}
+
+query getMailFilters($request: GetMailFiltersInput) {
+  mailFilters(request: $request) {
+    actions {
+      actionType
+      serializedData
+    }
+    filter {
+      filterField
+      filterType
+      serializedData
+      subFilter {
+        filterField
+        filterType
+        serializedData
+        subFilter {
+          filterField
+          filterType
+          serializedData
+        }
+      }
+    }
+    name
+    mailFilterID
+    clientside
+    encryptedSessionKey
+    encryptedByKey
+  }
+}
+
+query getAccountMailData($label: String!){
+  unread(label: $label)
+  currentUser {
+    ...UserProfileOrgData
+    userID
+    defaultEmailAlias
+    emailAliases
+  }
+}

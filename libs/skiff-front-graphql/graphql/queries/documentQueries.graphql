@@ -1,0 +1,116 @@
+query getCollaborators($request: GetDocumentRequest!) {
+  document(request: $request) {
+    ...DocumentBasicInfo
+    ...DocumentDecryptedMetadata
+    ...DocumentCollaborators
+    ...DocumentTeam
+    ...DocumentInvites
+  }
+}
+
+query getActiveUsers($request: GetDocumentRequest!) {
+  document(request: $request) {
+    ...DocumentBasicInfo
+    ...DocumentCollaborators
+    ...DocumentCurrentlyEditingUsers
+  }
+}
+
+query getLink($request: GetDocumentRequest!) {
+  document(request: $request) {
+    ...DocumentBasicInfo
+    ...DocumentLink
+  }
+}
+
+query getLink($request: GetDocumentRequest!) {
+  document(request: $request) {
+    ...DocumentBasicInfo
+    ...DocumentLink
+  }
+}
+
+# getDocumentsBase should be have at least the same (or more) fields has getDocumentBase to prevent additional network calls when listing documents
+query getDocumentsBase($request: GetDocumentsRequest!) {
+  documents(request: $request) {
+    ...DocumentBase
+    updatedAt
+  }
+}
+
+query getDocumentsBaseForTrash($request: GetDocumentsRequest!) {
+  documents(request: $request) {
+    ...DocumentBase
+    updatedAt
+    previousParentID
+  }
+}
+
+query getDocumentBreadcrumb($request: GetDocumentRequest!) {
+  document(request: $request) {
+    ...DocumentBasicInfo
+    ...DocumentParentsFullBreadcrumb
+  }
+}
+
+query getDocumentBase($request: GetDocumentRequest!) {
+  document(request: $request) {
+    ...DocumentBase
+  }
+}
+
+query getDocumentFull($request: GetDocumentRequest!) {
+  document(request: $request) {
+    ...DocumentFullInfo
+  }
+}
+
+query getDocumentPublicOrgData($request: GetDocumentRequest!) {
+  document(request: $request) {
+    docID
+    ...DocumentPublicInfo
+  }
+}
+
+query getDocumentSnapshots($request: GetDocumentRequest!) {
+  document(request: $request) {
+    docID
+    snapshots {
+      data
+      hierarchicalPermissionChain {
+        ...DocumentHierarchicalPermissionChainInfo
+      }
+      createdAt
+      version
+      decryptedKey @client
+      decryptedData @client
+    }
+  }
+}
+
+query getPendingDocumentKeyUpgrades($request: PendingDocumentKeyUpgradesRequest!) {
+  pendingDocumentKeyUpgrades(request: $request) {
+    collaborators {
+      userID
+      publicKey
+    }
+    newHierarchicalKeys {
+      docID
+      hierarchicalPermissionChain {
+        ...DocumentHierarchicalPermissionChainInfo
+      }
+      collaboratorsIDs
+      encryptedLinkKey
+      currentPublicHierarchicalKey
+    }
+    newKeysClaims {
+      docID
+      hierarchicalPermissionChain {
+        ...DocumentHierarchicalPermissionChainInfo
+      }
+      keysClaimSourceDocID
+      keysClaimSourceDocPublicHierarchicalKey
+      currentKeysClaim
+    }
+  }
+}

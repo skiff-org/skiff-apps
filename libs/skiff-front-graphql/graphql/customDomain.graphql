@@ -1,0 +1,91 @@
+fragment DNSRecordData on DNSRecord {
+  name
+  type
+  data
+  error {
+    errorData {
+      retrievedRecord {
+        priority
+        data
+      }
+    }
+    errorType
+  }
+}
+
+query getCurrentUserCustomDomains {
+  getCurrentUserCustomDomains {
+    domains {
+      domainID
+      domain
+      skiffManaged
+      dnsRecords {
+        ...DNSRecordData
+      }
+      verificationStatus
+      createdAt
+    }
+  }
+}
+
+query checkIfDomainsAvailable($domains: [String!]!) {
+  checkIfDomainsAvailable(domains: $domains) {
+    domains {
+      available
+      currency
+      domain
+      period
+      price
+    }
+  }
+}
+
+query getDomainSuggestions($domain: String!, $limit: Int) {
+  getDomainSuggestions(domain: $domain, limit: $limit) {
+    domains
+  }
+}
+
+query getDomainDetails($domain: String!) {
+  getDomainDetails(domain: $domain) {
+    expiresAt
+    renewAuto
+    renewalDetails {
+      price
+    }
+  }
+}
+
+mutation generateCustomDomainRecords($request: GenerateCustomDomainRecordsRequest!) {
+  generateCustomDomainRecords(request: $request) {
+    mxRecords {
+      ...DNSRecordData
+    }
+    spfRecords {
+      ...DNSRecordData
+    }
+    dkimRecords {
+      ...DNSRecordData
+    }
+    dmarcRecord {
+      ...DNSRecordData
+    }
+    domainID
+  }
+}
+
+mutation saveCustomDomainRecords($request: SaveCustomDomainRequest!) {
+  saveCustomDomainRecords(request: $request)
+}
+
+mutation deleteCustomDomain($request: DeleteCustomDomainRequest!) {
+  deleteCustomDomain(request: $request)
+}
+
+mutation deleteCustomDomainAlias($request: DeleteCustomDomainAliasRequest!) {
+  deleteCustomDomainAlias(request: $request)
+}
+
+mutation VerifyCustomDomain($domainId: String!) {
+  verifyCustomDomain(domainID: $domainId)
+}

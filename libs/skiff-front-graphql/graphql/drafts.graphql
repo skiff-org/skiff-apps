@@ -1,0 +1,16 @@
+query getAllDrafts {
+  allDrafts {
+    draftID
+    encryptedKey
+    encryptedDraft
+    updatedAt
+  }
+}
+
+mutation deleteDraft($request: DeleteDraftRequest!) {
+  deleteDraft(request: $request)
+}
+
+mutation createOrUpdateDraft($request: CreateOrUpdateDraftRequest!) {
+  createOrUpdateDraft(request: $request)
+}

@@ -1,0 +1,163 @@
+mutation referUser($request: ReferUserRequest!) {
+  referUser(request: $request) {
+    status
+  }
+}
+
+mutation enrollMfa($request: EnrollMfaRequest!) {
+  enrollMfa(request: $request) {
+    status
+    backupCodes
+  }
+}
+
+mutation disableMfa($request: DisableMfaRequest!) {
+  disableMfa(request: $request) {
+    status
+  }
+}
+
+mutation regenerateMfaBackupCodes($request: RegenerateMfaBackupCodesRequest!) {
+  regenerateMfaBackupCodes(request: $request) {
+    status
+    backupCodes
+  }
+}
+
+mutation updateDisplayName($request: UpdateDisplayNameRequest!) {
+  updateDisplayName(request: $request) {
+    status
+  }
+}
+
+mutation updateDocumentData($request: UpdateDocumentDataRequest!) {
+  updateDocumentData(request: $request) {
+    status
+  }
+}
+
+mutation deleteAccount($request: DeleteAccountRequest!) {
+  deleteAccount(request: $request) {
+    status
+  }
+}
+
+mutation deleteMailAccount($request: DeleteMailAccountRequest!) {
+  deleteMailAccount(deleteRequest: $request) {
+    status
+  }
+}
+
+mutation uploadRecoveryData($request: UploadRecoveryDataRequest!) {
+  uploadRecoveryData(request: $request) {
+    status
+  }
+}
+
+mutation resetAccount($request: ResetAccountRequest!) {
+  resetAccount(request: $request)
+}
+
+mutation addEmail($request: AddEmailRequest!) {
+  addEmail(request: $request) {
+    status
+  }
+}
+
+mutation deleteRecoveryEmail {
+  deleteRecoveryEmail
+}
+
+mutation setUseIPFS($request: SetUseIPFSRequest!) {
+  setUseIPFS(request: $request) {
+    status
+  }
+}
+
+mutation setNotificationPreferences($request: SetNotificationPreferencesRequest!) {
+  setNotificationPreferences(request: $request)
+}
+
+mutation setPDSubscribeFlag($request: SetPDSubscribeFlagRequest!) {
+  setPDSubscribeFlag(request: $request)
+}
+
+mutation grantCredits($request: GrantCreditsRequest!) {
+  grantCredits(request: $request) {
+    creditsGranted {
+      cents
+      skemailStorageBytes
+      editorStorageBytes
+    }
+    remainingCreditsToEarnForReason {
+      cents
+      skemailStorageBytes
+      editorStorageBytes
+    }
+  }
+}
+
+mutation createEmailAlias($request: CreateEmailAliasRequest) {
+  createEmailAlias(request: $request) {
+    emailAliases
+  }
+}
+
+mutation createUdAlias($request: CreateUdAliasRequest) {
+  createUdAlias(request: $request) {
+    emailAliases
+  }
+}
+
+mutation updateEmailAliasActiveState($request: UpdateEmailAliasActiveStateRequest) {
+  updateEmailAliasActiveState(request: $request) {
+    status
+  }
+}
+
+mutation setUserPublicKey($request: SetUserPublicKeyRequest) {
+  setUserPublicKey(request: $request)
+}
+
+mutation createUploadAvatarLink {
+  createUploadAvatarLink {
+    writeUrl
+    profileCustomURI
+  }
+}
+
+mutation updateDisplayPicture($request: UpdateDisplayPictureRequest!) {
+  updateDisplayPicture(request: $request) {
+    ...UserProfileData
+  }
+}
+
+mutation createCalendarUser($request: CreateCalendarUserRequest!) {
+  createCalendarUser(request: $request)
+}
+
+mutation markCurrentUserOnboardedWorkspaceMigration {
+  markCurrentUserOnboardedWorkspaceMigration
+}
+
+mutation setDefaultEmailAlias($request: SetDefaultEmailAliasRequest!) {
+  setDefaultEmailAlias(request: $request)
+}
+
+mutation generateWebAuthnChallenge {
+  generateWebAuthnChallenge {
+    options
+  }
+}
+
+mutation generateWebAuthnRegistration {
+  generateWebAuthnRegistration {
+    options
+  }
+}
+
+mutation verifyWebAuthnRegistration($request: VerifyWebAuthnRegistrationRequest!) {
+  verifyWebAuthnRegistration(request: $request) {
+    status
+  }
+}

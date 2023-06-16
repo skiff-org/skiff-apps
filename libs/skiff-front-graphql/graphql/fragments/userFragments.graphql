@@ -1,0 +1,88 @@
+fragment UserProfileData on User {
+  userID
+  username
+  publicData {
+    displayName
+    displayPictureData {
+      profileAccentColor
+      profileCustomURI
+      profileIcon
+    }
+  }
+}
+
+fragment UserProfileOrgData on User {
+  userID
+  username
+  publicData {
+    displayName
+    displayPictureData {
+      profileAccentColor
+      profileCustomURI
+      profileIcon
+    }
+  }
+  publicKey
+  rootOrganization {
+    orgID
+    name
+    displayPictureData {
+      profileAccentColor
+      profileCustomURI
+      profileIcon
+    }
+  }
+}
+
+fragment UserProfileDataWithKeys on User {
+  ...UserProfileData
+  publicKey
+  signingPublicKey
+}
+
+fragment UserWithEmailAliases on User {
+  userID
+  emailAliases
+}
+
+fragment UserWithMailStorageUsed on User {
+  userID
+  skemailStorageUsage {
+    attachmentUsageBytes
+    messageUsageBytes
+  }
+}
+
+fragment ContactData on Contact {
+  emailAddress
+  firstName
+  lastName
+  displayPictureData {
+    profileAccentColor
+    profileCustomURI
+    profileIcon
+  }
+}
+
+fragment UserPreferencesData on UserPreferences {
+  theme
+  dateFormat
+  hourFormat
+  showPageIcon
+  defaultCalendarColor
+  startDayOfTheWeek
+  leftSwipeGesture
+  rightSwipeGesture
+  blockRemoteContent
+  securedBySkiffSigDisabled
+  showAliasInboxes
+  threadFormat
+  hideActivationChecklist
+}
+
+fragment UserPreferencesFragment on User {
+  userID
+  userPreferences {
+    ...UserPreferencesData
+  }
+}
