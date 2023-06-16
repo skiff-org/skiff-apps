@@ -1,3 +1,5 @@
+![skiff-front-utils](https://github.com/skiff-org/skiff-apps/assets/36896271/9fe3c292-8241-4707-bcec-c9ba37982951)
+
 # skiff-front-utils
 
 `skiff-front-utils` is an open-source TypeScript library containing React hooks and utility functions for an end-to-end encrypted web and mobile application. This package powers web, mobile, and server applications inside Skiff's end-to-end encrypted, privacy-first product suite, including Mail, Pages, Drive, and Calendar applications. For more on Skiff, visit [skiff.com](https://skiff.com).
