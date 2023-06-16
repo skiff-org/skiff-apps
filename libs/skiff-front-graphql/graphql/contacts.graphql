@@ -1,0 +1,33 @@
+query getAllCurrentUserContacts {
+  allContacts {
+    emailAddress
+    firstName
+    lastName
+    displayPictureData {
+      profileAccentColor
+      profileCustomURI
+      profileIcon
+    }
+  }
+}
+
+query getContacts($request: GetContactsRequest!) {
+  contacts(request: $request) {
+    emailAddress
+    firstName
+    lastName
+    displayPictureData {
+      profileAccentColor
+      profileCustomURI
+      profileIcon
+    }
+  }
+}
+
+mutation createOrUpdateContact($request: CreateOrUpdateContactRequest!) {
+  createOrUpdateContact(request: $request)
+}
+
+mutation deleteContact($request: DeleteContactRequest!) {
+  deleteContact(request: $request)
+}

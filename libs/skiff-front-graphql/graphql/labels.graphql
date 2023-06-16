@@ -1,0 +1,60 @@
+mutation applyLabels($request: ModifyLabelsRequest) {
+  applyLabels(request: $request) {
+    updatedThreads {
+      threadID
+      systemLabels
+      userLabels {
+        labelID
+        labelName
+        color
+        variant
+      }
+    }
+  }
+}
+
+mutation removeLabels($request: ModifyLabelsRequest) {
+  removeLabels(request: $request) {
+    updatedThreads {
+      threadID
+      systemLabels
+      userLabels {
+        labelID
+        labelName
+        color
+        variant
+      }
+    }
+  }
+}
+
+query userLabels {
+  userLabels {
+    labelID
+    labelName
+    color
+    variant
+  }
+}
+
+mutation createUserLabel($request: CreateUserLabelRequest) {
+  createUserLabel(request: $request) {
+    labelID
+    labelName
+    color
+    variant
+  }
+}
+
+mutation editUserLabel($request: EditUserLabelRequest) {
+  editUserLabel(request: $request) {
+    labelID
+    labelName
+    color
+    variant
+  }
+}
+
+mutation deleteUserLabel($request: DeleteUserLabelRequest) {
+  deleteUserLabel(request: $request)
+}

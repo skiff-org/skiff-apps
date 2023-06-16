@@ -1,0 +1,301 @@
+query usersFromEmailAlias($emailAliases: [String!]!) {
+  usersFromEmailAlias(emailAliases: $emailAliases) {
+    userID
+    username
+    publicKey
+    publicData {
+      displayPictureData {
+        profileAccentColor
+        profileCustomURI
+        profileIcon
+      }
+    }
+  }
+}
+
+query usersFromEmailAliasWithCatchall($emailAliases: [String!]!) {
+  usersFromEmailAliasWithCatchall(emailAliases: $emailAliases) {
+    userID
+    username
+    publicKey
+    publicData {
+      displayPictureData {
+        profileAccentColor
+        profileCustomURI
+        profileIcon
+      }
+    }
+  }
+}
+
+query getUsersProfileData($request: GetUsersRequest!) {
+  users(request: $request) {
+    ...UserProfileData
+  }
+}
+
+query getUserProfileOrgData($request: GetUserRequest!) {
+  user(request: $request) {
+    ...UserProfileOrgData
+  }
+}
+
+query getUserProfileData($request: GetUserRequest!) {
+  user(request: $request) {
+    ...UserProfileData
+  }
+}
+
+mutation setNotificationPreferences($request: SetNotificationPreferencesRequest!) {
+  setNotificationPreferences(request: $request)
+}
+
+query getCurrentUserEmailAliases {
+  currentUser {
+    userID
+    emailAliases
+  }
+}
+
+query getUserTags($request: GetUserRequest!) {
+  user(request: $request) {
+    accountTags
+    userID
+  }
+}
+
+mutation storeWorkspaceEvent($request: WorkspaceEventRequest!) {
+  storeWorkspaceEvent(request: $request)
+}
+
+mutation referUser($request: ReferUserRequest!) {
+  referUser(request: $request) {
+    status
+  }
+}
+
+query getUserEmailAndWallet($request: GetUserRequest!) {
+  user(request: $request) {
+    userID
+    recoveryEmail
+    unverifiedRecoveryEmail
+    walletAddress
+    rootOrgID
+  }
+}
+
+mutation subscribeNotification($request: SubscribeNotificationRequest!) {
+  subscribeNotification(request: $request)
+}
+
+mutation unsubscribeNotification {
+  unsubscribeNotification
+}
+
+mutation updateDisplayName($request: UpdateDisplayNameRequest!) {
+  updateDisplayName(request: $request) {
+    status
+  }
+}
+
+query getUserSignature {
+  userSignature {
+    userSignature {
+      encryptedData
+    }
+    sessionKey {
+      encryptedBy
+      encryptedSessionKey
+    }
+  }
+}
+
+query getUserCustomDomainSubscriptionsInfo($request: GetUserRequest!) {
+  user(request: $request) {
+    userID
+    customDomainSubscriptionsInfo {
+      domainID
+      cancelAtPeriodEnd
+      supposedEndDate
+    }
+  }
+}
+
+query getUserPaidUpStatus {
+  currentUser {
+    userID
+    paidUpStatus {
+      paidUp
+      downgradeProgress {
+        currentStorageInMb
+        customDomains
+        emailAliases
+        shortAliases
+        workspaceUsers
+        userLabels
+        userFolders
+        userMailFilters
+      }
+    }
+  }
+}
+
+mutation updateDisplayPicture($request: UpdateDisplayPictureRequest!) {
+  updateDisplayPicture(request: $request) {
+    ...UserProfileData
+  }
+}
+
+mutation createUploadAvatarLink {
+  createUploadAvatarLink {
+    writeUrl
+    profileCustomURI
+  }
+}
+
+mutation createUploadContactAvatarLink($request: CreateUploadContactAvatarLinkRequest!) {
+  createUploadContactAvatarLink(request: $request) {
+    writeUrl
+    profileCustomURI
+  }
+}
+
+mutation updateUploadContactAvatarLink($request: UpdateUploadContactAvatarLinkRequest!) {
+  updateUploadContactAvatarLink(request: $request) {
+    newProfileCustomURI
+  }
+}
+
+mutation createOrgUploadAvatarLink {
+  createOrgUploadAvatarLink {
+    writeUrl
+    profileCustomURI
+  }
+}
+
+mutation deleteAccount($request: DeleteAccountRequest!) {
+  deleteAccount(request: $request) {
+    status
+  }
+}
+
+mutation deleteMailAccount($request: DeleteMailAccountRequest!) {
+  deleteMailAccount(deleteRequest: $request) {
+    status
+  }
+}
+
+mutation setUserSignature($request: SetUserSignatureRequest!) {
+  setUserSignature(request: $request)
+}
+
+mutation deleteUserSignature {
+  deleteUserSignature
+}
+
+query getAutoReply {
+  autoReply {
+    encryptedSubject {
+      encryptedData
+    }
+    encryptedText {
+      encryptedData
+    }
+    encryptedHtml {
+      encryptedData
+    }
+    encryptedTextAsHtml {
+      encryptedData
+    }
+    encryptedSessionKey {
+      encryptedBy
+      encryptedSessionKey
+    }
+  }
+}
+
+mutation setAutoReply($request: SetAutoReplyRequest!) {
+  setAutoReply(request: $request)
+}
+
+mutation deleteAutoReply {
+  deleteAutoReply
+}
+
+mutation addExternalEmail($request: AddEmailRequest!) {
+  addEmail(request: $request) {
+    status
+  }
+}
+
+mutation createUdAlias($request: CreateUdAliasRequest) {
+  createUdAlias(request: $request) {
+    emailAliases
+  }
+}
+
+mutation uploadRecoveryData($request: UploadRecoveryDataRequest!) {
+  uploadRecoveryData(request: $request) {
+    status
+  }
+}
+
+query getRecoveryData($request: GetUserRequest!) {
+  user(request: $request) {
+    userID
+    encryptedRecoveryData
+  }
+}
+
+query getRecoveryShare($request: GetUserRequest!) {
+  user(request: $request) {
+    userID
+    username
+    publicKey
+    recoverySigningPublicKey
+    recoveryServerShare
+  }
+}
+
+mutation updateDocumentData($request: UpdateDocumentDataRequest!) {
+  updateDocumentData(request: $request) {
+    status
+  }
+}
+
+mutation disableMfa($request: DisableMfaRequest!) {
+  disableMfa(request: $request) {
+    status
+  }
+}
+
+mutation enrollMfa($request: EnrollMfaRequest!) {
+  enrollMfa(request: $request) {
+    status
+    backupCodes
+  }
+}
+
+mutation regenerateMfaBackupCodes($request: RegenerateMfaBackupCodesRequest!) {
+  regenerateMfaBackupCodes(request: $request) {
+    status
+    backupCodes
+  }
+}
+
+mutation setUserPreferences($request: SetUserPreferencesRequest!) {
+  setUserPreferences(request: $request) {
+    ...UserPreferencesData
+  }
+}
+
+mutation setContactAutosyncSetting($request: Boolean!) {
+  setAutoSyncContactsSetting(value: $request)
+}
+
+query getContactAutoSyncSettings {
+  currentUser {
+    userID
+    autoSyncContactsSetting
+  }
+}

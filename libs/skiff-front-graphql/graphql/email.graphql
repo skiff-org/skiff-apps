@@ -1,0 +1,500 @@
+scalar PublicKey
+fragment Address on AddressObject {
+  name
+  address
+  blocked
+}
+
+fragment EmailWithoutContent on Email {
+  id
+  attachmentMetadata {
+    attachmentID
+  }
+  createdAt
+  from {
+    ...Address
+  }
+  to {
+    ...Address
+  }
+  cc {
+    ...Address
+  }
+  bcc {
+    ...Address
+  }
+  replyTo {
+    ...Address
+  }
+  encryptedSessionKey {
+    encryptedSessionKey
+    encryptedBy
+  }
+  encryptedSubject {
+    encryptedData
+  }
+  encryptedTextSnippet {
+    encryptedData
+  }
+  attachmentMetadata {
+    attachmentID
+    encryptedData {
+      encryptedData
+    }
+  }
+  scheduleSendAt
+  encryptedRawMimeUrl
+  decryptedSessionKey @client
+  decryptedSubject @client
+  decryptedTextSnippet @client
+  decryptedAttachmentMetadata @client {
+    attachmentID
+    decryptedMetadata {
+      contentType
+      contentDisposition
+      filename
+      checksum
+      size
+      contentId
+    }
+  }
+}
+
+fragment ThreadWithoutContent on UserThread {
+  threadID
+  attributes {
+    read
+    systemLabels
+    userLabels {
+      labelID
+      color
+      labelName
+      variant
+    }
+  }
+  emails {
+    ...EmailWithoutContent
+  }
+  emailsUpdatedAt
+  sentLabelUpdatedAt
+}
+
+fragment Email on Email {
+  id
+  attachmentMetadata {
+    attachmentID
+  }
+  createdAt
+  from {
+    ...Address
+  }
+  to {
+    ...Address
+  }
+  cc {
+    ...Address
+  }
+  bcc {
+    ...Address
+  }
+  replyTo {
+    ...Address
+  }
+  encryptedSessionKey {
+    encryptedSessionKey
+    encryptedBy
+  }
+  encryptedSubject {
+    encryptedData
+  }
+  encryptedText {
+    encryptedData
+  }
+  encryptedHtml {
+    encryptedData
+  }
+  encryptedTextAsHtml {
+    encryptedData
+  }
+  encryptedTextSnippet {
+    encryptedData
+  }
+  attachmentMetadata {
+    attachmentID
+    encryptedData {
+      encryptedData
+    }
+  }
+  scheduleSendAt
+  encryptedRawMimeUrl
+  decryptedSessionKey @client
+  decryptedSubject @client
+  decryptedText @client
+  decryptedHtml @client
+  decryptedTextAsHtml @client
+  decryptedTextSnippet @client
+  decryptedAttachmentMetadata @client {
+    attachmentID
+    decryptedMetadata {
+      contentType
+      contentDisposition
+      filename
+      checksum
+      size
+      contentId
+    }
+  }
+}
+
+fragment Thread on UserThread {
+  threadID
+  attributes {
+    read
+    systemLabels
+    userLabels {
+      labelID
+      color
+      labelName
+      variant
+    }
+  }
+  emails {
+    ...Email
+  }
+  emailsUpdatedAt
+  sentLabelUpdatedAt
+}
+
+fragment MobileThread on UserThread {
+  threadID
+  attributes {
+    read
+    systemLabels
+    userLabels {
+      labelID
+      color
+      labelName
+      variant
+    }
+  }
+  emails {
+    ...Email
+  }
+  emailsUpdatedAt
+  sentLabelUpdatedAt
+  updatedAt
+  permanentlyDeleted
+}
+
+fragment SlimThread on SlimUserThread {
+  threadID
+  attributes {
+    read
+    systemLabels
+    userLabels {
+      labelID
+      color
+      labelName
+      variant
+    }
+  }
+  emailsUpdatedAt
+  sentLabelUpdatedAt
+  updatedAt
+  permanentlyDeleted
+}
+
+fragment SlimThreadWithoutLabels on SlimUserThread {
+  threadID
+  attributes {
+    read
+    systemLabels
+    userLabels {
+      labelID
+    }
+  }
+  emailsUpdatedAt
+  sentLabelUpdatedAt
+  updatedAt
+  permanentlyDeleted
+}
+
+query mailboxWithContent($request: MailboxRequest!) {
+  mailbox(request: $request) {
+    threads {
+      ...Thread
+    }
+    pageInfo {
+      hasNextPage
+      cursor {
+        threadID
+        date
+      }
+    }
+  }
+}
+
+query mailbox($request: MailboxRequest!) {
+  mailbox(request: $request) {
+    threads {
+      ...ThreadWithoutContent
+    }
+    pageInfo {
+      hasNextPage
+      cursor {
+        threadID
+        date
+      }
+    }
+  }
+}
+
+query mobileMailbox($mailboxRequest: NativeMailboxRequest!, $threadIDs: [String!]!) {
+  nativeMailbox(request: $mailboxRequest) {
+    threads {
+      ...MobileThread
+    }
+    slimThreads {
+      ...SlimThread
+    }
+    pageInfo {
+      hasNextPage
+      cursor {
+        threadID
+        date
+      }
+    }
+  }
+  userThreads(threadIDs: $threadIDs) {
+    ...MobileThread
+  }
+}
+
+query mobileMailboxLabelsSync($mailboxRequest: NativeMailboxRequest!, $threadIDs: [String!]!) {
+  nativeMailbox(request: $mailboxRequest) {
+    threads {
+      ...MobileThread
+    }
+    slimThreads {
+      ...SlimThreadWithoutLabels
+    }
+    pageInfo {
+      hasNextPage
+      cursor {
+        threadID
+        date
+      }
+    }
+  }
+  userThreads(threadIDs: $threadIDs) {
+    ...MobileThread
+  }
+  userLabels {
+    labelID
+    color
+    labelName
+    variant
+  }
+}
+
+query getMobileThreadsFromID($threadIDs: [String!]!, $returnDeleted: Boolean) {
+  userThreads(threadIDs: $threadIDs, returnDeleted: $returnDeleted) {
+    ...MobileThread
+  }
+}
+
+query getThreadFromID($threadID: String!) {
+  userThread(threadID: $threadID) {
+    ...Thread
+  }
+}
+
+query getThreadsFromIDs($threadIDs: [String!]!) {
+  userThreads(threadIDs: $threadIDs) {
+    ...Thread
+  }
+}
+
+query getFromAddressListForEmailsOnThread($threadID: String!) {
+  userThread(threadID: $threadID) {
+    threadID
+    emails {
+      id
+      from {
+        ...Address
+      }
+    }
+  }
+}
+
+query threadAttributes($threadID: String!) {
+  userThread(threadID: $threadID) {
+    threadID
+    attributes {
+      read
+      systemLabels
+      userLabels {
+        labelID
+        color
+        labelName
+        variant
+      }
+    }
+  }
+}
+
+query validateMailAlias($request: GetAliasValidRequest!) {
+  aliasValid(request: $request)
+}
+
+mutation createEmailAlias($request: CreateEmailAliasRequest) {
+  createEmailAlias(request: $request) {
+    emailAliases
+  }
+}
+
+mutation createCustomDomainAlias($request: CreateCustomDomainAliasRequest) {
+  createCustomDomainAlias(request: $request) {
+    emailAliases
+  }
+}
+
+mutation updateEmailAliasActiveState($request: UpdateEmailAliasActiveStateRequest) {
+  updateEmailAliasActiveState(request: $request) {
+    status
+  }
+}
+
+mutation setAllThreadsReadStatus($request: SetAllThreadsReadStatusRequest!) {
+  setAllThreadsReadStatus(request: $request)
+}
+
+mutation setUserPublicKey($request: SetUserPublicKeyRequest) {
+  setUserPublicKey(request: $request)
+}
+
+mutation setReadStatus($request: SetReadStatusRequest) {
+  setReadStatus(request: $request) {
+    updatedThreadIDs
+  }
+}
+
+mutation sendMessage($request: SendEmailRequest!) {
+  sendMessage(message: $request) {
+    messageID
+    threadID
+  }
+}
+
+mutation unsendMessage($request: UnsendEmailRequest!) {
+  unsendMessage(message: $request) {
+    ...Email
+  }
+}
+
+mutation sendReplyMessage($request: ReplyToEmailRequest!) {
+  replyToMessage(message: $request) {
+    messageID
+    threadID
+  }
+}
+
+query decryptionServicePublicKey {
+  decryptionServicePublicKey
+}
+
+fragment Attachment on Attachment {
+  attachmentID
+  downloadLink
+  encryptedSessionKey {
+    encryptedSessionKey
+    encryptedBy
+  }
+  decryptedSessionKey @client
+}
+
+query getAttachments($ids: [String]!) {
+  attachments(ids: $ids) {
+    ...Attachment
+  }
+}
+
+mutation sendFeedback($request: SendFeedbackRequest!) {
+  sendFeedback(request: $request)
+}
+
+query getNumUnread($label: String!) {
+  unread(label: $label)
+}
+
+mutation blockEmailAddress($request: BlockEmailAddressRequest!) {
+  blockEmailAddress(request: $request)
+}
+
+mutation unblockEmailAddress($request: UnblockEmailAddressRequest!) {
+  unblockEmailAddress(request: $request)
+}
+
+query isBlocked($senderAddress: String!) {
+  isBlocked(senderAddress: $senderAddress)
+}
+
+query isCustomDomain($domains: [String!]!) {
+  isCustomDomain(domains: $domains)
+}
+
+mutation verifyWalletAddressCreateAlias($request: VerifyWalletAddressCreateAliasRequest!) {
+  verifyWalletAddressCreateAlias(request: $request) {
+    emailAliases
+  }
+}
+
+mutation deleteThread($request: DeleteThreadRequest!) {
+  deleteThread(request: $request)
+}
+
+mutation setPushToken($request: SetPushTokenRequest!) {
+  setPushToken(request: $request)
+}
+
+mutation unsetPushToken($request: UnsetPushTokenRequest!) {
+  unsetPushToken(request: $request)
+}
+
+query getENSName($ethereumAddress: String!) {
+  getENSName(ethereumAddress: $ethereumAddress)
+}
+
+query getBonfidaNames($solanaAddress: String!) {
+  getBonfidaNames(solanaAddress: $solanaAddress)
+}
+
+mutation setCatchallAddress($request: SetCatchallAddressRequest!) {
+  setCatchallAddress(request: $request)
+}
+
+query getAliasesOnDomain($domainID: String!) {
+  getAliasesOnDomain(domainID: $domainID) {
+    domainAliases {
+      emailAlias
+      displayEmailAlias
+      isCatchall
+    }
+  }
+}
+
+mutation createMailFilter($request: CreateMailFilterInput!) {
+  createMailFilter(input: $request)
+}
+
+mutation updateMailFilter($request: UpdateMailFilterInput!) {
+  updateMailFilter(input: $request)
+}
+
+mutation deleteMailFilter($request: DeleteMailFilterInput!) {
+  deleteMailFilter(input: $request)
+}
+
+mutation markThreadsAsClientsideFiltered($request: MarkThreadsAsClientsideFilteredInput!) {
+  markThreadsAsClientsideFiltered(input: $request)
+}

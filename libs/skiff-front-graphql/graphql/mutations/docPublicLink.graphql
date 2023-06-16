@@ -1,0 +1,14 @@
+mutation generateDocPublicLinkAuthTokenStep1($request: GenerateDocPublicLinkAuthTokenStep1Request!) {
+  generateDocPublicLinkAuthTokenStep1(request: $request) {
+    salt
+    serverEphemeralPublic
+  }
+}
+
+mutation generateDocPublicLinkAuthTokenStep2($request: GenerateDocPublicLinkAuthTokenStep2Request!) {
+  generateDocPublicLinkAuthTokenStep2(request: $request) {
+    serverSessionProof
+    jwt
+    encryptedPrivateHierarchicalKey
+  }
+}

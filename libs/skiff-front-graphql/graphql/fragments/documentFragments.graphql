@@ -1,0 +1,226 @@
+fragment DocumentPermissionInfo on PermissionEntry {
+  userID
+  expiryDate
+  encryptedBy
+  encryptedKey
+  encryptedPrivateHierarchicalKey
+}
+
+fragment DocumentCollaboratorInfo on DocumentCollaborator {
+  user {
+    ...UserProfileData
+  }
+  permissionLevel
+  expiryDate
+  sourceDocID
+}
+
+fragment DocumentPublicInfo on Document {
+  publicOrgData {
+    orgID
+    name
+    displayPictureData {
+      profileAccentColor
+      profileCustomURI
+      profileIcon
+    }
+  }
+}
+
+fragment DocumentHierarchicalPermissionChainInfo on HierarchicalPermissionChainLink {
+  docID
+  previousLinkDocID
+  keysClaim
+  keysClaimEncryptedByKey
+  permission {
+    ...DocumentPermissionInfo
+  }
+  encryptedSessionKey
+  encryptedSessionKeyEncryptedByKey
+}
+
+fragment DocumentBasicInfoWithoutTeamOrOrg on Document {
+  docID
+  documentType
+  publicHierarchicalKey
+  decryptedSessionKey @client
+  decryptedPrivateHierarchicalKey @client
+  currentUserPermissionLevel
+  hierarchicalPermissionChain {
+    ...DocumentHierarchicalPermissionChainInfo
+  }
+  parentID
+  hasChildren
+  trashedAt
+  previousParentID
+}
+
+fragment DocumentBasicInfo on Document {
+  ...DocumentBasicInfoWithoutTeamOrOrg
+  team {
+    teamID
+    name
+    icon
+    accessLevel
+    rootDocument {
+      docID
+    }
+    organization {
+      orgID
+    }
+  }
+}
+
+fragment DocumentBase on Document {
+  ...DocumentBasicInfo
+  ...DocumentDecryptedMetadata
+  ...DocumentParentsBreadcrumb
+  updatedAt
+}
+
+fragment DocumentDecryptedMetadata on Document {
+  # Don't put updatedAt here because it changes on every save, causing
+  # an expensive rerender since a lot of components use this fragment.
+  # Instead we put it in the getDocumentsBase query, since that's used by
+  # components that actually look at it (to sort a list of docs), plus
+  # DocumentContents so saving updates it.
+  createdAt
+  metadata {
+    signedBy
+    encryptedMetadata
+    signature
+  }
+  decryptedMetadata @client {
+    title
+    icon
+    color
+    description
+    timeLastModified
+    fileSizeBytes
+    mimeType
+  }
+}
+
+fragment DocumentContents on Document {
+  updatedAt
+  contents {
+    contentsArr {
+      content
+      signedBy
+      signature
+      chunkNumber
+    }
+  }
+  decryptedContents @client {
+    contentsArr {
+      chunkNumber
+      chunkData
+    }
+  }
+}
+
+fragment DocumentCurrentlyEditingUsers on Document {
+  # We need to require at least one non "@client" field in the fragment to prevent an error with an empty fragment sent to the server
+  docID
+  currentlyEditingUsers @client {
+    name
+    userID
+    color
+    displayPictureData {
+      profileAccentColor
+      profileCustomURI
+      profileIcon
+    }
+  }
+}
+
+fragment DocumentLink on Document {
+  link {
+    encryptedLinkKey
+    permissionLevel
+    salt
+    decryptedLinkKey @client
+  }
+}
+
+fragment DocumentInvites on Document {
+  invites {
+    docID
+    email
+    permissionLevel
+  }
+}
+
+fragment DocumentTeam on Document {
+  team {
+    teamID
+    name
+    icon
+    accessLevel
+    rootDocument {
+      docID
+    }
+    organization {
+      orgID
+    }
+  }
+}
+
+fragment DocumentPermissionProxies on Document {
+  permissionProxies {
+    sourceDocID
+    sourceTeam {
+      teamID
+      name
+      icon
+    }
+  }
+}
+
+fragment DocumentParentsFullBreadcrumb on Document {
+  parentsBreadcrumb {
+    ...DocumentBasicInfo
+    ...DocumentDecryptedMetadata
+  }
+}
+
+fragment DocumentParentsBreadcrumb on Document {
+  parentsBreadcrumb {
+    docID
+  }
+}
+
+fragment DocumentCollaborators on Document {
+  collaborators {
+    ...DocumentCollaboratorInfo
+  }
+}
+
+fragment DocumentFullInfo on Document {
+  ...DocumentBasicInfo
+  ...DocumentDecryptedMetadata
+  ...DocumentContents
+  ...DocumentCurrentlyEditingUsers
+  ...DocumentLink
+  ...DocumentInvites
+  ...DocumentTeam
+  ...DocumentParentsBreadcrumb
+  ...DocumentCollaborators
+  parentKeysClaim
+  parentPublicHierarchicalKey
+}
+
+fragment TemplateData on Template {
+  templateID
+  group
+  contents {
+    pmDoc
+  }
+  metadata {
+    title
+    icon
+    color
+    description
+  }
+  parentID
+}

@@ -1,0 +1,38 @@
+query getOrganization($id: String!) {
+  organization(id: $id) {
+    ...OrganizationFullInfo
+  }
+}
+
+query getOrganizationMembers($id: String!) {
+  organization(id: $id) {
+    orgID
+    name
+    everyoneTeam {
+      teamID
+      rootDocument {
+        ...DocumentBasicInfoWithoutTeamOrOrg
+        ...DocumentInvites
+        ...DocumentCollaborators
+      }
+    }
+    displayPictureData {
+      profileAccentColor
+      profileCustomURI
+      profileIcon
+    }
+    rootDocID
+    teams {
+      accessLevel
+      teamID
+      name
+      icon
+      rootDocument {
+        ...DocumentDecryptedMetadata
+        ...DocumentBasicInfoWithoutTeamOrOrg
+        ...DocumentPermissionProxies
+        ...DocumentCollaborators
+      }
+    }
+  }
+}

@@ -1,0 +1,1 @@
+export const DEFAULT_WORKSPACE_EVENT_VERSION = '0.1.0';

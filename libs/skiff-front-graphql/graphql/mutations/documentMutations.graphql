@@ -1,0 +1,172 @@
+mutation saveContents($request: SaveContentsRequest!) {
+  saveContents(request: $request) {
+    document {
+      docID
+      ...DocumentContents
+    }
+  }
+}
+
+mutation saveMetadata($request: SaveMetadataRequest!) {
+  saveMetadata(request: $request) {
+    document {
+      ...DocumentBasicInfo
+      ...DocumentDecryptedMetadata
+    }
+  }
+}
+
+mutation newMultipleDocs($request: [NewDocRequest!]!) {
+  newMultipleDocs(request: $request) {
+    docID
+    document {
+      ...DocumentFullInfo
+    }
+    error {
+      message
+      code
+      extensions
+    }
+  }
+}
+
+mutation shareDoc($request: ShareDocRequest!) {
+  shareDoc(request: $request) {
+    document {
+      ...DocumentBasicInfo
+      ...DocumentCollaborators
+    }
+  }
+}
+
+mutation upgradeKey($request: UpgradeKeyRequest!) {
+  upgradeKey(request: $request) {
+    document {
+      ...DocumentBasicInfo
+      ...DocumentDecryptedMetadata
+      ...DocumentContents
+      ...DocumentLink # required because document link is reencrypted with the new key
+    }
+  }
+}
+
+mutation upgradeHierarchicalKeys($request: UpgradeHierarchicalKeysRequest!) {
+  upgradeHierarchicalKeys(request: $request) {
+    documents {
+      ...DocumentBasicInfo
+    }
+  }
+}
+
+mutation unshareDoc($request: UnshareDocRequest!) {
+  unshareDoc(request: $request) {
+    document {
+      ...DocumentBasicInfo
+      ...DocumentCollaborators
+    }
+  }
+}
+
+mutation deleteDoc($request: DeleteDocRequest!) {
+  deleteDoc(request: $request) {
+    status
+  }
+}
+
+mutation deleteSnapshot($request: DeleteSnapshotRequest!) {
+  deleteSnapshot(request: $request) {
+    document {
+      docID
+      ...DocumentContents
+    }
+  }
+}
+
+mutation setupLink($request: SetupLinkRequest!) {
+  setupLink(request: $request) {
+    document {
+      ...DocumentBasicInfo
+      link {
+        salt
+        encryptedLinkKey
+        permissionLevel
+        decryptedLinkKey @client
+      }
+    }
+  }
+}
+
+mutation deleteLink($request: DeleteLinkRequest!) {
+  deleteLink(request: $request) {
+    status
+  }
+}
+
+mutation moveDoc($request: MoveDocRequest!) {
+  moveDoc(request: $request) {
+    document {
+      ...DocumentBase
+      ...DocumentCollaborators
+    }
+  }
+}
+
+mutation moveMultipleDoc($request: [MoveDocRequest!]!) {
+  moveMultipleDoc(request: $request) {
+    document {
+      ...DocumentBase
+      ...DocumentCollaborators
+    }
+  }
+}
+
+
+mutation createCacheElement($request: CreateCacheElementRequest!) {
+  createCacheElement(request: $request) {
+    writeUrl
+    cacheID
+  }
+}
+
+mutation confirmCacheUpload($request: ConfirmCacheUploadRequest!) {
+  confirmCacheUpload(request: $request) {
+    readUrl
+    ipfsPath
+  }
+}
+
+mutation sendDocumentEvent($request: SendDocumentEventRequest!) {
+  sendDocumentEvent(request: $request)
+}
+
+mutation changeLinkPermission($request: ChangeLinkPermissionRequest!) {
+  changeLinkPermission(request: $request) {
+    document {
+      ...DocumentBasicInfo
+      link {
+        salt
+        encryptedLinkKey
+        permissionLevel
+        decryptedLinkKey @client
+      }
+    }
+  }
+}
+
+mutation trashDocs($request: [TrashDocRequest!]!) {
+  trashDocs(request: $request) {
+    document {
+      ...DocumentBase
+      ...DocumentCollaborators
+    }
+  }
+}
+
+mutation restoreTrashDoc($request: TrashDocRequest!) {
+  restoreTrashDoc(request: $request) {
+    document {
+      ...DocumentBase
+      ...DocumentCollaborators
+    }
+  }
+}

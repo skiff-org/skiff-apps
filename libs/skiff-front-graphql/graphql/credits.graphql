@@ -1,0 +1,45 @@
+query getCredits($request: GetCreditsRequest!) {
+  credits(request: $request) {
+    credits {
+      ... on CreditInfoResponse {
+        info
+        count
+        amount {
+          cents
+          skemailStorageBytes
+          editorStorageBytes
+        }
+      }
+    }
+  }
+}
+
+query getLastViewedReferralCredit {
+  lastViewedReferralCredit {
+    count
+    amount {
+      cents
+      skemailStorageBytes
+      editorStorageBytes
+    }
+  }
+}
+
+mutation setLastViewedReferralCredit($request: SetLastViewedReferralCreditRequest!) {
+  setLastViewedReferralCredit(request: $request)
+}
+
+mutation grantCredits($request: GrantCreditsRequest!) {
+  grantCredits(request: $request) {
+    creditsGranted {
+      cents
+      skemailStorageBytes
+      editorStorageBytes
+    }
+    remainingCreditsToEarnForReason {
+      cents
+      skemailStorageBytes
+      editorStorageBytes
+    }
+  }
+}

@@ -1,0 +1,137 @@
+query getSessionCache {
+  sessionCache {
+    cacheKey
+    alternativeCacheKeys
+  }
+  currentUser {
+    userID
+    recoveryEmail
+    unverifiedRecoveryEmail
+    walletAddress
+    rootOrgID
+    publicData {
+      displayName
+      displayPictureData {
+        profileAccentColor
+        profileCustomURI
+        profileIcon
+      }
+    }
+  }
+}
+
+query getSessionCacheMobile($req: SessionCacheMobileRequest!) {
+  sessionCacheMobile(req: $req)
+}
+
+query getSessionCacheChallenge($req: SessionCacheInput!) {
+  sessionCacheChallenge(req: $req) {
+    serverPublicKey
+    encryptedChallenge
+  }
+}
+
+query getSessionCacheWithCalendars {
+  sessionCache {
+    cacheKey
+    alternativeCacheKeys
+  }
+  currentUser {
+    userID
+    recoveryEmail
+    unverifiedRecoveryEmail
+    walletAddress
+    rootOrgID
+    primaryCalendar {
+      calendarID
+    }
+    calendars {
+      calendarID
+      publicKey
+      encryptedPrivateKey
+      encryptedByKey
+    }
+  }
+}
+
+query getBillingPortalSessionUrl($request: GetBillingPortalSessionRequest!) {
+  billingPortal(request: $request) {
+    url
+  }
+}
+
+query getCheckoutSessionUrlOrStripeUpdateStatus($request: GetCheckoutSessionRequest!) {
+  checkoutPortal(request: $request) {
+    url
+    status
+    downgradeProgress {
+      currentStorageInMb
+      customDomains
+      emailAliases
+      shortAliases
+      workspaceUsers
+      userLabels
+      userFolders
+      userMailFilters
+    }
+  }
+}
+
+query getSearchIndexableDocuments {
+  searchIndexableDocuments {
+    docID
+    updatedAt
+  }
+}
+
+query getSearchIndexProgress($request: GetSearchIndexProgressRequest!) {
+   searchIndexProgress(request: $request) {
+     numIndexableThreads
+     numThreadsIndexed
+     isIndexComplete
+   }
+}
+
+query getAllFolderDocuments {
+  allFolderDocuments {
+    ...DocumentBasicInfo
+    ...DocumentDecryptedMetadata
+    updatedAt
+    parentsBreadcrumb {
+      docID
+      ...DocumentDecryptedMetadata
+    }
+  }
+}
+
+query getCredits($request: GetCreditsRequest!) {
+  credits(request: $request) {
+    credits {
+      ... on CreditInfoResponse {
+        info
+        count
+        amount {
+          cents
+          skemailStorageBytes
+          editorStorageBytes
+        }
+      }
+    }
+  }
+}
+
+query apiVersion {
+  apiVersion
+}
+
+query getENSName($ethereumAddress: String!) {
+  getENSName(ethereumAddress: $ethereumAddress)
+}
+
+query getBonfidaNames($solanaAddress: String!) {
+  getBonfidaNames(solanaAddress: $solanaAddress)
+}
+
+query getICNSName($cosmosAddress: String!) {
+  getICNSName(cosmosAddress: $cosmosAddress)
+}

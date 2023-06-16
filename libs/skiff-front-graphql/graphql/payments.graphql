@@ -1,0 +1,48 @@
+query getCheckoutSessionUrlOrStripeUpdateStatus($request: GetCheckoutSessionRequest!) {
+  checkoutPortal(request: $request) {
+    url
+    status
+    downgradeProgress {
+      currentStorageInMb
+      customDomains
+      emailAliases
+      shortAliases
+      workspaceUsers
+      userLabels
+      userFolders
+      userMailFilters
+    }
+  }
+}
+
+query getCustomDomainCheckoutPortal($request: GetCustomDomainCheckoutSessionRequest!) {
+  customDomainCheckoutPortal(request: $request) {
+    status
+    url
+  }
+}
+
+query getCoinbaseCheckoutID($request: GetCoinbaseCheckoutIDRequest!) {
+  getCoinbaseCheckoutID(request: $request) {
+    coinbaseCheckoutID
+  }
+}
+
+query getBillingPortalSessionUrl($request: GetBillingPortalSessionRequest!) {
+  billingPortal(request: $request) {
+    url
+  }
+}
+
+query getBillingPortalSessionUrl($request: GetBillingPortalSessionRequest!) {
+  billingPortal(request: $request) {
+    url
+  }
+}
+
+mutation adjustBusinessPlan($request: AdjustBusinessPlanRequest!) {
+  adjustBusinessPlan(request: $request) {
+    status
+    seats
+  }
+}
