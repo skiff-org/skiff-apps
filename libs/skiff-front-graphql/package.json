@@ -52,6 +52,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.3.20",
+    "@skiff-org/skiff-crypto": "workspace:libs/skiff-crypto",
     "@spliterati/threshold": "^0.4.2",
     "@stablelib/base64": "^1.0.1",
     "@stablelib/chacha20poly1305": "^1.0.1",
@@ -62,7 +63,6 @@
     "long": "^5.2.0",
     "protobufjs": "^6.11.3",
     "semver": "^7.3.5",
-    "@skiff-org/skiff-crypto": "workspace:libs/skiff-crypto",
     "skiff-graphql": "workspace:libs/skiff-graphql",
     "skiff-mail-protos": "workspace:libs/skiff-mail-protos",
     "skiff-utils": "workspace:libs/skiff-utils",
