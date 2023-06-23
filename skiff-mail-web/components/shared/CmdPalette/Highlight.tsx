@@ -1,4 +1,4 @@
-import { ThemeMode, themeNames, Typography, TypographyProps, TypographyWeight } from 'nightwatch-ui';
+import { ThemeMode, themeNames, Typography, TypographyProps, TypographyWeight } from '@skiff-org/skiff-ui';
 import styled from 'styled-components';
 
 const SearchText = styled.span<{ $isAction?: boolean }>`

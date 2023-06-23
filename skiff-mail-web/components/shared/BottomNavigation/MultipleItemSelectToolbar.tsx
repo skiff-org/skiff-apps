@@ -1,4 +1,4 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { SystemLabels } from 'skiff-graphql';

@@ -11,7 +11,7 @@ import {
   Toggle,
   Type,
   Typography
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';

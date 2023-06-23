@@ -1,4 +1,4 @@
-import { Color, Icon, Icons, Size, Typography, TypographySize, isValidIcon } from 'nightwatch-ui';
+import { Color, Icon, Icons, Size, Typography, TypographySize, isValidIcon } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { DisplayPictureData } from 'skiff-graphql';

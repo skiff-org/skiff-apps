@@ -1,4 +1,4 @@
-import { Icon, ThemeMode } from 'nightwatch-ui';
+import { Icon, ThemeMode } from '@skiff-org/skiff-ui';
 import { Node } from 'prosemirror-model';
 import { EditorState, Plugin, PluginKey } from 'prosemirror-state';
 

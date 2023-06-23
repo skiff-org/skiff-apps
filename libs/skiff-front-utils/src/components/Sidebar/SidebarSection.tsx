@@ -1,4 +1,4 @@
-import { Typography } from 'nightwatch-ui';
+import { Typography } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 

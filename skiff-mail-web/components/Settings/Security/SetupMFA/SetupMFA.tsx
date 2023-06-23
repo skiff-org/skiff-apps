@@ -1,4 +1,4 @@
-import { Icon, IconButton, Icons, Type, Typography, TypographySize } from 'nightwatch-ui';
+import { Icon, IconButton, Icons, Type, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import { useCallback, useEffect, useState } from 'react';
 import {
   GetUserMfaQuery,

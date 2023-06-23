@@ -1,4 +1,4 @@
-import { ButtonGroupItem, Dialog, DialogTypes } from 'nightwatch-ui';
+import { ButtonGroupItem, Dialog, DialogTypes } from '@skiff-org/skiff-ui';
 import { FC } from 'react';
 
 export interface ReferralSplashModalProps {

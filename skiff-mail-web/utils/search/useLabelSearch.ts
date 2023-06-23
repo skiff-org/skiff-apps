@@ -1,4 +1,4 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import { SystemLabels } from 'skiff-graphql';
 import { useUserLabelsQuery } from 'skiff-front-graphql';
 import { trimAndLowercase } from 'skiff-utils';

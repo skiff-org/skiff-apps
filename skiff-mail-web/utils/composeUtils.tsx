@@ -1,7 +1,7 @@
 import DOMPurify from 'dompurify';
 import isString from 'lodash/isString';
 import uniqBy from 'lodash/uniqBy';
-import { Avatar, Icon, Size } from 'nightwatch-ui';
+import { Avatar, Icon, Size } from '@skiff-org/skiff-ui';
 import { formatEmailAddress, UserAvatar } from 'skiff-front-utils';
 import { AddressObject } from 'skiff-graphql';
 

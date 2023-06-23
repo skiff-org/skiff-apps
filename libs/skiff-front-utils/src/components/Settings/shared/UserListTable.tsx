@@ -6,7 +6,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import styled, { css } from 'styled-components';

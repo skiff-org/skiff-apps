@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { DropdownItem, Icon, Icons, Size, ThemeMode, Typography, Drawer, TypographySize } from 'nightwatch-ui';
+import { DropdownItem, Icon, Icons, Size, ThemeMode, Typography, Drawer, TypographySize } from '@skiff-org/skiff-ui';
 import { FC, useCallback, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { useGetNumUnreadQuery, useUserLabelsQuery } from 'skiff-front-graphql';

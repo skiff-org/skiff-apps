@@ -1,4 +1,4 @@
-import { Typography, TypographySize, TypographyOverflow } from 'nightwatch-ui';
+import { Typography, TypographySize, TypographyOverflow } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { formatEmailAddress } from 'skiff-front-utils';
 import { AddressObject } from 'skiff-graphql';

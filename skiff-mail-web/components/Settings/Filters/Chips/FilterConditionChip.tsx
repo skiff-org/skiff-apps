@@ -12,7 +12,7 @@ import {
   TypographySize,
   TypographyWeight,
   getThemedColor
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { ChangeEvent, useRef, useState } from 'react';
 import {
   AddressObjectWithDisplayPicture,

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useOnClickOutside } from 'nightwatch-ui';
+import { useOnClickOutside } from '@skiff-org/skiff-ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useLocalSetting } from 'skiff-front-utils';

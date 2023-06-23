@@ -1,4 +1,4 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import React, { Suspense, useState } from 'react';
 import { useGetCurrentUserCustomDomainsQuery } from 'skiff-front-graphql';
 import { Setting, SETTINGS_LABELS, SettingType, SettingValue, PLAN_CHANGE_POLL_INTERVAL } from 'skiff-front-utils';

@@ -1,5 +1,5 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import { Divider, InputField, Skeleton } from 'nightwatch-ui';
+import { Divider, InputField, Skeleton } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { DocumentCollaborator, PermissionLevel } from 'skiff-graphql';
 import { assertExists } from 'skiff-utils';

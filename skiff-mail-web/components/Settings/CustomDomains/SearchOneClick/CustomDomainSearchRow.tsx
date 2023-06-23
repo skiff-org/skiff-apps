@@ -11,7 +11,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { TabPage, TABS_QUERY_PARAM, useToast } from 'skiff-front-utils';
 import { getPaywallErrorCode } from 'skiff-graphql';

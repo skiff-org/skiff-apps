@@ -1,4 +1,4 @@
-import { ButtonGroup, ButtonGroupItem, InputField } from 'nightwatch-ui';
+import { ButtonGroup, ButtonGroupItem, InputField } from '@skiff-org/skiff-ui';
 import React, { useCallback, useState } from 'react';
 import { RequestStatus, WorkspaceEventType } from 'skiff-graphql';
 

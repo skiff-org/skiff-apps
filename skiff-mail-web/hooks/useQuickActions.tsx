@@ -1,4 +1,4 @@
-import { Icon, IconProps } from 'nightwatch-ui';
+import { Icon, IconProps } from '@skiff-org/skiff-ui';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { TabPage, SettingValue } from 'skiff-front-utils';

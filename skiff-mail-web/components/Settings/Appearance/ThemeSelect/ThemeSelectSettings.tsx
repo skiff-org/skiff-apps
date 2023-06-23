@@ -1,4 +1,4 @@
-import { LocalStorageThemeMode, StorageOnlyThemeMode, ThemeMode } from 'nightwatch-ui';
+import { LocalStorageThemeMode, StorageOnlyThemeMode, ThemeMode } from '@skiff-org/skiff-ui';
 import { TitleActionSection, useTheme } from 'skiff-front-utils';
 import { WorkspaceEventType } from 'skiff-graphql';
 import styled from 'styled-components';

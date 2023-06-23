@@ -1,4 +1,4 @@
-import { Divider, Icon, Icons, Size, Typography, TypographyWeight } from 'nightwatch-ui';
+import { Divider, Icon, Icons, Size, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { insertIf } from 'skiff-utils';

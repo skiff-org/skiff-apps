@@ -4,7 +4,7 @@ import { useFlags } from 'launchdarkly-react-client-sdk';
 import uniq from 'lodash/uniq';
 import uniqBy from 'lodash/uniqBy';
 import dynamic from 'next/dynamic';
-import { Icon, IconButton, Size } from 'nightwatch-ui';
+import { Icon, IconButton, Size } from '@skiff-org/skiff-ui';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isAndroid, isIOS, isMacOs, isMobile, MobileView } from 'react-device-detect';
 import { configure } from 'react-hotkeys';

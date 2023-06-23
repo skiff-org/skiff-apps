@@ -1,4 +1,4 @@
-import { colors, ThemeMode, Typography, TypographySize } from 'nightwatch-ui';
+import { colors, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import styled from 'styled-components';
 
 import { useTheme } from '../../../theme/AppThemeProvider';

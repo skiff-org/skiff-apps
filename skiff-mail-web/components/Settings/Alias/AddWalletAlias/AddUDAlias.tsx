@@ -1,6 +1,6 @@
 import type { DomainResolver } from '@uauth/common';
 import UAuth from '@uauth/js';
-import { Button, Icon, Type } from 'nightwatch-ui';
+import { Button, Icon, Type } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { useCreateUdAliasMutation } from 'skiff-front-graphql';
 import { useToast } from 'skiff-front-utils';

@@ -1,4 +1,4 @@
-import { Chip, Size } from 'nightwatch-ui';
+import { Chip, Size } from '@skiff-org/skiff-ui';
 import { DragLayerMonitor, useDragLayer, XYCoord } from 'react-dnd';
 import { getAddrDisplayName } from 'skiff-front-utils';
 import styled from 'styled-components';

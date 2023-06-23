@@ -10,7 +10,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { DisplayPictureData, useUserProfile } from 'skiff-front-graphql';
 import { upperCaseFirstLetter } from 'skiff-utils';

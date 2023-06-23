@@ -1,5 +1,5 @@
 import range from 'lodash/range';
-import { Skeleton, ThemeMode } from 'nightwatch-ui';
+import { Skeleton, ThemeMode } from '@skiff-org/skiff-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';

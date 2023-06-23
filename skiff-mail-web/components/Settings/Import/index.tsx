@@ -1,4 +1,4 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import { useState } from 'react';
 import { Setting, SETTINGS_LABELS, SettingType, SettingValue } from 'skiff-front-utils';
 

@@ -1,4 +1,4 @@
-import { Avatar, AvatarProps, Icon, getAvatarIconOrLabel, AccentColor, ThemeMode } from 'nightwatch-ui';
+import { Avatar, AvatarProps, Icon, getAvatarIconOrLabel, AccentColor, ThemeMode } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { DisplayPictureData } from 'skiff-graphql';
 import { isWalletOrNameServiceAddress } from 'skiff-utils';

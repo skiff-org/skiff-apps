@@ -12,7 +12,7 @@ import {
   ThemeMode,
   Typography,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React from 'react';
 import { useUserLabelsQuery } from 'skiff-front-graphql';
 import { UserLabelVariant } from 'skiff-graphql';

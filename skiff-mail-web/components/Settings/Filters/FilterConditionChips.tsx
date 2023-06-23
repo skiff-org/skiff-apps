@@ -1,5 +1,5 @@
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import { Dropdown, DropdownItem, Icon, IconText, Icons, Size, Typography, TypographyWeight } from 'nightwatch-ui';
+import { Dropdown, DropdownItem, Icon, IconText, Icons, Size, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import React, { Dispatch, SetStateAction, useRef, useState } from 'react';
 import { contactToAddressObject, getEnvironment, useGetAllContactsWithOrgMembers } from 'skiff-front-utils';
 import { FrontendMailFilteringFeatureFlag } from 'skiff-utils';

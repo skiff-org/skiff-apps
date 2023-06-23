@@ -1,4 +1,4 @@
-import { Icon, Icons, Size, Typography } from 'nightwatch-ui';
+import { Icon, Icons, Size, Typography } from '@skiff-org/skiff-ui';
 import styled from 'styled-components';
 
 const SubscriptionBlock = styled.div`

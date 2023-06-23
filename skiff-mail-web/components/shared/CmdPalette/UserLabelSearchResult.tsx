@@ -1,4 +1,4 @@
-import { Icon, Icons, ThemeMode } from 'nightwatch-ui';
+import { Icon, Icons, ThemeMode } from '@skiff-org/skiff-ui';
 import { UserLabelVariant } from 'skiff-graphql';
 import styled from 'styled-components';
 

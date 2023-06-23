@@ -1,5 +1,5 @@
 import noop from 'lodash/noop';
-import { LocalStorageThemeMode, StorageOnlyThemeMode, ThemeMode, themeNames } from 'nightwatch-ui';
+import { LocalStorageThemeMode, StorageOnlyThemeMode, ThemeMode, themeNames } from '@skiff-org/skiff-ui';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 

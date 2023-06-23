@@ -1,4 +1,4 @@
-import { ButtonGroupItem, Dialog } from 'nightwatch-ui';
+import { ButtonGroupItem, Dialog } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import srp from 'secure-remote-password/client';
 import {

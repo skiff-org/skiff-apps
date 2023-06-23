@@ -1,4 +1,4 @@
-import { Divider, Icon, IconButton, ThemeMode, Type, Typography, useOnClickOutside } from 'nightwatch-ui';
+import { Divider, Icon, IconButton, ThemeMode, Type, Typography, useOnClickOutside } from '@skiff-org/skiff-ui';
 import { Node } from 'prosemirror-model';
 import { EditorState, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';

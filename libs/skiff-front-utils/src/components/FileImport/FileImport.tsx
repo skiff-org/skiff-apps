@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Button, CircularProgress, Icon, Icons, RelativelyCentered, Size, Type } from 'nightwatch-ui';
+import { Button, CircularProgress, Icon, Icons, RelativelyCentered, Size, Type } from '@skiff-org/skiff-ui';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { FileRejection, useDropzone } from 'react-dropzone';
 import { MB_SCALE_FACTOR } from 'skiff-utils';

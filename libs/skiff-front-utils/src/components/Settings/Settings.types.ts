@@ -1,4 +1,4 @@
-import { AccentColor, Icon } from 'nightwatch-ui';
+import { AccentColor, Icon } from '@skiff-org/skiff-ui';
 import React, { ReactElement } from 'react';
 
 export enum SettingsSection {

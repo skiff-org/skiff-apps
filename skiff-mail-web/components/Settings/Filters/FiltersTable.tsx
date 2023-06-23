@@ -1,4 +1,4 @@
-import { Alignment, Button, CustomCircularProgress, Type, Typography, TypographyWeight } from 'nightwatch-ui';
+import { Alignment, Button, CustomCircularProgress, Type, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import { useUserLabelsQuery } from 'skiff-front-graphql';

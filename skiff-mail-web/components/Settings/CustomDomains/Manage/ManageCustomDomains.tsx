@@ -1,4 +1,4 @@
-import { CustomCircularProgress, Skeleton, Typography } from 'nightwatch-ui';
+import { CustomCircularProgress, Skeleton, Typography } from '@skiff-org/skiff-ui';
 import { useState } from 'react';
 import { useGetUserCustomDomainSubscriptionsInfoQuery } from 'skiff-front-graphql';
 import { TitleActionSection, useDefaultEmailAlias, useRequiredCurrentUserData } from 'skiff-front-utils';

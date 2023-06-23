@@ -1,4 +1,4 @@
-import { Typography, TypographyWeight } from 'nightwatch-ui';
+import { Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import EmptyInvoiceIllustration from './assets/empty-invoice.svg';
 
 import { Center, MailTypography } from './EmptyInvoice.styles';

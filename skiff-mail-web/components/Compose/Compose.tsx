@@ -2,7 +2,7 @@ import { ApolloQueryResult, ApolloError } from '@apollo/client';
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
 import { Editor } from '@tiptap/react';
 import dayjs from 'dayjs';
-import { Typography, Drawer } from 'nightwatch-ui';
+import { Typography, Drawer } from '@skiff-org/skiff-ui';
 import { Node } from 'prosemirror-model';
 import {
   ChangeEvent,

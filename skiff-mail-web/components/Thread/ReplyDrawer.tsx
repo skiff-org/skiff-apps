@@ -1,5 +1,5 @@
 import partition from 'lodash/partition';
-import { Drawer, DropdownItem, Icon, ThemeMode } from 'nightwatch-ui';
+import { Drawer, DropdownItem, Icon, ThemeMode } from '@skiff-org/skiff-ui';
 import { useDispatch } from 'react-redux';
 import { DrawerOption, DrawerOptions, splitEmailToAliasAndDomain } from 'skiff-front-utils';
 import { DisplayPictureData, UserLabelVariant } from 'skiff-graphql';

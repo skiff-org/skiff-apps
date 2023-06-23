@@ -1,4 +1,4 @@
-import { Icon, IconText, TypographyWeight } from 'nightwatch-ui';
+import { Icon, IconText, TypographyWeight } from '@skiff-org/skiff-ui';
 import { DragLayerMonitor, useDragLayer, XYCoord } from 'react-dnd';
 import styled from 'styled-components';
 

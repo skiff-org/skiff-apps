@@ -1,4 +1,4 @@
-import { Button, Type, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { Button, Type, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import { useGetMailFiltersQuery } from 'skiff-front-graphql';

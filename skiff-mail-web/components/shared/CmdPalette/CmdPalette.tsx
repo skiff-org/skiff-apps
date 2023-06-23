@@ -1,4 +1,4 @@
-import { Dialog, DialogTypes, Divider, InputField, Size, ThemeMode } from 'nightwatch-ui';
+import { Dialog, DialogTypes, Divider, InputField, Size, ThemeMode } from '@skiff-org/skiff-ui';
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';

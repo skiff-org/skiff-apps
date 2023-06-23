@@ -1,4 +1,4 @@
-import { Icon, Icons, Size, ThemeMode, Typography, getThemedColor } from 'nightwatch-ui';
+import { Icon, Icons, Size, ThemeMode, Typography, getThemedColor } from '@skiff-org/skiff-ui';
 import { memo } from 'react';
 import { ListChildComponentProps, areEqual } from 'react-window';
 import styled from 'styled-components';

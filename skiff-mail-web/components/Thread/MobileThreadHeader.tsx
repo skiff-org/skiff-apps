@@ -1,4 +1,4 @@
-import { Icon, IconButton, Size, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { Icon, IconButton, Size, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import { useEffect, useState } from 'react';
 import { isAndroid } from 'react-device-detect';
 import { isMobileApp } from 'skiff-front-utils';

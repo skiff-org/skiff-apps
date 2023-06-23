@@ -1,5 +1,5 @@
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useUserLabelsQuery } from 'skiff-front-graphql';

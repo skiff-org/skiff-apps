@@ -1,4 +1,4 @@
-import { DropdownItem, Size, ThemeMode, Typography, TypographySize } from 'nightwatch-ui';
+import { DropdownItem, Size, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import { useEffect, useRef } from 'react';
 import { isWalletAddress } from 'skiff-utils';
 import styled from 'styled-components';

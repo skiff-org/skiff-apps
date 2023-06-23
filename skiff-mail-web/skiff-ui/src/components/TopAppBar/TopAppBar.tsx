@@ -1,4 +1,4 @@
-import { Icon, IconButton, Size, Type, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { Icon, IconButton, Size, Type, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import styled from 'styled-components';
 
 import { ClientAttachment } from '../../../../components/Attachments';

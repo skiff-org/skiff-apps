@@ -1,4 +1,4 @@
-import { Button, Dialog, ThemeMode, Type } from 'nightwatch-ui';
+import { Button, Dialog, ThemeMode, Type } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { GoogleLoginButton, useTheme } from 'skiff-front-utils';
 import styled from 'styled-components';

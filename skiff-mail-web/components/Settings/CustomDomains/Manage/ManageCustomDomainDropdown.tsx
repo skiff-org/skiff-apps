@@ -1,4 +1,4 @@
-import { Dropdown, DropdownItem, Icon, Drawer } from 'nightwatch-ui';
+import { Dropdown, DropdownItem, Icon, Drawer } from '@skiff-org/skiff-ui';
 import { RefObject } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useGetBillingPortalSessionUrlLazyQuery } from 'skiff-front-graphql';

@@ -1,4 +1,4 @@
-import { Icon, Typography } from 'nightwatch-ui';
+import { Icon, Typography } from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { generateVerificationPhraseFromSigningKey } from '@skiff-org/skiff-crypto';

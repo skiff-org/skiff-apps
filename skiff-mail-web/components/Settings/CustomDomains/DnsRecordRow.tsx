@@ -1,4 +1,4 @@
-import { Icons, Icon } from 'nightwatch-ui';
+import { Icons, Icon } from '@skiff-org/skiff-ui';
 import { DnsRecord } from 'skiff-graphql';
 import styled, { css } from 'styled-components';
 

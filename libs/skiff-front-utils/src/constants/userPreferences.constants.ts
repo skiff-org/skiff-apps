@@ -1,4 +1,4 @@
-import { AccentColor, isAccentColor, Color } from 'nightwatch-ui';
+import { AccentColor, isAccentColor, Color } from '@skiff-org/skiff-ui';
 import { BottomDrawerModes, ThreadDisplayFormat, SwipeSetting } from 'skiff-graphql';
 import { StorageTypes } from 'skiff-utils';
 

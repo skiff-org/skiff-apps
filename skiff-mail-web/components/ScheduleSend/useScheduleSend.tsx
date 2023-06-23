@@ -1,5 +1,5 @@
 import dayjs, { Dayjs } from 'dayjs';
-import { Dropdown, DropdownItem, Icon, IconButton, Portal } from 'nightwatch-ui';
+import { Dropdown, DropdownItem, Icon, IconButton, Portal } from '@skiff-org/skiff-ui';
 import { useCallback, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 

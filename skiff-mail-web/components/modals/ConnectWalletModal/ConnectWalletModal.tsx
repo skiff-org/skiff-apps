@@ -1,6 +1,6 @@
 import { ApolloError } from '@apollo/client';
 import { Keplr } from '@keplr-wallet/types/build/wallet/keplr';
-import { Button, Dialog, DialogTypes, Icon, IconButton, Type, Typography } from 'nightwatch-ui';
+import { Button, Dialog, DialogTypes, Icon, IconButton, Type, Typography } from '@skiff-org/skiff-ui';
 import { FC, useState } from 'react';
 import { useVerifyWalletAddressCreateAliasMutation } from 'skiff-front-graphql';
 import { updateEmailAliases, useToast } from 'skiff-front-utils';

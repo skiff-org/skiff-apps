@@ -10,7 +10,7 @@ import {
   Icons,
   ThemeMode,
   Type
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import {

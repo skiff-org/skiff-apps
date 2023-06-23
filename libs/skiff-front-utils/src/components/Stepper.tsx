@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 export interface DescriptionItem {

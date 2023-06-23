@@ -2,7 +2,7 @@ import { AnimatePresence } from 'framer-motion';
 import uniq from 'lodash/uniq';
 import uniqBy from 'lodash/uniqBy';
 import { useRouter } from 'next/router';
-import { Icon, IconButton, InputField, Type, Typography } from 'nightwatch-ui';
+import { Icon, IconButton, InputField, Type, Typography } from '@skiff-org/skiff-ui';
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';

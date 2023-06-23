@@ -1,5 +1,5 @@
 import Slide from '@mui/material/Slide';
-import { Toast, ToastProps, TOAST_DEFAULT_DURATION } from 'nightwatch-ui';
+import { Toast, ToastProps, TOAST_DEFAULT_DURATION } from '@skiff-org/skiff-ui';
 import { SnackbarKey, useSnackbar } from 'notistack';
 import { useCallback, useRef } from 'react';
 

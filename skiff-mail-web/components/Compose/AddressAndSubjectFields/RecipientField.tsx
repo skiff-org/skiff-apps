@@ -1,4 +1,4 @@
-import { MonoTag } from 'nightwatch-ui';
+import { MonoTag } from '@skiff-org/skiff-ui';
 import { FC, memo, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDrop } from 'react-dnd';

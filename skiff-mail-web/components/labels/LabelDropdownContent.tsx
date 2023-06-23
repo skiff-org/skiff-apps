@@ -1,4 +1,4 @@
-import { DISPLAY_SCROLLBAR_CSS, DropdownItem, Icon, Icons, InputField, ThemeMode } from 'nightwatch-ui';
+import { DISPLAY_SCROLLBAR_CSS, DropdownItem, Icon, Icons, InputField, ThemeMode } from '@skiff-org/skiff-ui';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { SystemLabels, UserLabelVariant } from 'skiff-graphql';

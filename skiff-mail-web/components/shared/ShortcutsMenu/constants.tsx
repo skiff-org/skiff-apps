@@ -1,4 +1,4 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 export interface ShortcutItem {
   icon?: Icon;
   name: string;

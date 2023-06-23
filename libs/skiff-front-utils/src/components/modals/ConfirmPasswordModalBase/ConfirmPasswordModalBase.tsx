@@ -7,7 +7,7 @@ import {
   InputField,
   InputType,
   Size
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';

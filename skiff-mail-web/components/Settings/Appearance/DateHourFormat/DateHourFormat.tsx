@@ -1,4 +1,4 @@
-import { Divider } from 'nightwatch-ui';
+import { Divider } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { TitleActionSection, useTimedRerender, useUserPreference } from 'skiff-front-utils';
 import { AllUserPreferences } from 'skiff-front-utils';

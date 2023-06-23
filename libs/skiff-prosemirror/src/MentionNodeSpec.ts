@@ -1,4 +1,4 @@
-import { Icon, IconProps, Icons, stringToColor } from 'nightwatch-ui';
+import { Icon, IconProps, Icons, stringToColor } from '@skiff-org/skiff-ui';
 import { NodeSpec } from 'prosemirror-model';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';

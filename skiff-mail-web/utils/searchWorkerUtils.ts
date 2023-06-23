@@ -1,4 +1,4 @@
-import { Icon, IconProps } from 'nightwatch-ui';
+import { Icon, IconProps } from '@skiff-org/skiff-ui';
 import { IndexedSkemail } from 'skiff-front-search';
 import { AddressObject, UserLabel as UserLabelOrFolder, UserLabelVariant } from 'skiff-graphql';
 

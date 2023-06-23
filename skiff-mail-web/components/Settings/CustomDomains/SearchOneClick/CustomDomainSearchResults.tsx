@@ -2,7 +2,7 @@ import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import range from 'lodash/range';
 import uniq from 'lodash/uniq';
-import { Alignment, ThemeMode, Typography } from 'nightwatch-ui';
+import { Alignment, ThemeMode, Typography } from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
 import { useGetDomainSuggestionsLazyQuery, useCheckIfDomainsAvailableLazyQuery } from 'skiff-front-graphql';
 import { useGetOrganizationQuery } from 'skiff-front-graphql';

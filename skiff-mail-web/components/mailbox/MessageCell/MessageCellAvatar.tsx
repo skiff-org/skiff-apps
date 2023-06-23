@@ -1,4 +1,4 @@
-import { Size, ThemeMode } from 'nightwatch-ui';
+import { Size, ThemeMode } from '@skiff-org/skiff-ui';
 import { UserAvatar, splitEmailToAliasAndDomain } from 'skiff-front-utils';
 
 import { useDisplayNameFromAddress } from '../../../hooks/useDisplayNameFromAddress';

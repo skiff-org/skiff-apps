@@ -2,7 +2,7 @@ import { ApolloCache, ApolloError } from '@apollo/client';
 import { GraphQLError } from 'graphql';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import { useRouter } from 'next/router';
-import { ButtonGroup, ButtonGroupItem, Icon, Typography } from 'nightwatch-ui';
+import { ButtonGroup, ButtonGroupItem, Icon, Typography } from '@skiff-org/skiff-ui';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';

@@ -1,6 +1,6 @@
 import isEqual from 'lodash/isEqual';
 import last from 'lodash/last';
-import { Button, Icon, IconButton, Icons, ThemeMode, Type, Typography, TypographyWeight } from 'nightwatch-ui';
+import { Button, Icon, IconButton, Icons, ThemeMode, Type, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BrowserView, MobileView, isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';

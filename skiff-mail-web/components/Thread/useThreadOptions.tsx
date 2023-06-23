@@ -1,5 +1,5 @@
-import { Icon } from 'nightwatch-ui';
-import { DropdownSubmenu } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
+import { DropdownSubmenu } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import { SystemLabels, UserLabelVariant, AddressObject } from 'skiff-graphql';

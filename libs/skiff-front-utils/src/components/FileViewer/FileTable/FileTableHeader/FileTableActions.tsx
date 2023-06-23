@@ -1,4 +1,4 @@
-import { IconText } from 'nightwatch-ui';
+import { IconText } from '@skiff-org/skiff-ui';
 import React from 'react';
 import styled from 'styled-components';
 

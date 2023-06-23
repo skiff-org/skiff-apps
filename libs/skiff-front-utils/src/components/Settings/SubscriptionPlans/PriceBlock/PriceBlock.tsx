@@ -1,4 +1,4 @@
-import { Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import { SubscriptionPlan } from 'skiff-graphql';
 import styled from 'styled-components';
 

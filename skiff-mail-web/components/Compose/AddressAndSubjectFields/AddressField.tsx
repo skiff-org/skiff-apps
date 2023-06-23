@@ -1,4 +1,4 @@
-import { Divider, Typography } from 'nightwatch-ui';
+import { Divider, Typography } from '@skiff-org/skiff-ui';
 import { FC } from 'react';
 import { isMobile } from 'react-device-detect';
 import styled, { css } from 'styled-components';

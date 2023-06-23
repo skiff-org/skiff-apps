@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Icon, Icons, ThemeMode, Typography, TypographyWeight } from 'nightwatch-ui';
+import { Icon, Icons, ThemeMode, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import { formatTypeSize, getIconFromMIMEType } from 'skiff-front-utils';
 import styled from 'styled-components';
 

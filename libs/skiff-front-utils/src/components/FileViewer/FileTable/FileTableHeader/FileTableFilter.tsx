@@ -1,4 +1,4 @@
-import { Dropdown, DropdownItem, Icon, IconText, TypographyWeight } from 'nightwatch-ui';
+import { Dropdown, DropdownItem, Icon, IconText, TypographyWeight } from '@skiff-org/skiff-ui';
 import React, { useRef, useState } from 'react';
 import { upperCaseFirstLetter } from 'skiff-utils';
 import styled from 'styled-components';

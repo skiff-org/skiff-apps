@@ -7,7 +7,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { getEnvironment, saveCurrentUserData, sendUserDataToMobileApp, isMobileApp } from 'skiff-front-utils';
 import styled from 'styled-components';

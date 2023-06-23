@@ -1,4 +1,4 @@
-import { Icon, IconButton, Size, TooltipLabelProps, Type } from 'nightwatch-ui';
+import { Icon, IconButton, Size, TooltipLabelProps, Type } from '@skiff-org/skiff-ui';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { SystemLabels } from 'skiff-graphql';

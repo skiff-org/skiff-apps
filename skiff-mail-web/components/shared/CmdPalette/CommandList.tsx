@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { useRouter } from 'next/router';
-import { DISPLAY_SCROLLBAR_CSS, ThemeMode } from 'nightwatch-ui';
+import { DISPLAY_SCROLLBAR_CSS, ThemeMode } from '@skiff-org/skiff-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { VariableSizeList } from 'react-window';

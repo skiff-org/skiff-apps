@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone'; // dependent on utc plugin
 import utc from 'dayjs/plugin/utc';
-import { DropdownItem, InputField, Select, Size } from 'nightwatch-ui';
+import { DropdownItem, InputField, Select, Size } from '@skiff-org/skiff-ui';
 import { Dispatch, FC, SetStateAction, useRef, useState } from 'react';
 import { uniqueTimezones, renderCustomLabel, stringifyTimeZone } from 'skiff-front-utils';
 import styled from 'styled-components';

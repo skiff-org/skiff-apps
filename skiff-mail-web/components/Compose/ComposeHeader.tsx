@@ -1,5 +1,5 @@
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
-import { Icon, IconButton, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { Icon, IconButton, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';

@@ -4,7 +4,7 @@ import { PickerOnChangeFn } from '@mui/x-date-pickers/internals/hooks/useViews';
 import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
 import locale from 'date-fns/locale/en-US';
 import dayjs, { Dayjs } from 'dayjs';
-import { colors, getThemedColor, Icon, Icons, Size, ThemeMode, themeNames } from 'nightwatch-ui';
+import { colors, getThemedColor, Icon, Icons, Size, ThemeMode, themeNames } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import styled, { css } from 'styled-components';

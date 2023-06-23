@@ -1,5 +1,5 @@
 import { Editor } from '@tiptap/react';
-import { InputField } from 'nightwatch-ui';
+import { InputField } from '@skiff-org/skiff-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { generateSymmetricKey, stringDecryptAsymmetric, stringEncryptAsymmetric } from '@skiff-org/skiff-crypto';

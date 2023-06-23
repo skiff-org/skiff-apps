@@ -7,7 +7,7 @@ import {
   getThemedColor,
   ThemeMode,
   DROPDOWN_CALLER_CLASSNAME
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { FC, useRef } from 'react';
 import styled from 'styled-components';
 

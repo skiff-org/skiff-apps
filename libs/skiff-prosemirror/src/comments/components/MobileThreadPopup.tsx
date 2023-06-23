@@ -1,4 +1,4 @@
-import { Drawer, Icon, IconButton, useOnClickOutside } from 'nightwatch-ui';
+import { Drawer, Icon, IconButton, useOnClickOutside } from '@skiff-org/skiff-ui';
 import { EditorView } from 'prosemirror-view';
 import React, { useMemo, useRef } from 'react';
 import { useTheme } from 'skiff-front-utils';

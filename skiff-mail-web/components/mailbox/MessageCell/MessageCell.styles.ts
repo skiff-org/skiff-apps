@@ -1,4 +1,4 @@
-import { themeNames, CorrectedColorSelect, ThemeMode } from 'nightwatch-ui';
+import { themeNames, CorrectedColorSelect, ThemeMode } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import styled, { css } from 'styled-components';
 

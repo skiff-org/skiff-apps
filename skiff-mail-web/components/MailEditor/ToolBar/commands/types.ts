@@ -1,4 +1,4 @@
-import { IconProps } from 'nightwatch-ui';
+import { IconProps } from '@skiff-org/skiff-ui';
 
 export interface ToolBarCommand {
   icon: IconProps['icon'];

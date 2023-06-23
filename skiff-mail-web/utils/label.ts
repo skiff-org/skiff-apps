@@ -1,4 +1,4 @@
-import { Icon, IconProps } from 'nightwatch-ui';
+import { Icon, IconProps } from '@skiff-org/skiff-ui';
 import { ThreadFragment, ThreadWithoutContentFragment } from 'skiff-front-graphql';
 import { splitEmailToAliasAndDomain, createEmail, abbreviateWalletAddress } from 'skiff-front-utils';
 import { SystemLabels, UserLabelVariant } from 'skiff-graphql';

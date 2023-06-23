@@ -1,4 +1,4 @@
-import { ThemeMode, Typography, TypographyWeight } from 'nightwatch-ui';
+import { ThemeMode, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import React from 'react'; // eslint-disable-line
 import { RadioCheckbox } from 'skiff-front-utils';
 import styled from 'styled-components';

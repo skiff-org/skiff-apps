@@ -1,4 +1,4 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useGetNumUnreadQuery } from 'skiff-front-graphql';

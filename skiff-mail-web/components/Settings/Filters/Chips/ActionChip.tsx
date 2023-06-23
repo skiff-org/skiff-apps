@@ -1,4 +1,4 @@
-import { ACCENT_COLOR_VALUES, Icon, IconProps, Icons, Size, Typography, TypographyWeight } from 'nightwatch-ui';
+import { ACCENT_COLOR_VALUES, Icon, IconProps, Icons, Size, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { ActionType } from 'skiff-graphql';
 import { assertUnreachable } from 'skiff-utils';

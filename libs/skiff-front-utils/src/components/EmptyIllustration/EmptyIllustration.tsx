@@ -1,5 +1,5 @@
 import range from 'lodash/range';
-import { Icons, Icon, Size, Typography, TypographyWeight } from 'nightwatch-ui';
+import { Icons, Icon, Size, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 
 import {
   EmptyMailbox,

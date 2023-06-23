@@ -1,4 +1,4 @@
-import { Icon as NWIcon } from 'nightwatch-ui';
+import { Icon as NWIcon } from '@skiff-org/skiff-ui';
 import { bytesToHumanReadable } from 'skiff-utils';
 
 import { VIDEO_UNSUPPORTED_FORMATS } from '../components/FileViewer/RecentFilePreview/Previews/VideoPreview';

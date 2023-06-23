@@ -1,4 +1,4 @@
-import { Dropdown, DropdownItem } from 'nightwatch-ui';
+import { Dropdown, DropdownItem } from '@skiff-org/skiff-ui';
 
 import { DROPDOWN_ANCHOR_GAP, ConditionType, CONDITION_TYPE_TO_LABEL } from '../Filters.constants';
 import { getAvailableConditionTypes } from '../Filters.utils';

@@ -1,7 +1,16 @@
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
-import { Icon, Typography, Icons, Layout, Size, ThemeMode, TypographySize, TypographyWeight } from 'nightwatch-ui';
-import { Facepile } from 'nightwatch-ui';
+import {
+  Icon,
+  Typography,
+  Icons,
+  Layout,
+  Size,
+  ThemeMode,
+  TypographySize,
+  TypographyWeight
+} from '@skiff-org/skiff-ui';
+import { Facepile } from '@skiff-org/skiff-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useResizeDetector } from 'react-resize-detector';

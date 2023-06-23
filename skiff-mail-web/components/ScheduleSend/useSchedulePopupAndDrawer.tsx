@@ -14,7 +14,7 @@ import {
   Size,
   Typography,
   TypographySize
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { HourPicker, useTheme, useUserPreference } from 'skiff-front-utils';

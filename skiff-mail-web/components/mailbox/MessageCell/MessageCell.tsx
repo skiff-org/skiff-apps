@@ -12,7 +12,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ConnectDragSource } from 'react-dnd';
 import { useResizeDetector } from 'react-resize-detector';

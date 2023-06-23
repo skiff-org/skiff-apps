@@ -9,7 +9,7 @@ import {
   Size,
   Type,
   Typography
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { Fragment, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSetUserPublicKeyMutation } from 'skiff-front-graphql';

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Tabs, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { Tabs, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { TitleActionSection } from 'skiff-front-utils';

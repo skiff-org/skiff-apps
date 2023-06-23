@@ -1,4 +1,4 @@
-import { useOnClickOutside } from 'nightwatch-ui';
+import { useOnClickOutside } from '@skiff-org/skiff-ui';
 import { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 

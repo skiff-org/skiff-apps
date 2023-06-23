@@ -1,4 +1,4 @@
-import { ButtonGroup, ButtonGroupItem, Dialog, DialogTypes, Icon, Icons, InputField } from 'nightwatch-ui';
+import { ButtonGroup, ButtonGroupItem, Dialog, DialogTypes, Icon, Icons, InputField } from '@skiff-org/skiff-ui';
 import { AddressObject, DisplayPictureData } from 'skiff-graphql';
 
 import { useToast } from '../../../hooks';

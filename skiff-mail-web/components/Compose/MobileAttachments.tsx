@@ -1,4 +1,4 @@
-import { Divider } from 'nightwatch-ui';
+import { Divider } from '@skiff-org/skiff-ui';
 import { MobileView } from 'react-device-detect';
 
 import { Attachments, ClientAttachment } from '../Attachments';

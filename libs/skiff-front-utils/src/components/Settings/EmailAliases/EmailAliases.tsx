@@ -1,5 +1,5 @@
 import { ApolloError } from '@apollo/client';
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { isPaywallErrorCode, PaywallErrorCode } from 'skiff-utils';
 import styled from 'styled-components';

@@ -1,4 +1,4 @@
-import { Button, Icon, IconButton, Size } from 'nightwatch-ui';
+import { Button, Icon, IconButton, Size } from '@skiff-org/skiff-ui';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 

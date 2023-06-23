@@ -1,5 +1,5 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import { Dialog, Drawer } from 'nightwatch-ui';
+import { Dialog, Drawer } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { PaywallErrorCode } from 'skiff-utils';

@@ -1,6 +1,6 @@
 import { Dayjs } from 'dayjs';
 import debounce from 'lodash/debounce';
-import { getThemedColor, ThemeMode, Typography, TypographySize } from 'nightwatch-ui';
+import { getThemedColor, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 

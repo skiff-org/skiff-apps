@@ -1,6 +1,6 @@
 import { BlockquoteOptions } from '@tiptap/extension-blockquote';
 import { NodeViewContent, NodeViewProps, NodeViewWrapper } from '@tiptap/react';
-import { Typography } from 'nightwatch-ui';
+import { Typography } from '@skiff-org/skiff-ui';
 import { TextSelection } from 'prosemirror-state';
 import { hasParentNode } from 'prosemirror-utils';
 

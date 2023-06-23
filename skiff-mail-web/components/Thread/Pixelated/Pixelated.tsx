@@ -1,5 +1,5 @@
 import range from 'lodash/range';
-import { colors, ThemeMode } from 'nightwatch-ui';
+import { colors, ThemeMode } from '@skiff-org/skiff-ui';
 import { useTheme } from 'skiff-front-utils';
 import styled from 'styled-components';
 

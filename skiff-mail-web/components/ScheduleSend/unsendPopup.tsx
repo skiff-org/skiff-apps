@@ -1,4 +1,4 @@
-import { ButtonGroup, ButtonGroupItem, Dialog, DialogTypes, Typography } from 'nightwatch-ui';
+import { ButtonGroup, ButtonGroupItem, Dialog, DialogTypes, Typography } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { ThreadFragment } from 'skiff-front-graphql';

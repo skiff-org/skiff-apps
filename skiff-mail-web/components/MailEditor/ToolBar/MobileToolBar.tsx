@@ -1,5 +1,5 @@
 import { Editor } from '@tiptap/react';
-import { Icon, IconButton, Size, Typography } from 'nightwatch-ui';
+import { Icon, IconButton, Size, Typography } from '@skiff-org/skiff-ui';
 import { MouseEventHandler, useEffect, useState } from 'react';
 import { isIOS } from 'react-device-detect';
 import styled from 'styled-components';

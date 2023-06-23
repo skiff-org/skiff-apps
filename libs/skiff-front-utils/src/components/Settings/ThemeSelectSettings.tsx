@@ -1,4 +1,4 @@
-import { LocalStorageThemeMode, StorageOnlyThemeMode, ThemeMode } from 'nightwatch-ui';
+import { LocalStorageThemeMode, StorageOnlyThemeMode, ThemeMode } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { useStoreWorkspaceEventMutation } from 'skiff-front-graphql';
 import { WorkspaceEventType } from 'skiff-graphql';

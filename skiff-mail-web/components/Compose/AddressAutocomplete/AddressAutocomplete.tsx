@@ -11,7 +11,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDrag } from 'react-dnd';

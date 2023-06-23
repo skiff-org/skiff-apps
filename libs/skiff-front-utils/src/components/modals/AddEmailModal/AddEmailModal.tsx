@@ -7,7 +7,7 @@ import {
   InputField,
   Layout,
   ThemeMode
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { RequestStatus } from 'skiff-graphql';

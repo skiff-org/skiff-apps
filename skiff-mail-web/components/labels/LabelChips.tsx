@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Avatar, Chip, ChipProps, Icon, Icons, Size } from 'nightwatch-ui';
+import { Avatar, Chip, ChipProps, Icon, Icons, Size } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { useMediaQuery, useUserPreference } from 'skiff-front-utils';
 import { ThreadDisplayFormat, UserLabelVariant } from 'skiff-graphql';

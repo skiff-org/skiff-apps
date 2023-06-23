@@ -1,6 +1,6 @@
 import DOMPurify from 'dompurify';
 import debounce from 'lodash/debounce';
-import { ThemeMode, themeNames } from 'nightwatch-ui';
+import { ThemeMode, themeNames } from '@skiff-org/skiff-ui';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isIOS, isMobile, isSafari } from 'react-device-detect';
 import { createPortal } from 'react-dom';

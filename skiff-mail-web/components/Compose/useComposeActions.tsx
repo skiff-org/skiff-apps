@@ -1,5 +1,5 @@
 import { Editor } from '@tiptap/react';
-import { Button, Icon, IconButton, Type } from 'nightwatch-ui';
+import { Button, Icon, IconButton, Type } from '@skiff-org/skiff-ui';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 

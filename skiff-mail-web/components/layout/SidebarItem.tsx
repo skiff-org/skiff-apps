@@ -13,7 +13,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';

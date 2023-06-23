@@ -1,7 +1,7 @@
 import { AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { BANNER_HEIGHT, CustomCircularProgress, Size } from 'nightwatch-ui';
+import { BANNER_HEIGHT, CustomCircularProgress, Size } from '@skiff-org/skiff-ui';
 import { FC, useEffect, useCallback } from 'react';
 import { isAndroid, isMobile, MobileView } from 'react-device-detect';
 import { useDispatch } from 'react-redux';

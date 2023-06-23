@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Icon, IconText, Size, Type, Typography } from 'nightwatch-ui';
+import { Button, CircularProgress, Icon, IconText, Size, Type, Typography } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 

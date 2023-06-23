@@ -12,7 +12,7 @@ import {
   Type,
   Typography,
   getThemedColor
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { FC, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { PermissionLevel } from 'skiff-graphql';

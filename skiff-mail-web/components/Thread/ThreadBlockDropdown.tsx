@@ -1,5 +1,5 @@
 import DOMPurify from 'dompurify';
-import { Dropdown, DropdownItem, DropdownSubmenu, Icon } from 'nightwatch-ui';
+import { Dropdown, DropdownItem, DropdownSubmenu, Icon } from '@skiff-org/skiff-ui';
 import React, { RefObject } from 'react';
 import { isMobile } from 'react-device-detect';
 

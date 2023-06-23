@@ -1,4 +1,4 @@
-import { AccentColor, CorrectedColorSelect, getThemedColor, ThemeMode } from 'nightwatch-ui';
+import { AccentColor, CorrectedColorSelect, getThemedColor, ThemeMode } from '@skiff-org/skiff-ui';
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 

@@ -7,7 +7,7 @@ import {
   Typography,
   TypographyWeight,
   getThemedColor
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { FC } from 'react';
 import { Email, SystemLabels, UserThread } from 'skiff-graphql';
 import { bytesToHumanReadable } from 'skiff-utils';

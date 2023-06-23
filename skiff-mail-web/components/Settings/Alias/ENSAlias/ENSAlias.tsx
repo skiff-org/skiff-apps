@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
   Type,
   Typography
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
 import { abbreviateWalletAddress, splitEmailToAliasAndDomain, TitleActionSection } from 'skiff-front-utils';
 import styled from 'styled-components';

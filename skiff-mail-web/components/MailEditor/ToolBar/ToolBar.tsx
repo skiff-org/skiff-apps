@@ -1,7 +1,7 @@
 import { Editor } from '@tiptap/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import isEqual from 'lodash/isEqual';
-import { Icon, Icons, getThemedColor, ThemeMode, ACCENT_COLOR_VALUES } from 'nightwatch-ui';
+import { Icon, Icons, getThemedColor, ThemeMode, ACCENT_COLOR_VALUES } from '@skiff-org/skiff-ui';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { TEXT_COLORS, HIGHLIGHT_COLORS } from 'skiff-front-utils';

@@ -8,7 +8,7 @@ import {
   Type,
   Typography,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useAdjustBusinessPlanMutation } from 'skiff-front-graphql';

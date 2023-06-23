@@ -6,7 +6,7 @@ import {
   ThemeMode,
   useOnClickOutside,
   DROPDOWN_CALLER_CLASSNAME
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { FC, useEffect, useRef, useState, ChangeEvent } from 'react';
 import styled from 'styled-components';
 

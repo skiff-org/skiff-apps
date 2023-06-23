@@ -13,7 +13,7 @@ import {
   ThemeMode,
   accentColorToPrimaryColor,
   themeNames
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { RefObject, useRef, useState } from 'react';
 import { useDeleteUserLabelMutation, useEditUserLabelMutation } from 'skiff-front-graphql';
 import { useToast } from 'skiff-front-utils';

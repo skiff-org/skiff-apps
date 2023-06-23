@@ -1,4 +1,4 @@
-import { Size, ThemeMode, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { Size, ThemeMode, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { FC } from 'react';
 import { isMobile } from 'react-device-detect';

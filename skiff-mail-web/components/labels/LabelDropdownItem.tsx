@@ -7,7 +7,7 @@ import {
   Size,
   ThemeMode,
   getThemedColor
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { Dispatch, FC, SetStateAction, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';

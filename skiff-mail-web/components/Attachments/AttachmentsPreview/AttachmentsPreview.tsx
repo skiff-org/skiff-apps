@@ -1,6 +1,6 @@
 import { TopAppBar } from '@skiff-org/skiff-ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { getThemedColor, Icon, IconText, Size, ThemeMode, useOnClickOutside } from 'nightwatch-ui';
+import { getThemedColor, Icon, IconText, Size, ThemeMode, useOnClickOutside } from '@skiff-org/skiff-ui';
 import { BaseSyntheticEvent, FC, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { HotKeys } from 'react-hotkeys';

@@ -1,4 +1,4 @@
-import { InputField } from 'nightwatch-ui';
+import { InputField } from '@skiff-org/skiff-ui';
 import { FC, memo, useEffect, useRef } from 'react';
 
 import { EmailFieldTypes } from '../Compose.constants';

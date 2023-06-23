@@ -1,4 +1,4 @@
-import { Icon, InputField, InputType } from 'nightwatch-ui';
+import { Icon, InputField, InputType } from '@skiff-org/skiff-ui';
 import React, { useRef, useState } from 'react';
 import { insertIf } from 'skiff-utils';
 import styled from 'styled-components';

@@ -1,4 +1,4 @@
-import { ButtonGroupItem, Dialog, DialogTypes, Type } from 'nightwatch-ui';
+import { ButtonGroupItem, Dialog, DialogTypes, Type } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 

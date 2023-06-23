@@ -12,7 +12,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { isMobile, MobileView } from 'react-device-detect';
 import { useDispatch } from 'react-redux';

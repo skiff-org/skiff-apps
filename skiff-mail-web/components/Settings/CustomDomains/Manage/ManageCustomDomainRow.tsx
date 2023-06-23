@@ -19,7 +19,7 @@ import {
   TypographySize,
   MonoTag,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import pluralize from 'pluralize';
 import { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';

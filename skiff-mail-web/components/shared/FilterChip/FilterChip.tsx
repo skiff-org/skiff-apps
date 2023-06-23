@@ -1,4 +1,4 @@
-import { Chip, Icons, IconProps, Size, ThemeMode, TypographyWeight } from 'nightwatch-ui';
+import { Chip, Icons, IconProps, Size, ThemeMode, TypographyWeight } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { formatEmailAddress, getAddressTooltipLabel, UserAvatar } from 'skiff-front-utils';
 import { AddressObject, UserLabel } from 'skiff-graphql';

@@ -1,4 +1,4 @@
-import { Dropdown, DropdownItem, Icon, IconButton, Icons, Type } from 'nightwatch-ui';
+import { Dropdown, DropdownItem, Icon, IconButton, Icons, Type } from '@skiff-org/skiff-ui';
 import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useGetNumUnreadQuery } from 'skiff-front-graphql';

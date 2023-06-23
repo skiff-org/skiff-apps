@@ -1,7 +1,7 @@
 import startCase from 'lodash/startCase';
 import toLower from 'lodash/toLower';
 import uniq from 'lodash/uniq';
-import { Dropdown, DropdownItem } from 'nightwatch-ui';
+import { Dropdown, DropdownItem } from '@skiff-org/skiff-ui';
 import pluralize from 'pluralize';
 import { Dispatch, MutableRefObject, SetStateAction, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';

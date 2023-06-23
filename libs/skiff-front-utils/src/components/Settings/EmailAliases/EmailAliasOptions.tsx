@@ -7,7 +7,7 @@ import {
   Icon,
   IconButton,
   Type
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { insertIf, isSkiffAddress } from 'skiff-utils';

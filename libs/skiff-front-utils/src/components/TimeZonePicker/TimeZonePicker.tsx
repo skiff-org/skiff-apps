@@ -1,5 +1,5 @@
 import { getTimeZones, TimeZone } from '@vvo/tzdb';
-import { Typography, ThemeMode, themeNames } from 'nightwatch-ui';
+import { Typography, ThemeMode, themeNames } from '@skiff-org/skiff-ui';
 import styled from 'styled-components';
 
 export const TimeDiffContainer = styled.span`

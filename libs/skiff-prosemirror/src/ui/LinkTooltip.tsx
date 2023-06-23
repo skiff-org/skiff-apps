@@ -1,6 +1,6 @@
 import './skiff-link-tooltip.css';
 
-import { Icon, IconButton, ThemeMode, Type } from 'nightwatch-ui';
+import { Icon, IconButton, ThemeMode, Type } from '@skiff-org/skiff-ui';
 import { EditorView } from 'prosemirror-view';
 import React from 'react';
 import scrollIntoView from 'smooth-scroll-into-view-if-needed';

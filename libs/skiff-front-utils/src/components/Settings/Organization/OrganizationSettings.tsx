@@ -1,5 +1,5 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import React from 'react';
 
 import { Setting, SettingsPage, SETTINGS_LABELS, SettingType, SettingValue } from '../Settings.types';

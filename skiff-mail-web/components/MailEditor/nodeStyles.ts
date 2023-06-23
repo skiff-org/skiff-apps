@@ -1,4 +1,4 @@
-import { themeNames } from 'nightwatch-ui';
+import { themeNames } from '@skiff-org/skiff-ui';
 
 export const linkStyling = `
     color: var(--text-link, ${themeNames.light['--text-link']});

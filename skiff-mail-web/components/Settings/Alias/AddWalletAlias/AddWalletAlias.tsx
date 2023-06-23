@@ -1,6 +1,14 @@
 import { ApolloError } from '@apollo/client';
 import { Keplr } from '@keplr-wallet/types/build/wallet/keplr';
-import { Button, Tooltip, TooltipContent, TooltipPlacement, TooltipTrigger, Type, Typography } from 'nightwatch-ui';
+import {
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipPlacement,
+  TooltipTrigger,
+  Type,
+  Typography
+} from '@skiff-org/skiff-ui';
 import React, { Suspense, useState } from 'react';
 import { isFirefox } from 'react-device-detect';
 import { useUserLabelsLazyQuery, useVerifyWalletAddressCreateAliasMutation } from 'skiff-front-graphql';

@@ -8,7 +8,7 @@ import {
   Icons,
   Size,
   getAvatarIconOrLabel
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { getWalletIcon, splitEmailToAliasAndDomain } from 'skiff-front-utils';
 import { UserLabelVariant } from 'skiff-graphql';
 import { isWalletOrNameServiceAddress } from 'skiff-utils';

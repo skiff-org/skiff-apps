@@ -1,4 +1,13 @@
-import { Typography, Icon, IconButton, Icons, Size, ThemeMode, TypographyWeight, TypographySize } from 'nightwatch-ui';
+import {
+  Typography,
+  Icon,
+  IconButton,
+  Icons,
+  Size,
+  ThemeMode,
+  TypographyWeight,
+  TypographySize
+} from '@skiff-org/skiff-ui';
 import { useCallback } from 'react';
 import { UserAvatar, useToast, copyToClipboardWebAndMobile } from 'skiff-front-utils';
 import { DisplayPictureData } from 'skiff-graphql';

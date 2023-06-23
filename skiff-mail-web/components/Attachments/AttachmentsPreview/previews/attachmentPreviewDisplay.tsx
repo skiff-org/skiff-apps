@@ -1,4 +1,4 @@
-import { CustomCircularProgressProps } from 'nightwatch-ui';
+import { CustomCircularProgressProps } from '@skiff-org/skiff-ui';
 import { isAndroid } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import {

@@ -1,5 +1,5 @@
 import { Editor, EditorContent, useEditor } from '@tiptap/react';
-import { ButtonGroup, ButtonGroupItem, Icon } from 'nightwatch-ui';
+import { ButtonGroup, ButtonGroupItem, Icon } from '@skiff-org/skiff-ui';
 import { MutableRefObject, useEffect, useMemo, useRef } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useTheme, useToast } from 'skiff-front-utils';

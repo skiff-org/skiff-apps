@@ -1,4 +1,4 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import { Setting, SETTINGS_LABELS, SettingType, SettingValue, useUserPreference } from 'skiff-front-utils';
 import { StorageTypes } from 'skiff-utils';
 

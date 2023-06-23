@@ -10,7 +10,7 @@ import {
   Typography,
   TypographyWeight,
   useOnClickOutside
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { FC, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 

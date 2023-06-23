@@ -1,4 +1,4 @@
-import { Button, Dialog, Type, Typography } from 'nightwatch-ui';
+import { Button, Dialog, Type, Typography } from '@skiff-org/skiff-ui';
 import { MutableRefObject } from 'react';
 import styled from 'styled-components';
 
