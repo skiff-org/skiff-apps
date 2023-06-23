@@ -1,5 +1,5 @@
 import srp from 'secure-remote-password/client';
-import { createKeyFromSecret, createSRPKey, createPasswordDerivedSecret } from 'skiff-crypto';
+import { createKeyFromSecret, createSRPKey, createPasswordDerivedSecret } from '@skiff-org/skiff-crypto';
 import {
   LoginSrpStep1Document,
   LoginSrpStep1Mutation,

@@ -62,7 +62,7 @@
     "long": "^5.2.0",
     "protobufjs": "^6.11.3",
     "semver": "^7.3.5",
-    "skiff-crypto": "workspace:libs/skiff-crypto",
+    "@skiff-org/skiff-crypto": "workspace:libs/skiff-crypto",
     "skiff-graphql": "workspace:libs/skiff-graphql",
     "skiff-mail-protos": "workspace:libs/skiff-mail-protos",
     "skiff-utils": "workspace:libs/skiff-utils",

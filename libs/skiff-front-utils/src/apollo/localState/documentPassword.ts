@@ -1,5 +1,5 @@
 import { makeVar } from '@apollo/client';
-import { createKeyFromSecret } from 'skiff-crypto';
+import { createKeyFromSecret } from '@skiff-org/skiff-crypto';
 
 /**
  * This stores the key derived from the password for each document.

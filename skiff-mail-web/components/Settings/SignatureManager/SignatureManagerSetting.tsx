@@ -7,7 +7,7 @@ import {
   stringEncryptAsymmetric,
   stringDecryptAsymmetric,
   decryptSymmetric
-} from 'skiff-crypto';
+} from '@skiff-org/skiff-crypto';
 import {
   useGetUserSignatureQuery,
   GetUserSignatureDocument,

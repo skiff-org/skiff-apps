@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 
-import { createJSONWrapperDatagram } from 'skiff-crypto';
+import { createJSONWrapperDatagram } from '@skiff-org/skiff-crypto';
 
 /**
  * RecoveryServerShareDatagram stores the server share for a user's recovery data.

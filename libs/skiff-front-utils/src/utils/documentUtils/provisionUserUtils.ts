@@ -1,6 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import srp from 'secure-remote-password/client';
-import { createKeyFromSecret, createSRPKey } from 'skiff-crypto';
+import { createKeyFromSecret, createSRPKey } from '@skiff-org/skiff-crypto';
 import {
   generateInitialUserObject,
   encryptPrivateUserData,

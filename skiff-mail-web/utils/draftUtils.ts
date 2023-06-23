@@ -4,7 +4,7 @@ import {
   encryptSymmetric,
   stringDecryptAsymmetric,
   stringEncryptAsymmetric
-} from 'skiff-crypto';
+} from '@skiff-org/skiff-crypto';
 import {
   Draft,
   models,

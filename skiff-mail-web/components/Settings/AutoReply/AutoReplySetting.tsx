@@ -2,7 +2,7 @@ import { Editor } from '@tiptap/react';
 import { InputField } from 'nightwatch-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { generateSymmetricKey, stringDecryptAsymmetric, stringEncryptAsymmetric } from 'skiff-crypto';
+import { generateSymmetricKey, stringDecryptAsymmetric, stringEncryptAsymmetric } from '@skiff-org/skiff-crypto';
 import { decryptDatagram } from 'skiff-crypto-v2';
 import {
   useGetAutoReplyQuery,

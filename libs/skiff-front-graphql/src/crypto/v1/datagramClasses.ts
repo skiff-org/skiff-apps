@@ -3,7 +3,7 @@
 import { fromByteArray, toByteArray } from 'base64-js';
 import { gunzipSync, gzipSync } from 'fflate';
 import { Range } from 'semver';
-import { Datagram, createJSONWrapperDatagram, createUint8ArrayDatagram } from 'skiff-crypto';
+import { Datagram, createJSONWrapperDatagram, createUint8ArrayDatagram } from '@skiff-org/skiff-crypto';
 import { utf8BytesToString, utf8StringToBytes } from 'skiff-utils';
 
 /**

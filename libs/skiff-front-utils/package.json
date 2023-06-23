@@ -127,7 +127,7 @@
     "react-spinners": "^0.13.3",
     "secure-remote-password": "^0.3.1",
     "semver": "^7.3.4",
-    "skiff-crypto": "workspace:libs/skiff-crypto",
+    "skiff-crypto": "workspace:skiff-crypto",
     "skiff-front-graphql": "workspace:libs/skiff-front-graphql",
     "skiff-graphql": "workspace:libs/skiff-graphql",
     "skiff-utils": "workspace:libs/skiff-utils",

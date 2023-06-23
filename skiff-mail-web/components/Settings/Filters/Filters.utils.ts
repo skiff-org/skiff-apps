@@ -1,4 +1,4 @@
-import { generateSymmetricKey } from 'skiff-crypto';
+import { generateSymmetricKey } from '@skiff-org/skiff-crypto';
 import { decryptDatagram, decryptSessionKey, encryptDatagram, encryptSessionKey } from 'skiff-crypto-v2';
 import { AddressObjectWithDisplayPicture, requireCurrentUserData } from 'skiff-front-utils';
 import {

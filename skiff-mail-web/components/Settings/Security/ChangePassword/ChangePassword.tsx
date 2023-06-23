@@ -6,7 +6,7 @@ import {
   createKeyFromSecret,
   createPasswordDerivedSecret,
   createSRPKey
-} from 'skiff-crypto';
+} from '@skiff-org/skiff-crypto';
 import {
   encryptPrivateUserData,
   UpdateSrpDocument,

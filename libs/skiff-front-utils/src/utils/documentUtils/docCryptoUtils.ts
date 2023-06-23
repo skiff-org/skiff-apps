@@ -8,7 +8,7 @@ import {
   stringDecryptAsymmetric,
   stringEncryptAsymmetric,
   verifyDetachedSignatureAsymmetric
-} from 'skiff-crypto';
+} from '@skiff-org/skiff-crypto';
 import {
   Document,
   GetPublicKeysDocument,

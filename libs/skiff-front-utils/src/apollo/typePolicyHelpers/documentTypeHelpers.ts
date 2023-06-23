@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import memoize from 'lodash-es/memoize';
-import { stringDecryptAsymmetric, decryptSymmetric } from 'skiff-crypto';
+import { stringDecryptAsymmetric, decryptSymmetric } from '@skiff-org/skiff-crypto';
 import { Document, DocumentDataDatagram, HierarchicalPermissionChainLink } from 'skiff-front-graphql';
 import { assertExists } from 'skiff-utils';
 

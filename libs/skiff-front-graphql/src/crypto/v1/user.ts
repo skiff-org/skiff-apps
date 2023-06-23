@@ -16,7 +16,7 @@ import {
   PrivateUserDataDatagram,
   PrivateUserData,
   generateHash
-} from 'skiff-crypto';
+} from '@skiff-org/skiff-crypto';
 import { LoginSrpRequest, PublicData, RequestStatus, SignatureContext } from 'skiff-graphql';
 import { assertExists, StorageTypes, getStorageKey } from 'skiff-utils';
 import { v4 as uuidv4 } from 'uuid';

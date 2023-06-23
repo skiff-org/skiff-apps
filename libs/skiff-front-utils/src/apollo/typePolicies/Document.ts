@@ -1,5 +1,5 @@
 import { FieldReadFunction, TypePolicy } from '@apollo/client';
-import { decryptSymmetric } from 'skiff-crypto';
+import { decryptSymmetric } from '@skiff-org/skiff-crypto';
 import { Document, LinkLinkKeyDatagram } from 'skiff-front-graphql';
 import { assertExists } from 'skiff-utils';
 

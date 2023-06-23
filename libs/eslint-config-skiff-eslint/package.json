@@ -15,7 +15,6 @@
     "eslint": "^8.*",
     "eslint-config-airbnb-typescript": "^17.*",
     "eslint-config-prettier": "^8.*",
-    "eslint-plugin-diff": "patch:eslint-plugin-diff@^2.0.2-1#../.yarn/patches/eslint-plugin-diff-npm-2.0.2-1-ee53075d10.patch",
     "eslint-plugin-import": "^2.*",
     "eslint-plugin-jsx-a11y": "^6.*",
     "eslint-plugin-lodash": "^7.*",
