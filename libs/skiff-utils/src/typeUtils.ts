@@ -13,7 +13,7 @@ export function assert(condition: unknown, message = 'Assertion failed'): assert
   }
 }
 
-export const assertUnreachable = (object: never, message = 'Did not expect to get here'): never => {
+export const assertUnreachable = (_object: never, message = 'Did not expect to get here'): never => {
   throw new Error(message);
 };
 

@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package com.skiff.calendar.encrypted;
+option go_package = "github.com/skiff-org/skiff-world/protobuf/calendar";
+
+message ExternalAttendee {
+  string id  = 1;
+  string type = 2;
+  string attendeeStatus = 3;
+  string permission = 4;
+  bool optional = 6;
+  string email = 7;
+  bool deleted = 8;
+  int64 updatedAt = 9;
+  string displayName = 10;
+  bool isNew = 11;
+  reserved 5;
+}
+
+enum ConferenceProvider {
+  Unknown = 0;
+  Jitsi = 1;
+  BraveTalk = 2;
+  GoogleMeet = 3;
+  Zoom = 4;
+  MicrosoftTeams = 5;
+}
+
+message Conference {
+  ConferenceProvider provider = 1;
+  string link = 2;
+}
+
+message EventHeader {
+
+}
+
+message EventBody {
+  string title = 1;
+  string description = 3;
+  string location = 4;
+  map<string, int64> lastUpdateKeyMap = 5;
+  repeated ExternalAttendee externalAttendees = 6;
+  bool isAllDay = 7;
+  optional Conference conference = 8;
+  reserved 2;
+}
+
+message CalendarEventPreferencesHeader {
+
+}
+
+message CalendarEventPreferencesBody {
+  optional string color = 1;
+  map<string, int64> lastUpdateKeyMap = 2;
+}

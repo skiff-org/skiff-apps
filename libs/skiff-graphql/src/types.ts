@@ -498,6 +498,7 @@ export type CreditInfoResponse = {
 
 export enum CreditTransactionReason {
   AndroidApp = 'ANDROID_APP',
+  EnsName = 'ENS_NAME',
   GmailImport = 'GMAIL_IMPORT',
   GoogleDriveImport = 'GOOGLE_DRIVE_IMPORT',
   IosApp = 'IOS_APP',
@@ -562,6 +563,11 @@ export type DecryptedAttachment = {
   __typename?: 'DecryptedAttachment';
   attachmentID: Scalars['String'];
   decryptedMetadata?: Maybe<AttachmentMetadata>;
+};
+
+export type DefaultDisplayPictureData = {
+  __typename?: 'DefaultDisplayPictureData';
+  profilePictureData: Scalars['String'];
 };
 
 export type DeleteAccountRequest = {
@@ -658,6 +664,10 @@ export type DeleteUserLabelRequest = {
 export type DeleteUserOrganizationMembershipRequest = {
   orgID: Scalars['String'];
   userID: Scalars['String'];
+};
+
+export type DisableEmailAutoForwardingRequest = {
+  client: EmailAutoForwardingClient;
 };
 
 export type DisableMfaRequest = {
@@ -915,10 +925,32 @@ export type Email = {
   to: Array<AddressObject>;
 };
 
+export enum EmailAutoForwardingClient {
+  Gmail = 'Gmail',
+  Outlook = 'Outlook'
+}
+
+/** The user's email auto-forwarding settings for a given external email client. */
+export type EmailAutoForwardingClientSettings = {
+  __typename?: 'EmailAutoForwardingClientSettings';
+  enabled: Scalars['Boolean'];
+};
+
+export type EmailAutoForwardingSettings = {
+  __typename?: 'EmailAutoForwardingSettings';
+  gmail: EmailAutoForwardingClientSettings;
+  outlook: EmailAutoForwardingClientSettings;
+};
+
 export type EmailsWithUnreadIcsResponse = {
   __typename?: 'EmailsWithUnreadICSResponse';
   emails: Array<Email>;
   hasMore: Scalars['Boolean'];
+};
+
+export type EnableEmailAutoForwardingRequest = {
+  client: EmailAutoForwardingClient;
+  code: Scalars['String'];
 };
 
 export type EncryptedAttachmentInput = {
@@ -996,6 +1028,7 @@ export type EncryptedSessionKeyOutput = {
 
 export type EnrollMfaRequest = {
   dataMFA: Scalars['String'];
+  loginSrpRequest: LoginSrpRequest;
   signature: Scalars['String'];
 };
 
@@ -1167,6 +1200,10 @@ export type GetCustomDomainCheckoutSessionRequest = {
   redirectURL?: InputMaybe<Scalars['String']>;
 };
 
+export type GetDefaultProfilePictureRequest = {
+  messageID: Scalars['String'];
+};
+
 export type GetDocumentRequest = {
   docID: Scalars['String'];
 };
@@ -1188,6 +1225,16 @@ export type GetDomainSuggestionsResponse = {
 
 export type GetMailFiltersInput = {
   clientside?: InputMaybe<Scalars['Boolean']>;
+};
+
+export type GetMboxImportUrlRequest = {
+  fileSizeInBytes: Scalars['Int'];
+};
+
+export type GetMboxImportUrlResponse = {
+  __typename?: 'GetMboxImportUrlResponse';
+  fileID: Scalars['String'];
+  uploadData: Scalars['String'];
 };
 
 export type GetRecoveryPublicKeysAndDataRequest = {
@@ -1260,8 +1307,7 @@ export type ImportGmailRequest = {
 };
 
 export type ImportMboxRequest = {
-  fileSizeInBytes: Scalars['Int'];
-  mboxFile: Scalars['Upload'];
+  fileID: Scalars['String'];
 };
 
 export type IndexableDocument = {
@@ -1464,7 +1510,9 @@ export type MailboxPageInfo = {
 export type MailboxRequest = {
   clientsideFiltersApplied?: InputMaybe<Scalars['Boolean']>;
   cursor?: InputMaybe<MailboxCursor>;
+  /** @deprecated Use lastUpdatedDate instead */
   emailsUpdatedAfterDate?: InputMaybe<Scalars['Date']>;
+  /** @deprecated Use lastUpdatedDate instead */
   emailsUpdatedBeforeDate?: InputMaybe<Scalars['Date']>;
   filters?: InputMaybe<MailboxFilters>;
   isAliasInbox?: InputMaybe<Scalars['Boolean']>;
@@ -1570,16 +1618,19 @@ export type Mutation = {
   deleteUserLabel?: Maybe<Scalars['Void']>;
   deleteUserOrganizationMembership: Scalars['Boolean'];
   deleteUserSignature?: Maybe<Scalars['Void']>;
+  disableEmailAutoForwarding?: Maybe<Scalars['Void']>;
   disableMfa: DisableMfaResponse;
   editOrganization: EditOrganizationResponse;
   editTeam: Team;
   editUserLabel?: Maybe<UserLabel>;
+  enableEmailAutoForwarding?: Maybe<Scalars['Void']>;
   enrollMfa: EnrollMfaResponse;
   generateCustomDomainRecords: GenerateCustomDomainRecordsResponse;
   generateDocPublicLinkAuthTokenStep1: GenerateDocPublicLinkAuthTokenStep1Response;
   generateDocPublicLinkAuthTokenStep2: GenerateDocPublicLinkAuthTokenStep2Response;
   generateWebAuthnChallenge?: Maybe<GenerateWebAuthnChallengeResponse>;
   generateWebAuthnRegistration: GenerateWebAuthnRegistrationResponse;
+  getMboxImportUrl?: Maybe<GetMboxImportUrlResponse>;
   grantCredits: GrantCreditsResponse;
   importEmlEmail?: Maybe<Scalars['Void']>;
   importGmailEmails?: Maybe<Scalars['Void']>;
@@ -1850,6 +1901,11 @@ export type MutationDeleteUserOrganizationMembershipArgs = {
 };
 
 
+export type MutationDisableEmailAutoForwardingArgs = {
+  request: DisableEmailAutoForwardingRequest;
+};
+
+
 export type MutationDisableMfaArgs = {
   request: DisableMfaRequest;
 };
@@ -1870,6 +1926,11 @@ export type MutationEditUserLabelArgs = {
 };
 
 
+export type MutationEnableEmailAutoForwardingArgs = {
+  request: EnableEmailAutoForwardingRequest;
+};
+
+
 export type MutationEnrollMfaArgs = {
   request: EnrollMfaRequest;
 };
@@ -1887,6 +1948,11 @@ export type MutationGenerateDocPublicLinkAuthTokenStep1Args = {
 
 export type MutationGenerateDocPublicLinkAuthTokenStep2Args = {
   request: GenerateDocPublicLinkAuthTokenStep2Request;
+};
+
+
+export type MutationGetMboxImportUrlArgs = {
+  getImportUrlRequest: GetMboxImportUrlRequest;
 };
 
 
@@ -2401,6 +2467,7 @@ export enum PermissionLevel {
 export type PlatformInfo = {
   browserName?: InputMaybe<Scalars['String']>;
   isAndroid: Scalars['Boolean'];
+  isBgTask?: InputMaybe<Scalars['Boolean']>;
   isIos: Scalars['Boolean'];
   isMacOs: Scalars['Boolean'];
   isMobile: Scalars['Boolean'];
@@ -2501,8 +2568,10 @@ export type Query = {
   customDomainCheckoutPortal: CheckoutSession;
   customDomains: Array<Scalars['String']>;
   decryptionServicePublicKey?: Maybe<Scalars['PublicKey']>;
+  defaultProfilePicture?: Maybe<DefaultDisplayPictureData>;
   document: Document;
   documents: Array<Document>;
+  emailAutoForwardingSettings: EmailAutoForwardingSettings;
   /** @deprecated Added pagination, use emailsWithUnreadICS2 instead */
   emailsWithUnreadICS: Array<Email>;
   emailsWithUnreadICS2: EmailsWithUnreadIcsResponse;
@@ -2597,6 +2666,11 @@ export type QueryCreditsArgs = {
 
 export type QueryCustomDomainCheckoutPortalArgs = {
   request: GetCustomDomainCheckoutSessionRequest;
+};
+
+
+export type QueryDefaultProfilePictureArgs = {
+  request: GetDefaultProfilePictureRequest;
 };
 
 
@@ -3281,6 +3355,7 @@ export enum SyncState {
 export enum SystemLabels {
   Archive = 'ARCHIVE',
   Drafts = 'DRAFTS',
+  Imports = 'IMPORTS',
   Inbox = 'INBOX',
   ScheduleSend = 'SCHEDULE_SEND',
   Sent = 'SENT',
@@ -3781,12 +3856,13 @@ export enum WorkspaceEventType {
   GetStartedStepComplete = 'GET_STARTED_STEP_COMPLETE',
   GetStartedStepSkip = 'GET_STARTED_STEP_SKIP',
   IpfsToggle = 'IPFS_TOGGLE',
-  Joyride = 'JOYRIDE',
-  JoyrideReplay = 'JOYRIDE_REPLAY',
   JoyrideSkip = 'JOYRIDE_SKIP',
   LoginPage = 'LOGIN_PAGE',
   Logout = 'LOGOUT',
   MailImportOpen = 'MAIL_IMPORT_OPEN',
+  MobileMailAppError = 'MOBILE_MAIL_APP_ERROR',
+  MobileThreadRecovered = 'MOBILE_THREAD_RECOVERED',
+  NativeAddAccount = 'NATIVE_ADD_ACCOUNT',
   NewUpload = 'NEW_UPLOAD',
   OnboardingDownloadRecoveryKey = 'ONBOARDING_DOWNLOAD_RECOVERY_KEY',
   OnboardingPlanSelect = 'ONBOARDING_PLAN_SELECT',
@@ -3811,10 +3887,7 @@ export enum WorkspaceEventType {
   PlanTableShown = 'PLAN_TABLE_SHOWN',
   PwNextBtn = 'PW_NEXT_BTN',
   Search = 'SEARCH',
-  SelectPersonalWorkspace = 'SELECT_PERSONAL_WORKSPACE',
-  SelectTeamsWorkspace = 'SELECT_TEAMS_WORKSPACE',
   SelectTheme = 'SELECT_THEME',
-  SetDisplayNameOnboarding = 'SET_DISPLAY_NAME_ONBOARDING',
   SignupConnectWalletStart = 'SIGNUP_CONNECT_WALLET_START',
   SignupStart = 'SIGNUP_START',
   SkemailAppCreateFolder = 'SKEMAIL_APP_CREATE_FOLDER',
@@ -3826,7 +3899,6 @@ export enum WorkspaceEventType {
   SkemailAppOpenCompose = 'SKEMAIL_APP_OPEN_COMPOSE',
   SkemailAppSendClick = 'SKEMAIL_APP_SEND_CLICK',
   SkemailAppThreadLoadingTime = 'SKEMAIL_APP_THREAD_LOADING_TIME',
-  SkipDisplayNameOnboarding = 'SKIP_DISPLAY_NAME_ONBOARDING',
   SwitchFromEditorToEmail = 'SWITCH_FROM_EDITOR_TO_EMAIL',
   SwitchFromEmailToEditor = 'SWITCH_FROM_EMAIL_TO_EDITOR',
   ToastCtaClick = 'TOAST_CTA_CLICK',

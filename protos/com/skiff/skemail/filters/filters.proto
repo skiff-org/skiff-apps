@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package com.skiff.skemail.filters;
+option go_package = "github.com/skiff-org/skiff-world/protobuf/skemail";
+
+message MailFilterHeader {
+}
+
+// MailFilter is a filter that can be applied to a mail message.
+message MailFilterBody {
+    string filterType = 1;
+    optional string filterField = 2;
+    optional string serializedData = 3; // any JSON
+    repeated MailFilterBody subFilter = 4;
+}
+
+message FilterActionHeader {
+}
+
+message SingleFilterAction {
+    string actionType = 1;
+    optional string serializedData = 2; // any JSON
+}
+
+message FilterActionBody {
+    repeated SingleFilterAction actions = 1;
+}
+
+message FilterSerializedDataHeader {
+}
+
+message FilterSerializedDataBody {
+    string text = 1;
+}

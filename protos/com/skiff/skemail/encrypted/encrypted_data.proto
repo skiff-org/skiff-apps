@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package com.skiff.skemail.encrypted;
+option go_package = "github.com/skiff-org/skiff-world/protobuf/skemail";
+
+// AttachmentMetadata. Encrypted data about an attachment that is stored for decryption by the client.
+// Metadata is encrypted seperately so it can be retrieved/decrypted by a client on email load without
+// having to download the full attachment.
+message AttachmentMetadataHeader {
+}
+message AttachmentMetadataBody {
+  string contentType = 1;
+  string contentDisposition = 2;
+  string filename = 3;
+  string checksum = 5;
+  int64 size = 6;
+  string contentId = 7;
+}
+
+// Mail content datagrams.
+message MailSubjectHeader {
+}
+
+message MailSubjectBody {
+  string subject = 1;
+}
+
+message MailHTMLHeader{
+}
+
+message MailHTMLBody {
+  string html = 1;
+}
+
+message MailTextHeader {
+}
+
+message MailTextBody {
+  string text = 1;
+}
+
+message MailTextAsHTMLHeader {
+}
+
+message MailTextAsHTMLBody {
+  string textAsHTML = 1;
+}
+
+
+// Attachment content
+message AttachmentHeader {
+}
+message AttachmentBody {
+  string content = 1;
+}
+
+// Encrypted raw mime for retrieval by the client.
+message RawMimeHeader {
+}
+message RawMimeBody {
+  string rawMime = 1;
+}
+
+// Encrypted email structures.
+message Address {
+  string name = 1;
+  string address = 2;
+}
+
+message EncryptedData {
+  string encryptedSubject = 1;
+  string encryptedHtml = 2;
+  string encryptedText = 3;
+  string encryptedTextAsHtml = 4;
+  string encryptedTextSnippet = 5;
+}
