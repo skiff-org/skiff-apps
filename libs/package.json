@@ -17,5 +17,8 @@
     "test": "yarn workspaces foreach -piv -j unlimited run test",
     "lint": "yarn workspaces foreach -iv run lint",
     "lint:fix": "yarn workspaces foreach -piv run lint:fix"
+  },
+  "dependencies": {
+    "@skiff-org/skiff-ui": "^1.2.2"
   }
 }

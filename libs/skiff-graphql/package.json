@@ -15,7 +15,6 @@
   ],
   "types": "dist/src/index.d.ts",
   "packageManager": "yarn@3.5.0",
-  "private": false,
   "scripts": {
     "emit-ts": "yarn tsc --build",
     "clean": "rm -rf dist/",
@@ -40,6 +39,7 @@
     "apollo-server-errors": "^3.3.1",
     "graphql": "16.5.0",
     "skiff-utils": "workspace:libs/skiff-utils",
+    "skiff-mail-protos": "workspace:libs/skiff-mail-protos",
     "tslib": "^2.4.0"
   }
 }

@@ -25,7 +25,6 @@
   ],
   "types": "dist/src/index.d.ts",
   "packageManager": "yarn@3.5.0",
-  "private": false,
   "scripts": {
     "emit-ts": "yarn tsc --build",
     "clean": "rm -rf dist/",
@@ -93,6 +92,7 @@
     "@mui/x-date-pickers": "5.0.3",
     "@simplewebauthn/browser": "^7.2.0",
     "@skiff-org/skiff-crypto": "workspace:libs/skiff-crypto",
+    "@skiff-org/skiff-ui": "^1.2.2",
     "@types/zxcvbn": "^4",
     "@vvo/tzdb": "^6.102.0",
     "axios": "^0.27.2",

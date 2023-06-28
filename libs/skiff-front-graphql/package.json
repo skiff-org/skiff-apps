@@ -15,7 +15,6 @@
   ],
   "types": "dist/src/index.d.ts",
   "packageManager": "yarn@3.5.0",
-  "private": false,
   "scripts": {
     "emit-ts": "tsc --emitDeclarationOnly",
     "clean": "rm -rf dist/",

@@ -16954,6 +16954,7 @@ __metadata:
     "@simplewebauthn/browser": ^7.2.0
     "@simplewebauthn/typescript-types": ^7.0.0
     "@skiff-org/skiff-crypto": "workspace:libs/skiff-crypto"
+    "@skiff-org/skiff-ui": ^1.2.2
     "@swc/jest": ^0.2.21
     "@testing-library/dom": ^8.11.1
     "@testing-library/jest-dom": ^5.16.3
@@ -17063,6 +17064,8 @@ __metadata:
 "skiff-libs@workspace:libs":
   version: 0.0.0-use.local
   resolution: "skiff-libs@workspace:libs"
+  dependencies:
+    "@skiff-org/skiff-ui": ^1.2.2
   languageName: unknown
   linkType: soft
 

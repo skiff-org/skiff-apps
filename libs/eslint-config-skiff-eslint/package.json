@@ -4,7 +4,6 @@
   "main": "index.js",
   "description": "eslint dev tooling and configs",
   "packageManager": "yarn@3.5.0",
-  "private": false,
   "dependencies": {
     "@rushstack/eslint-patch": "^1.1.4"
   },
