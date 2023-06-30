@@ -13,7 +13,7 @@ import { FC, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
 
-import { PermissionLevel } from '../../../../../skiff-graphql/src';
+import { PermissionLevel } from 'skiff-graphql';
 import { useCurrentOrganization, useCurrentUserIsOrgAdmin } from '../../../hooks';
 import Checkbox from '../../Checkbox/Checkbox';
 import { UserAvatar } from '../../UserAvatar';

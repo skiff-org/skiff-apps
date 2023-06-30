@@ -17055,6 +17055,7 @@ __metadata:
     eslint-config-skiff-eslint: "workspace:*"
     graphql: 16.5.0
     onchange: ^7.1.0
+    skiff-mail-protos: "workspace:libs/skiff-mail-protos"
     skiff-utils: "workspace:libs/skiff-utils"
     tslib: ^2.4.0
     typescript: ^5.0.0
