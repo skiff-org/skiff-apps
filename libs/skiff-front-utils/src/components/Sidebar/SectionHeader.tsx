@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import styled from 'styled-components';
 
-import IconTextWithEndActions from '../IconTextWithEndActions';
+import IconTextWithEndActions, { IconTextEndAction } from '../IconTextWithEndActions';
 
 import { SidebarHeaderProps, SidebarSectionType } from './Sidebar.types';
 
@@ -92,7 +92,7 @@ const SectionHeader = ({
   };
 
   const getEndActions = () => {
-    const actions = [];
+    const actions: IconTextEndAction[] = [];
     if (!!titleButton) {
       actions.push({
         icon: <Icons color='secondary' icon={Icon.Plus} />,

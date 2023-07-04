@@ -7,7 +7,6 @@ import { useSubscriptionPlan } from 'skiff-front-graphql';
 import { useStoreWorkspaceEventMutation } from 'skiff-front-graphql';
 import { getTierNameFromSubscriptionPlan } from 'skiff-graphql';
 import { WorkspaceEventType } from 'skiff-graphql';
-import { PlanDelinquencyFlag } from 'skiff-utils';
 
 import { HIGHEST_TIER } from '../../constants';
 import { DEFAULT_WORKSPACE_EVENT_VERSION } from '../../constants';
@@ -32,7 +31,7 @@ const DelinquencyBanner: React.FC<DelinquencyBannerProps> = ({ openPlansTab, onB
   } = useSubscriptionPlan();
   const [storeWorkspaceEvent] = useStoreWorkspaceEventMutation();
   const flags = useFlags();
-  const enableDelinquency = flags.delinquencyEnabled as PlanDelinquencyFlag;
+  const enableDelinquency = flags.delinquencyEnabled as boolean;
   const isUserOnHighestTier = activeSubscription === HIGHEST_TIER;
   // default to true if user is already on max tier, as we'd rather not pester them or block critical actions
   // even if they're in a technically delinquent state due to some legacy issue or bug

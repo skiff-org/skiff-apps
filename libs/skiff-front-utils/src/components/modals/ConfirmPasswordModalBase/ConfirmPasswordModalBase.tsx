@@ -71,6 +71,9 @@ function ConfirmPasswordModalBase(props: ConfirmPasswordModalBaseProps) {
   }, [encryptedMetamaskSecret]);
 
   const runSubmit = async () => {
+    if (isSubmitting) {
+      return;
+    }
     setIsSubmitting(true);
     await onSubmit(password, tokenMFA);
     setIsSubmitting(false);

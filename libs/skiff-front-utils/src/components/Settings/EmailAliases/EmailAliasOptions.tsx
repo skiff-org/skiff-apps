@@ -1,19 +1,11 @@
-import {
-  Drawer,
-  Dropdown,
-  DropdownItem,
-  DropdownItemColor,
-  FilledVariant,
-  Icon,
-  IconButton,
-  Type
-} from '@skiff-org/skiff-ui';
+import { Dropdown, DropdownItem, DropdownItemColor, FilledVariant, Icon, IconButton, Type } from '@skiff-org/skiff-ui';
 import React, { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { insertIf, isSkiffAddress } from 'skiff-utils';
 
 import { useDefaultEmailAlias, useToast } from '../../../hooks';
 import { copyToClipboardWebAndMobile, formatEmailAddress } from '../../../utils';
+import Drawer from '../../Drawer';
 import { DrawerOption, DrawerOptions } from '../../DrawerOptions';
 import { ConfirmModal } from '../../modals';
 

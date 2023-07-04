@@ -28,7 +28,7 @@ type NodeSection = {
   defaultIsOpenVal?: boolean;
 };
 
-type ContentSection = {
+export type ContentSection = {
   id: string;
   content: SidebarSectionContent;
   isCustom?: false;

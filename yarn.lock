@@ -4878,7 +4878,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/material@npm:^5.10.0":
+"@mui/material@npm:^5.10.0, @mui/material@npm:^5.13.6":
   version: 5.13.6
   resolution: "@mui/material@npm:5.13.6"
   dependencies:
@@ -5461,9 +5461,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skiff-org/skiff-ui@npm:^1.2.2":
-  version: 1.2.2
-  resolution: "@skiff-org/skiff-ui@npm:1.2.2"
+"@skiff-org/skiff-ui@npm:^1.2.5":
+  version: 1.2.5
+  resolution: "@skiff-org/skiff-ui@npm:1.2.5"
   dependencies:
     "@floating-ui/react-dom": ^1.0.1
     "@floating-ui/react-dom-interactions": ^0.11.0
@@ -5475,7 +5475,7 @@ __metadata:
   peerDependencies:
     react: ^17.0.2
     react-dom: ^17.0.2
-  checksum: 40e1bf39d079957dcada2479c91e7b82bbc183e0e8aff9376783fd539099e5fdf626c2c7920fff061ea86c1aba7394cce4e8961d4a8e5947220915f83b169d3a
+  checksum: 55f6fadccfc6cc1e36a05df115e589562bf9330df3950e914e29fa6f23ac9f98ab939fb97c3a6252074a4678a9eb5d546a3b1466fd76ed880ad8fa97320f2aa5
   languageName: node
   linkType: hard
 
@@ -6528,6 +6528,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-dom@npm:^18.2.6":
+  version: 18.2.6
+  resolution: "@types/react-dom@npm:18.2.6"
+  dependencies:
+    "@types/react": "*"
+  checksum: b56e42efab121a3a8013d2eb8c1688e6028a25ea6d33c4362d2846f0af3760b164b4d7c34846614024cfb8956cca70dd1743487f152e32ff89a00fe6fbd2be54
+  languageName: node
+  linkType: hard
+
 "@types/react-is@npm:^18.2.0":
   version: 18.2.1
   resolution: "@types/react-is@npm:18.2.1"
@@ -6556,7 +6565,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*":
+"@types/react@npm:*, @types/react@npm:^18.0.0":
   version: 18.2.14
   resolution: "@types/react@npm:18.2.14"
   dependencies:
@@ -16947,14 +16956,14 @@ __metadata:
     "@material-ui/lab": ^4.0.0-alpha.60
     "@metamask/eth-sig-util": ^4.0.1
     "@metamask/providers": ^10.0.0
-    "@mui/material": ^5.10.0
+    "@mui/material": ^5.13.6
     "@mui/styles": ^5.9.3
     "@mui/system": 5.10.8
     "@mui/x-date-pickers": 5.0.3
     "@simplewebauthn/browser": ^7.2.0
     "@simplewebauthn/typescript-types": ^7.0.0
     "@skiff-org/skiff-crypto": "workspace:libs/skiff-crypto"
-    "@skiff-org/skiff-ui": ^1.2.2
+    "@skiff-org/skiff-ui": ^1.2.5
     "@swc/jest": ^0.2.21
     "@testing-library/dom": ^8.11.1
     "@testing-library/jest-dom": ^5.16.3
@@ -16967,8 +16976,8 @@ __metadata:
     "@types/node": 17.0.45
     "@types/pluralize": ^0.0.29
     "@types/qrcode": ^1
-    "@types/react": ^17.0.0
-    "@types/react-dom": ^17.0.0
+    "@types/react": ^18.0.0
+    "@types/react-dom": ^18.2.6
     "@types/react-pdf": ^5.0.9
     "@types/semver": ^7.3.4
     "@types/styled-components": 5.1.15
@@ -17065,8 +17074,6 @@ __metadata:
 "skiff-libs@workspace:libs":
   version: 0.0.0-use.local
   resolution: "skiff-libs@workspace:libs"
-  dependencies:
-    "@skiff-org/skiff-ui": ^1.2.2
   languageName: unknown
   linkType: soft
 
@@ -17129,7 +17136,7 @@ __metadata:
     "@deanc/esbuild-plugin-postcss": ^1.0.2
     "@mui/material": ^5.10.0
     "@skiff-org/prosemirror-tables": ^3.7.3
-    "@skiff-org/skiff-ui": ^1.2.2
+    "@skiff-org/skiff-ui": ^1.2.5
     "@types/color": ^3.0.3
     "@types/dompurify": ^2
     "@types/emoji-mart": ^3.0.9

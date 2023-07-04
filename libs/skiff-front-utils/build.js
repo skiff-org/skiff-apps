@@ -80,8 +80,8 @@ Promise.all([
     // console.log(JSON.stringify(metafile1));
     // console.log('------------------');
     // console.log(JSON.stringify(metafile2));
-    await fs.writeFile('./dist/metafile1.json', JSON.stringify(metafile1));
-    await fs.writeFile('./dist/metafile2.json', JSON.stringify(metafile2));
+    await fs.writeFile('./dist/metafile1.json', JSON.stringify(metafile1), () => {});
+    await fs.writeFile('./dist/metafile2.json', JSON.stringify(metafile2), () => {});
     console.log(`Built ${packagejson.name}`);
     process.exit(0);
   })

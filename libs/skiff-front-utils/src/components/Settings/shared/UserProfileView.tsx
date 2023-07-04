@@ -11,7 +11,7 @@ import {
   Typography,
   TypographySize
 } from '@skiff-org/skiff-ui';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { isMobile } from 'react-device-detect';
 import { CreateUploadAvatarLinkResponse, DisplayPictureData } from 'skiff-graphql';
 import styled, { css } from 'styled-components';
@@ -125,6 +125,7 @@ interface UserProfileViewProps {
   footerButtons?: ButtonComponent | ButtonGroupProps['children'];
   editModeProps?: { isEditing: boolean; setIsEditing: (isEditing: boolean) => void };
   setDisplayPictureData?: (displayPictureData: DisplayPictureData) => Promise<void> | void;
+  children?: ReactNode;
 }
 
 const UserProfileView: React.FC<UserProfileViewProps> = ({

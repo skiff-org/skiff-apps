@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { Button, CircularProgress, Icon, Icons, RelativelyCentered, Size, Type } from '@skiff-org/skiff-ui';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
 import { FileRejection, useDropzone } from 'react-dropzone';
 import { MB_SCALE_FACTOR } from 'skiff-utils';
 import styled from 'styled-components';
@@ -140,6 +140,10 @@ type FileImportProps = {
    * How to display the file import select row
    */
   compact?: boolean;
+  /**
+   * React JSX children
+   */
+  children?: ReactNode;
 };
 
 // TODO: Dedup others

@@ -101,7 +101,7 @@
     "@codemirror/view": "^0.19.47",
     "@mui/material": "^5.10.0",
     "@skiff-org/prosemirror-tables": "^3.7.3",
-    "@skiff-org/skiff-ui": "^1.2.2",
+    "@skiff-org/skiff-ui": "^1.2.5",
     "@types/prosemirror-markdown": "^1.5.4",
     "classnames": "2.3.1",
     "color": "4.2.1",

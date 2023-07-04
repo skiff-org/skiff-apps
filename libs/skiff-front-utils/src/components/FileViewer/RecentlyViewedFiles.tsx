@@ -75,7 +75,7 @@ const RecentlyViewedFiles: React.FC<RecentlyViewedFilesProps> = ({
     <RecentlyViewedContainer ref={previewRef}>
       <RecentlyViewedFilesContainer filePreviewsLength={displayedPreviews.length}>
         {!loading &&
-          displayedPreviews.map((file, index: number) => (
+          displayedPreviews.map((file) => (
             <RecentFilePreview {...file} progress={file.progress || (loading ? 0 : undefined)} theme={theme} />
           ))}
         {loading &&

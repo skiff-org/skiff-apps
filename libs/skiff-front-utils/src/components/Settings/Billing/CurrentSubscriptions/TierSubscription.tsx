@@ -91,7 +91,7 @@ const TierSubscription: React.FC<TierSubscriptionProps> = ({ openPlansPage }) =>
 
   const [downgradeModalInfo, setDowngradeModalInfo] = useState<DowngradeModalInfo | null>(null);
 
-  const openStripePlan = async (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const openStripePlan = async () => {
     // Open Stripe portal to set subscription to cancel at period end
     // or un-cancel subscription previously set to cancel
     const { data } = await getBillingPortalSessionUrl({

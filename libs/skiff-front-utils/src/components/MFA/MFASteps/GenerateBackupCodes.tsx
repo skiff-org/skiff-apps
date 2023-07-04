@@ -2,7 +2,6 @@ import { Button, CircularProgress, Icon, IconText, Size, Type, Typography } from
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import { useRequiredCurrentUserData } from '../../../apollo';
 import { useToast } from '../../../hooks';
 import { copyToClipboardWebAndMobile, exportRecoveryKeyToClient } from '../../../utils';
 
@@ -73,7 +72,6 @@ type GenerateBackupCodesProps = {
 /** Component that renders the step that generates the backup codes for the user to copy or download */
 function GenerateBackupCodes({ username, backupCodes, getNewCodes }: GenerateBackupCodesProps) {
   const { enqueueToast } = useToast();
-  const { recoveryEmail } = useRequiredCurrentUserData();
   // Whether the PDF is being downloaded
   const [isDownloading, setIsDownloading] = useState(false);
 

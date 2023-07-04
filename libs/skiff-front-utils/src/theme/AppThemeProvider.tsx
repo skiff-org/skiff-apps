@@ -1,6 +1,6 @@
 import noop from 'lodash/noop';
 import { LocalStorageThemeMode, StorageOnlyThemeMode, ThemeMode, themeNames } from '@skiff-org/skiff-ui';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { ReactNode, createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 
 import { sendRNWebviewMsg } from '../utils/mobileUtils';
@@ -38,7 +38,7 @@ const GlobalStyles = createGlobalStyle`
     font-smoothing: antialiased;
   }
 `;
-export const AppThemeProvider: React.FC = ({ children }) => {
+export const AppThemeProvider: React.FC<{ children?: ReactNode }> = ({ children }) => {
   const [themeName, setThemeName] = useState<ThemeMode>(ThemeMode.DARK);
   const [storedThemeState, setStoredThemeState] = useState<LocalStorageThemeMode>(StorageOnlyThemeMode.SYSTEM);
 

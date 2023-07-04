@@ -1,5 +1,5 @@
 import { Color, Icon, Icons, Size, Typography, TypographySize, isValidIcon } from '@skiff-org/skiff-ui';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { isMobile } from 'react-device-detect';
 import { DisplayPictureData } from 'skiff-graphql';
 import styled, { css } from 'styled-components';
@@ -70,6 +70,7 @@ interface UserListRowProps {
   dataTest?: string;
   onClick?: () => void;
   setIsHovering?: (isHovering: boolean) => void;
+  children?: ReactNode;
 }
 
 const UserListRow: React.FC<UserListRowProps> = ({

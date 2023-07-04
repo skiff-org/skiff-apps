@@ -80,7 +80,7 @@ export const Stepper = ({ descriptionList }: CarouselProps) => {
             left: currentView
           }}
           dragElastic={0.5}
-          onDragEnd={(e, info) => {
+          onDragEnd={(_, info) => {
             if (info.offset.x + SWIPE_VELOCITY_FACTOR * info.velocity.x < -SWIPE_DISTANCE) {
               swipeLeft();
             } else if (info.offset.x + SWIPE_VELOCITY_FACTOR * info.velocity.x > SWIPE_DISTANCE) {
