@@ -1,4 +1,4 @@
-import { CustomCircularProgressProps } from '@skiff-org/skiff-ui';
+import { CircularProgressSize } from '@skiff-org/skiff-ui';
 import { isAndroid } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import {
@@ -18,7 +18,7 @@ import { errorAttachment, hasContent, inProgress } from '../../typeUtils';
 
 export interface PreviewProps {
   refetch: () => void;
-  progressSize: CustomCircularProgressProps['size'];
+  progressSize: CircularProgressSize;
   tryToOpenProtectedPdf?: boolean;
 }
 

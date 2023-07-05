@@ -62,9 +62,16 @@ export function useActiveThreadActions() {
 
   /** forward the last email in the thread */
   const forward = () => {
-    if (!email) return;
+    if (!email || !threadData?.userThread) return;
     composeNewDraft();
-    dispatch(skemailModalReducer.actions.forwardCompose({ email, emailAliases, defaultEmailAlias }));
+    dispatch(
+      skemailModalReducer.actions.forwardCompose({
+        email,
+        emailAliases,
+        defaultEmailAlias,
+        thread: threadData.userThread
+      })
+    );
   };
 
   const activeThreadLabels = (threadData?.userThread?.attributes.userLabels.map(userLabelFromGraphQL) ||

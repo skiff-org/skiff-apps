@@ -68,7 +68,7 @@ export const useThreadOptions = (
 
   const forward = () => {
     composeNewDraft();
-    dispatch(skemailModalReducer.actions.forwardCompose({ email, emailAliases, defaultEmailAlias }));
+    dispatch(skemailModalReducer.actions.forwardCompose({ email, emailAliases, defaultEmailAlias, thread }));
   };
   const moveThread = (targetLabel: SystemLabel) => {
     void moveThreads([thread.threadID], targetLabel, [currentLabel]);

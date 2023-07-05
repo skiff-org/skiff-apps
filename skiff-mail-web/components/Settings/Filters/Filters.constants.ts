@@ -1,6 +1,6 @@
 // The gap between the options dropdown and the label within the FilterConditionChip
 
-import { Datagram } from 'skiff-crypto-v2';
+import { DatagramV2 } from '@skiff-org/skiff-crypto';
 
 import { FilterSerializedDataBody, FilterSerializedDataHeader } from '../../../../../libs/skiff-mail-protos/dist/src';
 import { BodyTextDatagram, SubjectTextDatagram } from '../../../crypto/filters';
@@ -48,7 +48,7 @@ export enum FilterChipDropdown {
 export const FRONTEND_CONDITION_TYPES = [ConditionType.Subject, ConditionType.Body];
 
 export const ENCRYPTED_CONDITION_TYPES_TO_DATAGRAM: Partial<{
-  [key in ConditionType]: Datagram<FilterSerializedDataHeader, FilterSerializedDataBody>;
+  [key in ConditionType]: DatagramV2<FilterSerializedDataHeader, FilterSerializedDataBody>;
 }> = {
   [ConditionType.Subject]: SubjectTextDatagram,
   [ConditionType.Body]: BodyTextDatagram

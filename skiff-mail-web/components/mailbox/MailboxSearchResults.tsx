@@ -1,8 +1,9 @@
 import { AnimatePresence } from 'framer-motion';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import uniq from 'lodash/uniq';
 import uniqBy from 'lodash/uniqBy';
 import { useRouter } from 'next/router';
-import { Icon, IconButton, InputField, Type, Typography } from '@skiff-org/skiff-ui';
+import { FilledVariant, Icon, IconButton, InputField, Type, Typography } from '@skiff-org/skiff-ui';
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,18 +12,18 @@ import { FixedSizeList } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { useGetThreadsFromIDsQuery } from 'skiff-front-graphql';
 import { EmptyIllustration, useMediaQuery, usePrevious, useUserPreference } from 'skiff-front-utils';
+import { getEnvironment } from 'skiff-front-utils';
 import { SystemLabels, ThreadDisplayFormat } from 'skiff-graphql';
-import { filterExists, StorageTypes } from 'skiff-utils';
+import { filterExists, StorageTypes, SearchIndexProgressFeatureFlag } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { COMPACT_MAILBOX_BREAKPOINT } from '../../constants/mailbox.constants';
 import { useDrafts } from '../../hooks/useDrafts';
 import { useIosKeyboardHeight } from '../../hooks/useIosKeyboardHeight';
 import { useSearch } from '../../hooks/useSearch';
+import { useGetSearchIndexProgress } from '../../hooks/useSearchWorker';
 import { MailboxThreadInfo } from '../../models/thread';
-import { skemailDraftsReducer } from '../../redux/reducers/draftsReducer';
 import { skemailMailboxReducer } from '../../redux/reducers/mailboxReducer';
-import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { RootState } from '../../redux/store/reduxStore';
 import { getItemHeight } from '../../utils/mailboxUtils';
 import { SearchContext } from '../../utils/search/SearchProvider';
@@ -35,6 +36,8 @@ import { LoadingMailbox } from './LoadingMailbox';
 import { MailboxHeader } from './MailboxHeader';
 import MailboxSearchResultItem from './MailboxItem/MailboxSearchResultItem';
 import MessageDetailsPanel from './MessageDetailsPanel';
+import SearchIndexProgressItem from './SearchIndexProgress/SearchIndexProgressItem';
+import SearchIndexProgressView from './SearchIndexProgress/SearchIndexProgressView';
 
 const MailboxContainer = styled.div`
   flex: 1;
@@ -106,6 +109,19 @@ export const MailboxSearchResults = () => {
   const searchBarRef = useRef<HTMLInputElement>(null);
   const { query, fullView, activeResult, isNewSearch, setIsNewSearch } = useContext(SearchContext);
   const isCompact = useMediaQuery(`(max-width:${COMPACT_MAILBOX_BREAKPOINT}px)`);
+  const env = getEnvironment(new URL(window.location.origin));
+  const flags = useFlags();
+  const hasSearchIndexProgressFlag =
+    env === 'local' || env === 'vercel' || (flags.searchIndexProgress as SearchIndexProgressFeatureFlag);
+  const { progress: searchIndexProgress, progressRetrievalError: searchIndexProgressRetrievalError } =
+    useGetSearchIndexProgress(hasSearchIndexProgressFlag);
+
+  const showIndexProgress =
+    hasSearchIndexProgressFlag &&
+    !!searchIndexProgress &&
+    !searchIndexProgressRetrievalError &&
+    !searchIndexProgress.isIndexComplete;
+
   // keep track of active thead and email IDs within the component instead of through the useThreadActions
   // hook since the active thread and email is not stored with the route path
   const [activeThreadID, setActiveThreadID] = useState<string | undefined>(activeResult?.threadID);
@@ -139,7 +155,7 @@ export const MailboxSearchResults = () => {
   const messageListRef = useRef<HTMLDivElement>(null);
   const iosKeyboardHeight = useIosKeyboardHeight('mailbox');
 
-  const { draftThreads } = useDrafts();
+  const { openDraft } = useDrafts();
   const { resultThreadEmailIds, searchForQuery, query: activeQuery, setQuery: setActiveQuery, reset } = useSearch();
 
   const resultThreadIds = resultThreadEmailIds.map((result) => result.threadID);
@@ -179,17 +195,12 @@ export const MailboxSearchResults = () => {
       setActiveThreadID(threadID);
       setActiveEmailID(emailID);
 
-      // if the new active thread/email is a draft, open up the compose panel with the draft
-      const draftThread = draftThreads.find((draft) => draft.threadID === threadID);
-      if (draftThread) {
-        const email = draftThread.emails.find((e) => e.id === emailID);
-        if (email) {
-          dispatch(skemailDraftsReducer.actions.setCurrentDraftID({ draftID: draftThread.threadID }));
-          dispatch(skemailModalReducer.actions.editDraftCompose(email));
-        }
-      }
+      if (!threadID) return;
+      // if the new active thread/email is a draft, open up the compose panel with the draft;
+      // this function does nothing if thread is not a draft
+      openDraft(threadID, emailID);
     },
-    [dispatch, draftThreads]
+    [openDraft]
   );
 
   const startNewSearch = useCallback(
@@ -266,52 +277,70 @@ export const MailboxSearchResults = () => {
         {!!resultsToRender.length && (
           <Autosizer>
             {({ height, width }) => (
-              <InfiniteLoader
-                isItemLoaded={isItemLoaded}
-                itemCount={resultThreadIds.length}
-                loadMoreItems={loadMoreItems}
-                threshold={8}
-              >
-                {({ ref, onItemsRendered }) => (
-                  <FixedSizeList
-                    height={height - iosKeyboardHeight}
-                    itemCount={resultsToRender.length}
-                    itemData={{
-                      searchResults: resultsToRender,
-                      setActiveResult,
-                      activeEmailID,
-                      query: lastSubmittedQuery
-                    }}
-                    itemKey={(index, data) => data.searchResults[index]?.emailID ?? ''}
-                    itemSize={itemHeight}
-                    onItemsRendered={onItemsRendered}
-                    overscanCount={10}
-                    ref={ref}
-                    style={{ overflowX: 'hidden', paddingBottom: iosKeyboardHeight }}
-                    width={width}
-                  >
-                    {MailboxSearchResultItem}
-                  </FixedSizeList>
+              <>
+                {showIndexProgress && (
+                  <SearchIndexProgressItem searchIndexProgress={searchIndexProgress} width={width} />
                 )}
-              </InfiniteLoader>
+                <InfiniteLoader
+                  isItemLoaded={isItemLoaded}
+                  itemCount={resultThreadIds.length}
+                  loadMoreItems={loadMoreItems}
+                  threshold={8}
+                >
+                  {({ ref, onItemsRendered }) => (
+                    <FixedSizeList
+                      height={height - iosKeyboardHeight}
+                      itemCount={resultsToRender.length}
+                      itemData={{
+                        searchResults: resultsToRender,
+                        setActiveResult,
+                        activeEmailID,
+                        query: lastSubmittedQuery
+                      }}
+                      itemKey={(index, data) => data.searchResults[index]?.emailID ?? ''}
+                      itemSize={itemHeight}
+                      onItemsRendered={onItemsRendered}
+                      overscanCount={10}
+                      ref={ref}
+                      style={{ overflowX: 'hidden', paddingBottom: iosKeyboardHeight }}
+                      width={width}
+                    >
+                      {MailboxSearchResultItem}
+                    </FixedSizeList>
+                  )}
+                </InfiniteLoader>
+              </>
             )}
           </Autosizer>
         )}
       </MessageList>
     );
   };
-  const showSkeleton = loading && startingIndexToFetch === 0 && isNewSearch;
+
+  // if searchIndexProgress has yet to resolve and there are no results to render, we don't know whether
+  // the search returned no results because there are genuinely no results or because the index is not yet complete,
+  // so we show loading skeleton until indexing progress is determined
+  // (or until there's a retrieval error, in which case we fall back to the "No Results" illustration)
+  const noResults = resultsToRender.length === 0;
+  const shouldWaitForIndexProgress =
+    hasSearchIndexProgressFlag && noResults && !searchIndexProgress && !searchIndexProgressRetrievalError;
+  const showSkeleton = (loading && startingIndexToFetch === 0 && isNewSearch) || shouldWaitForIndexProgress;
 
   const renderMailboxBody = () => {
-    return (
-      <>
-        {showSkeleton && <LoadingMailbox />}
-        {!showSkeleton && !resultsToRender.length && (
-          <EmptyIllustration subtitle='No emails match the query' title='No results' />
-        )}
-        {!showSkeleton && !!resultsToRender.length && renderSearchResults()}
-      </>
-    );
+    if (showSkeleton) {
+      return <LoadingMailbox />;
+    }
+
+    if (noResults) {
+      // show index progress if there are no results and the search index is not yet complete
+      return showIndexProgress ? (
+        <SearchIndexProgressView searchIndexProgress={searchIndexProgress} />
+      ) : (
+        <EmptyIllustration subtitle='No emails match the query' title='No results' />
+      );
+    }
+
+    return renderSearchResults();
   };
 
   const activeEmailIDIndex = resultsToRender.findIndex((result) => result.emailID === activeEmailID) || 0;
@@ -352,7 +381,12 @@ export const MailboxSearchResults = () => {
             />
           </SearchBar>
           <div>
-            <IconButton icon={Icon.Close} onClick={() => router.back()} type={Type.SECONDARY} />
+            <IconButton
+              icon={Icon.Close}
+              onClick={() => router.back()}
+              type={Type.SECONDARY}
+              variant={FilledVariant.UNFILLED}
+            />
           </div>
         </TopBar>
       </HeaderInput>

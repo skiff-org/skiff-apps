@@ -20,8 +20,8 @@ export type DnsRecordColumnWithPossibleError = DnsRecordColumnHeader.PRIORITY | 
 // Default is 30 days
 export const EXPIRES_SOON_BUFFER_IN_MS = 1_000 * 60 * 60 * 24 * 30;
 // Amount of time before we confirm verification of domain
-// Default is 2 hours
-export const VERIFICATION_DELAY_IN_MS = 1_000 * 60 * 60 * 2;
+// Default is 1 hour
+export const VERIFICATION_DELAY_IN_MS = 1_000 * 60 * 60 * 1;
 
 // Wait to confirm VERIFIED status until it's a delay since the record was created
 // given uncertainty in DNS record propagation times
@@ -31,13 +31,21 @@ export const getUserFacingVerificationStatus = (
   dnsRecords: DnsRecord[],
   skiffManaged: boolean
 ): UserFacingCustomDomainStatus => {
-  // always return 'PENDING' within the verification delay time window for 1CCD's; minimize chances user sees an error state
-  // that will self-resolve
-  if (skiffManaged && Date.now() < createdAt.getTime() + VERIFICATION_DELAY_IN_MS) {
-    return UserFacingCustomDomainStatus.PENDING;
+  const hasVerificationDelayElapsed = Date.now() > createdAt.getTime() + VERIFICATION_DELAY_IN_MS;
+  if (!hasVerificationDelayElapsed) {
+    // always return 'PENDING' within the verification delay time window for 1CCD's;
+    // minimize chance of displaying an error state that will self-resolve
+    if (skiffManaged) {
+      return UserFacingCustomDomainStatus.PENDING;
+    }
+    // for external domains, only show error within this window if there's a mismatch,
+    // since such errors will not self-resolve
+    return dnsRecords.some((record) => record.error?.errorType === CUSTOM_DOMAIN_RECORD_ERRORS.RECORD_MISMATCH)
+      ? UserFacingCustomDomainStatus.DNS_RECORD_ERROR
+      : UserFacingCustomDomainStatus.PENDING;
   }
+  // the delay has elapsed and domain is most likely either in 'VERIFIED' or some error state ('PENDING' without errors only possible here if job was delayed somehow)
   if (statusFromDB !== CustomDomainStatus.VERIFIED) {
-    // 'PENDING' only shown to user between time of record creation and first verification attempt and 1CCD buyers during verification delay;
     // records in pending states that have errors require user action, so a more relevant status is used
     return statusFromDB === CustomDomainStatus.FAILED_REVERIFICATION || dnsRecords.some((record) => !!record.error)
       ? UserFacingCustomDomainStatus.DNS_RECORD_ERROR

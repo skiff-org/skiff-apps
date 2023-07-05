@@ -1,5 +1,5 @@
 import { Editor } from '@tiptap/react';
-import { Icon, IconButton, Size, Typography } from '@skiff-org/skiff-ui';
+import { FilledVariant, Icon, IconButton, Size, Typography } from '@skiff-org/skiff-ui';
 import { MouseEventHandler, useEffect, useState } from 'react';
 import { isIOS } from 'react-device-detect';
 import styled from 'styled-components';
@@ -92,15 +92,15 @@ export function MobileComposeToolbar({ editor, optionButtons }: ActionBarProps) 
 
   const formattingButtons = formattingButtonsArray
     .filter((cmd): cmd is ToolBarCommand => !!cmd)
-    .map(({ icon, command, active, enabled }, index) => {
+    .map(({ icon, command, enabled }, index) => {
       return (
         <IconButton
-          active={active(editor)}
           disabled={!enabled(editor)}
           icon={icon}
           key={`mobile-toolbar-button-${index}`}
           onClick={() => command(editor)}
           size={Size.LARGE}
+          variant={FilledVariant.UNFILLED}
         />
       );
     });
@@ -120,7 +120,12 @@ export function MobileComposeToolbar({ editor, optionButtons }: ActionBarProps) 
             {/* Headers, bold, italic, etc.. */}
             <ButtonGroup hide={!showFormatting}>{formattingButtons}</ButtonGroup>
             {/* Show formatting toggle */}
-            <IconButton icon={!showFormatting ? Icon.Text : Icon.ArrowRight} onClick={onTextClick} size={Size.LARGE} />
+            <IconButton
+              icon={!showFormatting ? Icon.Text : Icon.ArrowRight}
+              onClick={onTextClick}
+              size={Size.LARGE}
+              variant={FilledVariant.UNFILLED}
+            />
             {/* Add attachment, image, link, or discard draft */}
             <ButtonGroup hide={showFormatting}>{optionButtons}</ButtonGroup>
           </ActionBarButtons>

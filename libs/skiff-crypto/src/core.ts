@@ -1,11 +1,19 @@
-import { EncryptedDataOutput, PublicKey } from 'skiff-graphql';
-
 import { DatagramV2 } from './aead-v2/common';
 import { stringDecryptAsymmetric, stringEncryptAsymmetric } from './asymmetricEncryption';
 import { SignatureContext, createDetachedSignatureAsymmetric } from './signature';
 import { decryptSymmetricV2, encryptSymmetricV2 } from './utils';
 
 export type SessionKey = string;
+
+// GraphQL types
+export type EncryptedDataOutput = {
+  encryptedData: string;
+};
+
+export type PublicKey = {
+  key: string;
+  signature?: string;
+};
 
 /**
  * Encrypt document session key.

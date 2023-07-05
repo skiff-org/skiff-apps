@@ -3,6 +3,7 @@ import { sendRNWebviewMsg } from 'skiff-front-utils';
 
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
 import { useThreadActions } from '../../../hooks/useThreadActions';
+import { skemailDraftsReducer } from '../../../redux/reducers/draftsReducer';
 import { skemailMailboxReducer } from '../../../redux/reducers/mailboxReducer';
 import { skemailMobileDrawerReducer } from '../../../redux/reducers/mobileDrawerReducer';
 import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
@@ -32,6 +33,11 @@ export default function useBackButton(): () => void {
     showReportThreadBlockDrawer
   } = useAppSelector((state) => state.mobileDrawer);
 
+  const closeCompose = () => {
+    dispatch(skemailDraftsReducer.actions.clearCurrentDraftID());
+    dispatch(skemailModalReducer.actions.closeCompose());
+  };
+
   const onBackClick = () => {
     // If drawer is open close it
     if (showFilterDrawer) {
@@ -60,7 +66,7 @@ export default function useBackButton(): () => void {
     } else if (showReportThreadBlockDrawer) {
       return dispatch(skemailMobileDrawerReducer.actions.setShowReportThreadBlockDrawer(false));
     } else if (composeOpen) {
-      return dispatch(skemailModalReducer.actions.closeCompose());
+      return closeCompose();
     }
     // If multiple select is active close it
     else if (multipleItemSelector) {

@@ -1,4 +1,13 @@
-import { Icon, IconButton, Size, Type, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
+import {
+  FilledVariant,
+  Icon,
+  IconButton,
+  Size,
+  Type,
+  Typography,
+  TypographySize,
+  TypographyWeight
+} from '@skiff-org/skiff-ui';
 import styled from 'styled-components';
 
 import { ClientAttachment } from '../../../../components/Attachments';
@@ -48,6 +57,7 @@ export default function TopAppBar({ onLeftItemClick, title, currentAttachment, d
           }}
           size={Size.LARGE}
           type={Type.SECONDARY}
+          variant={FilledVariant.UNFILLED}
         />
       </TopRow>
       <Typography size={TypographySize.H3} weight={TypographyWeight.BOLD} wrap>

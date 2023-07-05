@@ -1,5 +1,5 @@
 import { ApolloError } from '@apollo/client';
-import { useAnimation, motion } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import {
   ButtonGroup,
@@ -8,55 +8,55 @@ import {
   DialogTypes,
   Divider,
   DropdownItem,
+  FilledVariant,
   Icon,
-  IconButton,
+  IconText,
   Icons,
   InputField,
+  MonoTag,
   Select,
   Size,
-  Type,
   Typography,
   TypographySize,
-  MonoTag,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
 import pluralize from 'pluralize';
 import { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import {
-  useGetAliasesOnDomainQuery,
   useDeleteCustomDomainMutation,
+  useGetAliasesOnDomainQuery,
   useGetDomainDetailsQuery,
-  useVerifyCustomDomainMutation,
-  useSetCatchallAddressMutation
+  useSetCatchallAddressMutation,
+  useVerifyCustomDomainMutation
 } from 'skiff-front-graphql';
 import {
+  CUSTOM_DOMAIN_SETUP_BLOG,
   ConfirmModal,
-  useToast,
-  renderDate,
-  useCreateAlias,
-  useAllowAddCustomDomainAliases,
-  useCurrentUserEmailAliases,
-  TabPage,
   SettingValue,
+  TabPage,
+  renderDate,
+  useAllowAddCustomDomainAliases,
+  useCreateAlias,
+  useCurrentUserEmailAliases,
   useCurrentUserIsOrgAdmin,
-  CUSTOM_DOMAIN_SETUP_BLOG
+  useToast
 } from 'skiff-front-utils';
 import {
-  CustomDomainRecord,
-  CustomDomainSubscriptionInfo,
   CustomDomainIsDefaultAliasError,
   CustomDomainIsInAllAliasesError,
+  CustomDomainRecord,
+  CustomDomainSubscriptionInfo,
   isApolloLogicErrorType
 } from 'skiff-graphql';
-import { CustomDomainStatus, GODADDY_PRICE_SCALE_FACTOR, CatchallEnabledFeatureFlag } from 'skiff-utils';
+import { CatchallEnabledFeatureFlag, CustomDomainStatus, GODADDY_PRICE_SCALE_FACTOR } from 'skiff-utils';
 import styled, { css } from 'styled-components';
 
 import {
-  UserFacingCustomDomainStatus,
-  getUserFacingVerificationStatus,
   EXPIRES_SOON_BUFFER_IN_MS,
-  getErrorStatusForDnsRecord
+  UserFacingCustomDomainStatus,
+  getErrorStatusForDnsRecord,
+  getUserFacingVerificationStatus
 } from '../../../../utils/customDomainUtils';
 import { useSettings } from '../../useSettings';
 import DnsRecordHeader from '../DnsRecordHeader';
@@ -186,10 +186,11 @@ const UnCheckedIcon = styled.div`
 
 const ButtonContainer = styled.div`
   display: flex;
+  align-items: center;
+  gap: 4px;
   ${isMobile &&
   css`
     padding: 0 0 8px 12px;
-    gap: 4px;
   `}
 `;
 
@@ -495,66 +496,63 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
   const renderButtonActions = () => (
     <ButtonContainer>
       {!skiffManaged && userFacingVerificationStatus !== UserFacingCustomDomainStatus.VERIFIED && (
-        <motion.div
-          animate={controls}
-          initial={false}
+        <IconText
+          iconColor='secondary'
           key='refresh'
-          transition={{
-            duration: RELOAD_ANIMATION_S,
-            ease: 'easeInOut',
-            times: [0, 0.2, 0.5, 0.8, 1]
+          onClick={() => {
+            async function verifyAndRefetch() {
+              await verifyCustomDomain({
+                variables: {
+                  domainId: domainID
+                }
+              });
+              refetchCustomDomains();
+            }
+            void verifyAndRefetch();
+            void controls.start({ rotate: rotation });
+            setRotation((prev) => prev + 720);
           }}
-        >
-          <IconButton
-            filled={isMobile ? true : false}
-            icon={Icon.Reload}
-            iconColor={isMobile ? 'secondary' : undefined}
-            onClick={() => {
-              async function verifyAndRefetch() {
-                await verifyCustomDomain({
-                  variables: {
-                    domainId: domainID
-                  }
-                });
-                refetchCustomDomains();
-              }
-              void verifyAndRefetch();
-              void controls.start({ rotate: rotation });
-              setRotation((prev) => prev + 720);
-            }}
-            size={isMobile ? undefined : Size.SMALL}
-            tooltip='Refetch'
-            type={isMobile ? Type.SECONDARY : undefined}
-          />
-        </motion.div>
+          size={isMobile ? undefined : Size.SMALL}
+          startIcon={
+            <motion.div
+              animate={controls}
+              initial={false}
+              transition={{
+                duration: RELOAD_ANIMATION_S,
+                ease: 'easeInOut',
+                times: [0, 0.2, 0.5, 0.8, 1]
+              }}
+            >
+              <Icons color='secondary' icon={Icon.Reload} />
+            </motion.div>
+          }
+          tooltip='Refetch'
+          variant={isMobile ? FilledVariant.FILLED : FilledVariant.UNFILLED}
+        />
       )}
       {/* Hide status tag if verified or on mobile */}
       {!isMobile && userFacingVerificationStatus !== UserFacingCustomDomainStatus.VERIFIED && (
         <InfoTag>
-          <MonoTag
-            bgColor={hasDNSRecordError ? undefined : 'var(--bg-overlay-tertiary)'}
-            color={hasDNSRecordError ? 'red' : undefined}
-            label={userFacingVerificationStatus}
-            textColor={hasDNSRecordError ? undefined : 'secondary'}
-          />
+          <MonoTag color={hasDNSRecordError ? 'red' : 'secondary'} label={userFacingVerificationStatus} />
         </InfoTag>
       )}
       {/* all dropdown items except, in some cases, 'Add alias' are only available to admins */}
       {(isCurrentUserOrgAdmin || showAddAliasOption) && (
-        <IconButton
-          filled={isMobile ? true : false}
-          icon={Icon.OverflowH}
+        <IconText
+          color='secondary'
           onClick={() => setDropdownOpen(!dropdownOpen)}
           ref={ref}
           size={isMobile ? undefined : Size.SMALL}
-          type={isMobile ? Type.SECONDARY : undefined}
+          startIcon={Icon.OverflowH}
+          variant={isMobile ? FilledVariant.FILLED : FilledVariant.UNFILLED}
         />
       )}
       {hasDomainInfoPane && dnsRecords.length > 0 && (
-        <IconButton
-          icon={showDomainInfo ? Icon.ChevronDown : Icon.ChevronRight}
+        <IconText
+          color='secondary'
           onClick={() => setShowDomainInfo((current) => !current)}
           size={isMobile ? undefined : Size.SMALL}
+          startIcon={showDomainInfo ? Icon.ChevronDown : Icon.ChevronRight}
         />
       )}
     </ButtonContainer>
@@ -578,6 +576,7 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
                 </Typography>
                 {!skiffManaged &&
                   !showDomainInfo &&
+                  isCurrentUserOrgAdmin &&
                   userFacingVerificationStatus === UserFacingCustomDomainStatus.DNS_RECORD_ERROR && (
                     <Typography color='link' onClick={() => setShowDomainInfo(true)} size={TypographySize.SMALL} wrap>
                       &nbsp;Check errors
@@ -645,7 +644,6 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
             </TitleContainer>
             <div>
               <Select
-                filled
                 maxHeight={400}
                 onChange={(value) => {
                   void setCatchallAddress({
@@ -660,6 +658,7 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
                 placeholder={currentCatchall ?? 'None'}
                 size={Size.SMALL}
                 value={currentCatchall ?? 'None'}
+                variant={FilledVariant.FILLED}
               >
                 {catchallSelectItems}
               </Select>

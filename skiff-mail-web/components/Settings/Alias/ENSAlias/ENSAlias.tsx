@@ -1,5 +1,6 @@
 import {
   Avatar,
+  FilledVariant,
   Icon,
   IconButton,
   Tooltip,
@@ -118,6 +119,7 @@ export const ENSAlias: React.FC<ENSAliasProps> = ({ walletAliases }) => {
                   onClick={() => viewOnENS(ensAlias)}
                   tooltip='View on ENS'
                   type={Type.SECONDARY}
+                  variant={FilledVariant.UNFILLED}
                 />
               </div>
             </ENSAliasRow>

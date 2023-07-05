@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { GetUserEmailAndWalletDocument, useDeleteRecoveryEmailMutation } from 'skiff-front-graphql';
-import { TitleActionSection, RecoveryEmailOptions, useRequiredCurrentUserData, useToast } from 'skiff-front-utils';
+import {
+  TitleActionSection,
+  RecoveryEmailOptions,
+  deleteCurrentUserRecoveryEmail,
+  useRequiredCurrentUserData,
+  useToast
+} from 'skiff-front-utils';
 import { SUPPORT_EMAIL } from 'skiff-utils';
 
 import ConfirmPasswordDialog from '../../../shared/ConfirmPasswordDialog';
@@ -21,7 +27,7 @@ function DeleteRecoveryEmail() {
     onError: () =>
       enqueueToast({
         title: 'Could not delete recovery email',
-        body: `There was an error deleting your recovery email. Please contact ${SUPPORT_EMAIL} if this issue persists.`
+        body: `There was an error deleting your recovery email. Please try refreshing and contact ${SUPPORT_EMAIL} if this issue persists.`
       }),
     onCompleted: () => {
       enqueueToast({
@@ -34,8 +40,11 @@ function DeleteRecoveryEmail() {
 
   const startDeleteRecoveryEmail = async () => {
     setShowConfirmModal(false);
-    await deleteRecoveryEmail({ variables: {} });
+    const { data } = await deleteRecoveryEmail({ variables: {} });
 
+    if (data?.deleteRecoveryEmail) {
+      deleteCurrentUserRecoveryEmail();
+    }
     return true;
   };
 

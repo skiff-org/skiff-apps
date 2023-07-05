@@ -1,11 +1,12 @@
 import { ACCENT_COLOR_VALUES, Icon, IconProps, Icons, Size, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import React from 'react';
+import { useGetFF } from 'skiff-front-utils';
 import { ActionType } from 'skiff-graphql';
-import { assertUnreachable } from 'skiff-utils';
+import { GmailImportImprovementsFlag, assertUnreachable } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { SystemLabel, UserLabelFolder, UserLabelPlain, isFolder, isSystemLabel } from '../../../../utils/label';
-import { SYSTEM_LABELS } from '../../../../utils/label';
+import { getSystemLabels } from '../../../../utils/label';
 import { CHIP_TYPOGRAPHY_PADDING, FILTER_CONDITION_CHIP_EDGE_PADDING } from '../Filters.constants';
 import { Action } from '../Filters.types';
 
@@ -44,10 +45,14 @@ interface ActionChipProps {
 }
 
 export const ActionChip: React.FC<ActionChipProps> = ({ action, labelsAndFolders }: ActionChipProps) => {
+  const hasGmailImportImprovementsFF = useGetFF<GmailImportImprovementsFlag>('gmailImportImprovements');
+
   const { type, value } = action;
 
   const targetLabelOrFolder = labelsAndFolders.find((userLabel) => userLabel.value === value);
-  const targetSystemLabel = SYSTEM_LABELS.find((systemLabel) => systemLabel.value === value);
+  const targetSystemLabel = getSystemLabels(hasGmailImportImprovementsFF).find(
+    (systemLabel) => systemLabel.value === value
+  );
   const moveToTarget = targetLabelOrFolder || targetSystemLabel;
   const isMoveToAction = type === ActionType.ApplyLabel || type === ActionType.ApplySystemLabel;
 

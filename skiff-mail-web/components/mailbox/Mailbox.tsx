@@ -24,7 +24,11 @@ import {
 import {
   EmptyIllustration,
   getEnvironment,
+  Illustration,
+  Illustrations,
   sendRNWebviewMsg,
+  SettingValue,
+  TabPage,
   useCurrentUserIsOrgAdmin,
   useMediaQuery,
   usePrevious,
@@ -32,7 +36,10 @@ import {
   UserPreferenceKey,
   useScrollActionBar,
   useSyncSavedAccount,
-  useUserPreference
+  useTheme,
+  useUserPreference,
+  isReactNativeDesktopApp,
+  useCurrentUserEmailAliases
 } from 'skiff-front-utils';
 import {
   CreditInfo,
@@ -46,8 +53,8 @@ import {
   ActivationChecklistFeatureFlag,
   filterExists,
   FrontendMailFilteringFeatureFlag,
-  POLL_INTERVAL_IN_MS,
-  StorageTypes
+  StorageTypes,
+  POLL_INTERVAL_IN_MS
 } from 'skiff-utils';
 import styled from 'styled-components';
 
@@ -69,6 +76,7 @@ import { getInitialThreadParams } from '../../utils/locationUtils';
 import { getItemHeight } from '../../utils/mailboxUtils';
 import { runClientSideMailFilters } from '../../utils/mailFiltering/mailFiltering';
 import { SearchItemType, SearchSkemail } from '../../utils/searchWorkerUtils';
+import { useSettings } from '../Settings/useSettings';
 
 import { MAIL_LIST_CONTAINER_ID } from './consts';
 import { fadeInAnimation } from './Mailbox.styles';
@@ -140,12 +148,19 @@ const MessageList = styled.div<{ threadFormat: ThreadDisplayFormat }>`
   opacity: 1;
   animation: ${fadeInAnimation} 0.2s linear;
 `;
+
+const EmptyIllustrationContainer = styled.div`
+  height: 96px;
+`;
+
 const SYSTEM_LABELS_TO_POLL: Set<string> = new Set([SystemLabels.Inbox, SystemLabels.Sent, SystemLabels.ScheduleSend]);
 
 const MAX_THREADS_TO_QUERY = 20;
 
 export const Mailbox = () => {
+  const { theme } = useTheme();
   const { value: label, name: labelName } = useRouterLabelContext();
+  const prevLabel = usePrevious(label);
   const { userLabelVariant } = useCurrentLabel();
   const flags = useFlags();
   const activationChecklistFF = flags.activationChecklist as ActivationChecklistFeatureFlag;
@@ -158,7 +173,11 @@ export const Mailbox = () => {
   const isCompact = useMediaQuery(`(max-width:${COMPACT_MAILBOX_BREAKPOINT}px)`, { noSsr: true });
   const activeThreadAndEmailIDsFromURL = getInitialThreadParams();
   const { activeThreadID, setActiveThreadID } = useThreadActions();
-  const { filters, hoveredThreadIndex, hoveredThreadID } = useAppSelector((state) => state.mailbox);
+  const { openSettings } = useSettings();
+
+  // Redux actions
+  const dispatch = useDispatch();
+  const { filters, hoveredThreadIndex, hoveredThreadID, pendingReplies } = useAppSelector((state) => state.mailbox);
   const { composeOpen } = useAppSelector((state) => state.modal);
   // Is the user refreshing or not
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -180,6 +199,8 @@ export const Mailbox = () => {
   const scrollOffset = useRef<number>(0);
   // Fetch aliases to determine whether to show welcome
   const [fetchEmailAliases] = useGetCurrentUserEmailAliasesLazyQuery();
+  const currentUserAliases = useCurrentUserEmailAliases();
+
   // Fetch users referral credit info
   const [fetchReferralCredits] = useGetCreditsLazyQuery({
     variables: {
@@ -288,8 +309,16 @@ export const Mailbox = () => {
     skip: !label,
     pollInterval: SYSTEM_LABELS_TO_POLL.has(label) ? POLL_INTERVAL_IN_MS : undefined,
     notifyOnNetworkStatusChange: true,
-    onCompleted: () => {
+    onCompleted: (loadedData) => {
       if (hasFrontendMailFilteringFeatureFlag) void runClientSideMailFilters();
+
+      // Remove loaded emails from pending replies
+      const allEmailIDs = loadedData.mailbox?.threads.flatMap((thread) => thread.emails.map((email) => email.id)) ?? [];
+      const loadedPendingReplyEmailIDs = pendingReplies
+        .filter((pendingReply) => allEmailIDs.includes(pendingReply.email.id))
+        .map((pendingReply) => pendingReply.email.id);
+      if (loadedPendingReplyEmailIDs.length)
+        dispatch(skemailMailboxReducer.actions.removeFromPendingReplies({ emailIDs: loadedPendingReplyEmailIDs }));
     }
   });
 
@@ -299,6 +328,47 @@ export const Mailbox = () => {
 
   // Only lock data when refreshing in order to get clean pull to refresh animation
   const data = useGatedMailboxData(_data, isRefreshing);
+  const prevData = usePrevious({ ...data });
+  useEffect(() => {
+    // check for new messages for native notifications
+    if (!isReactNativeDesktopApp()) {
+      return;
+    }
+    if (document.hasFocus()) {
+      return;
+    }
+    // compare all the messageIDs for the threads inside data and see which are new
+    const prevMessageIDs = prevData?.mailbox?.threads.flatMap((thread) => thread.emails.map((email) => email.id));
+    const newMessageIDs = data?.mailbox?.threads.flatMap((thread) => thread.emails.map((email) => email.id));
+    const diffMsgIDs = newMessageIDs?.filter((id) => !prevMessageIDs?.includes(id));
+    if (diffMsgIDs?.length) {
+      const msgWithNewIds =
+        data?.mailbox?.threads.flatMap((thread) => thread.emails.filter((email) => diffMsgIDs.includes(email.id))) ??
+        [];
+      // filter by not from self
+      const msgsNotFromSelf = msgWithNewIds.filter((email) => !currentUserAliases.includes(email.from.address));
+      const msgsFilteredByRecency = msgsNotFromSelf?.filter((email) => {
+        // return true if createdAt within last 1 minute
+        const diff = new Date().getTime() - email.createdAt.getTime();
+        const diffInMinutes = diff / (1000 * 60);
+        return diffInMinutes < 1;
+      });
+      const notificationInfoForNativeApp = msgsFilteredByRecency.map((email) => ({
+        title: email.from.name,
+        body: email.decryptedSubject
+      }));
+      try {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({ type: 'newMessageNotifications', data: { notificationData: notificationInfoForNativeApp } })
+        );
+      } catch (err) {
+        console.error('Failed to send data to native app', err);
+      }
+    }
+  }, [data, prevData]);
 
   // omit polling from showing the loading state
   // when switching labels, `data` is briefly not defined, so falsy data implies loading
@@ -312,6 +382,7 @@ export const Mailbox = () => {
   const isInbox = label === SystemLabels.Inbox;
   const isSent = label === SystemLabels.Sent;
   const isScheduleSend = label === SystemLabels.ScheduleSend;
+  const isImported = label === SystemLabels.Imported;
   const isAutoOpenLabel = isInbox || isSent || isScheduleSend;
   const threads = isDrafts ? draftThreads : data?.mailbox?.threads ?? [];
 
@@ -323,20 +394,6 @@ export const Mailbox = () => {
   configure({
     ignoreRepeatedEventsWhenKeyHeldDown: false
   });
-
-  // keep track on number of rendered threads in mailbox, used for arrows navigation hotkeys
-  useEffect(() => {
-    dispatch(skemailMailboxReducer.actions.setRenderedMailboxThreadsCount(data?.mailbox?.threads.length || 0));
-  }, [data?.mailbox?.threads.length]);
-
-  // Refetch when navigating to the Scheduled Send inbox, as
-  // you want to immediately see all new scheduled send emails, instead
-  // of waiting for the next poll
-  useEffect(() => {
-    if (isScheduleSend) {
-      void refetch();
-    }
-  }, [isScheduleSend, refetch]);
 
   // We are adding space at the top of the list for support animation hide/show on header
   const threadsWithSpacer = [{ threadID: '_spacer' }, ...threads];
@@ -378,8 +435,6 @@ export const Mailbox = () => {
 
   const setMailBoxListOuterRef = useScrollActionBar(MOBILE_HEADER_HEIGHT, MAIL_LIST_HEADER_ID);
 
-  // Redux actions
-  const dispatch = useDispatch();
   // Memoize with `useCallback` so that `useEffect` dependencies don't change every render
   const setSelectedThreadIDs = useCallback(
     (selectedThreadIDs: string[]) =>
@@ -393,7 +448,19 @@ export const Mailbox = () => {
     // Unselect threads when we switch labels
     setSelectedThreadIDs([]);
     dispatch(skemailMailboxReducer.actions.setLastSelctedIndex(null));
-  }, [setSelectedThreadIDs, label]);
+    // refetch threads when we switch labels
+    // prevLabel will be undefined on first render, and we don't need to refetch then as the
+    // mailbox query will already be triggered
+    if (prevLabel !== undefined && prevLabel !== label) {
+      void refetch();
+    }
+  }, [setSelectedThreadIDs, label, dispatch, prevLabel, refetch]);
+
+  // Keeps track of the total number of rendered threads in the mailbox
+  // Necessary for hotkey arrow key navigation
+  useEffect(() => {
+    dispatch(skemailMailboxReducer.actions.setRenderedMailboxThreadsCount(threads.length));
+  }, [threads.length, dispatch]);
 
   // if the activeThread parsed from the URL changes, update the active thread
   useEffect(() => {
@@ -593,6 +660,7 @@ export const Mailbox = () => {
                       selectedThreadIDs,
                       mobileMultiItemsActive,
                       activeThreadID,
+                      isDraft: label === SystemLabels.Drafts,
                       setActiveThreadID
                     }}
                     itemKey={(index, dataToRender) => {
@@ -717,8 +785,29 @@ export const Mailbox = () => {
         {showLoadingMailbox && <LoadingMailbox />}
         {!loading && !threads.length && (
           <EmptyIllustration
-            subtitle={`You have no emails in ${displayLabelName.toLowerCase()}`}
-            title={`${displayLabelName} empty`}
+            action={
+              isImported
+                ? {
+                    label: 'Import mail',
+                    onClick: () => {
+                      openSettings({ tab: TabPage.Import, setting: SettingValue.ImportMail });
+                    }
+                  }
+                : undefined
+            }
+            illustration={
+              isImported ? (
+                <EmptyIllustrationContainer>
+                  <Illustration illustration={Illustrations.OpenEnvelope} theme={theme} />
+                </EmptyIllustrationContainer>
+              ) : undefined
+            }
+            subtitle={
+              isImported
+                ? 'Import your old emails into Skiff'
+                : `You have no emails in ${displayLabelName.toLowerCase()}`
+            }
+            title={isImported ? 'No mail imported yet' : `${displayLabelName} empty`}
           />
         )}
         {(!loading || isRefreshing) && !!threads.length && renderInfiniteLoader()}
@@ -822,7 +911,6 @@ export const Mailbox = () => {
           <QuickComposeButton>
             <IconButton
               dataTest='open-compose'
-              filled
               icon={Icon.Compose}
               onClick={() => {
                 // Reset mail animation progress

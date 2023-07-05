@@ -1,9 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import isArray from 'lodash/isArray';
+import uniqBy from 'lodash/uniqBy';
 import { MailboxFilters } from 'skiff-graphql';
 
+import { ThreadViewEmailInfo } from '../../models/email';
 import { MailboxThreadInfo } from '../../models/thread';
 import { getInitialThreadParams } from '../../utils/locationUtils';
+
+interface PendingReply {
+  email: ThreadViewEmailInfo;
+  threadID: string;
+}
 
 export interface SkemailMailboxReducerState {
   selectedThreadIDs: string[];
@@ -24,6 +31,7 @@ export interface SkemailMailboxReducerState {
     activeEmailID?: string;
   };
   lastSelectedIndex: number | null;
+  pendingReplies: PendingReply[]; // email replies used for optimistic rendering
 }
 
 // Used for updating caching
@@ -38,7 +46,8 @@ const initialSkemailMailboxState: SkemailMailboxReducerState = {
   renderedMailboxThreadsCount: 0,
   filters: {},
   activeThread: getInitialThreadParams(),
-  lastSelectedIndex: null
+  lastSelectedIndex: null,
+  pendingReplies: []
 };
 
 export const skemailMailboxReducer = createSlice({
@@ -113,6 +122,17 @@ export const skemailMailboxReducer = createSlice({
       else {
         multiSelectedThreadIDs.forEach((t) => state.selectedThreadIDs.push(t));
       }
+    },
+    addToPendingReplies: (state, action: PayloadAction<{ reply: PendingReply }>) => {
+      state.pendingReplies = uniqBy(
+        [...state.pendingReplies, action.payload.reply],
+        (pendingReply) => pendingReply.email.id
+      );
+    },
+    removeFromPendingReplies: (state, action: PayloadAction<{ emailIDs: string[] }>) => {
+      state.pendingReplies = state.pendingReplies.filter(
+        (pendingReply) => !action.payload.emailIDs.includes(pendingReply.email.id)
+      );
     }
   }
 });

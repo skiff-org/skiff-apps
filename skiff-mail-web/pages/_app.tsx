@@ -2,7 +2,7 @@ import { ApolloProvider } from '@apollo/client';
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import { AppProps } from 'next/app';
-import 'nightwatch-ui/dist/esm/index.css';
+// import 'nightwatch-ui/dist/esm/index.css';
 import { SnackbarProvider } from 'notistack';
 import { ComponentType } from 'react';
 import { DndProvider } from 'react-dnd';

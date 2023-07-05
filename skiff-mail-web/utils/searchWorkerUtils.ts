@@ -1,5 +1,5 @@
 import { Icon, IconProps } from '@skiff-org/skiff-ui';
-import { IndexedSkemail } from 'skiff-front-search';
+// import { IndexedSkemail } from 'skiff-front-search';
 import { AddressObject, UserLabel as UserLabelOrFolder, UserLabelVariant } from 'skiff-graphql';
 
 import { ClientAttachment } from '../components/Attachments';
@@ -12,7 +12,7 @@ import {
 import { AppRoutes } from '../constants/route.constants';
 import { getSearchWorker } from '../hooks/useSearchWorker';
 
-import { SYSTEM_LABELS } from './label';
+import { getSystemLabels } from './label';
 
 export enum SearchItemType {
   Document = 'DOCUMENT', // document search result
@@ -33,7 +33,7 @@ interface SearchItemBase {
 /**
  * A kind of abbreviated Skemail.
  */
-export interface SearchSkemail extends SearchItemBase, IndexedSkemail {
+export interface SearchSkemail extends SearchItemBase {
   itemType: SearchItemType.Skemail;
 }
 
@@ -298,7 +298,8 @@ const getLabelOrFolderColorFromFilterValue = (userLabels: UserLabelOrFolder[], f
  */
 export const getIconFromFilter = (
   filter: SearchAddressFilter | SearchLabelFilter | SearchAttachmentFilter | SearchCategoryFilter | SearchDateFilter,
-  userLabels: UserLabelOrFolder[]
+  userLabels: UserLabelOrFolder[],
+  hasGmailImportImprovementsFF: boolean
 ) => {
   const { filterType, filterValue } = filter;
   switch (filterType) {
@@ -307,7 +308,9 @@ export const getIconFromFilter = (
         icon: Icon.UserCircle
       };
     case SearchFilterType.SystemLabel:
-      const systemIcon = SYSTEM_LABELS.find((label) => label.value === filterValue)?.icon;
+      const systemIcon = getSystemLabels(hasGmailImportImprovementsFF).find(
+        (label) => label.value === filterValue
+      )?.icon;
       return {
         icon: systemIcon ?? Icon.Dot
       };

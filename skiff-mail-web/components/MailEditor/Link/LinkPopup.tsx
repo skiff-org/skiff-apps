@@ -6,7 +6,8 @@ import {
   Type,
   getThemedColor,
   ThemeMode,
-  DROPDOWN_CALLER_CLASSNAME
+  DROPDOWN_CALLER_CLASSNAME,
+  FilledVariant
 } from '@skiff-org/skiff-ui';
 import { FC, useRef } from 'react';
 import styled from 'styled-components';
@@ -78,6 +79,7 @@ const LinkPopup: FC<LinkCreatePopupProps> = ({ editor, editorContainerRef }) => 
         }}
         tooltip='Unlink'
         type={Type.SECONDARY}
+        variant={FilledVariant.UNFILLED}
       />
     </Container>
   );

@@ -1,5 +1,5 @@
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
-import { Icon, IconText, Size, TypographyWeight } from '@skiff-org/skiff-ui';
+import { FilledVariant, Icon, IconText, Size, TypographyWeight } from '@skiff-org/skiff-ui';
 import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useGetThreadFromIdQuery } from 'skiff-front-graphql';
@@ -172,19 +172,19 @@ export const ThreadActions = ({
               <Separator />
               <IconText
                 disabled={!prevThreadAndEmail}
-                filled
                 onClick={selectPreviousThread}
                 size={Size.SMALL}
                 startIcon={Icon.Backward}
                 tooltip='Previous email'
+                variant={FilledVariant.FILLED}
               />
               <IconText
                 disabled={!nextThreadAndEmail}
-                filled
                 onClick={selectNextThread}
                 size={Size.SMALL}
                 startIcon={Icon.Forward}
                 tooltip='Next email'
+                variant={FilledVariant.FILLED}
               />
             </>
           )}
@@ -192,11 +192,11 @@ export const ThreadActions = ({
         <RightButtons>
           <div>
             <IconText
-              filled
               onClick={() => setLabelsDropdown()}
               ref={labelDropdownRef}
               startIcon={Icon.Tag}
               tooltip={{ title: 'Labels', shortcut: 'L' }}
+              variant={FilledVariant.FILLED}
             />
             <MoveToLabelDropdown
               buttonRef={labelDropdownRef}
@@ -211,11 +211,11 @@ export const ThreadActions = ({
           {label !== SystemLabels.ScheduleSend && (
             <div>
               <IconText
-                filled
                 onClick={() => setMoveToDropdownOpen(true)}
                 ref={moveToDropdownRef}
                 startIcon={Icon.FolderArrow}
                 tooltip='Move to'
+                variant={FilledVariant.FILLED}
               />
               <MoveToLabelDropdown
                 buttonRef={moveToDropdownRef}
@@ -233,7 +233,6 @@ export const ThreadActions = ({
           {(isTrash || isArchive) && (
             <IconText
               dataTest={ThreadActionsDataTest.undoTrashIcon}
-              filled
               onClick={(e) => {
                 e?.stopPropagation();
                 // undo trash or archive
@@ -247,11 +246,11 @@ export const ThreadActions = ({
               }}
               startIcon={Icon.MoveMailbox}
               tooltip={{ title: 'Move to inbox', shortcut: 'Z' }}
+              variant={FilledVariant.FILLED}
             />
           )}
           {![SystemLabels.Spam, SystemLabels.ScheduleSend].includes(label as SystemLabels) && (
             <IconText
-              filled
               onClick={() => {
                 void moveThreads(
                   [threadID],
@@ -263,11 +262,11 @@ export const ThreadActions = ({
               }}
               startIcon={Icon.Spam}
               tooltip='Report spam'
+              variant={FilledVariant.FILLED}
             />
           )}
           {label === SystemLabels.Spam && (
             <IconText
-              filled
               onClick={() => {
                 void moveThreads(
                   [threadID],
@@ -279,11 +278,11 @@ export const ThreadActions = ({
               }}
               startIcon={Icon.MoveMailbox}
               tooltip='Not spam'
+              variant={FilledVariant.FILLED}
             />
           )}
           {!isArchive && !isTrash && !isDraftsOrSent && (
             <IconText
-              filled
               onClick={(e) => {
                 e?.stopPropagation();
                 void archiveThreads([threadID], false, clearActiveThreadIDAfterAction);
@@ -291,13 +290,13 @@ export const ThreadActions = ({
               }}
               startIcon={Icon.Archive}
               tooltip={{ title: 'Archive', shortcut: 'E' }}
+              variant={FilledVariant.FILLED}
             />
           )}
           {!isTrash && (
             <IconText
               color='destructive'
               dataTest={ThreadActionsDataTest.moveToTrashIcon}
-              filled
               onClick={(e) => {
                 e?.stopPropagation();
                 void trashThreads([threadID], isDrafts, false, clearActiveThreadIDAfterAction);
@@ -305,12 +304,12 @@ export const ThreadActions = ({
               }}
               startIcon={Icon.Trash}
               tooltip={{ title: 'Trash', shortcut: '#' }}
+              variant={FilledVariant.FILLED}
             />
           )}
           {isTrash && (
             <IconText
               color='destructive'
-              filled
               onClick={(e) => {
                 e?.stopPropagation();
                 void deleteThreads([threadID], false, clearActiveThreadIDAfterAction);
@@ -318,6 +317,7 @@ export const ThreadActions = ({
               }}
               startIcon={Icon.Trash}
               tooltip='Permanently delete'
+              variant={FilledVariant.FILLED}
             />
           )}
           <Separator />
@@ -326,12 +326,14 @@ export const ThreadActions = ({
             <FloatingDelayGroup delay={{ open: 0, close: 200 }}>
               <IconText
                 color={loading ? 'inverse' : isSkiffSender ? 'green' : 'primary'}
-                filled
                 iconColor={isSkiffSender ? 'green' : 'secondary'}
                 label={isSkiffSender ? 'E2EE' : 'Secure'}
-                onClick={() => window.open(SKIFF_WHITEPAPER, '_blank', 'noopener noreferrer')}
+                onClick={() => {
+                  window.open(SKIFF_WHITEPAPER, '_blank', 'noopener noreferrer');
+                }}
                 startIcon={isSkiffSender ? Icon.ShieldCheck : Icon.Lock}
                 tooltip={isSkiffSender ? 'Thread is end-to-end encrypted' : 'Thread is encrypted'}
+                variant={FilledVariant.FILLED}
                 weight={TypographyWeight.REGULAR}
               />
               {isSkiffSender && (

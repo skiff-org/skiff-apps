@@ -22,7 +22,6 @@ import { POLL_INTERVAL_IN_MS } from 'skiff-utils';
 
 import { getRouterUri } from '../../apollo/client';
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
-import { useCurrentLabel } from '../../hooks/useCurrentLabel';
 import { useUsernameFromUser } from '../../hooks/useUsernameFromUser';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { ModalType } from '../../redux/reducers/modalTypes';
@@ -43,9 +42,8 @@ interface Account {
 
 const AppSwitcher: React.FC<AppSwitcherProps> = ({ user }) => {
   const dispatch = useDispatch();
-  const { label: currentLabel } = useCurrentLabel();
   const { data: numUnread } = useGetNumUnreadQuery({
-    variables: { label: currentLabel ?? SystemLabels.Inbox },
+    variables: { label: SystemLabels.Inbox },
     pollInterval: POLL_INTERVAL_IN_MS
   });
   const bannersOpen = useAppSelector((state) => state.modal.bannersOpen);

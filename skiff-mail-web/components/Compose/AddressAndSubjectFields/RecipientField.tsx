@@ -7,18 +7,16 @@ import { AddressObjectWithDisplayPicture, splitEmailToAliasAndDomain } from 'ski
 import { AddressObject } from 'skiff-graphql';
 import { isSkiffAddress } from 'skiff-utils';
 import styled, { css } from 'styled-components';
-import client from '../../../apollo/client';
 
+import client from '../../../apollo/client';
 import { toAddressObjects } from '../../../utils/composeUtils';
 import { DNDItemTypes } from '../../../utils/dragAndDrop';
+import { parseEmailAddressesFromString } from '../../../utils/emailUtils';
 import { resolveENSName } from '../../../utils/userUtils';
 import AddressAutocomplete from '../AddressAutocomplete/AddressAutocomplete';
 import { EmailFieldTypes } from '../Compose.constants';
 
 import AddressField from './AddressField';
-
-// matches bracketed address (e.g. jasong@gmail.com from Jason Ginsberg <jasong@gmail.com>)
-const BRACKET_EMAIL_REGEX = /[\w.-]+@[a-zA-Z_-]+?\.[a-zA-Z]{2,30}(\.[a-zA-Z]{2,30})*/g;
 
 const NUM_CONTACTS_TO_RENDER = 20;
 
@@ -102,6 +100,7 @@ const RecipientField: FC<RecipientFieldProps> = ({
   const [numCommas, setNumCommas] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // QUESTION: is it valid to update this map directly instead of calling setSkiffInternalAddressMap?
   const [skiffInternalAddressMap] = useState<Map<string, boolean>>(new Map());
   const [maxFieldWidth, setMaxFieldWidth] = useState(DEFAULT_MAX_WIDTH);
 
@@ -138,6 +137,7 @@ const RecipientField: FC<RecipientFieldProps> = ({
           const isSkiffInternal = isSkiffAddress(emailAddress);
           const { domain } = splitEmailToAliasAndDomain(emailAddress);
           if (isSkiffInternal) {
+            // here's the set call. is this valid?
             skiffInternalAddressMap.set(emailAddress, isSkiffInternal);
           } else {
             const isSkiffCustomDomainResponse = await client.query<IsCustomDomainQuery, IsCustomDomainQueryVariables>({
@@ -176,10 +176,8 @@ const RecipientField: FC<RecipientFieldProps> = ({
     if (!e) return;
     try {
       const pastedValue = getPastedValues(e);
-      const parsedValues = pastedValue.match(BRACKET_EMAIL_REGEX);
-
-      const pastedEmails = parsedValues?.map((value) => value.trim());
-      if (!!pastedEmails && pastedEmails.length > 0) {
+      const pastedEmails = parseEmailAddressesFromString(pastedValue);
+      if (pastedEmails.length > 0) {
         setAddresses(toAddressObjects(pastedEmails).concat(addresses));
       }
     } catch (e) {
@@ -248,12 +246,12 @@ const RecipientField: FC<RecipientFieldProps> = ({
           additionalButtons={additionalButtons}
           dataTest={dataTest}
           field={field}
-          isFocused={isFocused}
+          isFocused={isFocused && addresses.length > 0}
           moveButtons={addresses.length > 0 && isFocused && !!additionalButtons}
-          showField={showField}
           onClick={() => {
             inputRef.current?.focus();
           }}
+          showField={showField}
         >
           {!isFocused && addresses.length > 0 && (
             <InputWrapper onClick={() => onFocus(field)}>
@@ -262,11 +260,7 @@ const RecipientField: FC<RecipientFieldProps> = ({
               </MaxWidthFieldContainer>
               <TagContainer>
                 {addresses.length - numCommas - 1 > 0 && (
-                  <MonoTag
-                    bgColor='var(--bg-overlay-tertiary)'
-                    label={`${addresses.length - numCommas - 1} more`}
-                    textColor='secondary'
-                  />
+                  <MonoTag color='secondary' label={`${addresses.length - numCommas - 1} more`} />
                 )}
               </TagContainer>
             </InputWrapper>
@@ -276,6 +270,7 @@ const RecipientField: FC<RecipientFieldProps> = ({
               <AddressAutocomplete
                 addresses={addresses}
                 field={field}
+                inputRef={inputRef}
                 inputValue={inputValue}
                 isFocused={isFocused}
                 onBlur={onBlur ? () => onBlur() : undefined}
@@ -285,7 +280,6 @@ const RecipientField: FC<RecipientFieldProps> = ({
                 }
                 onFocus={() => onFocus(field)}
                 onPaste={handlePaste}
-                inputRef={inputRef}
                 options={contactOptionsToRender}
                 placeholder={addresses.length === 0 ? addressInputPlaceholder : undefined}
                 setAddresses={setAddresses}

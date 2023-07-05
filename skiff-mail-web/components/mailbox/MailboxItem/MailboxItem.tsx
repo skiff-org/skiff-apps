@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import uniqBy from 'lodash/uniqBy';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
@@ -12,7 +13,7 @@ import { useRouterLabelContext } from '../../../context/RouterLabelContext';
 import { useMarkAsReadUnread } from '../../../hooks/useMarkAsReadUnread';
 import { useUserLabelsToRenderAsChips } from '../../../hooks/useUserLabelsToRenderAsChips';
 import { MailboxEmailInfo } from '../../../models/email';
-import { MailboxThreadInfo } from '../../../models/thread';
+import { MailboxThreadInfo, ThreadDetailInfo } from '../../../models/thread';
 import { skemailDraftsReducer } from '../../../redux/reducers/draftsReducer';
 import { skemailMailboxReducer } from '../../../redux/reducers/mailboxReducer';
 import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
@@ -29,6 +30,7 @@ interface MailboxItemData {
   selectedThreadIDs: string[];
   mobileMultiItemsActive: boolean;
   activeThreadID?: string;
+  isDraft?: boolean;
   setActiveThreadID: (thread?: { threadID: string; emailID?: string | undefined } | undefined) => void;
 }
 
@@ -38,20 +40,21 @@ function MailboxItem({ index, style, data }: ListChildComponentProps<MailboxItem
   const { markThreadsAsReadUnread } = useMarkAsReadUnread();
   const currentUserEmailAliases = useCurrentUserEmailAliases();
 
-  const isDrafts = label === SystemLabels.Drafts;
-  const isSent = label === SystemLabels.Sent;
-  const isScheduledSend = label === SystemLabels.ScheduleSend;
-  const isOutboundFolder = isDrafts || isSent || isScheduledSend;
-
-  const openDraft = (draft: MailboxEmailInfo) => dispatch(skemailModalReducer.actions.editDraftCompose(draft));
-
   const {
     threads,
     selectedThreadIDs: currSelectedThreadIDs,
     mobileMultiItemsActive,
     activeThreadID,
+    isDraft,
     setActiveThreadID
   } = data;
+
+  const isSent = label === SystemLabels.Sent;
+  const isScheduledSend = label === SystemLabels.ScheduleSend;
+  const isOutboundFolder = isDraft || isSent || isScheduledSend;
+
+  const openDraft = (draft: MailboxEmailInfo, replyThread?: ThreadDetailInfo) =>
+    dispatch(skemailModalReducer.actions.editDraftCompose({ draftEmail: draft, replyThread }));
 
   const thread = index === 0 ? undefined : threads[index];
   const allUserLabels = useUserLabelsToRenderAsChips(thread?.attributes.userLabels || []);
@@ -138,9 +141,9 @@ function MailboxItem({ index, style, data }: ListChildComponentProps<MailboxItem
       onSelectToggle(e);
       return;
     }
-    if (isDrafts) {
+    if (isDraft) {
       dispatch(skemailDraftsReducer.actions.setCurrentDraftID({ draftID: thread.threadID }));
-      openDraft(latestEmail);
+      openDraft(latestEmail, thread.replyThread);
     } else {
       // if compose is already open, collapse it so the thread panel is visible
       dispatch(skemailModalReducer.actions.collapse());
@@ -192,6 +195,7 @@ function MailboxItem({ index, style, data }: ListChildComponentProps<MailboxItem
             read={thread.attributes.read}
             selected={isSelected}
             subject={thread.emails[0]?.decryptedSubject || NO_SUBJECT_TEXT}
+            thread={thread}
             threadID={thread.threadID}
             userLabels={labelsToRender}
           />
@@ -223,6 +227,15 @@ const threadActive = (
   const styleChanged = prev.style !== next.style;
   const indexChanged = prev.index !== next.index;
 
+  const prevThread = prev.index !== 0 ? prev.data.threads[prev.index] : undefined;
+  const nextThread = next.index !== 0 ? next.data.threads[next.index] : undefined;
+
+  const prevLatestEmail = prevThread?.emails?.[prevThread.emails.length - 1];
+  const nextLatestEmail = nextThread?.emails?.[nextThread.emails.length - 1];
+
+  // re-render when the draft content in a thread whose most recent email is a draft changes
+  const draftContentChanged = prev.data.isDraft && next.data.isDraft && !isEqual(prevLatestEmail, nextLatestEmail);
+
   const shouldRender =
     wasActive ||
     willBeActive ||
@@ -232,7 +245,8 @@ const threadActive = (
     readStatusChanged ||
     multSelectChanged ||
     styleChanged ||
-    indexChanged;
+    indexChanged ||
+    draftContentChanged;
   return !shouldRender;
 };
 

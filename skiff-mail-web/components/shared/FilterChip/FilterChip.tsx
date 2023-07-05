@@ -1,8 +1,8 @@
-import { Chip, Icons, IconProps, Size, ThemeMode, TypographyWeight } from '@skiff-org/skiff-ui';
+import { Chip, Icons, IconColor, Size, ThemeMode, TypographyWeight } from '@skiff-org/skiff-ui';
 import React from 'react';
-import { formatEmailAddress, getAddressTooltipLabel, UserAvatar } from 'skiff-front-utils';
+import { formatEmailAddress, getAddressTooltipLabel, useGetFF, UserAvatar } from 'skiff-front-utils';
 import { AddressObject, UserLabel } from 'skiff-graphql';
-import { upperCaseFirstLetter } from 'skiff-utils';
+import { GmailImportImprovementsFlag, upperCaseFirstLetter } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useDisplayPictureDataFromAddress } from '../../../hooks/useDisplayPictureDataFromAddress';
@@ -29,6 +29,8 @@ const FilterChip: React.FC<FilterChipProps> = ({
   prefix,
   noBorder
 }) => {
+  const hasGmailImportImprovementsFF = useGetFF<GmailImportImprovementsFlag>('gmailImportImprovements');
+
   const { subject, filter } = searchFilter;
   const { filterType, filterValue } = filter;
   const isAddressFilter = filterType === SearchFilterType.FromAddress || filterType === SearchFilterType.ToAddress;
@@ -38,32 +40,14 @@ const FilterChip: React.FC<FilterChipProps> = ({
       (filterValue === FilterByType.Folders || filterValue === FilterByType.Labels));
   const displayPictureData = useDisplayPictureDataFromAddress(filterValue as AddressObject);
   const getStartIcon = () => {
-    if (isAddressFilter) {
-      return (
-        <UserAvatar
-          displayPictureData={displayPictureData}
-          forceTheme={ThemeMode.DARK}
-          label={subject}
-          size={Size.X_SMALL}
-        />
-      );
-    } else {
-      const { icon, color } = getIconFromFilter(filter, userLabels);
-      return (
-        <Icons
-          color={(color as IconProps['color']) ?? 'white'}
-          forceTheme={ThemeMode.DARK}
-          icon={icon}
-          size={Size.SMALL}
-        />
-      );
-    }
+    const { icon, color } = getIconFromFilter(filter, userLabels, hasGmailImportImprovementsFF);
+    return <Icons color={(color as IconColor) ?? 'white'} icon={icon} size={Size.SMALL} />;
   };
   const emailAddress = formatLabel ? formatEmailAddress(subject) : subject;
   const applyPrefix = (label: string) => (
     //Label text will render as 'label' type Typography and prefix text will override with 'paragraph' type
     <>
-      <InChipPrefixText>{prefix + ' '}</InChipPrefixText>
+      <InChipPrefixText>{`${prefix ?? ''} `}</InChipPrefixText>
       <span>{label}</span>
     </>
   );
@@ -78,14 +62,19 @@ const FilterChip: React.FC<FilterChipProps> = ({
   };
   return (
     <Chip
+      avatar={
+        isAddressFilter ? (
+          <UserAvatar displayPictureData={displayPictureData} forceTheme={ThemeMode.DARK} label={subject} />
+        ) : undefined
+      }
       color='white'
       forceTheme={ThemeMode.DARK}
+      icon={isAddressFilter ? undefined : getStartIcon()}
       key={subject}
       label={getChipLabel()}
       noBorder={noBorder}
       onDelete={onDelete}
       size={Size.SMALL}
-      startIcon={getStartIcon()}
       tooltip={isAddressFilter && formatLabel ? getAddressTooltipLabel(subject) : undefined}
       typographyWeight={TypographyWeight.MEDIUM}
     />

@@ -1,4 +1,4 @@
-import { Chip, Size } from '@skiff-org/skiff-ui';
+import { Chip } from '@skiff-org/skiff-ui';
 import { DragLayerMonitor, useDragLayer, XYCoord } from 'react-dnd';
 import { getAddrDisplayName } from 'skiff-front-utils';
 import styled from 'styled-components';
@@ -45,7 +45,7 @@ export const MailDragLayer = () => {
     const { formattedDisplayName: chipLabel } = getAddrDisplayName(item.addr);
     return (
       <DragContainer offset={currentOffset}>
-        <Chip label={chipLabel} size={Size.MEDIUM} startIcon={getBadgeIcon(chipLabel, item.icon, false)} />
+        <Chip avatar={getBadgeIcon(chipLabel, item.icon, false)} label={chipLabel} />
       </DragContainer>
     );
   }

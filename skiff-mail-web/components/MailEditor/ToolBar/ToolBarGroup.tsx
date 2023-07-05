@@ -189,7 +189,7 @@ const ToolBarNormalGroup: FC<Omit<ToolbarGroupProps, 'type'>> = ({ commands, edi
           color={!enabled(editor) ? 'disabled' : 'primary'}
           forceTheme={ThemeMode.DARK}
           icon={icon}
-          size={Size.X_MEDIUM}
+          size={Size.MEDIUM}
         />
       </IconHover>
     ))}

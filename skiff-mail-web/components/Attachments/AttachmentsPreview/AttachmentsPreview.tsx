@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import { FileTypes, MIMETypes } from 'skiff-front-utils';
 import styled from 'styled-components';
 
-import { useAttachments } from '..';
+import { useAttachments } from '../../Attachments';
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
 import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { isAttachmentPreviewModal } from '../../../redux/reducers/modalTypes';

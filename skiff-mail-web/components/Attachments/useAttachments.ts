@@ -1,12 +1,12 @@
 import axios from 'axios';
 import saveAs from 'file-saver';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { decryptDatagram } from 'skiff-crypto-v2';
+import { decryptDatagramV2 } from '@skiff-org/skiff-crypto';
 import { AttachmentDatagram, EmailFragment, useGetAttachmentsQuery } from 'skiff-front-graphql';
 import { useToast } from 'skiff-front-utils';
-import { contentAsBase64, isDataUrl } from 'skiff-front-utils';
+import { contentAsBase64, DEFAULT_FILE_TITLE, isDataUrl } from 'skiff-front-utils';
 import {
-  isDesktopApp,
+  isReactNativeDesktopApp,
   isMobileApp,
   sendRNWebviewMsg,
   BANNED_CONTENT_TYPES,
@@ -48,7 +48,7 @@ export const fetchAndDecryptAttachment = async (
   if (!response) {
     return;
   }
-  return decryptDatagram(AttachmentDatagram, attachmentData.sessionKey, response.data as string).body.content;
+  return decryptDatagramV2(AttachmentDatagram, attachmentData.sessionKey, response.data as string).body.content;
 };
 
 export interface InitialAttachmentsData {
@@ -226,7 +226,7 @@ const useAttachments = (initialAttachments: InitialAttachmentsData, fetchAll = f
       return;
     }
 
-    if (isMobileApp() || isDesktopApp()) {
+    if (isMobileApp() || isReactNativeDesktopApp()) {
       // On mobile app save file with RN
       sendRNWebviewMsg('saveFile', {
         base64Data: decryptedAttachment,
@@ -252,7 +252,7 @@ const useAttachments = (initialAttachments: InitialAttachmentsData, fetchAll = f
       return downloadAttachment(
         firstAttachmentID,
         decryptedAttachmentMetadata[0]?.decryptedMetadata?.contentType || 'text',
-        decryptedAttachmentMetadata[0]?.decryptedMetadata?.filename || 'untitled'
+        decryptedAttachmentMetadata[0]?.decryptedMetadata?.filename || DEFAULT_FILE_TITLE.toLowerCase()
       );
 
     setIsDownloadingAttachments(true);
@@ -278,12 +278,15 @@ const useAttachments = (initialAttachments: InitialAttachmentsData, fetchAll = f
           return;
         }
 
-        zip.file(attachment.decryptedMetadata?.filename || 'untitled', Buffer.from(decryptedAttachment, 'base64'));
+        zip.file(
+          attachment.decryptedMetadata?.filename || DEFAULT_FILE_TITLE,
+          Buffer.from(decryptedAttachment, 'base64')
+        );
       })
     );
 
     const content = await zip.generateAsync({ type: 'blob' });
-    if (isMobileApp() || isDesktopApp()) {
+    if (isMobileApp() || isReactNativeDesktopApp()) {
       // On mobile app save file with RN
       // Convert zip to base64
       const base64Data = await getBase64FromZip(content);

@@ -1,7 +1,8 @@
-import { ApolloQueryResult, ApolloError } from '@apollo/client';
+import { ApolloError } from '@apollo/client';
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
 import { Editor } from '@tiptap/react';
 import dayjs from 'dayjs';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import { Typography, Drawer } from '@skiff-org/skiff-ui';
 import { Node } from 'prosemirror-model';
 import {
@@ -20,7 +21,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   EmailFragment,
   EmailFragmentDoc,
-  GetUserProfileDataQuery,
   useDecryptionServicePublicKeyQuery,
   useSendMessageMutation,
   useSendReplyMessageMutation,
@@ -28,7 +28,9 @@ import {
   useGetOrganizationQuery,
   AttachmentPair,
   encryptMessage,
-  useSubscriptionPlan
+  useSubscriptionPlan,
+  ThreadFragment,
+  useGetThreadFromIdLazyQuery
 } from 'skiff-front-graphql';
 import {
   convertFileListToArray,
@@ -50,9 +52,10 @@ import {
   getPaywallErrorCode,
   SendEmailRequest,
   getTierNameFromSubscriptionPlan,
-  PermissionLevel
+  PermissionLevel,
+  SystemLabels
 } from 'skiff-graphql';
-import { getMaxUsersPerWorkspace, StorageTypes } from 'skiff-utils';
+import { getMaxUsersPerWorkspace, StorageTypes, DecreasedFreeTierCollaboratorLimitFlag } from 'skiff-utils';
 import styled from 'styled-components';
 import { v4 } from 'uuid';
 
@@ -65,15 +68,21 @@ import { usePaywall } from '../../hooks/usePaywall';
 import { usePlanDelinquency } from '../../hooks/usePlanDelinquency';
 import { useThreadActions } from '../../hooks/useThreadActions';
 import { useUserSignature } from '../../hooks/useUserSignature';
-import { MailboxEmailInfo } from '../../models/email';
+import { MailboxEmailInfo, ThreadViewEmailInfo } from '../../models/email';
+import { ThreadDetailInfo } from '../../models/thread';
 import { skemailDraftsReducer } from '../../redux/reducers/draftsReducer';
+import { skemailMailboxReducer } from '../../redux/reducers/mailboxReducer';
 import { skemailMobileDrawerReducer } from '../../redux/reducers/mobileDrawerReducer';
 import { ComposeExpandTypes, skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { ModalType } from '../../redux/reducers/modalTypes';
 import { AppDispatch, RootState } from '../../redux/store/reduxStore';
-import { getMailFooter } from '../../utils/composeUtils';
+import {
+  getMailFooter,
+  preprocessAddressesForEncryption,
+  removeEmailFromOptimisticUpdate
+} from '../../utils/composeUtils';
 import { getThreadSenders } from '../../utils/mailboxUtils';
-import { getUserProfileFromID, resolveAndSetENSDisplayName } from '../../utils/userUtils';
+import { resolveAndSetENSDisplayName } from '../../utils/userUtils';
 import {
   Attachments,
   AttachmentStates,
@@ -167,6 +176,11 @@ export const ComposeDataTest = {
 };
 
 const Compose: React.FC = () => {
+  const flags = useFlags();
+  const decreasedFreeTierCollaboratorLimit =
+    flags.decreasedFreeTierCollaboratorLimit as DecreasedFreeTierCollaboratorLimitFlag;
+
+  const [fetchThreadFromID] = useGetThreadFromIdLazyQuery();
   const user = useRequiredCurrentUserData();
   const emailAliases = useCurrentUserEmailAliases();
 
@@ -189,21 +203,18 @@ const Compose: React.FC = () => {
   const [defaultEmailAlias] = useDefaultEmailAlias(user.userID, (newValue: string) => {
     void resolveAndSetENSDisplayName(newValue, user);
   });
-  const { activeAliasInbox } = useCurrentLabel();
+  const { activeAliasInbox, label } = useCurrentLabel();
 
-  const { composeNewDraft, saveCurrentDraft, flushSaveCurrentDraft } = useDrafts();
+  const isDraftsMailbox = label === SystemLabels.Drafts;
+
+  const { composeNewDraft, saveComposeDraft, flushSaveComposeDraft } = useDrafts();
 
   const { isUserPaidUp, downgradeProgress, openPlanDelinquencyModal } = usePlanDelinquency();
 
   const mailFormDirty = useRef<boolean>(false);
-  const currentDraftID = useAppSelector((state) => state.draft.currentDraftID);
-  // currentDraftID can be undefined on mobile since this component is not rendered within ComposePanel
-  // and therefore can be rendered before the Compose button is clicked
-  if (!currentDraftID) {
-    composeNewDraft();
-  }
+  const { currentDraftID, currentDraftIDToDelete } = useAppSelector((state) => state.draft);
 
-  const { trashThreads } = useThreadActions();
+  const { trashThreads, activeThreadID } = useThreadActions();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -241,6 +252,14 @@ const Compose: React.FC = () => {
     populateComposeContent
   } = useSelector((state: RootState) => state.modal);
 
+  // currentDraftID can be undefined on mobile since this component is not rendered within ComposePanel
+  // and therefore can be rendered before the Compose button is clicked
+  // Only open a new draft if the compose panel is open and
+  // there isn't already a draft open or we aren't in the middle of deleting a draft
+  if (!currentDraftID && isOpen && !currentDraftIDToDelete) {
+    composeNewDraft();
+  }
+
   const {
     subject: populatedSubject,
     toAddresses: populatedToAddresses,
@@ -249,9 +268,11 @@ const Compose: React.FC = () => {
     fromAddress: populatedFromAddress,
     messageBody: populatedMessage,
     attachmentMetadata: populatedAttachmentMetadata,
-    replyEmailID,
+    replyEmailID: populatedReplyEmailID,
     replyThread
   } = populateComposeContent;
+
+  const populatedExistingThread = replyThread ? (replyThread as ThreadFragment) : undefined;
 
   const [fromEmail, setFromEmail] = useState(populatedFromAddress || activeAliasInbox || defaultEmailAlias);
   const [customDomainAlias, setCustomDomainAlias] = useState('');
@@ -284,6 +305,9 @@ const Compose: React.FC = () => {
 
   const [subject, setSubject] = useState<string>(populatedSubject);
 
+  const [existingThread, setExistingThread] = useState<ThreadFragment | undefined>(populatedExistingThread);
+  const [replyEmailID, setReplyEmailID] = useState<string | undefined>(populatedReplyEmailID);
+
   const isComposeDirtyCheck = (setter) => (arg) => {
     mailFormDirty.current = true;
     return setter(arg);
@@ -293,17 +317,17 @@ const Compose: React.FC = () => {
   const [sendReply] = useSendReplyMessageMutation();
   const [unsendMessage] = useUnsendMessageMutation();
 
-  const reopenEditCompose = (draft: MailboxEmailInfo) => dispatch(skemailModalReducer.actions.editDraftCompose(draft));
+  const reopenEditCompose = (draft: MailboxEmailInfo, existingReplyThread?: ThreadDetailInfo) =>
+    dispatch(skemailModalReducer.actions.editDraftCompose({ draftEmail: draft, replyThread: existingReplyThread }));
 
   // Whether a message is currently being sent
   const isSending = useAppSelector((state) => state.modal.isSending);
-  const setIsSending = (isSending: boolean) => dispatch(skemailModalReducer.actions.setIsSending(isSending));
+  const setIsSending = (updatedVal: boolean) => dispatch(skemailModalReducer.actions.setIsSending(updatedVal));
 
-  const clearCurrentDraftID = useCallback(
-    () => dispatch(skemailDraftsReducer.actions.clearCurrentDraftID()),
-    [dispatch]
-  );
-  const closeCompose = () => dispatch(skemailModalReducer.actions.closeCompose());
+  const closeCompose = useCallback(() => {
+    dispatch(skemailDraftsReducer.actions.clearCurrentDraftID());
+    dispatch(skemailModalReducer.actions.closeCompose());
+  }, [dispatch]);
 
   const [showCc, setShowCc] = useState<boolean>(!!populatedCCAddresses.length);
   const [showBcc, setShowBcc] = useState<boolean>(!!populatedBCCAddresses.length);
@@ -349,6 +373,8 @@ const Compose: React.FC = () => {
     setToAddresses(populatedToAddresses);
     setCcAddresses(populatedCCAddresses);
     setBccAddresses(populatedBCCAddresses);
+    setExistingThread(populatedExistingThread);
+    setReplyEmailID(populatedReplyEmailID);
 
     mailDraftDataRef.current = {
       composeIsDirty: false, // compose never starts dirty
@@ -356,9 +382,20 @@ const Compose: React.FC = () => {
       toAddresses: populatedToAddresses,
       bccAddresses: populatedBCCAddresses,
       ccAddresses: populatedCCAddresses,
-      text: initialHtmlContent
+      text: initialHtmlContent,
+      fromAddress: populatedFromAddress ?? ''
     };
-  }, [populatedBCCAddresses, populatedCCAddresses, initialHtmlContent, populatedToAddresses, populatedSubject, isOpen]);
+  }, [
+    populatedBCCAddresses,
+    populatedCCAddresses,
+    initialHtmlContent,
+    populatedToAddresses,
+    populatedSubject,
+    populatedExistingThread,
+    populatedReplyEmailID,
+    isOpen,
+    populatedFromAddress
+  ]);
 
   // When the initial content change, set editor - helps when there is a minimize mail while clicking reply on any thread mail
   useEffect(() => {
@@ -416,8 +453,18 @@ const Compose: React.FC = () => {
 
   const mailEditorOnCreate = useCallback(
     (createdEditor: Editor) => {
+      if (!currentDraftID) return;
       // Flush on create so all content immediately gets saved and we don't run into race conditions
-      flushSaveCurrentDraft(subject, fromEditorToHtml(createdEditor), toAddresses, ccAddresses, bccAddresses);
+      void flushSaveComposeDraft({
+        draftID: currentDraftID,
+        subject,
+        text: fromEditorToHtml(createdEditor),
+        toAddresses,
+        ccAddresses,
+        bccAddresses,
+        fromAddress: fromEmail,
+        existingThread
+      });
       // Focus into editor / body on mount if there are addresses in the To header
       if (!createdEditor.isFocused && initialFocus === EmailFieldTypes.BODY) {
         setTimeout(() => {
@@ -427,7 +474,7 @@ const Compose: React.FC = () => {
         setFocusedField(initialFocus);
       }
     },
-    [initialFocus]
+    [initialFocus, currentDraftID]
   );
 
   useEffect(() => {
@@ -438,29 +485,63 @@ const Compose: React.FC = () => {
         ccAddresses,
         subject,
         toAddresses,
-        composeIsDirty
+        composeIsDirty,
+        fromAddress: fromEmail
       };
 
       const { text } = mailDraftDataRef.current;
-
-      saveCurrentDraft(subject, text, toAddresses, ccAddresses, bccAddresses);
+      if (!currentDraftID) return;
+      void saveComposeDraft({
+        draftID: currentDraftID,
+        subject,
+        text,
+        toAddresses,
+        ccAddresses,
+        bccAddresses,
+        fromAddress: fromEmail,
+        existingThread
+      });
     }
-  }, [bccAddresses, editor, ccAddresses, composeIsDirty, subject, toAddresses, saveCurrentDraft]);
+  }, [
+    bccAddresses,
+    editor,
+    ccAddresses,
+    composeIsDirty,
+    subject,
+    toAddresses,
+    saveComposeDraft,
+    existingThread,
+    currentDraftID,
+    fromEmail
+  ]);
 
   const closeComposeWithDraftSnack = () => {
     closeCompose();
     if (composeIsDirty) {
-      enqueueToast({ title: 'Draft saved', body: 'Message moved to drafts.' });
+      enqueueToast({ title: 'Draft saved', body: `Message ${isDraftsMailbox ? 'saved' : 'moved'} to drafts.` });
     }
   };
 
-  // Clear draft ID on clean up
+  // Clear draft ID and reset redux on clean up
   useEffect(
     () => () => {
-      clearCurrentDraftID();
+      closeCompose();
     },
-    [clearCurrentDraftID]
+    [closeCompose]
   );
+
+  // If the user tries to close the window while the email is sending, warn the user
+  useEffect(() => {
+    const warnBeforeClosing = (e: BeforeUnloadEvent) => {
+      if (!isSending) return;
+      const confirmationMessage = 'Emails are still sending. If you leave the page, your email will be lost.';
+
+      (e || window.event).returnValue = confirmationMessage; // Gecko + IE
+      return confirmationMessage; // Webkit, Safari, Chrome
+    };
+    window.addEventListener('beforeunload', warnBeforeClosing);
+    return () => window.removeEventListener('beforeunload', warnBeforeClosing);
+  }, [isSending]);
 
   // Get the public key for the decryption service, which is used when sending emails to external users.
   const decryptionServicePublicKey = useDecryptionServicePublicKeyQuery();
@@ -496,9 +577,22 @@ const Compose: React.FC = () => {
   const discardDraft = async (hideToast = false) => {
     if (currentDraftID) {
       await trashThreads([currentDraftID], true, hideToast);
+    } else {
+      console.error('No draft to discard, no draft is selected');
     }
     setShowMoreOptions(false);
     closeCompose();
+  };
+
+  const undoOptimisticReply = (emailIDOfReply: string) => {
+    if (activeThreadID) {
+      dispatch(
+        skemailMailboxReducer.actions.removeFromPendingReplies({
+          emailIDs: [emailIDOfReply]
+        })
+      );
+      removeEmailFromOptimisticUpdate(activeThreadID, emailIDOfReply);
+    }
   };
 
   const send = async (scheduleSendAt?: Date) => {
@@ -509,7 +603,11 @@ const Compose: React.FC = () => {
     const isNonAdminExcessUser =
       !isCurrentUserOrgAdmin &&
       downgradeProgress?.workspaceUsers &&
-      downgradeProgress.workspaceUsers > getMaxUsersPerWorkspace(getTierNameFromSubscriptionPlan(activeSubscription));
+      downgradeProgress.workspaceUsers >
+        getMaxUsersPerWorkspace(
+          getTierNameFromSubscriptionPlan(activeSubscription),
+          decreasedFreeTierCollaboratorLimit
+        );
     const shouldBlockSend = !isUserPaidUp && (isFromAddressPaidTierExclusive || isNonAdminExcessUser);
     if (shouldBlockSend) {
       return openPlanDelinquencyModal(isFromAddressPaidTierExclusive ? fromEmail : undefined);
@@ -586,25 +684,6 @@ const Compose: React.FC = () => {
       })
     );
 
-    // get user profile data, force network
-    // if user is disabled, this will fail
-    let profileResponse: ApolloQueryResult<GetUserProfileDataQuery> | undefined;
-    try {
-      profileResponse = await getUserProfileFromID(user.userID, true);
-      if (!profileResponse.data?.user) {
-        throw new Error('Did not fetch data');
-      }
-    } catch (error) {
-      console.warn('Could not fetch profile data');
-      enqueueToast({
-        title: 'Failed to send message',
-        body: 'Could not fetch profile data.'
-      });
-      void discardDraft(true);
-      return;
-    }
-
-    const fromEmailWithCustomDomain = fromEmail;
     const captchaToken = hcaptchaToken;
 
     const {
@@ -625,13 +704,13 @@ const Compose: React.FC = () => {
         messageTextBody: convertHtmlToTextContent(messageWithInlineAttachments),
         messageHtmlBody: messageWithInlineAttachments,
         attachments: convertedAttachments,
-        // Remove the __typename field before we send
-        toAddresses: toAddresses.map(({ name, address }) => ({ name, address })),
-        ccAddresses: ccAddresses.map(({ name, address }) => ({ name, address })),
-        bccAddresses: bccAddresses.map(({ name, address }) => ({ name, address })),
+        // Uniq addresses before sending and remove the __typename field
+        toAddresses: preprocessAddressesForEncryption(toAddresses),
+        ccAddresses: preprocessAddressesForEncryption(ccAddresses),
+        bccAddresses: preprocessAddressesForEncryption(bccAddresses),
         fromAddress: {
-          name: profileResponse.data.user.publicData?.displayName,
-          address: fromEmailWithCustomDomain ?? ''
+          name: user.publicData?.displayName,
+          address: fromEmail
         },
         privateKey: user.privateUserData.privateKey,
         publicKey: user.publicKey,
@@ -656,6 +735,39 @@ const Compose: React.FC = () => {
       captchaToken
     };
 
+    const newReplyEmailID = v4();
+    if (activeThreadID && replyEmailID) {
+      // For replies, optimistically store the new reply in redux
+      // so that when we render the thread, the email renders immediately
+      if (fromAddressWithEncryptedKey.encryptedSessionKey) {
+        const decryptedText = convertHtmlToTextContent(messageWithInlineAttachments);
+        const newEmail: ThreadViewEmailInfo = {
+          createdAt: new Date(),
+          id: newReplyEmailID,
+          to: toAddresses,
+          cc: ccAddresses,
+          bcc: bccAddresses,
+          from: {
+            name: user.publicData?.displayName,
+            address: fromEmail
+          },
+          decryptedText,
+          decryptedTextAsHtml: decryptedText,
+          decryptedHtml: messageWithInlineAttachments,
+          decryptedSubject: subject,
+          scheduleSendAt
+        };
+        dispatch(
+          skemailMailboxReducer.actions.addToPendingReplies({
+            reply: {
+              email: newEmail,
+              threadID: activeThreadID
+            }
+          })
+        );
+      }
+    }
+
     let messageAndThreadID: { messageID: string; threadID: string } | undefined | null;
 
     try {
@@ -665,13 +777,30 @@ const Compose: React.FC = () => {
           variables: {
             request: {
               ...request,
-              replyID: replyEmailID
+              replyID: replyEmailID,
+              customMessageID: newReplyEmailID
             }
           },
           context: {
             headers: {
               'Apollo-Require-Preflight': true // this is required for attachment uploading. Otherwise, router backend will reject request.
             }
+          },
+          onCompleted: () => {
+            // refetch getThreadByID for the active thread
+            // the optimistic reply does not include attachments, so this will
+            // ensure that what is rendered will match what is on the server + render attachments
+            if (activeThreadID) {
+              void fetchThreadFromID({ variables: { threadID: activeThreadID } });
+            }
+          },
+          onError: () => {
+            // the email did not send, so remove it from the pending replies
+            dispatch(
+              skemailMailboxReducer.actions.removeFromPendingReplies({
+                emailIDs: [newReplyEmailID]
+              })
+            );
           }
         });
         messageAndThreadID = data?.replyToMessage;
@@ -693,7 +822,7 @@ const Compose: React.FC = () => {
         title: scheduleSendAt
           ? `Scheduled for ${dayjs(scheduleSendAt).format('ddd MMM D [at] h:mma')}`
           : 'Message sent',
-        body: 'Your email is being sent.',
+        body: scheduleSendAt ? 'Your email is being scheduled.' : 'Your email is being sent.',
         duration: 5000,
         actions: [
           {
@@ -725,6 +854,12 @@ const Compose: React.FC = () => {
                 const mailboxInfo: MailboxEmailInfo = emailFromCache;
                 // re-open compose modal for draft
                 reopenEditCompose(mailboxInfo);
+                // since we are opening a new draft, this means there is no current draft we are deleting
+                dispatch(skemailDraftsReducer.actions.clearCurrentDraftIDToDelete());
+
+                if (replyEmailID) {
+                  undoOptimisticReply(messageAndThreadID.messageID);
+                }
               }
               closeToast(key);
             }
@@ -738,6 +873,10 @@ const Compose: React.FC = () => {
       // Refetch contacts
       void refetchContacts();
     } catch (err: any) {
+      if (replyEmailID) {
+        undoOptimisticReply(newReplyEmailID);
+      }
+
       const paywallErrorCode = getPaywallErrorCode((err as ApolloError).graphQLErrors);
       if (paywallErrorCode) {
         openPaywallModal(paywallErrorCode);
@@ -842,10 +981,20 @@ const Compose: React.FC = () => {
       toAddresses: toAddressesRef,
       bccAddresses: bccAddressesRef,
       ccAddresses: ccAddressesRef,
-      subject: subjectRef
+      subject: subjectRef,
+      fromAddress: fromAddressRef
     } = mailDraftDataRef.current;
-
-    saveCurrentDraft(subjectRef, text, toAddressesRef, ccAddressesRef, bccAddressesRef);
+    if (!currentDraftID) return;
+    void saveComposeDraft({
+      draftID: currentDraftID,
+      subject: subjectRef,
+      text,
+      toAddresses: toAddressesRef,
+      ccAddresses: ccAddressesRef,
+      bccAddresses: bccAddressesRef,
+      fromAddress: fromAddressRef,
+      existingThread
+    });
   };
 
   // Renders To, Cc, Bcc, and From fields
@@ -858,7 +1007,7 @@ const Compose: React.FC = () => {
             focusedField={focusedField}
             setCustomDomainAlias={setCustomDomainAlias}
             setFocusedField={setFocusedField}
-            setUserEmail={setFromEmail}
+            setUserEmail={isComposeDirtyCheck(setFromEmail)}
             userEmail={fromEmail ?? ''}
           />
         )}
@@ -1013,9 +1162,7 @@ const Compose: React.FC = () => {
         <Drawer
           extraSpacer={false}
           forceTheme={theme}
-          hideDrawer={() => {
-            dispatch(skemailModalReducer.actions.closeCompose());
-          }}
+          hideDrawer={closeCompose}
           paperId={MOBILE_COMPOSE_PAPER_ID}
           show={isOpen}
           verticalScroll={false}

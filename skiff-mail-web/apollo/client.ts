@@ -1,4 +1,5 @@
 import { ApolloClient, ApolloLink, InMemoryCache, NextLink, Operation, from } from '@apollo/client';
+import { RetryLink } from '@apollo/client/link/retry';
 import { createUploadLink } from 'apollo-upload-client';
 import fetch from 'cross-fetch';
 import {
@@ -47,7 +48,10 @@ export const getRouterUri = () => {
 const uri = (getRouterUri() || 'http://localhost:4000') + '/graphql';
 const cache = new InMemoryCache({
   typePolicies: {
-    UserThread: { keyFields: ['threadID'], fields: { emailsUpdatedAt: { read: parseAsMemoizedDate } } },
+    UserThread: {
+      keyFields: ['threadID'],
+      fields: { emailsUpdatedAt: { read: parseAsMemoizedDate }, sentLabelUpdatedAt: { read: parseAsMemoizedDate } }
+    },
     User: userTypePolicy,
     Email: emailTypePolicy,
     Attachment: attachmentTypePolicy,
@@ -89,8 +93,10 @@ const link = createUploadLink({
   credentials: 'include'
 }) as unknown as ApolloLink;
 
+const retryLink = new RetryLink();
+
 const client = new ApolloClient({
-  link: from([authLink, cloudflareChallengeRedirectLink, link]),
+  link: from([authLink, retryLink, cloudflareChallengeRedirectLink, link]),
   cache,
   name: 'skemail-web',
   version: process.env.NEXT_PUBLIC_GIT_HASH

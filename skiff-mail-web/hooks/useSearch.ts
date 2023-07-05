@@ -24,6 +24,9 @@ export const useSearch = () => {
       setResultThreadEmailIds([]);
       return;
     }
+
+    setLoading(true);
+
     const searchIds = (await getSearchWorker()?.search(currentQuery, { fuzzy: 0 }, false, true)) || []; // sort
     // set to threadID/emailID pairs
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
@@ -33,7 +36,6 @@ export const useSearch = () => {
   }, SEARCH_UPDATE_INTERVAL);
 
   const search = () => {
-    setLoading(true);
     void workerSearch(query);
   };
 

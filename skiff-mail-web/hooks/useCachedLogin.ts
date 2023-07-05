@@ -127,12 +127,13 @@ export const tryCachedLogin = async (): Promise<boolean> => {
     setNextIDAndReload();
     return false;
   }
-  // refresh critical data on user load
+  // Refresh critical data on user load. Update if null or defined (except for
+  // `publicData`, which should always be set to the latest value).
   if (userDataToRefresh) {
-    if (userDataToRefresh.recoveryEmail) {
+    if (userDataToRefresh.recoveryEmail !== undefined) {
       decryptedUser.recoveryEmail = userDataToRefresh.recoveryEmail;
     }
-    if (userDataToRefresh.unverifiedRecoveryEmail) {
+    if (userDataToRefresh.unverifiedRecoveryEmail !== undefined) {
       decryptedUser.unverifiedRecoveryEmail = userDataToRefresh.unverifiedRecoveryEmail;
     }
     if (userDataToRefresh.walletAddress) {
@@ -141,6 +142,8 @@ export const tryCachedLogin = async (): Promise<boolean> => {
     if (userDataToRefresh.rootOrgID) {
       decryptedUser.rootOrgID = userDataToRefresh.rootOrgID;
     }
+
+    decryptedUser.publicData = userDataToRefresh.publicData;
   }
   saveCurrentUserData(decryptedUser);
 

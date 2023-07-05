@@ -1,4 +1,4 @@
-import { decryptSessionKey, decryptDatagram } from 'skiff-crypto-v2';
+import { decryptSessionKey, decryptDatagramV2 } from '@skiff-org/skiff-crypto';
 import {
   ApplyLabelsMutation,
   ApplyLabelsMutationVariables,
@@ -39,9 +39,9 @@ export const decryptEmailTextAndSubject = (email: EmailFragment) => {
     privateKey,
     encryptedSessionKey?.encryptedBy
   );
-  const text = decryptDatagram(MailTextDatagram, sessionKey, email.encryptedText.encryptedData).body.text || '';
+  const text = decryptDatagramV2(MailTextDatagram, sessionKey, email.encryptedText.encryptedData).body.text || '';
   const subject =
-    decryptDatagram(MailSubjectDatagram, sessionKey, email.encryptedSubject.encryptedData).body.subject || '';
+    decryptDatagramV2(MailSubjectDatagram, sessionKey, email.encryptedSubject.encryptedData).body.subject || '';
 
   return { text, subject };
 };

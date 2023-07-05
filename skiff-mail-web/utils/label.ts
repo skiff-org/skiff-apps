@@ -1,9 +1,10 @@
 import { Icon, IconProps } from '@skiff-org/skiff-ui';
+import { isMobile } from 'react-device-detect';
 import { ThreadFragment, ThreadWithoutContentFragment } from 'skiff-front-graphql';
 import { splitEmailToAliasAndDomain, createEmail, abbreviateWalletAddress } from 'skiff-front-utils';
 import { SystemLabels, UserLabelVariant } from 'skiff-graphql';
 import { UserLabel as UserLabelGraphQL } from 'skiff-graphql';
-import { isWalletAddress } from 'skiff-utils';
+import { insertIf, isWalletAddress } from 'skiff-utils';
 import { validate } from 'uuid';
 
 import { AppRoutes } from '../constants/route.constants';
@@ -14,7 +15,8 @@ export const ALIAS_LABEL_URL_PARAM = 'alias';
 export const RESTRICTED_DRAG_AND_DROP_LABELS = new Set([
   SystemLabels.Sent,
   SystemLabels.Drafts,
-  SystemLabels.ScheduleSend
+  SystemLabels.ScheduleSend,
+  SystemLabels.Imported
 ]);
 
 export enum LabelType {
@@ -142,57 +144,66 @@ export const splitUserLabelsByVariant = (allLabels: UserLabelTypes[]) => {
   };
 };
 
-export const SYSTEM_LABELS: SystemLabel[] = [
-  {
-    name: 'Inbox',
-    icon: Icon.Inbox,
-    value: SystemLabels.Inbox,
-    type: LabelType.SYSTEM,
-    dataTest: 'inbox-mailbox-selector'
-  },
-  {
-    name: 'Sent',
-    icon: Icon.Send,
-    value: SystemLabels.Sent,
-    type: LabelType.SYSTEM,
-    dataTest: 'sent-mailbox-selector'
-  },
-  {
-    name: 'Send later',
-    icon: Icon.Calendar,
-    value: SystemLabels.ScheduleSend,
-    type: LabelType.SYSTEM,
-    dataTest: 'send-later-mailbox-selector'
-  },
-  {
-    name: 'Drafts',
-    icon: Icon.FileEmpty,
-    value: SystemLabels.Drafts,
-    type: LabelType.SYSTEM,
-    dataTest: 'draft-mailbox-selector'
-  },
-  {
-    name: 'Spam',
-    icon: Icon.Spam,
-    value: SystemLabels.Spam,
-    type: LabelType.SYSTEM,
-    dataTest: 'spam-mailbox-selector'
-  },
-  {
-    name: 'Archive',
-    icon: Icon.Archive,
-    value: SystemLabels.Archive,
-    type: LabelType.SYSTEM,
-    dataTest: 'archive-mailbox-selector'
-  },
-  {
-    name: 'Trash',
-    icon: Icon.Trash,
-    value: SystemLabels.Trash,
-    type: LabelType.SYSTEM,
-    dataTest: 'trash-mailbox-selector'
-  }
-];
+export const getSystemLabels = (hasImportedFF: boolean): SystemLabel[] => {
+  return [
+    {
+      name: 'Inbox',
+      icon: Icon.Inbox,
+      value: SystemLabels.Inbox,
+      type: LabelType.SYSTEM,
+      dataTest: 'inbox-mailbox-selector'
+    },
+    {
+      name: 'Sent',
+      icon: Icon.Send,
+      value: SystemLabels.Sent,
+      type: LabelType.SYSTEM,
+      dataTest: 'sent-mailbox-selector'
+    },
+    {
+      name: 'Send later',
+      icon: Icon.Calendar,
+      value: SystemLabels.ScheduleSend,
+      type: LabelType.SYSTEM,
+      dataTest: 'send-later-mailbox-selector'
+    },
+    {
+      name: 'Drafts',
+      icon: Icon.FileEmpty,
+      value: SystemLabels.Drafts,
+      type: LabelType.SYSTEM,
+      dataTest: 'draft-mailbox-selector'
+    },
+    {
+      name: 'Spam',
+      icon: Icon.Spam,
+      value: SystemLabels.Spam,
+      type: LabelType.SYSTEM,
+      dataTest: 'spam-mailbox-selector'
+    },
+    {
+      name: 'Archive',
+      icon: Icon.Archive,
+      value: SystemLabels.Archive,
+      type: LabelType.SYSTEM,
+      dataTest: 'archive-mailbox-selector'
+    },
+    ...insertIf<SystemLabel>(hasImportedFF && !isMobile, {
+      name: 'Imported',
+      icon: Icon.Upload,
+      value: SystemLabels.Imported,
+      type: LabelType.SYSTEM,
+      dataTest: 'imported-mailbox-selector'
+    }),
+    {
+      name: 'Trash',
+      icon: Icon.Trash,
+      value: SystemLabels.Trash,
+      type: LabelType.SYSTEM,
+      dataTest: 'trash-mailbox-selector'
+    }
+  ];
+};
 
 export const HIDDEN_LABELS: HiddenLabel[] = [
   {
@@ -211,6 +222,7 @@ const DEFAULT_SIDEBAR_LABELS = [
   SystemLabels.Drafts,
   SystemLabels.Spam,
   SystemLabels.Archive,
+  SystemLabels.Imported,
   SystemLabels.Trash
 ];
 
@@ -223,7 +235,7 @@ export const isDefaultSidebarLabel = (label: SystemLabel) => {
   return (DEFAULT_SIDEBAR_LABELS as string[]).includes(label.value);
 };
 
-export const LABEL_TO_SYSTEM_LABEL: { [key in SystemLabels]: SystemLabel } = SYSTEM_LABELS.reduce<{
+export const LABEL_TO_SYSTEM_LABEL: { [key in SystemLabels]: SystemLabel } = getSystemLabels(true).reduce<{
   [key in SystemLabels]: SystemLabel;
 }>((acc, label) => {
   acc[label.value] = label;

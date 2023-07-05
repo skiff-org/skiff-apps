@@ -2,7 +2,7 @@ import { ApolloError } from '@apollo/client';
 import { motion } from 'framer-motion';
 import {
   colors,
-  CustomCircularProgress,
+  CircularProgress,
   Icon,
   Icons,
   Size,
@@ -77,10 +77,10 @@ const DomainRegistrationInterval = styled.div<{ $isHovering: boolean }>`
 const LoadingCustomDomainSearchRow: React.FC = () => {
   return (
     <SearchRowContainer>
-      <Skeleton height='24px' width='80px' borderRadius={4} forceTheme={ThemeMode.DARK} />
+      <Skeleton borderRadius={4} forceTheme={ThemeMode.DARK} height='24px' width='80px' />
       <DomainPrice>
-        <Skeleton height='16px' width='60px' borderRadius={4} forceTheme={ThemeMode.DARK} />
-        <Skeleton height='12px' width='80px' borderRadius={4} forceTheme={ThemeMode.DARK} />
+        <Skeleton borderRadius={4} forceTheme={ThemeMode.DARK} height='16px' width='60px' />
+        <Skeleton borderRadius={4} forceTheme={ThemeMode.DARK} height='12px' width='80px' />
       </DomainPrice>
     </SearchRowContainer>
   );
@@ -111,7 +111,7 @@ const CustomDomainSearchRow: React.FC<CustomDomainSearchRowProps> = ({ domainRes
         // (e.g. they may have come from a promo modal)
         `${window.location.origin}${window.location.pathname}?${new URLSearchParams({
           [TABS_QUERY_PARAM]: TabPage.CustomDomains
-        }).toString()}}`
+        }).toString()}`
       );
       if (errors?.length) {
         const paywallErrorCode = getPaywallErrorCode(errors);
@@ -181,7 +181,7 @@ const CustomDomainSearchRow: React.FC<CustomDomainSearchRowProps> = ({ domainRes
         {domainResult.available &&
           showArrow &&
           (checkoutQueryLoading ? (
-            <CustomCircularProgress color='white' size={Size.SMALL} />
+            <CircularProgress progressColor='white' size={Size.SMALL} />
           ) : (
             <Icons color='white' icon={Icon.ArrowRight} />
           ))}

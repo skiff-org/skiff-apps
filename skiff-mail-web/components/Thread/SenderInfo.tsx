@@ -1,15 +1,16 @@
 import {
-  Typography,
+  FilledVariant,
   Icon,
   IconButton,
   Icons,
   Size,
   ThemeMode,
-  TypographyWeight,
-  TypographySize
+  Typography,
+  TypographySize,
+  TypographyWeight
 } from '@skiff-org/skiff-ui';
 import { useCallback } from 'react';
-import { UserAvatar, useToast, copyToClipboardWebAndMobile } from 'skiff-front-utils';
+import { UserAvatar, copyToClipboardWebAndMobile, useToast } from 'skiff-front-utils';
 import { DisplayPictureData } from 'skiff-graphql';
 import { isSkiffAddress } from 'skiff-utils';
 import styled from 'styled-components';
@@ -73,10 +74,17 @@ interface SenderInfoProps {
   emailAlias: string;
   displayName: string;
   displayPictureData: DisplayPictureData;
+  unverified?: boolean;
   forceTheme?: ThemeMode;
 }
 
-export const SenderInfo = ({ emailAlias, displayName, displayPictureData, forceTheme }: SenderInfoProps) => {
+export const SenderInfo = ({
+  emailAlias,
+  displayName,
+  displayPictureData,
+  unverified,
+  forceTheme
+}: SenderInfoProps) => {
   const { enqueueToast } = useToast();
   const isSecured = isSkiffAddress(emailAlias);
 
@@ -93,6 +101,7 @@ export const SenderInfo = ({ emailAlias, displayName, displayPictureData, forceT
       <AvatarContainer>
         <UserAvatar
           displayPictureData={displayPictureData}
+          unverified={unverified}
           forceTheme={forceTheme}
           label={displayName}
           style={{ width: '30px', height: '30px' }}
@@ -123,7 +132,12 @@ export const SenderInfo = ({ emailAlias, displayName, displayPictureData, forceT
         </Typography>
       </NameContainer>
       <AlignRight>
-        <IconButton forceTheme={forceTheme} icon={Icon.Copy} iconColor='disabled' onClick={copyToClipboard} />
+        <IconButton
+          forceTheme={forceTheme}
+          icon={<Icons color='disabled' icon={Icon.Copy} />}
+          onClick={copyToClipboard}
+          variant={FilledVariant.UNFILLED}
+        />
       </AlignRight>
     </Container>
   );

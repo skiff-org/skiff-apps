@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
   ACCENT_COLOR_VALUES,
-  CustomCircularProgress,
+  CircularProgress,
   Icon,
   Icons,
   IconText,
@@ -111,7 +111,8 @@ const UnreadLabel = styled.div`
 `;
 
 const IconTextContainer = styled.div`
-  min-width: 0px;
+  flex: 1;
+  min-width: 0;
 `;
 
 /* Rules to determine if something can be dropped in another mailbox */
@@ -144,6 +145,8 @@ interface LabelSidebarItemProps {
   label: Exclude<Label, HiddenLabel>;
   variant: LabelVariants;
 }
+
+const MAX_NUM_UNREAD = 500_000;
 
 const LabelSidebarItem: React.FC<LabelSidebarItemProps> = ({ label, variant }: LabelSidebarItemProps) => {
   const { label: routeLabel, userLabelVariant } = useCurrentLabel();
@@ -251,31 +254,31 @@ const LabelSidebarItem: React.FC<LabelSidebarItemProps> = ({ label, variant }: L
           onMouseLeave={() => setHover(false)}
           onMouseOver={() => setHover(true)}
         >
-          {hasMoreOptions && (
-            <IconTextWithEndActions
-              endActions={[
-                {
-                  icon: Icon.OverflowH,
-                  onClick: (e?: React.MouseEvent) => {
-                    e?.stopPropagation();
-                    e?.preventDefault();
-                    setShowDropdown((prev) => !prev);
-                  },
-                  buttonRef: ref
-                }
-              ]}
-              showEndActions={hover || showDropdown}
-              {...iconTextProps}
-            />
-          )}
-          {!hasMoreOptions && (
-            <IconTextContainer>
-              <IconText {...iconTextProps} />
-            </IconTextContainer>
-          )}
+          <IconTextContainer>
+            {hasMoreOptions && (
+              <IconTextWithEndActions
+                endActions={[
+                  {
+                    icon: Icon.OverflowH,
+                    onClick: (e?: React.MouseEvent) => {
+                      e?.stopPropagation();
+                      e?.preventDefault();
+                      setShowDropdown((prev) => !prev);
+                    },
+                    buttonRef: ref
+                  }
+                ]}
+                showEndActions={hover || showDropdown}
+                {...iconTextProps}
+              />
+            )}
+            {!hasMoreOptions && <IconText {...iconTextProps} />}
+          </IconTextContainer>
           {numUnreadInbox > 0 && (
             <Typography color={active ? 'primary' : 'secondary'} size={TypographySize.SMALL}>
-              <UnreadLabel>{numUnreadInbox.toLocaleString()}</UnreadLabel>
+              <UnreadLabel>
+                {numUnreadInbox > MAX_NUM_UNREAD ? `${MAX_NUM_UNREAD / 1000}k+` : numUnreadInbox.toLocaleString()}
+              </UnreadLabel>
             </Typography>
           )}
           {label.value === SystemLabels.Drafts && numDrafts > 0 && (
@@ -332,7 +335,7 @@ const ActionSidebarItem: React.FC<ActionSidebarItemProps> = ({
       onClick={onClick}
     >
       <IconText color={color} label={label} startIcon={icon} weight={TypographyWeight.REGULAR} />
-      {(spinner || progress !== undefined) && <CustomCircularProgress progress={progress} spinner={spinner} />}
+      {(spinner || progress !== undefined) && <CircularProgress progress={progress} spinner={spinner} />}
     </SidebarLabel>
   );
 

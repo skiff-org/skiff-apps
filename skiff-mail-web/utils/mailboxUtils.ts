@@ -19,7 +19,7 @@ import { MailboxThreadInfo } from '../models/thread';
 
 import { updateLabelsNumUnreadCache } from './cache/cache';
 import { cacheMarkAllRead, updateReadUnreadFilterThreads } from './cache/mailbox';
-import { SYSTEM_LABELS } from './label';
+import { getSystemLabels } from './label';
 import { SearchSkemail } from './searchWorkerUtils';
 
 export const getItemHeight = (isMobile: boolean) => {
@@ -29,7 +29,7 @@ export const getItemHeight = (isMobile: boolean) => {
   return ITEM_HEIGHT;
 };
 
-export const markAllThreadsAsRead = async (read: boolean, label: string) => {
+export const markAllThreadsAsRead = async (read: boolean, label: string, hasGmailImportImprovementsFF: boolean) => {
   await client.mutate<SetAllThreadsReadStatusMutation, SetAllThreadsReadStatusMutationVariables>({
     mutation: SetAllThreadsReadStatusDocument,
     variables: { request: { read, label } },
@@ -39,7 +39,7 @@ export const markAllThreadsAsRead = async (read: boolean, label: string) => {
         return;
       }
       cacheMarkAllRead(cache, read);
-      SYSTEM_LABELS.forEach((sysLabel) => {
+      getSystemLabels(hasGmailImportImprovementsFF).forEach((sysLabel) => {
         updateReadUnreadFilterThreads(cache, sysLabel.name, { read: true });
         updateReadUnreadFilterThreads(cache, sysLabel.name, { read: false });
       });
@@ -124,16 +124,21 @@ export const getReplyOrForwardFromAddress = (
   defaultEmailAlias?: string
 ) => {
   // Priority for determining from address
-  //   1. Default email alias if it exists in to, cc, or bcc
-  //   2. Other email alias if it exists in to, cc, or bcc
-  //   3. Use default email alias
-  const { to, cc, bcc } = email;
-  const aliasesSet = new Set(concat(to, cc, bcc).map(({ address }) => address));
-  if (defaultEmailAlias && aliasesSet.has(defaultEmailAlias)) {
+  //   1. If the email you are replying to was sent by you, use the original from address
+  //   2. Default email alias if it exists in to, cc, or bcc
+  //   3. Other email alias if it exists in to, cc, or bcc
+  //   4. Use default email alias
+  const { to, cc, bcc, from } = email;
+
+  // Return the original from address if the email was sent by you
+  if (emailAliases.includes(from.address)) return from.address;
+
+  const aliasesSet = new Set(concat(to, cc, bcc).map(({ address }) => address.toLowerCase()));
+  if (defaultEmailAlias && aliasesSet.has(defaultEmailAlias.toLowerCase())) {
     return defaultEmailAlias;
   }
 
-  const otherEmailAliasInTo = emailAliases.find((alias) => aliasesSet.has(alias));
+  const otherEmailAliasInTo = emailAliases.find((alias) => aliasesSet.has(alias.toLowerCase()));
   if (otherEmailAliasInTo) {
     return otherEmailAliasInTo;
   }

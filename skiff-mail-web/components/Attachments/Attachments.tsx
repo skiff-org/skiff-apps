@@ -1,5 +1,5 @@
 import {
-  CustomCircularProgress,
+  CircularProgress,
   Icon,
   Icons,
   IconText,
@@ -250,10 +250,10 @@ const Attachments: FC<AttachmentsProps> = ({
                   </TextContainer>
                   {attachment.state === AttachmentStates.LocalUploading && (
                     <MarginLeft>
-                      <CustomCircularProgress
-                        color='disabled'
+                      <CircularProgress
                         dataTest='attachment-upload-loader'
                         progress={attachment.progress}
+                        progressColor='disabled'
                         size={Size.SMALL}
                       />
                     </MarginLeft>

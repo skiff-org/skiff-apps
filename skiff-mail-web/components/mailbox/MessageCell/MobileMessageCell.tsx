@@ -25,6 +25,7 @@ import { MOBILE_ITEM_HEIGHT } from '../../../constants/mailbox.constants';
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
 import { useDate } from '../../../hooks/useDate';
 import { useThreadActions } from '../../../hooks/useThreadActions';
+import { MailboxThreadInfo } from '../../../models/thread';
 import { skemailMailboxReducer } from '../../../redux/reducers/mailboxReducer';
 import { skemailMobileDrawerReducer } from '../../../redux/reducers/mobileDrawerReducer';
 import { LABEL_TO_SYSTEM_LABEL, UserLabelPlain, UserLabelAlias } from '../../../utils/label';
@@ -84,6 +85,7 @@ export interface MobileMessageCellProps {
   onSelectToggle: (e: React.MouseEvent<Element | HTMLInputElement, globalThis.MouseEvent>) => void;
   onClick: (e: React.MouseEvent<Element | HTMLInputElement, globalThis.MouseEvent>) => void;
   markThreadsAsReadUnread?: () => void;
+  thread?: MailboxThreadInfo;
 }
 
 export const MobileMessageCell = ({
@@ -103,6 +105,7 @@ export const MobileMessageCell = ({
   userLabels,
   onSelectToggle,
   onClick,
+  thread,
   markThreadsAsReadUnread
 }: MobileMessageCellProps) => {
   const { ref } = useResizeDetector();
@@ -184,6 +187,7 @@ export const MobileMessageCell = ({
           <MessageCellAvatar
             address={addresses[index]}
             key={`${addresses[index]}-${threadID}`}
+            messageID={thread?.emails[index]?.id}
             senderName={senderName}
           />
         ))}

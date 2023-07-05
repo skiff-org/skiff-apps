@@ -1,14 +1,4 @@
-import {
-  ACCENT_COLOR_VALUES,
-  AccentColor,
-  Avatar,
-  Chip,
-  ChipProps,
-  Icon,
-  Icons,
-  Size,
-  getAvatarIconOrLabel
-} from '@skiff-org/skiff-ui';
+import { Avatar, Chip, ChipSize, FilledVariant, Icon, Icons, getAvatarIconOrLabel } from '@skiff-org/skiff-ui';
 import { getWalletIcon, splitEmailToAliasAndDomain } from 'skiff-front-utils';
 import { UserLabelVariant } from 'skiff-graphql';
 import { isWalletOrNameServiceAddress } from 'skiff-utils';
@@ -19,7 +9,7 @@ import { UserLabelAlias, UserLabelPlain, getLabelDisplayName } from '../../utils
 interface LabelChipProps {
   userLabel: UserLabelPlain | UserLabelAlias;
   onClick?: (e: React.MouseEvent) => void;
-  size?: ChipProps['size'];
+  size?: ChipSize;
   customLabelName?: string;
   deletable?: boolean;
 }
@@ -34,28 +24,22 @@ export const LabelChip: React.FC<LabelChipProps> = ({
   const { name, variant, color, value } = userLabel;
   const { removeUserLabel, activeThreadID } = useThreadActions();
 
-  const containerColor = color && Object.keys(ACCENT_COLOR_VALUES).includes(color) ? (color as AccentColor) : undefined;
-
-  const getStartIcon = () => {
-    if (variant === UserLabelVariant.Alias) {
-      const { alias } = splitEmailToAliasAndDomain(name);
-      const aliasLabelIcon = isWalletOrNameServiceAddress(alias) ? getWalletIcon(alias) : undefined;
-      const labelOrIcon = getAvatarIconOrLabel(name, aliasLabelIcon);
-      return <Avatar {...labelOrIcon} rounded size={Size.X_SMALL} />;
-    }
-    return <Icons color={color} icon={Icon.Dot} size={Size.X_SMALL} />;
+  const getAvatar = () => {
+    const { alias } = splitEmailToAliasAndDomain(name);
+    const aliasLabelIcon = isWalletOrNameServiceAddress(alias) ? getWalletIcon(alias) : undefined;
+    const labelOrIcon = getAvatarIconOrLabel(name, aliasLabelIcon);
+    return <Avatar {...labelOrIcon} />;
   };
 
   const labelName = getLabelDisplayName(name);
 
   return (
     <Chip
+      avatar={variant === UserLabelVariant.Alias ? getAvatar() : undefined}
+      icon={variant === UserLabelVariant.Alias ? undefined : <Icons color={color} icon={Icon.Dot} />}
       key={value}
-      containerColor={containerColor}
       label={customLabelName ?? labelName}
       onClick={onClick}
-      size={size}
-      transparent
       onDelete={
         deletable
           ? async (e) => {
@@ -66,7 +50,8 @@ export const LabelChip: React.FC<LabelChipProps> = ({
             }
           : undefined
       }
-      startIcon={getStartIcon()}
+      size={size}
+      variant={FilledVariant.UNFILLED}
     />
   );
 };

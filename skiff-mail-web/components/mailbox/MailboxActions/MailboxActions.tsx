@@ -1,10 +1,10 @@
-import { Dropdown, DropdownItem, Icon, IconButton, Icons, Type } from '@skiff-org/skiff-ui';
-import { useRef, useState } from 'react';
+import { Dropdown, DropdownItem, FilledVariant, Icon, IconButton, Icons, Type } from '@skiff-org/skiff-ui';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { useGetNumUnreadQuery } from 'skiff-front-graphql';
-import { useMediaQuery, useToast, useUserPreference } from 'skiff-front-utils';
+import { useGetFF, useMediaQuery, useToast, useUserPreference } from 'skiff-front-utils';
 import { SystemLabels, ThreadDisplayFormat, UserLabelVariant } from 'skiff-graphql';
-import { POLL_INTERVAL_IN_MS, StorageTypes, upperCaseFirstLetter } from 'skiff-utils';
+import { GmailImportImprovementsFlag, POLL_INTERVAL_IN_MS, StorageTypes, upperCaseFirstLetter } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { COMPACT_MAILBOX_BREAKPOINT } from '../../../constants/mailbox.constants';
@@ -77,6 +77,8 @@ interface MailboxActionsProps {
  *
  */
 export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefresh }: MailboxActionsProps) => {
+  const hasGmailImportImprovementsFF = useGetFF<GmailImportImprovementsFlag>('gmailImportImprovements');
+
   const { markThreadsAsReadUnread } = useMarkAsReadUnread();
 
   /** State */
@@ -84,11 +86,14 @@ export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefre
   const [showSelectAll, setShowSelectAll] = useState(false);
   const [selectFilter, setSelectFilter] = useState<MailboxFilters | null>(null);
   useSyncSelectedThreads(threads, selectFilter);
-  const setSelectedThreadIDs = (selectedThreadIDs: string[]) =>
-    dispatch(skemailMailboxReducer.actions.setSelectedThreadIDs({ selectedThreadIDs }));
-
   /** Redux */
   const dispatch = useDispatch();
+
+  const setSelectedThreadIDs = useCallback(
+    (selectedThreadIDs: string[]) =>
+      dispatch(skemailMailboxReducer.actions.setSelectedThreadIDs({ selectedThreadIDs })),
+    [dispatch]
+  );
 
   const checkboxRef = useRef<HTMLDivElement>(null);
 
@@ -155,6 +160,13 @@ export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefre
   });
   const totalNumUnread = data?.unread ?? 0;
 
+  // clear selected threads when label changes
+  useEffect(() => {
+    setSelectFilter(null);
+    setSelectedThreadIDs([]);
+    clearLastSelectedIndex();
+  }, [label, setSelectedThreadIDs, clearLastSelectedIndex]);
+
   const someThreadsAreSelected = selectedThreadIDs.length > 0;
   const allThreadsAreSelected = selectedThreadIDs.length === threads.length;
   const someSelectedAreUnread = selectedThreadIDs.some(
@@ -178,7 +190,7 @@ export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefre
           {
             label: 'Mark all as read',
             onClick: (key) => {
-              void markAllThreadsAsRead(true, label);
+              void markAllThreadsAsRead(true, label, hasGmailImportImprovementsFF);
               closeToast(key);
             }
           }
@@ -250,6 +262,7 @@ export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefre
                 onClick={markSelectionAsReadUnread}
                 tooltip={someSelectedAreUnread ? 'Mark as read' : 'Mark as unread'}
                 type={Type.SECONDARY}
+                variant={FilledVariant.UNFILLED}
               />
               <div>
                 <IconButton
@@ -260,6 +273,7 @@ export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefre
                   ref={labelDropdownRef}
                   tooltip={{ title: 'Labels', shortcut: 'L' }}
                   type={Type.SECONDARY}
+                  variant={FilledVariant.UNFILLED}
                 />
                 <MoveToLabelDropdown
                   buttonRef={labelDropdownRef}
@@ -278,6 +292,7 @@ export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefre
                   ref={moveToDropdownRef}
                   tooltip='Move to'
                   type={Type.SECONDARY}
+                  variant={FilledVariant.UNFILLED}
                 />
                 <MoveToLabelDropdown
                   buttonRef={moveToDropdownRef}
@@ -300,6 +315,7 @@ export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefre
                   }}
                   tooltip='Permanently delete'
                   type={Type.SECONDARY}
+                  variant={FilledVariant.UNFILLED}
                 />
               )}
               {!isSpam && (
@@ -311,6 +327,7 @@ export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefre
                   }}
                   tooltip='Report spam'
                   type={Type.SECONDARY}
+                  variant={FilledVariant.UNFILLED}
                 />
               )}
               {!isSent && (
@@ -322,6 +339,7 @@ export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefre
                   }}
                   tooltip='Export'
                   type={Type.SECONDARY}
+                  variant={FilledVariant.UNFILLED}
                 />
               )}
               {allSpam && (
@@ -333,6 +351,7 @@ export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefre
                   }}
                   tooltip='Not spam'
                   type={Type.SECONDARY}
+                  variant={FilledVariant.UNFILLED}
                 />
               )}
             </>
@@ -349,6 +368,7 @@ export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefre
               }}
               tooltip={{ title: 'Archive', shortcut: 'E' }}
               type={Type.SECONDARY}
+              variant={FilledVariant.UNFILLED}
             />
           )}
           {!isTrash && (
@@ -364,6 +384,7 @@ export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefre
               }}
               tooltip={{ title: 'Trash', shortcut: '#' }}
               type={Type.SECONDARY}
+              variant={FilledVariant.UNFILLED}
             />
           )}
           {(isTrash || isArchive) && !isInbox && (
@@ -377,6 +398,7 @@ export const MailboxActions = ({ threads, label, clearLastSelectedIndex, onRefre
               }}
               tooltip={{ title: 'Move to inbox', shortcut: 'Z' }}
               type={Type.SECONDARY}
+              variant={FilledVariant.UNFILLED}
             />
           )}
         </Toolbar>

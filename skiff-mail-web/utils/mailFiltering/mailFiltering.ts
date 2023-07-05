@@ -1,5 +1,5 @@
 import uniq from 'lodash/uniq';
-import { decryptDatagram, decryptSessionKey } from 'skiff-crypto-v2';
+import { decryptDatagramV2, decryptSessionKey } from '@skiff-org/skiff-crypto';
 import { EmailFragment, ThreadFragment } from 'skiff-front-graphql';
 import { requireCurrentUserData } from 'skiff-front-utils';
 import {
@@ -88,8 +88,8 @@ export const emailMatchesFilter = (
         console.error(`Could not decrypt subject value. Skipping filter for emailID: ${email.id}.`);
         return false;
       }
-      const decryptedSubjectFilterValue = decryptDatagram(SubjectTextDatagram, decryptedSessionKey, serializedData).body
-        .text;
+      const decryptedSubjectFilterValue = decryptDatagramV2(SubjectTextDatagram, decryptedSessionKey, serializedData)
+        .body.text;
       const normalizedSubjectValue = normalize(decryptedSubjectFilterValue);
       const normalizedDecryptedSubject = normalize(decryptedSubject);
       return normalizedDecryptedSubject.includes(normalizedSubjectValue);
@@ -99,7 +99,8 @@ export const emailMatchesFilter = (
         console.error(`Could not decrypt body value. Skipping filter for emailID: ${email.id}.`);
         return false;
       }
-      const decryptedBodyFilterValue = decryptDatagram(BodyTextDatagram, decryptedSessionKey, serializedData).body.text;
+      const decryptedBodyFilterValue = decryptDatagramV2(BodyTextDatagram, decryptedSessionKey, serializedData).body
+        .text;
       const normalizedBodyValue = normalize(decryptedBodyFilterValue);
       const normalizedDecryptedText = normalize(decryptedText);
       return normalizedDecryptedText.includes(normalizedBodyValue);

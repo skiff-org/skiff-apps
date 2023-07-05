@@ -40,7 +40,6 @@ export interface CommandListItems {
 
 interface CommandListProps {
   query: string;
-  loading: boolean;
   listItems: CommandListItems;
   searchOptions: {
     contentSearch: boolean;
@@ -62,7 +61,6 @@ const StyledVariableSizeList = styled(VariableSizeList)`
 export const CommandList = ({
   query,
   listItems: searchItems,
-  loading,
   searchOptions,
   onClose,
   searchQuery,
@@ -80,8 +78,9 @@ export const CommandList = ({
 
   const searchResults = combineSearchResults(searchActions, showActionsToggle);
 
-  // if loading, show empty screen, otherwise show search results or 1 row for no results
-  const itemCount = loading ? 0 : Math.max(searchResults.length, 1);
+  // If there are no search results, there should still be 1 row for the
+  // "no results" row.
+  const itemCount = Math.max(searchResults.length, 1);
   const { navigateToUserLabel } = useNavigate();
   const { setActiveThreadID } = useThreadActions();
   const { label: currentRouteLabel } = useCurrentLabel();
@@ -205,7 +204,7 @@ export const CommandList = ({
   useEffect(() => {
     setHighlightedRow(0);
     listRef.current?.resetAfterIndex(0, false);
-  }, [query, loading]);
+  }, [query]);
 
   useEffect(() => {
     window.addEventListener('keydown', onKeyPress);

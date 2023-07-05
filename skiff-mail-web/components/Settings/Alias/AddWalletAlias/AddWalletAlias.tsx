@@ -2,6 +2,7 @@ import { ApolloError } from '@apollo/client';
 import { Keplr } from '@keplr-wallet/types/build/wallet/keplr';
 import {
   Button,
+  Icons,
   Tooltip,
   TooltipContent,
   TooltipPlacement,
@@ -227,11 +228,10 @@ export const AddWalletAlias = ({ walletAliases, requestHcaptchaToken, includeDel
       <WalletButtonContainer>
         <Button
           fullWidth
-          iconColor='source'
+          icon={<Icons color='source' icon={icon} />}
           key={`add-${walletName}`}
           loading={!!isAddingWallet[provider]}
           onClick={onClick}
-          startIcon={icon}
           type={Type.SECONDARY}
         >
           {isAddingWallet[provider] ? `Check wallet...` : walletName}

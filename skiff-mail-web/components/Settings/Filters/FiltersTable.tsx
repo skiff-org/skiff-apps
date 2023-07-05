@@ -1,14 +1,13 @@
-import { Alignment, Button, CustomCircularProgress, Type, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
+import { Alignment, Button, CircularProgress, Type, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import { useUserLabelsQuery } from 'skiff-front-graphql';
-import { DEFAULT_WORKSPACE_EVENT_VERSION } from 'skiff-front-utils';
+import { DEFAULT_WORKSPACE_EVENT_VERSION, Illustration, Illustrations } from 'skiff-front-utils';
 import { WorkspaceEventType } from 'skiff-graphql';
 import styled from 'styled-components';
 
 import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { ModalType } from '../../../redux/reducers/modalTypes';
-import Illustration, { Illustrations } from '../../../svgs/Illustration';
 import { sortByName, splitUserLabelsByVariant, userLabelFromGraphQL } from '../../../utils/label';
 import { storeWorkspaceEvent } from '../../../utils/userUtils';
 
@@ -96,7 +95,7 @@ export const FiltersTable: React.FC<FiltersTableProps> = ({ filters, isFiltersLo
       )}
       {isLoading && (
         <LoadingContainer>
-          <CustomCircularProgress />
+          <CircularProgress spinner />
         </LoadingContainer>
       )}
     </FiltersTableContainer>

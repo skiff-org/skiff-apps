@@ -41,10 +41,12 @@ export function getSettingsParams() {
   return settingsQuery;
 }
 
+type QueryParam = Record<string, string | string[] | undefined>;
+
 interface ConstructURLParams {
   url: string;
   pathname?: string;
-  query?: Record<string, string>;
+  query?: QueryParam;
   hash?: string;
 }
 export function constructURL({ url, pathname, query, hash }: ConstructURLParams) {
@@ -55,7 +57,11 @@ export function constructURL({ url, pathname, query, hash }: ConstructURLParams)
   }
   if (query) {
     Object.entries(query).forEach(([param, val]) => {
-      newUrl.searchParams.append(param, val);
+      if (Array.isArray(val)) {
+        val.forEach((value) => newUrl.searchParams.append(param, value));
+      } else if (val) {
+        newUrl.searchParams.append(param, val);
+      }
     });
   }
   if (hash) {
@@ -64,8 +70,23 @@ export function constructURL({ url, pathname, query, hash }: ConstructURLParams)
   return newUrl.toString();
 }
 
-function constructAsPath(pathname: string, query: Record<string, string>, hash: string) {
-  const queryString = !!Object.values(query).length ? '?' + new URLSearchParams(query).toString() : '';
+const constructQueryString = (query: QueryParam): string => {
+  if (!Object.values(query).length) return '';
+  let queryString = '';
+  Object.entries(query).forEach(([param, val], index) => {
+    let paramString = '';
+    if (Array.isArray(val)) {
+      paramString = val.length ? new URLSearchParams(val.map((paramVal) => [param, paramVal])).toString() : '';
+    } else if (val) {
+      paramString = new URLSearchParams([[param, val]]).toString();
+    }
+    if (paramString) queryString = queryString.concat(`${index > 0 ? '&' : ''}${paramString}`);
+  });
+  return `?${queryString}`;
+};
+
+function constructAsPath(pathname: string, query: QueryParam, hash: string) {
+  const queryString = constructQueryString(query);
   const formattedHash = hash && hash.charAt(0) !== '#' ? '#' + hash : hash;
   return pathname + queryString + formattedHash;
 }

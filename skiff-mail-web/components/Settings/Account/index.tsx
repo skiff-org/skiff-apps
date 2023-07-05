@@ -9,7 +9,6 @@ import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { ModalType } from '../../../redux/reducers/modalTypes';
 
 import AddEmail from './AddEmail/AddEmail';
-import DeleteAccount from './DeleteAccount/DeleteAccount';
 import DeleteRecoveryEmail from './DeleteRecoveryEmail/DeleteRecoveryEmail';
 import EditProfileSettings from './EditProfileSettings/EditProfileSettings';
 
@@ -55,14 +54,6 @@ export const useAccountSettings: () => Setting[] = () => {
         icon: Icon.Envelope,
         color: 'green'
       }),
-      {
-        value: SettingValue.DeleteAccount,
-        type: SettingType.Custom,
-        component: <DeleteAccount key='delete-account' />,
-        label: SETTINGS_LABELS[SettingValue.DeleteAccount],
-        icon: Icon.Trash,
-        color: 'red'
-      },
       ...insertIf<Setting>(isMobile, {
         value: SettingValue.Logout,
         type: SettingType.Action,

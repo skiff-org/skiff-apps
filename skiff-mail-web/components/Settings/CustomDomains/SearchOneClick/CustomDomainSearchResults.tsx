@@ -8,6 +8,8 @@ import { useGetDomainSuggestionsLazyQuery, useCheckIfDomainsAvailableLazyQuery }
 import { useGetOrganizationQuery } from 'skiff-front-graphql';
 import {
   DEFAULT_WORKSPACE_EVENT_VERSION,
+  Illustration,
+  Illustrations,
   splitEmailToAliasAndDomain,
   useDefaultEmailAlias,
   useRequiredCurrentUserData
@@ -22,7 +24,6 @@ import {
 } from 'skiff-utils';
 import styled from 'styled-components';
 
-import Illustration, { Illustrations } from '../../../../svgs/Illustration';
 import { storeWorkspaceEvent } from '../../../../utils/userUtils';
 
 import {

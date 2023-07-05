@@ -30,7 +30,8 @@ enum LoginMutationStatus {
 }
 
 const LoginErrors = {
-  CHECK_USERNAME_PASSWORD: 'Check your username and password. Contact support@skiff.org for support.',
+  CHECK_USERNAME_PASSWORD:
+    'Check your username and password. If you have forgotten your password, try "Forgot password?" below.',
   CHECK_2FA_TOKEN: 'Login failed. Please check your two-factor authentication token.',
   TOKEN_NOT_ACCEPTED: 'Token was not accepted. Please re-enter verification token.',
   SERVER_CONNECTION_FAILED: 'Unable to connect to server. Contact support@skiff.org for support.',

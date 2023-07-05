@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { isMobile } from 'react-device-detect';
-import { BannerTypes, isDesktopApp } from 'skiff-front-utils';
+import { BannerTypes, isReactNativeDesktopApp } from 'skiff-front-utils';
 import { AddressObject, DecryptedAttachment } from 'skiff-graphql';
 
 import { isInline } from '../../components/Attachments';
@@ -10,7 +10,7 @@ import {
   createForwardContent
 } from '../../components/MailEditor/mailEditorUtils';
 import { MailboxEmailInfo, ThreadViewEmailInfo } from '../../models/email';
-import { MailboxThreadInfo, ThreadDetailInfo } from '../../models/thread';
+import { ThreadDetailInfo } from '../../models/thread';
 import { excludeEmailAliases, filterPopulatedToAddresses } from '../../utils/composeUtils';
 import { getReplyOrForwardFromAddress } from '../../utils/mailboxUtils';
 
@@ -37,8 +37,8 @@ export interface PopulateComposeContent {
   fromAddress: string | undefined;
   messageBody: string;
   attachmentMetadata: DecryptedAttachment[];
-  replyEmailID: string | null;
-  replyThread: MailboxThreadInfo | null;
+  replyEmailID: string | undefined;
+  replyThread: ThreadDetailInfo | undefined;
 }
 
 const emptyComposeContent: PopulateComposeContent = {
@@ -49,8 +49,8 @@ const emptyComposeContent: PopulateComposeContent = {
   fromAddress: undefined,
   messageBody: '',
   attachmentMetadata: [],
-  replyEmailID: null,
-  replyThread: null
+  replyEmailID: undefined,
+  replyThread: undefined
 };
 
 export interface SkemailModalReducerState {
@@ -75,7 +75,7 @@ export const initialSkemailDialogState: SkemailModalReducerState = {
   openModal: undefined,
   composeOpen: false,
   replyComposeOpen: false,
-  bannersOpen: !isMobile && !isSS && !isDesktopApp() ? [BannerTypes.Mobile] : [],
+  bannersOpen: !isMobile && !isSS && !isReactNativeDesktopApp() ? [BannerTypes.Mobile] : [],
   composeCollapseState: defaultExpandState,
   populateComposeContent: emptyComposeContent,
   isSending: false
@@ -148,7 +148,7 @@ export const skemailModalReducer = createSlice({
       state,
       action: PayloadAction<{
         email: MailboxEmailInfo;
-        thread: MailboxThreadInfo;
+        thread: ThreadDetailInfo;
         emailAliases: string[];
         defaultEmailAlias?: string;
         signature?: string;
@@ -182,15 +182,24 @@ export const skemailModalReducer = createSlice({
 
       state.composeCollapseState = defaultExpandState;
     },
-    editDraftCompose: (state, action: PayloadAction<MailboxEmailInfo>) => {
-      const email = action.payload;
-      const { decryptedSubject, to, cc, bcc } = email;
+    editDraftCompose: (
+      state,
+      action: PayloadAction<{ draftEmail: MailboxEmailInfo; replyThread?: ThreadDetailInfo }>
+    ) => {
+      const { draftEmail, replyThread } = action.payload;
+      const { decryptedSubject, to, cc, bcc, from } = draftEmail;
       state.populateComposeContent.subject = decryptedSubject || '';
+      state.populateComposeContent.fromAddress = from.address;
       state.populateComposeContent.toAddresses = to;
       state.populateComposeContent.ccAddresses = cc;
       state.populateComposeContent.bccAddresses = bcc;
-
-      state.populateComposeContent.messageBody = getEmailBody(email);
+      const mostRecentEmailOnReplyThread = replyThread?.emails?.[replyThread.emails.length - 1];
+      // draft is either for a reply or a forward, this ensures it is threaded
+      if (replyThread && mostRecentEmailOnReplyThread) {
+        state.populateComposeContent.replyEmailID = mostRecentEmailOnReplyThread.id;
+        state.populateComposeContent.replyThread = replyThread;
+      }
+      state.populateComposeContent.messageBody = getEmailBody(draftEmail);
 
       state.composeOpen = true;
       state.replyComposeOpen = false;
@@ -201,16 +210,20 @@ export const skemailModalReducer = createSlice({
       action: PayloadAction<{
         email: MailboxEmailInfo;
         emailAliases: string[];
+        thread: ThreadDetailInfo;
         defaultEmailAlias?: string;
       }>
     ) => {
-      const { email, emailAliases, defaultEmailAlias } = action.payload;
+      const { email, emailAliases, defaultEmailAlias, thread } = action.payload;
       const { decryptedSubject, decryptedAttachmentMetadata } = email;
       state.populateComposeContent.subject = `FWD: ${decryptedSubject || ''}`;
       state.populateComposeContent.fromAddress = getReplyOrForwardFromAddress(email, emailAliases, defaultEmailAlias);
 
       state.populateComposeContent.messageBody = createForwardContent(email);
       state.populateComposeContent.attachmentMetadata = decryptedAttachmentMetadata ?? [];
+      state.populateComposeContent.replyEmailID = email.id;
+
+      state.populateComposeContent.replyThread = thread;
 
       if (isMobile) {
         state.composeOpen = true;

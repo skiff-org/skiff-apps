@@ -1,4 +1,5 @@
 import {
+  FilledVariant,
   Icon,
   IconButton,
   IconText,
@@ -90,6 +91,7 @@ const TopBar: FC<TopBarProps> = ({ attachment, thread, email, onPrev, onNext, cl
               icon={Icon.ExternalLink}
               onClick={() => void navigateToSystemLabel(attributes?.systemLabels[0] as SystemLabels, activeThreadQuery)}
               size={Size.SMALL}
+              variant={FilledVariant.UNFILLED}
             />
           )}
           <VerticalDivider />
@@ -115,6 +117,7 @@ const TopBar: FC<TopBarProps> = ({ attachment, thread, email, onPrev, onNext, cl
                 e.stopPropagation();
                 if (onPrev) onPrev();
               }}
+              variant={FilledVariant.UNFILLED}
             />
             <IconButton
               disabled={!onNext}
@@ -124,6 +127,7 @@ const TopBar: FC<TopBarProps> = ({ attachment, thread, email, onPrev, onNext, cl
                 e.stopPropagation();
                 if (onNext) onNext();
               }}
+              variant={FilledVariant.UNFILLED}
             />
             <VerticalDivider />
           </>
@@ -135,6 +139,7 @@ const TopBar: FC<TopBarProps> = ({ attachment, thread, email, onPrev, onNext, cl
             e.stopPropagation();
             closeModal();
           }}
+          variant={FilledVariant.UNFILLED}
         />
       </RightSection>
     </TopBarContainer>

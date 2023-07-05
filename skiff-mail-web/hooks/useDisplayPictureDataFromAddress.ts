@@ -1,8 +1,34 @@
-import { useUsersFromEmailAliasQuery } from 'skiff-front-graphql';
+import { useGetDefaultProfilePictureQuery, useUsersFromEmailAliasQuery } from 'skiff-front-graphql';
 import { getContactDisplayPictureData, useGetContactWithEmailAddress } from 'skiff-front-utils';
 import { AddressObject } from 'skiff-graphql';
 import { isSkiffAddress } from 'skiff-utils';
+
 import client from '../apollo/client';
+
+export const useDisplayPictureWithDefaultFallback = (
+  address: string | AddressObject | undefined,
+  messageID?: string
+) => {
+  const displayPictureDataFromAddress = useDisplayPictureDataFromAddress(address);
+  const defaultRes = useGetDefaultProfilePictureQuery({
+    variables: {
+      request: {
+        messageID: messageID ?? ''
+      }
+    },
+    skip: !messageID,
+    fetchPolicy: 'cache-first'
+  });
+  let displayPictureData = displayPictureDataFromAddress ?? {};
+  let unverified = false;
+  if (defaultRes.data?.defaultProfilePicture?.profilePictureData && !displayPictureDataFromAddress) {
+    unverified = true;
+    displayPictureData = {
+      profileCustomURI: defaultRes.data.defaultProfilePicture.profilePictureData
+    };
+  }
+  return { displayPictureData, unverified };
+};
 
 export const useDisplayPictureDataFromAddress = (address: string | AddressObject | undefined) => {
   const emailAddress = address ? (typeof address === 'string' ? address : address.address) : undefined;

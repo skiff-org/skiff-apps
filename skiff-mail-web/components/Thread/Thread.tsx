@@ -23,7 +23,7 @@ import { useDrafts } from '../../hooks/useDrafts';
 import { useThreadActions } from '../../hooks/useThreadActions';
 import { useUserLabelsToRenderAsChips } from '../../hooks/useUserLabelsToRenderAsChips';
 import { useUserSignature } from '../../hooks/useUserSignature';
-import { MailboxEmailInfo } from '../../models/email';
+import { MailboxEmailInfo, ThreadViewEmailInfo } from '../../models/email';
 import { skemailMobileDrawerReducer } from '../../redux/reducers/mobileDrawerReducer';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { getActiveSystemLabel } from '../../utils/label';
@@ -136,8 +136,7 @@ function Thread({
   emailAliases
 }: ThreadProps) {
   const { data, loading: isThreadDataLoading } = useGetThreadFromIdQuery({ variables: { threadID } });
-  const emails = useMemo(() => data?.userThread?.emails ?? [], [data]);
-  const thread = data?.userThread || undefined;
+  const emailsFromQuery: ThreadViewEmailInfo[] = data?.userThread?.emails ?? [];
   const attributes = data?.userThread?.attributes;
   const userLabels = attributes?.userLabels ?? [];
   const labelsToRender = useUserLabelsToRenderAsChips(userLabels, true);
@@ -147,6 +146,27 @@ function Thread({
   const replyRef = useRef<HTMLDivElement>(null);
   const userSignature = useUserSignature();
   const { replyComposeOpen } = useAppSelector((state) => state.modal);
+
+  // Append the pending replies to the thread's emails. A pending reply is one that is not
+  // yet in the cache (not yet polled from the server), but the user has sent the email.
+  // We append it so that we can optimistically show the sent email on the thread before the next poll.
+  const pendingReplies = useAppSelector((state) => state.mailbox.pendingReplies);
+  const pendingRepliesForThread = pendingReplies.filter((reply) => reply.threadID === threadID);
+  const emails = pendingRepliesForThread.reduce(
+    (acc, reply) => {
+      // Only add the pending reply to the emails list if it is not already there
+      if (!acc.find((email) => email.id === reply.email.id)) return [...acc, reply.email];
+      return acc;
+    },
+    [...emailsFromQuery]
+  );
+  // Update the thread with the updated emails
+  const thread = useMemo(
+    () => (data?.userThread ? { ...data.userThread, emails } : undefined),
+    [data?.userThread, emails]
+  );
+
+  const isSending = useAppSelector((state) => state.modal.isSending);
 
   const { composeNewDraft } = useDrafts();
 
@@ -184,11 +204,11 @@ function Thread({
     }
 
     composeNewDraft();
-    if (!data?.userThread) return;
+    if (!thread) return;
     dispatch(
       skemailModalReducer.actions.replyCompose({
         email: lastEmail,
-        thread: data.userThread,
+        thread,
         emailAliases,
         defaultEmailAlias,
         signature: userSignature
@@ -203,11 +223,11 @@ function Thread({
     }
 
     composeNewDraft();
-    if (!data?.userThread) return;
+    if (!thread) return;
     dispatch(
       skemailModalReducer.actions.replyAllCompose({
         email: lastEmail,
-        thread: data.userThread,
+        thread,
         emailAliases,
         defaultEmailAlias,
         signature: userSignature
@@ -222,7 +242,15 @@ function Thread({
     }
 
     composeNewDraft();
-    dispatch(skemailModalReducer.actions.forwardCompose({ email: lastEmail, emailAliases, defaultEmailAlias }));
+    if (!thread) return;
+    dispatch(
+      skemailModalReducer.actions.forwardCompose({
+        email: lastEmail,
+        emailAliases,
+        defaultEmailAlias,
+        thread
+      })
+    );
   };
 
   const emailRefs = emails.reduce((acc, val) => {
@@ -247,7 +275,7 @@ function Thread({
   const [threadIsCollapsed, setThreadIsCollapsed] = useState(initialCollapsedState);
 
   const { value: labelFromRouter } = useRouterLabelContext() ?? {};
-  const activeThreadSystemLabels = data?.userThread?.attributes.systemLabels ?? [];
+  const activeThreadSystemLabels = thread?.attributes.systemLabels ?? [];
   // labelFromRouter will be undefined for cases where a Thread is rendered
   // outside of the system label/user label mailboxes (ie in the full view search page)
   const activeThreadLabel = labelFromRouter ?? getActiveSystemLabel(activeThreadSystemLabels);
@@ -421,7 +449,7 @@ function Thread({
     return (
       <>
         {/* hide first divider to avoid overlap with header */}
-        {data?.userThread && (
+        {thread && (
           <>
             {divider}
             <ThreadBlock
@@ -434,7 +462,7 @@ function Thread({
               expanded={!!isExpanded[email.id]}
               key={email.id}
               onClick={onThreadBlockClick}
-              thread={data.userThread}
+              thread={thread}
             />
           </>
         )}
@@ -476,7 +504,7 @@ function Thread({
           </div>
         ))}
         <BrowserView>
-          {replyComposeOpen && (
+          {replyComposeOpen && !isSending && (
             <ReplyComposeContainer ref={replyRef}>
               <Suspense fallback={null}>
                 <Compose />
@@ -486,26 +514,14 @@ function Thread({
         </BrowserView>
         <MobileView>
           <MobileReplyContainer>
-            <Button fullWidth onClick={reply} startIcon={Icon.Reply}>
+            <Button fullWidth icon={Icon.Reply} onClick={reply}>
               Reply
             </Button>
             <div>
-              <IconButton
-                dataTest='mobile-reply-all'
-                filled
-                icon={Icon.ReplyAll}
-                onClick={replyAll}
-                type={Type.SECONDARY}
-              />
+              <IconButton dataTest='mobile-reply-all' icon={Icon.ReplyAll} onClick={replyAll} type={Type.SECONDARY} />
             </div>
             <div>
-              <IconButton
-                dataTest='mobile-forward'
-                filled
-                icon={Icon.ForwardEmail}
-                onClick={forward}
-                type={Type.SECONDARY}
-              />
+              <IconButton dataTest='mobile-forward' icon={Icon.ForwardEmail} onClick={forward} type={Type.SECONDARY} />
             </div>
           </MobileReplyContainer>
         </MobileView>

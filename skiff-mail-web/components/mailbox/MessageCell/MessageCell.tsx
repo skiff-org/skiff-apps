@@ -3,6 +3,7 @@ import isToday from 'dayjs/plugin/isToday';
 import {
   Chip,
   Facepile,
+  FilledVariant,
   Icon,
   Icons,
   IconText,
@@ -22,13 +23,13 @@ import styled from 'styled-components';
 
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
 import { useDate } from '../../../hooks/useDate';
+import { useDisplayNameFromAddress } from '../../../hooks/useDisplayNameFromAddress';
 import { MailboxThreadInfo } from '../../../models/thread';
 import { UserLabelAlias, UserLabelPlain } from '../../../utils/label';
 import { getScheduledSendAtDateForThread } from '../../../utils/mailboxUtils';
 import Checkbox from '../../Checkbox';
 import { LinkedLabelChips } from '../../labels/LinkedLabelChips';
 
-import { useDisplayNameFromAddress } from '../../../hooks/useDisplayNameFromAddress';
 import {
   ActionsContainer,
   AvatarContainer,
@@ -210,8 +211,10 @@ export const MessageCell = ({
             >
               {facepileNames.map((senderName, index) => (
                 <MessageCellAvatar
+                  badgeBackground={facepileColor}
                   address={addresses[index]}
-                  key={`${addresses[index]}-${emailID || threadID}`}
+                  key={`${addresses[index] ?? ''}-${emailID || threadID}`}
+                  messageID={emails[index]?.id}
                   senderName={senderName}
                 />
               ))}
@@ -269,7 +272,13 @@ export const MessageCell = ({
             )}
             {renderScheduledSendLink()}
             {emails.length > 1 && (
-              <Chip label={emails.length} size={Size.SMALL} startIcon={<Icons color='secondary' icon={Icon.Reply} />} />
+              <Chip
+                color='secondary'
+                icon={Icon.Reply}
+                label={emails.length}
+                size={Size.SMALL}
+                variant={FilledVariant.UNFILLED}
+              />
             )}
           </LabelsContainer>
           <EmailContentTop $hide={hover}>

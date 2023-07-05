@@ -2,12 +2,14 @@ import { Typography, Icon, TypographySize, Icons, TypographyWeight, Size } from 
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
+import { useGetFF } from 'skiff-front-utils';
 import { ActionType } from 'skiff-graphql';
+import { GmailImportImprovementsFlag } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { ModalType } from '../../../redux/reducers/modalTypes';
-import { UserLabelPlain, UserLabelFolder, SYSTEM_LABELS } from '../../../utils/label';
+import { UserLabelPlain, UserLabelFolder, getSystemLabels } from '../../../utils/label';
 
 import { ActionChip } from './Chips/ActionChip';
 import { FilterConditionChip } from './Chips/FilterConditionChip';
@@ -70,6 +72,8 @@ interface FilterRowProps {
 }
 
 export const FilterRow: React.FC<FilterRowProps> = ({ filter, index, labels, folders, isLastRow }: FilterRowProps) => {
+  const hasGmailImportImprovementsFF = useGetFF<GmailImportImprovementsFlag>('gmailImportImprovements');
+
   const dispatch = useDispatch();
 
   const [hover, setHover] = useState(false);
@@ -88,7 +92,7 @@ export const FilterRow: React.FC<FilterRowProps> = ({ filter, index, labels, fol
       const targetFolder = folders.filter((folder) =>
         possibleMoveToTargets.find((target) => target.value === folder.value)
       );
-      const targetSystemLabel = SYSTEM_LABELS.filter((systemLabel) =>
+      const targetSystemLabel = getSystemLabels(hasGmailImportImprovementsFF).filter((systemLabel) =>
         possibleMoveToTargets.find((target) => target.value === systemLabel.value)
       );
       // Can only move to one folder or system label

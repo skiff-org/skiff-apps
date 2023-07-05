@@ -1,5 +1,5 @@
-import { buildEditorNodes } from '../Extensions/EditorNodes';
-import { buildEditorPlugins } from '../Extensions/EditorPlugins';
+import { buildEditorNodes } from './EditorNodes';
+import { buildEditorPlugins } from './EditorPlugins';
 
 import { buildEditorMarks } from './EditorMarks';
 import { EditorExtensionsOptions } from './ExtensionsOptions';

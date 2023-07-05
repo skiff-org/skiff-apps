@@ -1,5 +1,6 @@
-import { Icon, IconButton, Icons, Type, Typography, TypographySize } from '@skiff-org/skiff-ui';
+import { FilledVariant, Icon, IconButton, Icons, Type, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import { useCallback, useEffect, useState } from 'react';
+import { isMobile } from 'react-device-detect';
 import {
   GetUserMfaQuery,
   LoginSrpRequest,
@@ -24,7 +25,6 @@ import { LoginMutationStatus, MfaTypes, RequestStatus, WorkspaceEventType } from
 import { insertIf } from 'skiff-utils';
 import styled from 'styled-components';
 
-import { isMobile } from 'react-device-detect';
 import client from '../../../../apollo/client';
 import { storeWorkspaceEvent } from '../../../../utils/userUtils';
 import ConfirmPasswordDialog from '../../../shared/ConfirmPasswordDialog';
@@ -243,7 +243,8 @@ function SetupMFA() {
     <>
       <TitleActionSection
         actions={[
-          ...insertIf<SettingAction>(hasTotpEnabled, {
+          // Hide WebAuthn prompt on React Native apps
+          ...insertIf<SettingAction>(hasTotpEnabled && !window.ReactNativeWebView, {
             onClick: () =>
               setAuthenticationOpen({
                 isOpen: true,
@@ -315,6 +316,7 @@ function SetupMFA() {
                   }}
                   tooltip='Disable credential'
                   type={Type.SECONDARY}
+                  variant={FilledVariant.UNFILLED}
                 />
               </MfaRightJustifiedContainer>
             </MfaDataContainer>
@@ -335,6 +337,7 @@ function SetupMFA() {
                     }}
                     tooltip='Regenerate backup codes'
                     type={Type.SECONDARY}
+                    variant={FilledVariant.UNFILLED}
                   />
                 )}
                 <IconButton
@@ -357,6 +360,7 @@ function SetupMFA() {
                   }}
                   tooltip='Remove TOTP'
                   type={Type.SECONDARY}
+                  variant={FilledVariant.UNFILLED}
                 />
               </MfaRightJustifiedContainer>
             </MfaDataContainer>

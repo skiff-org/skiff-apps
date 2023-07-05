@@ -115,7 +115,7 @@ const activationChecklistItems = ({
 }: {
   mobileAppCreditsEarned: number;
   importMailCreditsEarned: number;
-  recoveryEmail: string | undefined;
+  recoveryEmail: string | null | undefined;
   nonCryptoAliases: string[];
   openMailImportModal: () => void;
   openQrCodeModal: () => void;
