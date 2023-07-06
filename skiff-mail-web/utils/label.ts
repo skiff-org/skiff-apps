@@ -191,7 +191,7 @@ export const getSystemLabels = (hasImportedFF: boolean): SystemLabel[] => {
     ...insertIf<SystemLabel>(hasImportedFF && !isMobile, {
       name: 'Imported',
       icon: Icon.Upload,
-      value: SystemLabels.Imported,
+      value: SystemLabels.Imports,
       type: LabelType.SYSTEM,
       dataTest: 'imported-mailbox-selector'
     }),

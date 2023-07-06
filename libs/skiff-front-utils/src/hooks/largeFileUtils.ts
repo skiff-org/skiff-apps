@@ -18,7 +18,7 @@ export const downloadSlices = async function* (slices: string[], updateProgress?
   let offset = 0;
   for (let i = 0; i < slices.length; i += 1) {
     const sliceData = slices[i];
-    const slice = await getCacheElementArray(sliceData, (progress) => {
+    const slice = (await getCacheElementArray(sliceData, (progress) => {
       if (updateProgress) {
         // In decimal form.
         const progressBeforeChunk = i / slices.length;
@@ -28,7 +28,7 @@ export const downloadSlices = async function* (slices: string[], updateProgress?
         const overallProgress = progressBeforeChunk + progressCurrentChunk;
         updateProgress(overallProgress * 100);
       }
-    });
+    })) as any[];
     yield { slice, offset };
     offset += slice.length;
   }

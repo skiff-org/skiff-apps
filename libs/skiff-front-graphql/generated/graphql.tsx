@@ -16,6 +16,13 @@ export type GetContactsQueryVariables = Types.Exact<{
 
 export type GetContactsQuery = { __typename?: 'Query', contacts: Array<{ __typename?: 'Contact', emailAddress: string, firstName?: string | null, lastName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureDataSkemail', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null }> };
 
+export type GetDefaultProfilePictureQueryVariables = Types.Exact<{
+  request: Types.GetDefaultProfilePictureRequest;
+}>;
+
+
+export type GetDefaultProfilePictureQuery = { __typename?: 'Query', defaultProfilePicture?: { __typename?: 'DefaultDisplayPictureData', profilePictureData: string } | null };
+
 export type CreateOrUpdateContactMutationVariables = Types.Exact<{
   request: Types.CreateOrUpdateContactRequest;
 }>;
@@ -2321,6 +2328,41 @@ export function useGetContactsLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type GetContactsQueryHookResult = ReturnType<typeof useGetContactsQuery>;
 export type GetContactsLazyQueryHookResult = ReturnType<typeof useGetContactsLazyQuery>;
 export type GetContactsQueryResult = Apollo.QueryResult<GetContactsQuery, GetContactsQueryVariables>;
+export const GetDefaultProfilePictureDocument = /*#__PURE__*/ gql`
+    query getDefaultProfilePicture($request: GetDefaultProfilePictureRequest!) {
+  defaultProfilePicture(request: $request) {
+    profilePictureData
+  }
+}
+    `;
+
+/**
+ * __useGetDefaultProfilePictureQuery__
+ *
+ * To run a query within a React component, call `useGetDefaultProfilePictureQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDefaultProfilePictureQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDefaultProfilePictureQuery({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useGetDefaultProfilePictureQuery(baseOptions: Apollo.QueryHookOptions<GetDefaultProfilePictureQuery, GetDefaultProfilePictureQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDefaultProfilePictureQuery, GetDefaultProfilePictureQueryVariables>(GetDefaultProfilePictureDocument, options);
+      }
+export function useGetDefaultProfilePictureLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDefaultProfilePictureQuery, GetDefaultProfilePictureQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDefaultProfilePictureQuery, GetDefaultProfilePictureQueryVariables>(GetDefaultProfilePictureDocument, options);
+        }
+export type GetDefaultProfilePictureQueryHookResult = ReturnType<typeof useGetDefaultProfilePictureQuery>;
+export type GetDefaultProfilePictureLazyQueryHookResult = ReturnType<typeof useGetDefaultProfilePictureLazyQuery>;
+export type GetDefaultProfilePictureQueryResult = Apollo.QueryResult<GetDefaultProfilePictureQuery, GetDefaultProfilePictureQueryVariables>;
 export const CreateOrUpdateContactDocument = /*#__PURE__*/ gql`
     mutation createOrUpdateContact($request: CreateOrUpdateContactRequest!) {
   createOrUpdateContact(request: $request)

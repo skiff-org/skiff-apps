@@ -1,5 +1,5 @@
 import { Icon, Icons, IconText, IconTextProps, Size } from '@skiff-org/skiff-ui';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import styled from 'styled-components';
 
@@ -55,12 +55,16 @@ const SectionHeaderContainer = ({
   acceptedDragType: string;
   children?: React.ReactNode;
 }) => {
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: acceptedDragType,
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver()
-    })
-  }));
+  // TODO: Fix and revert this
+  // This is causing `missing drag and drop context` errors
+  // const [{ isOver }, drop] = useDrop(() => ({
+  //   accept: acceptedDragType,
+  //   collect: (monitor) => ({
+  //     isOver: !!monitor.isOver()
+  //   })
+  // }));
+  const isOver = false;
+  const drop = useRef();
 
   useEffect(() => {
     if (isOver) {

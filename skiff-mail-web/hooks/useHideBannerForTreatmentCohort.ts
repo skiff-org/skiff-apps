@@ -9,9 +9,7 @@ export default function useHideBannerForTreatmentCohort() {
   const featureFlags = useFlags();
   const showBannerAfterOnboardingPrompt = featureFlags.showBannersAfterOnboarding as BannersAfterOnboardingFeatureFlag;
   const onboardingExperimentCohort = featureFlags.onboardingRetentionFlow as OnboardingRetentionFlowFeatureFlag;
-  const isInTreatmentCohort =
-    onboardingExperimentCohort === OnboardingRetentionFlowFeatureFlag.STEPS ||
-    onboardingExperimentCohort === OnboardingRetentionFlowFeatureFlag.CHECKLIST;
+  const isInTreatmentCohort = onboardingExperimentCohort === 'steps' || onboardingExperimentCohort === 'checklist';
   // returns true for users not in control cohort who are exempted from banner exposure
   return isInTreatmentCohort && !showBannerAfterOnboardingPrompt;
 }

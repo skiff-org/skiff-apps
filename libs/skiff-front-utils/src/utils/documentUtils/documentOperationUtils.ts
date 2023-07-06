@@ -229,7 +229,7 @@ export function upgradeHierarchicalKey(client: ApolloClient<NormalizedCacheObjec
           };
         });
 
-        const decryptedLinkKey =
+        const decryptedLinkKey: string =
           newHierarchicalKeyRequest.encryptedLinkKey &&
           decryptSymmetric(
             newHierarchicalKeyRequest.encryptedLinkKey,
