@@ -82,6 +82,7 @@ import { MAIL_LIST_CONTAINER_ID } from './consts';
 import { fadeInAnimation } from './Mailbox.styles';
 import { animateMailListHeader, MAIL_LIST_HEADER_ID, MailboxHeader, MOBILE_HEADER_HEIGHT } from './MailboxHeader';
 import useGatedMailboxData from './useGatedMailboxData';
+import { MOCK_MAILBOX_REQUEST } from '__mocks__/mockApiResponse';
 
 const ActivationPaneToggle = dynamic(() => import('./ActivationPane/ActivationPaneToggle'), { ssr: false });
 const LoadingMailbox = dynamic(() => import('./LoadingMailbox'), { ssr: false });
@@ -384,7 +385,7 @@ export const Mailbox = () => {
   const isScheduleSend = label === SystemLabels.ScheduleSend;
   const isImported = label === SystemLabels.Imported;
   const isAutoOpenLabel = isInbox || isSent || isScheduleSend;
-  const threads = isDrafts ? draftThreads : data?.mailbox?.threads ?? [];
+  const threads = isDrafts ? draftThreads : MOCK_MAILBOX_REQUEST.data.mailbox?.threads ?? [];
 
   const mostRecentThreadID = !!threads.length ? threads[0]?.threadID : undefined;
   const prevMostRecentThreadID = usePrevious(mostRecentThreadID);

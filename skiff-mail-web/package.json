@@ -1,7 +1,6 @@
 {
-  "name": "skemail-web",
+  "name": "skiff-mail-web",
   "version": "0.1.0",
-  "private": true,
   "packageManager": "yarn@3.5.0",
   "scripts": {
     "analyze": "OPEN_ANALYZE=true yarn build",

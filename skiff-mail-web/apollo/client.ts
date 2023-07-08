@@ -98,7 +98,7 @@ const retryLink = new RetryLink();
 const client = new ApolloClient({
   link: from([authLink, retryLink, cloudflareChallengeRedirectLink, link]),
   cache,
-  name: 'skemail-web',
+  name: 'skiff-mail-web',
   version: process.env.NEXT_PUBLIC_GIT_HASH
 });
 
