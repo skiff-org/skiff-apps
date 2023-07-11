@@ -5,7 +5,7 @@ export const MOCK_MAILBOX_REQUEST = {
         {
           threadID: '80d21e74-635e-4a4b-8197-5d59cddcede4',
           attributes: {
-            read: false,
+            read: true,
             systemLabels: ['INBOX'],
             userLabels: [
               {
@@ -76,7 +76,7 @@ export const MOCK_MAILBOX_REQUEST = {
         {
           threadID: '6e62341b-3568-4770-b76d-dff0404fcf03',
           attributes: {
-            read: false,
+            read: true,
             systemLabels: ['INBOX'],
             userLabels: [
               {
@@ -157,7 +157,7 @@ export const MOCK_MAILBOX_REQUEST = {
   }
 };
 
-export const MOCK_NUM_UNREAD = MOCK_MAILBOX_REQUEST.data.mailbox.threads.length;
+export const MOCK_NUM_UNREAD = 0;
 
 export const getMockedThread = (threadID: string | null) => {
   console.log({

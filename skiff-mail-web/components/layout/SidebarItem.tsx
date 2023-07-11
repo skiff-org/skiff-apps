@@ -44,6 +44,7 @@ import {
   UserLabelPlain
 } from '../../utils/label';
 import LabelOptionsDropdown from '../labels/LabelOptionsDropdown';
+import { MOCK_NUM_UNREAD } from '__mocks__/mockApiResponse';
 
 const IconColorContainer = styled.div<{ $color: string }>`
   background: ${(props) => props.$color};
@@ -163,16 +164,10 @@ const LabelSidebarItem: React.FC<LabelSidebarItemProps> = ({ label, variant }: L
 
   const { moveThreads, applyUserLabel } = useThreadActions();
 
-  const { data } = useGetNumUnreadQuery({
-    variables: { label: label.value },
-    skip: label.value === SystemLabels.Sent || label.value === SystemLabels.Drafts || label.value === FILES_LABEL.value,
-    pollInterval: POLL_INTERVAL_IN_MS
-  });
-
   const { draftThreads } = useDrafts();
   const numDrafts = draftThreads.length;
 
-  const numUnreadInbox = data?.unread ?? 0;
+  const numUnreadInbox = MOCK_NUM_UNREAD;
 
   // Files label does not populate route label like other system labels (since it's handled by pages/files.tsx)
   const filesLabelActive = label.value === FILES_LABEL.value && router.pathname.includes('/files');

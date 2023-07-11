@@ -45,6 +45,7 @@ import { FilterModal } from '../Settings/Filters/FilterModal';
 import { useSettings } from '../Settings/useSettings';
 
 import { MailboxActions, MailboxFilters } from './MailboxActions/MailboxActions';
+import { MOCK_MAILBOX_REQUEST, MOCK_NUM_UNREAD } from '__mocks__/mockApiResponse';
 
 interface MailboxHeaderProps {
   showSkeleton: boolean;
@@ -208,7 +209,7 @@ export const MailboxHeader = ({
   // Fallback to search while context is loading/switching
   const label = context?.value || HiddenLabels.Search;
   const labelName = context?.name || 'Search';
-  const { data, refetch: updateNumUnread } = useGetNumUnreadQuery({
+  const { refetch: updateNumUnread } = useGetNumUnreadQuery({
     variables: { label },
     skip: label === SystemLabels.Sent || label === SystemLabels.Drafts,
     pollInterval: POLL_INTERVAL_IN_MS
@@ -252,7 +253,7 @@ export const MailboxHeader = ({
     void updateNumUnread();
   }, [threads]);
 
-  const numUnread = data?.unread ?? 0;
+  const numUnread = MOCK_NUM_UNREAD;
   const user = useRequiredCurrentUserData();
   const mobileMultiItemsActive = useAppSelector((state) => state.mobileDrawer.multipleItemSelector);
   const [shouldSelectAll, setShouldSelectAll] = useState(true);
