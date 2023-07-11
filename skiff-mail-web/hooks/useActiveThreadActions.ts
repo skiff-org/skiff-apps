@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { useGetThreadFromIdQuery } from 'skiff-front-graphql';
 import { useDefaultEmailAlias, useRequiredCurrentUserData, useCurrentUserEmailAliases } from 'skiff-front-utils';
 
 import { skemailModalReducer } from '../redux/reducers/modalReducer';
@@ -9,6 +8,7 @@ import { UserLabelPlain, userLabelFromGraphQL } from '../utils/label';
 import { useDrafts } from './useDrafts';
 import { useThreadActions } from './useThreadActions';
 import { useUserSignature } from './useUserSignature';
+import { getMockedThread } from '__mocks__/mockApiResponse';
 
 export function useActiveThreadActions() {
   const dispatch = useDispatch();
@@ -19,10 +19,7 @@ export function useActiveThreadActions() {
   const userSignature = useUserSignature();
 
   const { activeThreadID } = useThreadActions();
-  const { data: threadData } = useGetThreadFromIdQuery({
-    variables: { threadID: activeThreadID || '' },
-    skip: !activeThreadID
-  });
+  const { data: threadData } = getMockedThread(activeThreadID);
 
   const email = useMemo(
     () => threadData?.userThread?.emails[threadData?.userThread?.emails.length - 1],

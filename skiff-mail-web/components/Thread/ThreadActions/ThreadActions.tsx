@@ -2,7 +2,6 @@ import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
 import { FilledVariant, Icon, IconText, Size, TypographyWeight } from '@skiff-org/skiff-ui';
 import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useGetThreadFromIdQuery } from 'skiff-front-graphql';
 import { useMediaQuery, useUserPreference } from 'skiff-front-utils';
 import { SystemLabels, ThreadDisplayFormat, UserLabelVariant } from 'skiff-graphql';
 import { StorageTypes } from 'skiff-utils';
@@ -16,6 +15,7 @@ import { skemailHotKeysReducer } from '../../../redux/reducers/hotkeysReducer';
 import { LABEL_TO_SYSTEM_LABEL } from '../../../utils/label';
 import { MoveToLabelDropdown } from '../../labels/MoveToLabelDropdown';
 import { ThreadNavigationIDs } from '../Thread.types';
+import { getMockedThread } from '__mocks__/mockApiResponse';
 
 const ThreadToolbar = styled.div`
   display: flex;
@@ -108,7 +108,7 @@ export const ThreadActions = ({
   isSkiffSender,
   loading
 }: ThreadActionsProps) => {
-  const { data } = useGetThreadFromIdQuery({ variables: { threadID } });
+  const { data } = getMockedThread(threadID);
   const thread = data?.userThread;
   const labelDropdownRef = useRef<HTMLDivElement>(null);
   const isDrafts = label === SystemLabels.Drafts;

@@ -4,7 +4,7 @@ import { Button, Icon, IconButton, Icons, ThemeMode, Type, Typography, Typograph
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BrowserView, MobileView, isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
-import { useGetThreadFromIdQuery, useIsCustomDomainQuery } from 'skiff-front-graphql';
+import { useIsCustomDomainQuery } from 'skiff-front-graphql';
 import {
   splitEmailToAliasAndDomain,
   useCurrentUserEmailAliases,
@@ -38,6 +38,7 @@ import { ThreadNavigationIDs } from './Thread.types';
 import ThreadBlock from './ThreadBlock';
 import ThreadHeader from './ThreadHeader';
 import { useThreadOptions } from './useThreadOptions';
+import { getMockedThread } from '__mocks__/mockApiResponse';
 
 const Compose = React.lazy(() => import('../Compose/Compose'));
 
@@ -135,7 +136,7 @@ function Thread({
   defaultEmailAlias,
   emailAliases
 }: ThreadProps) {
-  const { data, loading: isThreadDataLoading } = useGetThreadFromIdQuery({ variables: { threadID } });
+  const { data, loading: isThreadDataLoading } = getMockedThread(threadID);
   const emailsFromQuery: ThreadViewEmailInfo[] = data?.userThread?.emails ?? [];
   const attributes = data?.userThread?.attributes;
   const userLabels = attributes?.userLabels ?? [];
