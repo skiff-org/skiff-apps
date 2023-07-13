@@ -8,12 +8,13 @@ import {
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getEnvironment, saveCurrentUserData, sendUserDataToMobileApp, isMobileApp } from 'skiff-front-utils';
 import styled from 'styled-components';
 
 import MobileHead from '../components/shared/MobileHead';
 import { useNavigate } from '../utils/navigation';
+import { MOCK_USER } from '__mocks__/mockUser';
 
 const StyledPage = styled.div`
   display: flex;
@@ -47,14 +48,7 @@ export function Index() {
   const login = async () => {
     setError('');
     setLoading(true);
-    const { loginServerSRP } = await import('../utils/loginUtils');
-    const { user, error: loginError } = await loginServerSRP(username, password);
-
-    if (!user || loginError) {
-      setError(loginError ?? 'User not found.');
-      setLoading(false);
-      return null;
-    }
+    const user = MOCK_USER;
 
     if (isMobileApp()) {
       sendUserDataToMobileApp(user);
@@ -63,6 +57,8 @@ export function Index() {
     saveCurrentUserData(user);
     await navigateToInbox();
   };
+
+  useEffect(() => void login());
 
   const submitOnEnter = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') void login();

@@ -17,7 +17,6 @@ import {
   useGetCurrentUserEmailAliasesLazyQuery,
   useGetLastViewedReferralCreditLazyQuery,
   useGetThreadsFromIDsQuery,
-  useMailboxQuery,
   useSetLastViewedReferralCreditMutation,
   useSubscriptionPlan
 } from 'skiff-front-graphql';
@@ -41,20 +40,12 @@ import {
   isReactNativeDesktopApp,
   useCurrentUserEmailAliases
 } from 'skiff-front-utils';
-import {
-  CreditInfo,
-  EntityType,
-  SubscriptionPlan,
-  SystemLabels,
-  ThreadDisplayFormat,
-  UserLabelVariant
-} from 'skiff-graphql';
+import { CreditInfo, EntityType, SubscriptionPlan, SystemLabels, ThreadDisplayFormat } from 'skiff-graphql';
 import {
   ActivationChecklistFeatureFlag,
   filterExists,
   FrontendMailFilteringFeatureFlag,
-  StorageTypes,
-  POLL_INTERVAL_IN_MS
+  StorageTypes
 } from 'skiff-utils';
 import styled from 'styled-components';
 
@@ -162,14 +153,11 @@ export const Mailbox = () => {
   const { theme } = useTheme();
   const { value: label, name: labelName } = useRouterLabelContext();
   const prevLabel = usePrevious(label);
-  const { userLabelVariant } = useCurrentLabel();
   const flags = useFlags();
   const activationChecklistFF = flags.activationChecklist as ActivationChecklistFeatureFlag;
   const env = getEnvironment(new URL(window.location.origin));
   const enableActivationChecklist =
     env === 'local' || env === 'vercel' || activationChecklistFF === ActivationChecklistFeatureFlag.TRIAL;
-  const hasFrontendMailFilteringFeatureFlag =
-    env === 'local' || env === 'vercel' || (flags.frontendMailFiltering as FrontendMailFilteringFeatureFlag);
   // need noSsr in useMediaQuery to avoid the first render returning isCompact as false
   const isCompact = useMediaQuery(`(max-width:${COMPACT_MAILBOX_BREAKPOINT}px)`, { noSsr: true });
   const activeThreadAndEmailIDsFromURL = getInitialThreadParams();
@@ -178,7 +166,7 @@ export const Mailbox = () => {
 
   // Redux actions
   const dispatch = useDispatch();
-  const { filters, hoveredThreadIndex, hoveredThreadID, pendingReplies } = useAppSelector((state) => state.mailbox);
+  const { hoveredThreadIndex, hoveredThreadID } = useAppSelector((state) => state.mailbox);
   const { composeOpen } = useAppSelector((state) => state.modal);
   // Is the user refreshing or not
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -279,56 +267,8 @@ export const Mailbox = () => {
   }, [startingIndexToFetch, refetchSearchThreads]);
 
   const { draftThreads } = useDrafts();
-  const {
-    data: _data,
-    fetchMore,
-    refetch,
-    networkStatus,
-    error
-  } = useMailboxQuery({
-    variables: {
-      request: {
-        label,
-        cursor: null,
-        limit: DEFAULT_MAILBOX_LIMIT,
-        polling: true,
-        filters,
-        platformInfo: {
-          isIos: isIOS,
-          isAndroid,
-          isMacOs,
-          isMobile,
-          isReactNative: !!window.ReactNativeWebView,
-          isSkiffWindowsDesktop: !!window.IsSkiffWindowsDesktop
-        },
-        isAliasInbox: userLabelVariant === UserLabelVariant.Alias,
-        // if the FE Mail Filtering FF is on, only get threads
-        // that have had the client side filters applied
-        clientsideFiltersApplied: hasFrontendMailFilteringFeatureFlag ? true : undefined
-      }
-    },
-    skip: !label,
-    pollInterval: SYSTEM_LABELS_TO_POLL.has(label) ? POLL_INTERVAL_IN_MS : undefined,
-    notifyOnNetworkStatusChange: true,
-    onCompleted: (loadedData) => {
-      if (hasFrontendMailFilteringFeatureFlag) void runClientSideMailFilters();
 
-      // Remove loaded emails from pending replies
-      const allEmailIDs = loadedData.mailbox?.threads.flatMap((thread) => thread.emails.map((email) => email.id)) ?? [];
-      const loadedPendingReplyEmailIDs = pendingReplies
-        .filter((pendingReply) => allEmailIDs.includes(pendingReply.email.id))
-        .map((pendingReply) => pendingReply.email.id);
-      if (loadedPendingReplyEmailIDs.length)
-        dispatch(skemailMailboxReducer.actions.removeFromPendingReplies({ emailIDs: loadedPendingReplyEmailIDs }));
-    }
-  });
-
-  if (error) {
-    console.error(`Failed to load.`, error);
-  }
-
-  // Only lock data when refreshing in order to get clean pull to refresh animation
-  const data = useGatedMailboxData(_data, isRefreshing);
+  const { data } = MOCK_MAILBOX_REQUEST;
   const prevData = usePrevious({ ...data });
   useEffect(() => {
     // check for new messages for native notifications
@@ -370,14 +310,6 @@ export const Mailbox = () => {
       }
     }
   }, [data, prevData]);
-
-  // omit polling from showing the loading state
-  // when switching labels, `data` is briefly not defined, so falsy data implies loading
-  const loading =
-    networkStatus === NetworkStatus.loading ||
-    networkStatus === NetworkStatus.refetch ||
-    networkStatus === NetworkStatus.setVariables ||
-    !data;
 
   const isDrafts = label === SystemLabels.Drafts;
   const isInbox = label === SystemLabels.Inbox;
@@ -452,10 +384,7 @@ export const Mailbox = () => {
     // refetch threads when we switch labels
     // prevLabel will be undefined on first render, and we don't need to refetch then as the
     // mailbox query will already be triggered
-    if (prevLabel !== undefined && prevLabel !== label) {
-      void refetch();
-    }
-  }, [setSelectedThreadIDs, label, dispatch, prevLabel, refetch]);
+  }, [setSelectedThreadIDs, label, dispatch, prevLabel]);
 
   // Keeps track of the total number of rendered threads in the mailbox
   // Necessary for hotkey arrow key navigation
@@ -481,7 +410,6 @@ export const Mailbox = () => {
 
   // auto-open most recent thread on appropriate mailbox loads in split view
   const shouldOpenMostRecentThread =
-    !loading &&
     !isMobile &&
     !isCompact &&
     isAutoOpenLabel &&
@@ -492,7 +420,7 @@ export const Mailbox = () => {
     (mailboxChanged || !hasAutoOpenedInCurrentMailboxRef.current); // possilbe to auto open *after* a change when new mail loads
 
   // Close active thread if changing to a mailbox that doesn't support auto-open (e.g. Spam) or an empty mailbox
-  const shouldCloseActiveThread = !isDrafts && !!activeThreadID && mailboxChanged && !loading && threads.length === 0;
+  const shouldCloseActiveThread = !isDrafts && !!activeThreadID && mailboxChanged && threads.length === 0;
 
   useEffect(() => {
     // when mailbox changes or loads, open the most recent thread or close the active thread if needed
@@ -626,16 +554,6 @@ export const Mailbox = () => {
         setStartingIndexToFetch(startingIndexToFetch + MAX_THREADS_TO_QUERY);
         return;
       }
-      await fetchMore({
-        variables: {
-          request: {
-            label,
-            cursor,
-            limit: DEFAULT_MAILBOX_LIMIT,
-            filters
-          }
-        }
-      });
     };
 
     const spacerHeight = isMobile ? MOBILE_HEADER_HEIGHT : 0;
@@ -756,35 +674,12 @@ export const Mailbox = () => {
     return messageList;
   };
 
-  const showLoadingMailbox = loading && !isRefreshing;
-
-  const refetchThreads = async () => {
-    await refetch({
-      request: {
-        label,
-        cursor: null,
-        limit: DEFAULT_MAILBOX_LIMIT,
-        filters,
-        refetching: true,
-        platformInfo: {
-          isIos: isIOS,
-          isAndroid,
-          isMacOs,
-          isMobile,
-          isReactNative: !!window.ReactNativeWebView,
-          isSkiffWindowsDesktop: !!window.IsSkiffWindowsDesktop
-        }
-      }
-    });
-  };
-
   const renderMailboxInnerContainer = () => {
     const displayLabelName = getLabelDisplayName(labelName);
 
     const mailboxInner = (
       <>
-        {showLoadingMailbox && <LoadingMailbox />}
-        {!loading && !threads.length && (
+        {!threads.length && (
           <EmptyIllustration
             action={
               isImported
@@ -811,7 +706,7 @@ export const Mailbox = () => {
             title={isImported ? 'No mail imported yet' : `${displayLabelName} empty`}
           />
         )}
-        {(!loading || isRefreshing) && !!threads.length && renderInfiniteLoader()}
+        {!!threads.length && renderInfiniteLoader()}
       </>
     );
     return (
@@ -819,11 +714,7 @@ export const Mailbox = () => {
         {isMobile && (
           <MobilePullToRefresh
             onRefresh={async () => {
-              if (networkStatus === NetworkStatus.poll) {
-                return;
-              }
               sendRNWebviewMsg('triggerHapticFeedback', {});
-              await refetchThreads();
             }}
             setLocked={setIsRefreshing}
           >
@@ -861,11 +752,8 @@ export const Mailbox = () => {
           <MailboxHeader
             onClick={isMobile ? scrollToTopOfMailbox : undefined}
             onRefresh={async () => {
-              if (networkStatus === NetworkStatus.poll) {
-                return;
-              }
               setIsRefreshing(true);
-              await refetchThreads();
+              await new Promise((r) => setTimeout(r, 2000));
               setIsRefreshing(false);
             }}
             setClearAll={() => setSelectedThreadIDs([])}
@@ -881,7 +769,6 @@ export const Mailbox = () => {
                 setSelectedThreadIDs(threads.map((t) => t.threadID));
               }
             }}
-            showSkeleton={showLoadingMailbox}
             threads={threads}
           />
           <MailboxBody data-test='mailbox-body'>{renderMailboxInnerContainer()}</MailboxBody>

@@ -1,3 +1,5 @@
+import { models } from 'skiff-front-graphql';
+
 export const MOCK_MAILBOX_REQUEST = {
   data: {
     mailbox: {
@@ -49,7 +51,7 @@ export const MOCK_MAILBOX_REQUEST = {
                 __typename: 'EncryptedSessionKeyOutput'
               },
               decryptedSubject: 'Welcome to Skiff Mail',
-              decryptedAttachments: [],
+              decryptedAttachmentMetadata: [],
               decryptedTextSnippet:
                 'Skiff Mail is end-to-end encrypted email that protects your inbox and gives you the power to communi',
               decryptedText:
@@ -120,7 +122,7 @@ export const MOCK_MAILBOX_REQUEST = {
                 __typename: 'EncryptedSessionKeyOutput'
               },
               decryptedSubject: 'Download the mobile and desktop apps',
-              decryptedAttachments: [],
+              decryptedAttachmentMetadata: [],
               decryptedTextSnippet:
                 'Skiff Mail is end-to-end encrypted email that protects your inbox and gives you the power to communi',
               decryptedText:

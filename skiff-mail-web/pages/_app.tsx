@@ -4,11 +4,11 @@ import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import { AppProps } from 'next/app';
 // import 'nightwatch-ui/dist/esm/index.css';
 import { SnackbarProvider } from 'notistack';
-import { ComponentType } from 'react';
+import { ComponentType, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Provider } from 'react-redux';
-import { AppThemeProvider, ErrorPage } from 'skiff-front-utils';
+import { AppThemeProvider, ErrorPage, saveCurrentUserData } from 'skiff-front-utils';
 import { getMailDomain } from 'skiff-utils';
 
 import 'react-image-crop/dist/ReactCrop.css';
@@ -24,8 +24,12 @@ import '../components/shared/CmdPalette/CmdPalette.css';
 import MobileHead from '../components/shared/MobileHead';
 import store from '../redux/store/reduxStore';
 import { CustomHTML5Backend } from '../utils/dragAndDrop';
+import { MOCK_USER } from '__mocks__/mockUser';
 
 function CustomApp({ Component, pageProps }: AppProps) {
+  useEffect(() => {
+    saveCurrentUserData(MOCK_USER);
+  }, []);
   return (
     <ErrorBoundary FallbackComponent={() => <ErrorPage client={client} origin='Skemail' />}>
       <ApolloProvider client={client}>
