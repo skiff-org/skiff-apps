@@ -18,6 +18,7 @@
   "scripts": {
     "emit-ts": "yarn tsc --build",
     "clean": "rm -rf dist/",
+    "preinstall": "rm -rf node_modules/",
     "build": "yarn node build.js",
     "watch": "WATCH=1 yarn build",
     "test": "yarn jest",
