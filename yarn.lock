@@ -19121,6 +19121,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"libs@workspace:libs":
+  version: 0.0.0-use.local
+  resolution: "libs@workspace:libs"
+  languageName: unknown
+  linkType: soft
+
 "libsodium-wrappers@npm:^0.7.6":
   version: 0.7.11
   resolution: "libsodium-wrappers@npm:0.7.11"
@@ -24309,12 +24315,6 @@ __metadata:
     skiff-utils: "workspace:libs/skiff-utils"
     tslib: ^2.4.0
     typescript: ^5.0.0
-  languageName: unknown
-  linkType: soft
-
-"skiff-libs@workspace:libs":
-  version: 0.0.0-use.local
-  resolution: "skiff-libs@workspace:libs"
   languageName: unknown
   linkType: soft
 

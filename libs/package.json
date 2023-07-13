@@ -2,7 +2,7 @@
   "workspaces": [
     "*"
   ],
-  "name": "skiff-libs",
+  "name": "libs",
   "packageManager": "yarn@3.5.0",
   "scripts": {
     "-- foreach flags Docs --": "https://yarnpkg.com/cli/workspaces/foreach",
@@ -11,11 +11,6 @@
     "-i,--interlaced": "Print the output of commands in real-time instead of buffering it",
     "-j,--jobs": "The maximum number of parallel tasks that the execution will be limited to",
     "-t,--topological": "Run the command after all workspaces it depends on (regular) have finished",
-    "build": "yarn workspaces foreach -pvit -j unlimited run build",
-    "watch": "yarn workspaces foreach -piv -j unlimited run watch",
-    "clean": "yarn workspaces foreach -p -i run clean",
-    "test": "yarn workspaces foreach -piv -j unlimited run test",
-    "lint": "yarn workspaces foreach -iv run lint",
-    "lint:fix": "yarn workspaces foreach -piv run lint:fix"
+    "build": "yarn workspace skiff-utils build && yarn workspace skiff-mail-protos build && yarn workspace skiff-graphql build && yarn workspace @skiff-org/skiff-crypto build && yarn workspace skiff-front-graphql build && yarn workspace skiff-front-utils build"
   }
 }
