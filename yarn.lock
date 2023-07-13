@@ -22320,7 +22320,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"protobufjs@npm:^7.0.0":
+"protobufjs@npm:^7.0.0, protobufjs@npm:^7.2.4":
   version: 7.2.4
   resolution: "protobufjs@npm:7.2.4"
   dependencies:
@@ -24476,7 +24476,7 @@ __metadata:
     prosemirror-transform: ^1.4.2
     prosemirror-utils: ^0.9.6
     prosemirror-view: ^1.23.10
-    protobufjs: ^6.11.3
+    protobufjs: ^7.2.4
     react: ^17.0.2
     react-device-detect: ^2.1.2
     react-dnd: ^15.1.1
