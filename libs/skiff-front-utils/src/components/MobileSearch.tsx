@@ -1,5 +1,5 @@
 import debounce from 'lodash/debounce';
-import { InputField, Typography } from 'nightwatch-ui';
+import { InputField, Typography } from '@skiff-org/skiff-ui';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 

@@ -1,15 +1,17 @@
 import { ApolloCache, ApolloError } from '@apollo/client';
+import axios from 'axios';
 import { GraphQLError } from 'graphql';
+import * as t from 'io-ts';
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import { useRouter } from 'next/router';
-import { ButtonGroup, ButtonGroupItem, Icon, Typography } from 'nightwatch-ui';
+import { ButtonGroup, ButtonGroupItem, Divider, Icon, Typography } from '@skiff-org/skiff-ui';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import {
   GetGmailAutoImportStatusDocument,
-  GetGoogleAuthUrlDocument,
-  GetGoogleAuthUrlQuery,
+  GetMboxImportUrlDocument,
+  GetMboxImportUrlMutation,
+  GetMboxImportUrlMutationVariables,
   GetOutlookAuthUrlDocument,
   GetOutlookAuthUrlQuery,
   ImportEmlEmailDocument,
@@ -28,22 +30,28 @@ import {
   useGrantCreditsMutation,
   useUnsubscribeFromGmailImportMutation
 } from 'skiff-front-graphql';
-import { ConfirmModal, ImportSelect, isMobileApp, TitleActionSection, useToast } from 'skiff-front-utils';
+import {
+  ConfirmModal,
+  getEnvironment,
+  ImportSelect,
+  isMobileApp,
+  TitleActionSection,
+  useToast
+} from 'skiff-front-utils';
 import { CreditTransactionReason, ImportClients } from 'skiff-graphql';
-import { gbToBytes } from 'skiff-utils';
+import { AutoForwardingFlag, assertExists, gbToBytes } from 'skiff-utils';
 import styled from 'styled-components';
 
 import client from '../../../../apollo/client';
-import {
-  GENERAL_MAIL_IMPORT_PARAMS,
-  GOOGLE_MAIL_IMPORT_PARAMS,
-  OUTLOOK_MAIL_IMPORT_PARAMS
-} from '../../../../constants/settings.constants';
 import { useAppSelector } from '../../../../hooks/redux/useAppSelector';
 import { skemailModalReducer } from '../../../../redux/reducers/modalReducer';
 import { Modals, ModalType } from '../../../../redux/reducers/modalTypes';
-import { getGoogleOAuth2CodeInURL, getOutlookCodeInURL } from '../../../../utils/importEmails';
-import { extractHashParamFromURL } from '../../../../utils/navigation';
+import {
+  clearAuthCodes,
+  getGoogleOAuth2CodeInURL,
+  getOutlookCodeInURL,
+  signIntoGoogle
+} from '../../../../utils/importEmails';
 import { MESSAGE_MAX_SIZE_IN_BYTES, MESSAGE_MAX_SIZE_IN_MB } from '../../../MailEditor/Plugins/MessageSizePlugin';
 
 import { GmailImportDialog } from './GmailImportDialog';
@@ -58,22 +66,12 @@ const ImportClientsList = styled.div`
   justify-content: center;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
   ${isMobile && 'flex-direction: column;'}
 `;
 
-const getParamsToDelete = (provider: ImportClients) => {
-  const paramsToDelete: string[] = [];
-  switch (provider) {
-    case ImportClients.Gmail:
-      paramsToDelete.push(...GOOGLE_MAIL_IMPORT_PARAMS);
-      break;
-    case ImportClients.Outlook:
-      paramsToDelete.push(...OUTLOOK_MAIL_IMPORT_PARAMS);
-      break;
-  }
-  paramsToDelete.push(...GENERAL_MAIL_IMPORT_PARAMS);
-  return paramsToDelete;
+const ImportListDivider: React.FC = () => {
+  return <Divider color='tertiary' />;
 };
 
 type ConfirmImportModalProps = {
@@ -101,8 +99,16 @@ interface ImportMailProps {
   googleLogin: boolean;
 }
 
+const MboxImportSigedDataValidator = t.type({
+  url: t.string,
+  fields: t.record(t.string, t.string)
+});
+
 export const ImportMail: React.FC<ImportMailProps> = ({ setGoogleLogin, googleLogin }: ImportMailProps) => {
-  const router = useRouter();
+  const flags = useFlags();
+  const env = getEnvironment(new URL(window.location.origin));
+  const hasAutoForwardingFlag = env === 'local' || env === 'vercel' || (flags.autoForwarding as AutoForwardingFlag);
+
   const dispatch = useDispatch();
   const { openModal: openSharedModal } = useAppSelector((state) => state.modal);
   const { enqueueToast } = useToast();
@@ -138,8 +144,6 @@ export const ImportMail: React.FC<ImportMailProps> = ({ setGoogleLogin, googleLo
   const googleAuthClientCode = getGoogleOAuth2CodeInURL();
   const outlookAuthClientCode = getOutlookCodeInURL();
   const [grantCredits] = useGrantCreditsMutation();
-  const featureFlags = useFlags();
-  const gmailImportFlag = featureFlags.gmailImport as boolean;
 
   const handleUnsubscribe = async () => {
     await unsubscribe({
@@ -165,24 +169,15 @@ export const ImportMail: React.FC<ImportMailProps> = ({ setGoogleLogin, googleLo
   const onClose = useCallback(() => {
     // clean code query params
     if (googleAuthClientCode || outlookAuthClientCode) {
-      const newQuery = { ...router.query };
       const provider = googleAuthClientCode ? ImportClients.Gmail : ImportClients.Outlook;
-      const paramsToDelete = getParamsToDelete(provider);
-      paramsToDelete.forEach((param) => delete newQuery[param]);
-      const hash = extractHashParamFromURL(router.asPath);
-      void router.replace({ query: newQuery, hash, pathname: router.pathname }, undefined, { shallow: true });
+      clearAuthCodes(provider);
     }
 
     dispatch(skemailModalReducer.actions.setOpenModal(undefined));
-  }, [dispatch, googleAuthClientCode, outlookAuthClientCode, router]);
+  }, [dispatch, googleAuthClientCode, outlookAuthClientCode]);
 
   const handleGmailAuth = useCallback(async () => {
-    const loginUrl = await client.query<GetGoogleAuthUrlQuery>({
-      query: GetGoogleAuthUrlDocument
-    });
-    if (!loginUrl.data.getGoogleAuthURL) return;
-
-    window.location.replace(loginUrl.data.getGoogleAuthURL);
+    await signIntoGoogle(client);
 
     // Since mobile app does not open google auth url in app (open is browser)
     // we need to reset googleLogin state
@@ -359,9 +354,40 @@ export const ImportMail: React.FC<ImportMailProps> = ({ setGoogleLogin, googleLo
               onClose();
               return;
             }
+            const { data } = await client.mutate<GetMboxImportUrlMutation, GetMboxImportUrlMutationVariables>({
+              mutation: GetMboxImportUrlDocument,
+              variables: {
+                getImportUrlRequest: {
+                  fileSizeInBytes: file.size
+                }
+              }
+            });
+
+            assertExists(data);
+            assertExists(data.getMboxImportUrl);
+            const { uploadData, fileID } = data.getMboxImportUrl;
+            const uploadDataParsed = JSON.parse(uploadData) as unknown;
+            if (!MboxImportSigedDataValidator.is(uploadDataParsed)) {
+              throw new Error('Invalid upload data');
+            }
+            const formData = new FormData();
+
+            Object.entries(uploadDataParsed.fields).forEach(([key, value]) => {
+              formData.append(key, value);
+            });
+            formData.append('file', file);
+            await axios(uploadDataParsed.url, {
+              method: 'POST',
+              data: formData
+              // Can be used to get progress. Not used for now.
+              // onUploadProgress: (progressEvent) => {
+              //   // console.log(progressEvent);
+              // }
+            });
+
             await client.mutate<ImportMboxEmailsMutation, ImportMboxEmailsMutationVariables>({
               mutation: ImportMboxEmailsDocument,
-              variables: { importMboxRequest: { mboxFile: file, fileSizeInBytes: file.size } },
+              variables: { importMboxRequest: { fileID } },
               context: {
                 headers: {
                   'Apollo-Require-Preflight': true // this is required for files uploading. Otherwise, router backend will reject request.
@@ -425,35 +451,37 @@ export const ImportMail: React.FC<ImportMailProps> = ({ setGoogleLogin, googleLo
 
   return (
     <>
-      <TitleActionSection subtitle='Securely import email from Gmail or other webmail accounts' />
+      <TitleActionSection
+        subtitle='Securely import past email from Gmail or other webmail accounts'
+        title={hasAutoForwardingFlag ? 'Import mail' : undefined}
+      />
       <ImportClientsList>
-        {gmailImportFlag && (
-          <ImportSelect
-            dataTest='gmail-mail-import'
-            destructive={isGmailConnected}
-            icon={Icon.Gmail}
-            iconColor='source'
-            label='Gmail'
-            onClick={() => {
-              if (!isGmailConnected) {
-                setTimeout(() => setGoogleLogin(true), 0);
-              } else {
-                setShowDisableGmail(true);
-              }
-            }}
-            onClickLabel={isGmailConnected ? 'Disable' : 'Import'}
-            sublabel={
-              isGmailConnected
-                ? 'Your account is connected to Skiff.'
-                : 'Earn $10 of credit when you import from Gmail.'
+        <ImportSelect
+          dataTest='gmail-mail-import'
+          destructive={isGmailConnected}
+          hasAutoForwardingFlag={hasAutoForwardingFlag}
+          icon={Icon.Gmail}
+          iconColor='source'
+          label='Gmail'
+          onClick={() => {
+            if (!isGmailConnected) {
+              setTimeout(() => setGoogleLogin(true), 0);
+            } else {
+              setShowDisableGmail(true);
             }
-            wrap
-          />
-        )}
+          }}
+          onClickLabel={isGmailConnected ? 'Disable' : 'Import'}
+          sublabel={
+            isGmailConnected ? 'Your account is connected to Skiff.' : 'Earn $10 of credit when you import from Gmail.'
+          }
+          wrap
+        />
+        <ImportListDivider />
         <ImportSelect
           dataTest='outlook-mail-import'
-          icon={Icon.Envelope}
-          iconColor='secondary'
+          hasAutoForwardingFlag={hasAutoForwardingFlag}
+          icon={Icon.Outlook}
+          iconColor='source'
           label='Outlook'
           onClick={() => {
             void handleOutlookAuth();
@@ -461,21 +489,27 @@ export const ImportMail: React.FC<ImportMailProps> = ({ setGoogleLogin, googleLo
           sublabel='Earn $10 of credit when you import from Outlook.'
           wrap
         />
+        <ImportListDivider />
         <ImportSelect
-          icon={Icon.Parcel}
-          iconColor='secondary'
+          hasAutoForwardingFlag={hasAutoForwardingFlag}
+          icon={Icon.Proton}
+          iconColor='source'
           label='ProtonMail'
           onClick={() => setProtonImport(true)}
           sublabel='Start with the Import/Export app.'
         />
+        <ImportListDivider />
         <ImportSelect
+          hasAutoForwardingFlag={hasAutoForwardingFlag}
           icon={Icon.Mailbox}
           iconColor='secondary'
           label='MBOX file'
           onClick={() => mboxInputRef.current?.click()}
           sublabel='Upload a .mbox file to get started.'
         />
+        <ImportListDivider />
         <ImportSelect
+          hasAutoForwardingFlag={hasAutoForwardingFlag}
           icon={Icon.File}
           iconColor='secondary'
           label='EML file'

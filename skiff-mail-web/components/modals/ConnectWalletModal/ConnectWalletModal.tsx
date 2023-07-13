@@ -1,6 +1,16 @@
 import { ApolloError } from '@apollo/client';
 import { Keplr } from '@keplr-wallet/types/build/wallet/keplr';
-import { Button, Dialog, DialogTypes, Icon, IconButton, Type, Typography } from 'nightwatch-ui';
+import {
+  Button,
+  Dialog,
+  DialogTypes,
+  FilledVariant,
+  Icon,
+  IconButton,
+  Icons,
+  Type,
+  Typography
+} from '@skiff-org/skiff-ui';
 import { FC, useState } from 'react';
 import { useVerifyWalletAddressCreateAliasMutation } from 'skiff-front-graphql';
 import { updateEmailAliases, useToast } from 'skiff-front-utils';
@@ -184,7 +194,12 @@ export const ConnectWalletModal: FC<ConnectWalletModalProps> = ({
 
   const backButton = (
     <BackButton>
-      <IconButton dataTest={ConnectWalletModalDataTest.backBtn} icon={Icon.Backward} onClick={onBack} />
+      <IconButton
+        dataTest={ConnectWalletModalDataTest.backBtn}
+        icon={Icon.Backward}
+        onClick={onBack}
+        variant={FilledVariant.UNFILLED}
+      />
     </BackButton>
   );
 
@@ -195,10 +210,9 @@ export const ConnectWalletModal: FC<ConnectWalletModalProps> = ({
         dataTest={`${ConnectWalletModalDataTest.addWalletBtn}-${walletName}`}
         disabled={isAddingWallet[provider]}
         fullWidth
-        iconColor='source'
+        icon={<Icons color='source' icon={icon} />}
         key={`add-${walletName}`}
         onClick={onClick}
-        startIcon={icon}
         type={Type.SECONDARY}
       >
         {isAddingWallet[provider] ? `Check ${walletName} Wallet` : walletName}

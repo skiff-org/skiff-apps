@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogTypes, Type, Typography } from 'nightwatch-ui';
+import { Button, Dialog, DialogTypes, Type, Typography } from '@skiff-org/skiff-ui';
 import React, { useRef, useState } from 'react';
 import ReactCrop, { PercentCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import styled from 'styled-components';

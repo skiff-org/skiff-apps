@@ -1,4 +1,4 @@
-import { Color, CircularProgress, Size } from 'nightwatch-ui';
+import { Color, CircularProgress, Size } from '@skiff-org/skiff-ui';
 import React from 'react';
 
 type PasswordStrengthBarProps = {

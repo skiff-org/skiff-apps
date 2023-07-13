@@ -1,4 +1,4 @@
-import { ToastProps } from 'nightwatch-ui';
+import { ToastProps } from '@skiff-org/skiff-ui';
 import { SnackbarKey } from 'notistack';
 import { useEffect } from 'react';
 import { isIOS } from 'react-device-detect';

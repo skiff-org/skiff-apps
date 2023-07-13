@@ -1,6 +1,23 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "lib": ["dom", "esnext"],
+    "importHelpers": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "declarationDir": "dist",
+    "noImplicitAny": false,
+    "strict": true,
+    "pretty": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "target": "es2021",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+
     "jsx": "preserve",
     "allowJs": true,
     "module": "esnext",
@@ -11,20 +28,8 @@
     "incremental": true,
     "isolatedModules": true,
     "composite": true,
-    "baseUrl": ".",
-    "paths": {
-      "@skiff-org/skiff-ui": ["skiff-ui/src/"],
-      "@skiff-org/skiff-ui/*": ["skiff-ui/src/*"]
-    }
+    "baseUrl": "."
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "next-env.d.ts", "**/*.json"],
-  "exclude": ["node_modules", "dist"],
-  "references": [
-    { "path": "../../libs/skiff-crypto" },
-    { "path": "../../libs/skiff-front-search" },
-    { "path": "../../libs/skiff-front-utils" },
-    { "path": "../../libs/skiff-graphql" },
-    { "path": "../../libs/skiff-front-graphql" },
-    { "path": "../../libs/skiff-utils" }
-  ]
+  "exclude": ["node_modules", "dist"]
 }

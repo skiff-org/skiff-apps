@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { isIOS, isMobile } from 'react-device-detect';
-import { decryptDatagram, decryptSessionKey } from 'skiff-crypto-v2';
+import { decryptDatagramV2, decryptSessionKey } from '@skiff-org/skiff-crypto';
 import {
   AttachmentMetadataDatagram,
   EmailFragment,
@@ -9,11 +9,11 @@ import {
   MailboxWithContentQueryVariables,
   ThreadFragment
 } from 'skiff-front-graphql';
-import { MailSubjectDatagram, MailTextDatagram } from 'skiff-front-graphql';
+import { MailSubjectDatagram, MailTextDatagram, useGetSearchIndexProgressLazyQuery } from 'skiff-front-graphql';
 import { models } from 'skiff-front-graphql';
-import { IndexedSkemail, createWorkerizedSkemailSearchIndex } from 'skiff-front-search';
+// import { IndexedSkemail, createWorkerizedSkemailSearchIndex } from 'skiff-front-search';
 import { requireCurrentUserData, useCurrentUserData } from 'skiff-front-utils';
-import { AscDesc } from 'skiff-graphql';
+import { AscDesc, SearchIndexProgress } from 'skiff-graphql';
 import { sleep } from 'skiff-utils';
 
 import client from '../apollo/client';
@@ -22,7 +22,7 @@ import { ThreadDetailInfo } from '../models/thread';
 
 import { useDrafts } from './useDrafts';
 
-let worker: Awaited<ReturnType<typeof createWorkerizedSkemailSearchIndex>> | null = null;
+let worker: Awaited<ReturnType<any>> | null = null;
 export const getSearchWorker = () => worker?.searchIndex;
 
 /** Time to sleep per skemail background indexing */
@@ -48,13 +48,13 @@ function decryptEmailContent(email: EmailFragment) {
     privateKey,
     encryptedSessionKey?.encryptedBy
   );
-  const text = decryptDatagram(MailTextDatagram, sessionKey, email.encryptedText.encryptedData).body.text || '';
+  const text = decryptDatagramV2(MailTextDatagram, sessionKey, email.encryptedText.encryptedData).body.text || '';
   const subject =
-    decryptDatagram(MailSubjectDatagram, sessionKey, email.encryptedSubject.encryptedData).body.subject || '';
+    decryptDatagramV2(MailSubjectDatagram, sessionKey, email.encryptedSubject.encryptedData).body.subject || '';
   const attachments = email.attachmentMetadata.map((attachment) => {
     return {
       attachmentID: attachment.attachmentID,
-      ...decryptDatagram(AttachmentMetadataDatagram, sessionKey, attachment.encryptedData.encryptedData).body
+      ...decryptDatagramV2(AttachmentMetadataDatagram, sessionKey, attachment.encryptedData.encryptedData).body
     };
   });
 
@@ -85,7 +85,7 @@ async function addThreadsToSearchIndex(threads: Array<ThreadFragment | ThreadDet
       // Search on parent threads system/user labels since messages don't have their own labels
       const { systemLabels, userLabels } = attributes;
       const { to, cc, bcc, from, createdAt, id } = email;
-      const searchMail: IndexedSkemail = {
+      const searchMail = {
         id,
         threadID,
         content: isMobile ? '' : decryptedContent.text || '',
@@ -186,35 +186,99 @@ export function useInitializeSearchWorker() {
   const draftRef = useRef<typeof draftThreads>(draftThreads); // used to always keep the latest version of draftThread for addThreadsToSearchIndex
   draftRef.current = draftThreads;
 
+  // useEffect(() => {
+  //   if (!userData) return;
+  //   let stopped = false; // used to stop setup() if the effect unloads while setup is still running
+
+  //   const setup = async () => {
+  //     worker = await createWorkerizedSkemailSearchIndex(userData.userID, {
+  //       privateKey: userData.privateUserData.privateKey,
+  //       publicKey: userData.publicKey.key
+  //     });
+  //     if (stopped) {
+  //       // can happen if useEffect teardown function has been called before createWorkerizedSkemailSearchIndex returned
+  //       worker.terminate();
+  //       worker = null;
+  //     }
+  //     while (!stopped) {
+  //       // temporarily disable indexing of drafts
+  //       // if (draftThreads) {
+  //       //   await addThreadsToSearchIndex(draftThreads);
+  //       // }
+  //       await indexSkemails(userData);
+  //       await sleep(SEARCH_INDEX_SKEMAILS_INTERVAL_MS);
+  //     }
+  //   };
+  //   void setup();
+
+  //   return () => {
+  //     stopped = true;
+  //     void worker?.terminate();
+  //     worker = null;
+  //   };
+  // }, [userData?.userID, userData?.publicKey, userData?.privateUserData.privateKey]);
+}
+
+// how often we check for changes in index progress
+const INDEX_PROGRESS_UPDATE_INTERVAL = 2000; //ms
+
+interface SearchIndexProgressWithError {
+  progress?: SearchIndexProgress;
+  progressRetrievalError?: boolean;
+}
+
+export function useGetSearchIndexProgress(hasSearchIndexProgressFeatureFlag: boolean): SearchIndexProgressWithError {
+  // initialize both progress and error as undefined
+  const [searchIndexProgress, setSearchIndexProgress] = useState<SearchIndexProgressWithError>({});
+  // check progress until the index is confirmed to be complete
+  const [shouldGetProgress, setShouldGetProgress] = useState<boolean>(true);
+  const [getSearchIndexProgress] = useGetSearchIndexProgressLazyQuery();
+
+  const stopQueryingOnError = (e: unknown) => {
+    // this is non-critical logic whose failure does not need to be communicated to the user,
+    // so if it fails, we stop querying and report the error to the caller
+    setSearchIndexProgress({ progressRetrievalError: true });
+    setShouldGetProgress(false);
+    console.error('Error in retrieving search index progress', e);
+  };
+
   useEffect(() => {
-    if (!userData) return;
-    let stopped = false; // used to stop setup() if the effect unloads while setup is still running
-
-    const setup = async () => {
-      worker = await createWorkerizedSkemailSearchIndex(userData.userID, {
-        privateKey: userData.privateUserData.privateKey,
-        publicKey: userData.publicKey.key
-      });
-      if (stopped) {
-        // can happen if useEffect teardown function has been called before createWorkerizedSkemailSearchIndex returned
-        worker.terminate();
-        worker = null;
-      }
-      while (!stopped) {
-        // temporarily disable indexing of drafts
-        // if (draftThreads) {
-        //   await addThreadsToSearchIndex(draftThreads);
-        // }
-        await indexSkemails(userData);
-        await sleep(SEARCH_INDEX_SKEMAILS_INTERVAL_MS);
+    if (!hasSearchIndexProgressFeatureFlag || !shouldGetProgress) return;
+    const updateProgress = async () => {
+      try {
+        const metadata = await worker?.searchIndex.metadata;
+        if (!metadata?.newestThreadUpdatedAt || !metadata.oldestThreadUpdatedAt) return;
+        const { oldestThreadUpdatedAt, newestThreadUpdatedAt } = metadata;
+        const { data, error } = await getSearchIndexProgress({
+          variables: {
+            request: {
+              oldestThreadUpdatedAtInIndex: new Date(oldestThreadUpdatedAt),
+              newestThreadUpdatedAtInIndex: new Date(newestThreadUpdatedAt)
+            }
+          }
+        });
+        if (error) {
+          stopQueryingOnError(error.message);
+          return;
+        }
+        if (!data?.searchIndexProgress) return;
+        const { numIndexableThreads, numThreadsIndexed, isIndexComplete } = data.searchIndexProgress;
+        // stop getting the progress after the index is complete
+        if (isIndexComplete) setShouldGetProgress(false);
+        setSearchIndexProgress({ progress: { numIndexableThreads, numThreadsIndexed, isIndexComplete } });
+      } catch (e) {
+        stopQueryingOnError(e);
       }
     };
-    void setup();
 
-    return () => {
-      stopped = true;
-      void worker?.terminate();
-      worker = null;
-    };
-  }, [userData?.userID, userData?.publicKey, userData?.privateUserData.privateKey]);
+    void updateProgress();
+
+    // check the search worker on an interval to see if the newest and oldest threads have changed
+    const interval = setInterval(() => void updateProgress(), INDEX_PROGRESS_UPDATE_INTERVAL);
+
+    // clear the interval on cleanup
+    return () => clearInterval(interval);
+  }, [shouldGetProgress, hasSearchIndexProgressFeatureFlag, getSearchIndexProgress]);
+
+  return searchIndexProgress;
 }

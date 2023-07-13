@@ -1,4 +1,4 @@
-import { Avatar, Typography } from 'nightwatch-ui';
+import { Avatar, Typography } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import styled, { css } from 'styled-components';

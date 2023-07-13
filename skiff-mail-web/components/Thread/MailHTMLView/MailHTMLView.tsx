@@ -1,6 +1,6 @@
 import DOMPurify from 'dompurify';
 import debounce from 'lodash/debounce';
-import { ThemeMode, themeNames } from 'nightwatch-ui';
+import { ThemeMode, themeNames } from '@skiff-org/skiff-ui';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isIOS, isMobile, isSafari } from 'react-device-detect';
 import { createPortal } from 'react-dom';
@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import {
   contentAsDataUrl,
   getResourceProxyURL,
-  isDesktopApp,
+  isReactNativeDesktopApp,
   PLACEHOLDER_CONTENT_URL,
   proxyAttributes,
   rewriteCSSAttribute,
@@ -311,11 +311,11 @@ const MailHTMLView: FC<MailViewProps> = ({ email, attachments, disableRemoteCont
       allowFullScreen={false}
       csp={csp}
       data-test='message-content-iframe'
-      id={MAIL_HTML_IFRAME}
       frameBorder='0'
+      id={MAIL_HTML_IFRAME}
       ref={iframeRef}
       sandbox={`allow-same-origin allow-popups allow-popups-to-escape-sandbox ${
-        isSafari || isIOS || isDesktopApp() ? 'allow-scripts' : ''
+        isSafari || isIOS || isReactNativeDesktopApp() ? 'allow-scripts' : ''
       }`}
       srcDoc='<html></html>'
     >

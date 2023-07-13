@@ -1,5 +1,5 @@
 import { FieldReadFunction, TypePolicy } from '@apollo/client';
-import { decryptSymmetric } from 'skiff-crypto';
+import { decryptSymmetric } from '@skiff-org/skiff-crypto';
 import { Document, LinkLinkKeyDatagram } from 'skiff-front-graphql';
 import { assertExists } from 'skiff-utils';
 
@@ -91,7 +91,7 @@ const readDecryptedMetadata: FieldReadFunction<Document['decryptedMetadata']> = 
     const teamName = team ? options.readField<string>('name', team) : 'NAME_NOT_FOUND';
     const teamIcon = team ? options.readField<string>('icon', team) : 'ICON_NOT_FOUND';
     const teamRootDoc = team ? options.readField<Document>('rootDocument', team) : undefined;
-    const teamRootDocID = team ? options.readField<Document>('docID', teamRootDoc) : undefined;
+    const teamRootDocID = team ? options.readField<Document['docID']>('docID', teamRootDoc) : undefined;
     assertExists(teamName);
     return { encryptedMetadata, sessionKey, docID, teamName, teamIcon, teamRootDocID };
   },

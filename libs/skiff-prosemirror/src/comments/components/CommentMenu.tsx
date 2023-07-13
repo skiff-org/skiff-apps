@@ -1,4 +1,4 @@
-import { Dropdown, DropdownItem, Icon, IconButton, ThemeMode, Typography, TypographySize } from 'nightwatch-ui';
+import { Dropdown, DropdownItem, Icon, IconButton, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import React, { FC, useRef } from 'react';
 import { isMobile } from 'react-device-detect';
 

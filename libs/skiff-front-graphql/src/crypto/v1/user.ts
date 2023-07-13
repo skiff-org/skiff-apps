@@ -16,7 +16,7 @@ import {
   PrivateUserDataDatagram,
   PrivateUserData,
   generateHash
-} from 'skiff-crypto';
+} from '@skiff-org/skiff-crypto';
 import { LoginSrpRequest, PublicData, RequestStatus, SignatureContext } from 'skiff-graphql';
 import { assertExists, StorageTypes, getStorageKey } from 'skiff-utils';
 import { v4 as uuidv4 } from 'uuid';
@@ -608,7 +608,12 @@ export async function disableMfa(request: DisableMfaRequestVariables) {
  * @param {string} dataMFA - New MFA secret for user.
  * @returns {{ status, backupCodes }} Status from enrollment and backup MFA codes received from server
  */
-export async function enrollMfa(client: ApolloClient<NormalizedCacheObject>, userData: User, dataMFA: string) {
+export async function enrollMfa(
+  client: ApolloClient<NormalizedCacheObject>,
+  userData: User,
+  dataMFA: string,
+  loginSrpRequest: LoginSrpRequest
+) {
   // Get signature
   const signature = createDetachedSignatureAsymmetric(
     dataMFA,
@@ -622,7 +627,8 @@ export async function enrollMfa(client: ApolloClient<NormalizedCacheObject>, use
     variables: {
       request: {
         dataMFA,
-        signature
+        signature,
+        loginSrpRequest
       }
     }
   });

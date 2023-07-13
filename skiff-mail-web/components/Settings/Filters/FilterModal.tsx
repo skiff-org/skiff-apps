@@ -9,7 +9,7 @@ import {
   Type,
   Typography,
   TypographySize
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { ChangeEvent, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {

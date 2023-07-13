@@ -11,7 +11,7 @@ import {
   ThemeMode,
   Typography,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { FC, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useGetOrganizationQuery, useValidateMailAliasLazyQuery } from 'skiff-front-graphql';

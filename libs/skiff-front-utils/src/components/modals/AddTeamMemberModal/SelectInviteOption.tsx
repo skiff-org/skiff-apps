@@ -1,4 +1,4 @@
-import { Icon, Icons, ThemeMode, Typography, getThemedColor } from 'nightwatch-ui';
+import { Icon, Icons, ThemeMode, Typography, getThemedColor } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';

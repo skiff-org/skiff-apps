@@ -1,5 +1,5 @@
 import dayjs, { Dayjs } from 'dayjs';
-import { Dropdown, DropdownItem, Icon, IconButton, Portal } from 'nightwatch-ui';
+import { Dropdown, DropdownItem, FilledVariant, Icon, IconButton, Portal } from '@skiff-org/skiff-ui';
 import { useCallback, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
@@ -61,13 +61,13 @@ const useScheduleSend = (handleSendClick: (scheduleSendAt?: Date) => Promise<voi
     <>
       <div>
         <IconButton
-          active={popupStep !== PopupStepType.Closed}
           icon={Icon.Clock}
           onClick={() => {
             if (popupStep === PopupStepType.Closed) setStep({ type: PopupStepType.Dropdown });
           }}
           ref={ref}
           tooltip='Send later'
+          variant={FilledVariant.UNFILLED}
         />
       </div>
       <Dropdown

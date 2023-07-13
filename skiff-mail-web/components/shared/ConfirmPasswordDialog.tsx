@@ -1,7 +1,7 @@
 import { startAuthentication } from '@simplewebauthn/browser';
 import { PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/typescript-types';
 import React, { useState } from 'react';
-import { useLoginSrpStep2Mutation } from 'skiff-front-graphql';
+import { useCurrentUserQuery, useLoginSrpStep2Mutation } from 'skiff-front-graphql';
 import { ConfirmPasswordModalBase, useRequiredCurrentUserData } from 'skiff-front-utils';
 import { LoginMutationStatus, LoginSrpRequest } from 'skiff-graphql';
 
@@ -20,8 +20,11 @@ function ConfirmPasswordDialog(props: ConfirmPasswordDialogProps) {
   const [showTokenMFAModal, setShowTokenMFAModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const userData = useRequiredCurrentUserData();
-  const { username } = userData;
+  // Prioritize latest username from DB to prevent inconsistencies with legacy accounts.
+  const { data: currentUserData } = useCurrentUserQuery();
+  const username = currentUserData?.currentUser?.username ?? userData.username;
   const [loginSrpStep2] = useLoginSrpStep2Mutation();
+
   const closeAndResetFields = () => {
     onClose();
     setShowTokenMFAModal(false);

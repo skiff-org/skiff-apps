@@ -2,7 +2,7 @@ import '../../ui/comments.css';
 import '../../ui/emoji-mart-styles.css';
 
 import cx from 'classnames';
-import { Icon, Icons, Typography, useOnClickOutside } from 'nightwatch-ui';
+import { Icon, Icons, Typography, useOnClickOutside } from '@skiff-org/skiff-ui';
 import { MarkType } from 'prosemirror-model';
 import { EditorView } from 'prosemirror-view';
 import React, { FC, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';

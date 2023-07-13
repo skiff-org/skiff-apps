@@ -5,9 +5,17 @@ import uniqBy from 'lodash/uniqBy';
 import { Mailbox, MailboxPageInfo, MailboxRequest, SystemLabels, UserThread } from 'skiff-graphql';
 import { assertExists } from 'skiff-utils';
 
-const threadSortByDate = (readField: ReadFieldFunction) => (a: UserThread, b: UserThread) => {
-  const aTime = readField<Date>('emailsUpdatedAt', a)?.getTime();
-  const bTime = readField<Date>('emailsUpdatedAt', b)?.getTime();
+const getUpdatedAtField = (label?: string) => {
+  if (label === SystemLabels.Sent) {
+    return 'sentLabelUpdatedAt';
+  }
+  return 'emailsUpdatedAt';
+};
+
+const threadSortByDate = (readField: ReadFieldFunction, label?: string) => (a: UserThread, b: UserThread) => {
+  const sortField = getUpdatedAtField(label);
+  const aTime = readField<Date>(sortField, a)?.getTime();
+  const bTime = readField<Date>(sortField, b)?.getTime();
   assertExists(aTime, `thread ${readField('threadID', a)} does not have a last updated time`);
   assertExists(bTime, `thread ${readField('threadID', b)} does not have a last updated time`);
   return bTime - aTime;
@@ -24,8 +32,15 @@ export const mailboxFieldPolicy: FieldPolicy<Mailbox> = {
       useUpdatedAtField: (args?.request as MailboxRequest)?.useUpdatedAtField,
       lastUpdatedDate: (args?.request as MailboxRequest)?.lastUpdatedDate?.toISOString()
     }),
-  read: (existing, { readField }) =>
-    existing ? { ...existing, threads: [...existing?.threads].sort(threadSortByDate(readField)) } : undefined,
+  read: (existing, { readField, args }) =>
+    existing
+      ? {
+          ...existing,
+          threads: [...existing?.threads].sort(
+            threadSortByDate(readField, (args?.request as MailboxRequest)?.label || undefined)
+          )
+        }
+      : undefined,
   merge: (existing, incoming, { readField, args }) => {
     if (!existing) {
       return incoming;
@@ -33,6 +48,8 @@ export const mailboxFieldPolicy: FieldPolicy<Mailbox> = {
     if (!incoming) {
       return existing;
     }
+
+    const label = (args?.request as MailboxRequest)?.label || undefined;
 
     const existingThreadIDs = new Set(existing.threads.map((thread) => readField('threadID', thread)));
 
@@ -72,8 +89,8 @@ export const mailboxFieldPolicy: FieldPolicy<Mailbox> = {
       if (
         lastIncomingThread &&
         lastExistingThread &&
-        (readField<Date>('emailsUpdatedAt', lastIncomingThread)?.getTime() ?? 0) >
-          (readField<Date>('emailsUpdatedAt', lastExistingThread)?.getTime() ?? 0)
+        (readField<Date>(getUpdatedAtField(label), lastIncomingThread)?.getTime() ?? 0) >
+          (readField<Date>(getUpdatedAtField(label), lastExistingThread)?.getTime() ?? 0)
       ) {
         pageInfo = existing.pageInfo;
       } else {
@@ -82,7 +99,7 @@ export const mailboxFieldPolicy: FieldPolicy<Mailbox> = {
 
       const combinedThreads = [...incoming.threads, ...existing.threads];
       const dedupedThreads = uniqBy(combinedThreads, (thread) => readField('threadID', thread));
-      const sortedThreads = dedupedThreads.sort(threadSortByDate(readField));
+      const sortedThreads = dedupedThreads.sort(threadSortByDate(readField, label));
 
       return {
         ...existing,

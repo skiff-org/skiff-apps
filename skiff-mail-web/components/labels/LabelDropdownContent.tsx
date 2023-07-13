@@ -1,8 +1,9 @@
-import { DISPLAY_SCROLLBAR_CSS, DropdownItem, Icon, Icons, InputField, ThemeMode } from 'nightwatch-ui';
+import { DISPLAY_SCROLLBAR_CSS, DropdownItem, Icon, Icons, InputField, ThemeMode } from '@skiff-org/skiff-ui';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useGetFF } from 'skiff-front-utils';
 import { SystemLabels, UserLabelVariant } from 'skiff-graphql';
-import { trimAndLowercase } from 'skiff-utils';
+import { GmailImportImprovementsFlag, trimAndLowercase } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useAvailableUserLabels } from '../../hooks/useAvailableLabels';
@@ -12,7 +13,7 @@ import {
   Label,
   NONE_LABEL,
   RESTRICTED_DRAG_AND_DROP_LABELS,
-  SYSTEM_LABELS,
+  getSystemLabels,
   SystemLabel,
   UserLabelFolder,
   UserLabelPlain,
@@ -81,6 +82,8 @@ const LabelDropdownContent: FC<LabelDropdownContentProps> = ({
   setHighlightedIdx,
   setNumItems
 }) => {
+  const hasGmailImportImprovementsFF = useGetFF<GmailImportImprovementsFlag>('gmailImportImprovements');
+
   const theme = ThemeMode.DARK;
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [search, setSearch] = useState('');
@@ -107,7 +110,7 @@ const LabelDropdownContent: FC<LabelDropdownContentProps> = ({
   // Filter out all Systems labels you cannot drag threads to + Inbox, which is
   // redundant since for the most part all emails start out in Inbox
   const allAvailableSystemLabels = includeSystemLabels
-    ? SYSTEM_LABELS.filter(
+    ? getSystemLabels(hasGmailImportImprovementsFF).filter(
         (label) =>
           !RESTRICTED_DRAG_AND_DROP_LABELS.has(label.value as SystemLabels) && label.value !== SystemLabels.Inbox
       )

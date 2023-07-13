@@ -1,5 +1,5 @@
 import {
-  CustomCircularProgress,
+  CircularProgress,
   Icon,
   Icons,
   IconText,
@@ -7,7 +7,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { FC } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -250,10 +250,10 @@ const Attachments: FC<AttachmentsProps> = ({
                   </TextContainer>
                   {attachment.state === AttachmentStates.LocalUploading && (
                     <MarginLeft>
-                      <CustomCircularProgress
-                        color='disabled'
+                      <CircularProgress
                         dataTest='attachment-upload-loader'
                         progress={attachment.progress}
+                        progressColor='disabled'
                         size={Size.SMALL}
                       />
                     </MarginLeft>

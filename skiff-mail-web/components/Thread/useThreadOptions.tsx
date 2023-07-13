@@ -1,5 +1,5 @@
-import { Icon } from 'nightwatch-ui';
-import { DropdownSubmenu } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
+import { DropdownSubmenu } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import { SystemLabels, UserLabelVariant, AddressObject } from 'skiff-graphql';
@@ -68,7 +68,7 @@ export const useThreadOptions = (
 
   const forward = () => {
     composeNewDraft();
-    dispatch(skemailModalReducer.actions.forwardCompose({ email, emailAliases, defaultEmailAlias }));
+    dispatch(skemailModalReducer.actions.forwardCompose({ email, emailAliases, defaultEmailAlias, thread }));
   };
   const moveThread = (targetLabel: SystemLabel) => {
     void moveThreads([thread.threadID], targetLabel, [currentLabel]);

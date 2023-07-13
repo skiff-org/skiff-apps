@@ -1,6 +1,6 @@
 import { oneDarkHighlightStyle } from '@codemirror/theme-one-dark';
 import { EditorView } from '@codemirror/view';
-import { ThemeMode } from 'nightwatch-ui';
+import { ThemeMode } from '@skiff-org/skiff-ui';
 import { redo, undo } from 'y-prosemirror';
 
 import { customCreateSelect, updateCustomSelect } from './customCreateSelect';

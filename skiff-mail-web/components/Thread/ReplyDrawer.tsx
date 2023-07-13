@@ -1,18 +1,17 @@
 import partition from 'lodash/partition';
-import { Drawer, DropdownItem, Icon, ThemeMode } from 'nightwatch-ui';
+import { Drawer, DropdownItem, Icon, ThemeMode } from '@skiff-org/skiff-ui';
 import { useDispatch } from 'react-redux';
 import { DrawerOption, DrawerOptions, splitEmailToAliasAndDomain } from 'skiff-front-utils';
-import { DisplayPictureData, UserLabelVariant } from 'skiff-graphql';
+import { UserLabelVariant } from 'skiff-graphql';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
-import { useDisplayPictureDataFromAddress } from '../../hooks/useDisplayPictureDataFromAddress';
-import { ReportOptions } from '../../redux/reducers/mobileDrawerReducer';
-import { skemailMobileDrawerReducer } from '../../redux/reducers/mobileDrawerReducer';
+import { useDisplayPictureWithDefaultFallback } from '../../hooks/useDisplayPictureDataFromAddress';
+import { ReportOptions, skemailMobileDrawerReducer } from '../../redux/reducers/mobileDrawerReducer';
 
 import { EnlargedOption } from './ContactDetails/EnlargedOption';
 import { SenderInfo } from './SenderInfo';
-import { ThreadBlockOptions, OptionWithSubOption } from './Thread.types';
+import { OptionWithSubOption, ThreadBlockOptions } from './Thread.types';
 
 enum DestructiveLabels {
   Trash = 'Trash'
@@ -44,7 +43,12 @@ export const ReplyDrawer = ({ threadOptions, reportSubOptions }: ReplyDrawerProp
 
   const show = useAppSelector((state) => state.mobileDrawer.showReplyDrawer);
   const currentEmail = useAppSelector((state) => state.mobileDrawer.currentEmail);
-  const displayPictureData = useDisplayPictureDataFromAddress(currentEmail?.from.address);
+
+  const messageID = currentEmail?.id;
+  const { displayPictureData, unverified } = useDisplayPictureWithDefaultFallback(
+    currentEmail?.from.address,
+    messageID
+  );
 
   // Sets report options
   const setReportSubOptions = () => {
@@ -80,7 +84,8 @@ export const ReplyDrawer = ({ threadOptions, reportSubOptions }: ReplyDrawerProp
       <ReplyDrawerContainer>
         <SenderInfo
           displayName={currentEmail.from.name || fromAlias} // if no name, use the email's username
-          displayPictureData={displayPictureData as DisplayPictureData}
+          displayPictureData={displayPictureData}
+          unverified={unverified}
           emailAlias={currentEmail.from.address}
           forceTheme={ThemeMode.DARK}
         />

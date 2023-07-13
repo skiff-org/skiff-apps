@@ -7,7 +7,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import styled from 'styled-components';
 
 import { ThreadBlockOptions } from '../Thread.types';

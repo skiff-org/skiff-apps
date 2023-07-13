@@ -1,5 +1,5 @@
 import Link from '@tiptap/extension-link';
-import { ThemeMode } from 'nightwatch-ui';
+import { ThemeMode } from '@skiff-org/skiff-ui';
 
 import { linkStyling } from '../nodeStyles';
 

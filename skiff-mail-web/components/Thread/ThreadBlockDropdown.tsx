@@ -1,7 +1,8 @@
 import DOMPurify from 'dompurify';
-import { Dropdown, DropdownItem, DropdownSubmenu, Icon } from 'nightwatch-ui';
+import { Dropdown, DropdownItem, DropdownSubmenu, Icon } from '@skiff-org/skiff-ui';
 import React, { RefObject } from 'react';
 import { isMobile } from 'react-device-detect';
+import { isReactNativeDesktopApp, isMobileApp } from 'skiff-front-utils';
 
 import { MailboxEmailInfo } from '../../models/email';
 import { MailboxThreadInfo } from '../../models/thread';
@@ -39,31 +40,33 @@ export const ThreadBlockDropdown = ({
 
   if (!options) return null;
 
-  if (!isMobile && email.encryptedRawMimeUrl) {
-    options.threadOptions.push({
-      label: 'Download EML',
-      icon: Icon.Download,
-      onClick: () => {
-        const { encryptedRawMimeUrl, decryptedSessionKey } = email;
-        if (!encryptedRawMimeUrl || !decryptedSessionKey) {
-          console.error('missing encryptedRawMimeUrl or decryptedSessionKey fields');
-          return;
-        }
-        const runDownload = async () => {
-          const rawMime = await getRawMime(encryptedRawMimeUrl, decryptedSessionKey);
-          if (!rawMime) return;
+  if (!(isMobileApp() && isReactNativeDesktopApp())) {
+    if (email.encryptedRawMimeUrl) {
+      options.threadOptions.push({
+        label: 'Download EML',
+        icon: Icon.Download,
+        onClick: () => {
+          const { encryptedRawMimeUrl, decryptedSessionKey } = email;
+          if (!encryptedRawMimeUrl || !decryptedSessionKey) {
+            console.error('missing encryptedRawMimeUrl or decryptedSessionKey fields');
+            return;
+          }
+          const runDownload = async () => {
+            const rawMime = await getRawMime(encryptedRawMimeUrl, decryptedSessionKey);
+            if (!rawMime) return;
 
-          const linkElem = document.createElement('a');
-          linkElem.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(rawMime));
-          linkElem.setAttribute('download', `${email.decryptedSubject ?? 'email'}.eml`);
-          linkElem.style.display = 'none';
-          document.body.appendChild(linkElem);
-          linkElem.click();
-          document.body.removeChild(linkElem);
-        };
-        void runDownload();
-      }
-    });
+            const linkElem = document.createElement('a');
+            linkElem.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(rawMime));
+            linkElem.setAttribute('download', `${email.decryptedSubject ?? 'email'}.eml`);
+            linkElem.style.display = 'none';
+            document.body.appendChild(linkElem);
+            linkElem.click();
+            document.body.removeChild(linkElem);
+          };
+          void runDownload();
+        }
+      });
+    }
     options.threadOptions.push({
       label: 'Print email',
       icon: Icon.Printer,

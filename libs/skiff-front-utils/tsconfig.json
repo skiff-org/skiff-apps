@@ -1,35 +1,23 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "lib": ["dom", "esnext"],
-    "importHelpers": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "declarationDir": "dist",
-    "noImplicitAny": false,
-    "strict": true,
-    "pretty": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "resolveJsonModule": true,
-    "moduleResolution": "node",
-    "target": "es2021",
-    "esModuleInterop": true,
-    "baseUrl": ".",
-    "skipLibCheck": true,
     "composite": true,
-    "jsx": "react"
-  },
-  "exclude": [
-    "**/.git",
-    "**/.git/objects/**",
-    "**/.git/subtree-cache/**",
-    "**/node_modules/**",
-    "**/tmp/**",
-    "**/bower_components/**",
-    "**/dist/**",
-    "**/.yarn/cache/**"
-  ]
+    "incremental": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    "declaration": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "preserveWatchOutput": true,
+    "declarationDir": "dist/",
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "jsx": "react-jsx",
+    "module": "ES2022",
+    "target": "ES2020"
+  }
 }

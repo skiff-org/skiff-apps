@@ -1,4 +1,4 @@
-import { Divider, Typography, TypographySize } from 'nightwatch-ui';
+import { Divider, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import { DnsRecord } from 'skiff-graphql';
 import { upperCaseFirstLetter } from 'skiff-utils';
 import styled from 'styled-components';

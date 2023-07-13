@@ -1,4 +1,4 @@
-import { FilledVariant, Icon, IconButton, Size, Type, Typography, TypographyWeight } from 'nightwatch-ui';
+import { FilledVariant, Icon, IconButton, Size, Type, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { bytesToHumanReadable } from 'skiff-utils';
 import styled from 'styled-components';

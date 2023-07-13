@@ -1,4 +1,4 @@
-import { Typography } from 'nightwatch-ui';
+import { Typography } from '@skiff-org/skiff-ui';
 import styled from 'styled-components';
 import { TabPage } from '../../Settings.types';
 import DomainSubscriptions from './DomainSubscriptions';

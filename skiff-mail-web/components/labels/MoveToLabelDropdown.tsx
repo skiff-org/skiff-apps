@@ -1,4 +1,4 @@
-import { Dropdown } from 'nightwatch-ui';
+import { Dropdown } from '@skiff-org/skiff-ui';
 import { RefObject, useState } from 'react';
 import { UserLabelVariant } from 'skiff-graphql';
 

@@ -183,3 +183,8 @@ a {
   --sab: env(safe-area-inset-bottom);
   --sal: env(safe-area-inset-left);
 }
+
+/* Toast z-index needs to be higher than Surface so that it is always on top*/
+.SnackbarContainer-root {
+  z-index: 100000000 !important;
+}

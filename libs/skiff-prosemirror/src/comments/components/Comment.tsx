@@ -10,7 +10,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { Suspense, FC, ReactElement, useRef } from 'react';
 import { isMobile } from 'react-device-detect';
 import { DateDisplay, formatName, getNameTooltipLabel } from 'skiff-front-utils';

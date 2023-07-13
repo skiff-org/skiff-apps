@@ -1,4 +1,4 @@
-import { Icon, Icons, Size, ThemeMode, Typography, TypographySize } from 'nightwatch-ui';
+import { Icon, Icons, Size, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { ProductApp } from 'skiff-graphql';
 

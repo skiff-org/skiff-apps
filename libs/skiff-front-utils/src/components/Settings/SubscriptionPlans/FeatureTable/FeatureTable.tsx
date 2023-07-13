@@ -12,7 +12,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { SubscriptionInterval, SubscriptionPlan } from 'skiff-graphql';
 import styled from 'styled-components';

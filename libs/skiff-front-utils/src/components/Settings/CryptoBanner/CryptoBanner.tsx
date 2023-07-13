@@ -12,7 +12,7 @@ import {
   TypographySize,
   TypographyWeight,
   themeNames
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { useState } from 'react';
 import { useGetCoinbaseCheckoutIdLazyQuery, useStoreWorkspaceEventMutation } from 'skiff-front-graphql';
 import { SubscriptionPlan, WorkspaceEventType } from 'skiff-graphql';

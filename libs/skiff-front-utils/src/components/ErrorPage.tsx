@@ -8,7 +8,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { SnackbarProvider } from 'notistack';

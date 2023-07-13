@@ -1,4 +1,4 @@
-import { Drawer, Icon, Icons, Size, themeNames, ThemeMode, Typography, TypographySize } from 'nightwatch-ui';
+import { Drawer, Icon, Icons, Size, themeNames, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { DrawerBlocksContainer } from 'skiff-front-utils';

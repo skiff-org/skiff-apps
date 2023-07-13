@@ -1,4 +1,4 @@
-import { stringToColor } from 'nightwatch-ui';
+import { stringToColor } from '@skiff-org/skiff-ui';
 
 export const getBlockquoteDepth = (node: HTMLElement) => {
   let depth = 0;

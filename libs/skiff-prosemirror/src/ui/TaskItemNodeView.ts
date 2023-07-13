@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import { Node } from 'prosemirror-model';
 import { EditorView, NodeView } from 'prosemirror-view';
 import { isMobile } from 'react-device-detect';

@@ -1,4 +1,4 @@
-import { Dialog, DialogTypes, Divider, InputField, Size, ThemeMode } from 'nightwatch-ui';
+import { Dialog, DialogTypes, Divider, InputField, Size, ThemeMode } from '@skiff-org/skiff-ui';
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -48,7 +48,7 @@ function CmdPalette() {
   const dispatch = useDispatch();
 
   // Hooks
-  const { query, loading, reset, setQuery, searchForQuery } = useSearch();
+  const { query, reset, setQuery, searchForQuery } = useSearch();
   // This updates the search results for the full view search page
   const { search: fullViewSearch } = useFullViewSearch();
   const { setFullView, setActiveResult, setIsNewSearch } = useContext(SearchContext);
@@ -139,7 +139,6 @@ function CmdPalette() {
           skemails: [],
           quickActions
         }}
-        loading={loading}
         onClose={onClose}
         // We can use this to paywall contentSearch if we want
         query={query}

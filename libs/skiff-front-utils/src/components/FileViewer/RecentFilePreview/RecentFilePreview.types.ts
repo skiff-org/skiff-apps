@@ -1,4 +1,4 @@
-import { Color, CircularProgressSize, Icon } from 'nightwatch-ui';
+import { Color, CircularProgressSize, Icon } from '@skiff-org/skiff-ui';
 import { FC } from 'react';
 import { NwContentType } from 'skiff-graphql';
 

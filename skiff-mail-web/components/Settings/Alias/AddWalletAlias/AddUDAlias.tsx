@@ -1,6 +1,6 @@
 import type { DomainResolver } from '@uauth/common';
 import UAuth from '@uauth/js';
-import { Button, Icon, Type } from 'nightwatch-ui';
+import { Button, Icon, Icons, Type } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { useCreateUdAliasMutation } from 'skiff-front-graphql';
 import { useToast } from 'skiff-front-utils';
@@ -61,11 +61,10 @@ const AddUDAlias: React.FC = () => {
     <WalletButtonContainer>
       <Button
         fullWidth
-        iconColor='source'
+        icon={<Icons color='source' icon={Icon.Unstoppable} />}
         key='add-unstoppable'
         loading={isAddingAlias}
         onClick={onClick}
-        startIcon={Icon.Unstoppable}
         type={Type.SECONDARY}
       >
         {isAddingAlias ? `Check wallet...` : 'Unstoppable Domains'}

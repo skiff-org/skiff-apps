@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Icon, Icons, Size, ThemeMode } from 'nightwatch-ui';
+import { Icon, Icons, Size, ThemeMode } from '@skiff-org/skiff-ui';
 import React from 'react';
 import styled from 'styled-components';
 

@@ -1,7 +1,7 @@
 // Type policy to decrypt attachment content.
 
 import { FieldReadFunction, TypePolicy } from '@apollo/client';
-import { decryptSessionKey } from 'skiff-crypto-v2';
+import { decryptSessionKey } from '@skiff-org/skiff-crypto';
 import { memoizeFieldReadFunction, requireCurrentUserData } from 'skiff-front-utils';
 import { Attachment } from 'skiff-graphql';
 import { assertExists } from 'skiff-utils';

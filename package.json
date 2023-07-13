@@ -5,5 +5,9 @@
     "skiff-pages-drive",
     "skiff-calendar"
   ],
-  "packageManager": "yarn@3.5.0"
+  "packageManager": "yarn@3.5.0",
+  "scripts": {
+    "build:lib": "yarn workspace libs build",
+    "dev": "yarn workspace skiff-mail-web dev"
+  }
 }

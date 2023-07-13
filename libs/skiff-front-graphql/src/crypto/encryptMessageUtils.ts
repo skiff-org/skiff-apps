@@ -1,6 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import { generateSymmetricKey, stringEncryptAsymmetric } from 'skiff-crypto';
-import { encryptDatagramV2 } from 'skiff-crypto';
+import { generateSymmetricKey, stringEncryptAsymmetric } from '@skiff-org/skiff-crypto';
+import { encryptDatagramV2 } from '@skiff-org/skiff-crypto';
 import {
   PublicKey,
   EncryptedDataInput,

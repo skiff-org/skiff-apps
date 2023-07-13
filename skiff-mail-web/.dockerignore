@@ -1,0 +1,10 @@
+.dockerignore
+.env
+.env.example
+.gitignore
+.next/
+coverage/
+deploy.yaml
+node_modules/
+README.md
+VERSION

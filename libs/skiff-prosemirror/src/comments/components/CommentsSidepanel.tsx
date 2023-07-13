@@ -10,7 +10,7 @@ import {
   Typography,
   TypographyWeight,
   useOnClickOutside
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { MarkType } from 'prosemirror-model';
 import { EditorView } from 'prosemirror-view';
 import React, { FC, MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react'; // eslint-disable-line

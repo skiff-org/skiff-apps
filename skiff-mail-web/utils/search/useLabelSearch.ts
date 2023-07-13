@@ -1,14 +1,17 @@
-import { Icon } from 'nightwatch-ui';
-import { SystemLabels } from 'skiff-graphql';
+import { Icon } from '@skiff-org/skiff-ui';
 import { useUserLabelsQuery } from 'skiff-front-graphql';
-import { trimAndLowercase } from 'skiff-utils';
+import { useGetFF } from 'skiff-front-utils';
+import { SystemLabels } from 'skiff-graphql';
+import { GmailImportImprovementsFlag, trimAndLowercase } from 'skiff-utils';
 
-import { SYSTEM_LABELS } from '../label';
+import { getSystemLabels } from '../label';
 
 import { LabelSearchResult, SearchItemType } from './searchTypes';
 
 // used for searching through labels when the user selects the "LABEL" category
 export const useLabelSearch = () => {
+  const hasGmailImportImprovementsFF = useGetFF<GmailImportImprovementsFlag>('gmailImportImprovements');
+
   const { data, error } = useUserLabelsQuery();
 
   if (error) {
@@ -26,7 +29,9 @@ export const useLabelSearch = () => {
     const systemLabelResults: LabelSearchResult[] = systemLabels.map((currLabel) => ({
       type: SearchItemType.LABEL_RESULT,
       title: currLabel,
-      icon: SYSTEM_LABELS.find((label) => label.name.toUpperCase() === currLabel)?.icon || Icon.Tag
+      icon:
+        getSystemLabels(hasGmailImportImprovementsFF).find((label) => label.name.toUpperCase() === currLabel)?.icon ||
+        Icon.Tag
     }));
     const userLabelResults: LabelSearchResult[] = userLabels?.map((label) => ({
       type: SearchItemType.LABEL_RESULT,

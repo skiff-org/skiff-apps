@@ -6,7 +6,6 @@ import { ClientAttachment } from '../../components/Attachments';
 import { MarkAsType } from '../../components/Settings/Filters/Filters.constants';
 import { Condition, MoveToType } from '../../components/Settings/Filters/Filters.types';
 import { MailboxEmailInfo } from '../../models/email';
-import { ThreadDetailInfo } from '../../models/thread';
 import { UserLabelPlain, UserLabelFolder } from '../../utils/label';
 
 /**
@@ -126,7 +125,7 @@ export interface ReferralSplashModal {
 
 export interface UnSendModal {
   type: ModalType.UnSendMessage;
-  thread: ThreadDetailInfo;
+  threadID: string;
 }
 
 /******** Shortcuts Modal ***********/

@@ -1,4 +1,4 @@
-import { ButtonGroupItem, Dialog, DialogTypes } from 'nightwatch-ui';
+import { ButtonGroupItem, Dialog, DialogTypes } from '@skiff-org/skiff-ui';
 import { useDispatch } from 'react-redux';
 import { useBlockEmailAddressMutation, useUnblockEmailAddressMutation } from 'skiff-front-graphql';
 import { useToast } from 'skiff-front-utils';

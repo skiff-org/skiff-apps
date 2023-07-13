@@ -10,7 +10,7 @@ import {
   Typography,
   TypographyWeight,
   useOnClickOutside
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { FC, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -189,7 +189,7 @@ const ToolBarNormalGroup: FC<Omit<ToolbarGroupProps, 'type'>> = ({ commands, edi
           color={!enabled(editor) ? 'disabled' : 'primary'}
           forceTheme={ThemeMode.DARK}
           icon={icon}
-          size={Size.X_MEDIUM}
+          size={Size.MEDIUM}
         />
       </IconHover>
     ))}

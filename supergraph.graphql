@@ -1,0 +1,3625 @@
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0")
+  @link(url: "https://specs.apollo.dev/join/v0.2", for: EXECUTION)
+{
+  query: Query
+  mutation: Mutation
+}
+
+directive @join__field(graph: join__Graph!, requires: join__FieldSet, provides: join__FieldSet, type: String, external: Boolean, override: String, usedOverridden: Boolean) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(graph: join__Graph!, interface: String!) repeatable on OBJECT | INTERFACE
+
+directive @join__type(graph: join__Graph!, key: join__FieldSet, extension: Boolean! = false, resolvable: Boolean! = true) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+
+directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+enum AccentColor
+  @join__type(graph: EDITOR)
+{
+  BLUE
+  DARK_BLUE
+  GREEN
+  ORANGE
+  PINK
+  RED
+  YELLOW
+}
+
+input AcceptInviteStep1Request
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  inviteID: String!
+}
+
+type AcceptInviteStep1Response
+  @join__type(graph: EDITOR)
+{
+  encryptedPrivateHierarchicalKey: String!
+  encryptedSessionKey: String!
+  permissionLevel: PermissionLevel!
+  publicHierarchicalKey: String
+  salt: String!
+  serverEphemeralPublic: String!
+}
+
+input AcceptInviteStep2Request
+  @join__type(graph: EDITOR)
+{
+  clientEphemeralPublic: String!
+  clientSessionProof: String!
+  docID: String!
+  inviteID: String!
+  newPermissionEntry: PermissionEntryInput!
+  publicHierarchicalKey: String
+  signature: String!
+}
+
+type AcceptInviteStep2Response
+  @join__type(graph: EDITOR)
+{
+  serverSessionProof: String!
+}
+
+enum AccountRecovery
+  @join__type(graph: EDITOR)
+{
+  EMAIL_SEND_FAILED
+  INVALID_RECOVERY_KEY
+  NOT_VERIFIED_EMAIL
+  SENT_EMAIL
+  VERIFIED_EMAIL
+  VERIFIED_RECOVERY_KEY
+}
+
+enum ActionType
+  @join__type(graph: SKEMAIL)
+{
+  APPLY_LABEL
+  APPLY_SYSTEM_LABEL
+  MARK_AS_READ
+}
+
+input AddEmailRequest
+  @join__type(graph: EDITOR)
+{
+  newEmail: String
+  token: String
+}
+
+type AddEmailResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+enum AdditionalContext
+  @join__type(graph: EDITOR)
+{
+  LAST_CHUNK
+  NOT_LAST_CHUNK
+  NO_CONTEXT
+}
+
+input AddPendingInviteRequest
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  documentLink: String!
+  email: String!
+  permissionLevel: PermissionLevel!
+}
+
+type AddPendingInviteResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+type AddressObject
+  @join__type(graph: SKEMAIL)
+{
+  address: String!
+  blocked: Boolean
+  name: String
+}
+
+input AdjustBusinessPlanRequest
+  @join__type(graph: EDITOR)
+{
+  requestedQuantity: Int!
+}
+
+type AdjustBusinessPlanResponse
+  @join__type(graph: EDITOR)
+{
+  seats: Int
+  status: RequestStatus!
+}
+
+type AliasesOnDomainResponse
+  @join__type(graph: SKEMAIL)
+{
+  domainAliases: [DomainAliasData!]!
+}
+
+enum AscDesc
+  @join__type(graph: SKEMAIL)
+{
+  ASC
+  DESC
+}
+
+type Attachment
+  @join__type(graph: SKEMAIL)
+{
+  attachmentID: String!
+  downloadLink: String!
+  encryptedSessionKey: EncryptedSessionKeyOutput!
+}
+
+enum AttendeePermission
+  @join__type(graph: SKALENDAR)
+{
+  OWNER
+  READ
+  WRITE
+}
+
+enum AttendeeStatus
+  @join__type(graph: SKALENDAR)
+{
+  MAYBE
+  NO
+  PENDING
+  YES
+}
+
+type AutoImportStatus
+  @join__type(graph: SKEMAIL)
+{
+  subscribed: Boolean!
+}
+
+type AutoReplyOutput
+  @join__type(graph: SKEMAIL)
+{
+  encryptedHtml: EncryptedDataOutput!
+  encryptedSessionKey: EncryptedSessionKeyOutput!
+  encryptedSubject: EncryptedDataOutput!
+  encryptedText: EncryptedDataOutput!
+  encryptedTextAsHtml: EncryptedDataOutput!
+  encryptedTextSnippet: EncryptedDataOutput
+}
+
+type BatchError
+  @join__type(graph: EDITOR)
+{
+  code: String!
+  extensions: JSON
+  message: String!
+}
+
+input BlockEmailAddressRequest
+  @join__type(graph: SKEMAIL)
+{
+  emailAddressToBlock: String
+}
+
+enum BottomDrawerModes
+  @join__type(graph: EDITOR)
+{
+  CLOSED
+  FEEDBACK
+  UPLOADS
+}
+
+enum CacheControlScope
+  @join__type(graph: EDITOR)
+  @join__type(graph: SKEMAIL)
+{
+  PRIVATE
+  PUBLIC
+}
+
+type Calendar
+  @join__type(graph: SKALENDAR)
+{
+  calendarID: String!
+  publicKey: String!
+}
+
+type CalendarEvent
+  @join__type(graph: SKALENDAR)
+{
+  calendarEventID: String!
+  calendarID: String!
+  creatorCalendarID: String!
+  deleted: Boolean!
+  encryptedByKey: String!
+  encryptedContent: String!
+  encryptedPreferences: String
+  encryptedPreferencesSessionKey: String
+  encryptedSessionKey: String!
+  endDate: Date!
+  externalCreator: String
+  externalID: String!
+  internalAttendeeList: [InternalAttendee!]!
+  lastUpdateKeyMap: LastUpdateKeyMap
+  parentEventID: String!
+  parentRecurrenceID: String
+  recurrenceDate: Date
+  recurrenceRule: RecurrenceRule
+  sequence: Int!
+  startDate: Date!
+  updatedAt: Date!
+}
+
+input CalendarEventData
+  @join__type(graph: SKALENDAR)
+{
+  deleted: Boolean!
+  encryptedCalendarEventSessionKey: String
+  encryptedContent: String!
+  encryptedPreferences: String
+  endDate: Date!
+  externalID: String!
+  lastUpdateKeyMap: LastUpdateKeyMapInput
+  parentRecurrenceID: String
+  recurrenceDate: Date
+  recurrenceRule: RecurrenceRuleInput
+  startDate: Date!
+}
+
+input CalendarEventData2
+  @join__type(graph: SKALENDAR)
+{
+  deleted: Boolean!
+  encryptedCalendarEventSessionKey: String
+  encryptedContent: String!
+  encryptedPreferences: String
+  endDate: Date!
+  externalID: String!
+  lastUpdateKeyMap: LastUpdateKeyMapInput
+  parentRecurrenceID: String
+  recurrenceDate: Date
+  recurrenceRule: RecurrenceRuleInput
+  sequence: Int!
+  startDate: Date!
+}
+
+input ChangeLinkPermissionRequest
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  permissionLevel: PermissionLevel!
+}
+
+type ChangeLinkPermissionResponse
+  @join__type(graph: EDITOR)
+{
+  document: Document!
+}
+
+type CheckIfDomainsAvailableResponse
+  @join__type(graph: SKEMAIL)
+{
+  domains: [Domain!]
+}
+
+type CheckoutSession
+  @join__type(graph: EDITOR)
+{
+  downgradeProgress: DowngradeProgress
+  status: RequestStatus!
+  url: String
+}
+
+type ClearSessionCacheResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+input ConfirmCacheUploadRequest
+  @join__type(graph: EDITOR)
+{
+  cacheID: String!
+}
+
+type ConfirmCacheUploadResponse
+  @join__type(graph: EDITOR)
+{
+  ipfsPath: String
+  readUrl: String
+}
+
+type Contact
+  @join__type(graph: SKEMAIL)
+{
+  displayPictureData: DisplayPictureDataSkemail
+  emailAddress: String!
+  firstName: String
+  lastName: String
+}
+
+type CreateBillingPortalSessionOutput
+  @join__type(graph: EDITOR)
+{
+  url: String
+}
+
+input CreateCacheElementRequest
+  @join__type(graph: EDITOR)
+{
+  dataSize: Float!
+  docID: String!
+  type: String!
+}
+
+type CreateCacheElementResponse
+  @join__type(graph: EDITOR)
+{
+  cacheID: String!
+  writeUrl: String!
+}
+
+input CreateCalendarUserRequest
+  @join__type(graph: SKALENDAR)
+{
+  calendarEncryptedPrivateKey: String
+  calendarPublicKey: String!
+  publicKey: PublicKeyWithSignature!
+  signingPublicKey: PublicKey!
+}
+
+input CreateCustomDomainAliasRequest
+  @join__type(graph: SKEMAIL)
+{
+  customDomain: String!
+  emailAlias: String!
+  userID: String
+}
+
+type CreateCustomDomainAliasResponse
+  @join__type(graph: SKEMAIL)
+{
+  emailAliases: [String!]!
+}
+
+input CreateEmailAliasRequest
+  @join__type(graph: SKEMAIL)
+{
+  customDomain: String
+  emailAlias: String!
+}
+
+type CreateEmailAliasResponse
+  @join__type(graph: SKEMAIL)
+{
+  emailAliases: [String!]!
+}
+
+input CreateMailFilterInput
+  @join__type(graph: SKEMAIL)
+{
+  actions: [FilterActionInput!]!
+  encryptedByKey: String!
+  encryptedSessionKey: String!
+  filter: MailFilterInput!
+  name: String
+}
+
+input CreateOrUpdateContactRequest
+  @join__type(graph: SKEMAIL)
+{
+  displayPictureData: UpdateDisplayPictureSkemailRequest
+  emailAddress: String!
+  firstName: String
+  lastName: String
+}
+
+input CreateOrUpdateDraftRequest
+  @join__type(graph: SKEMAIL)
+{
+  draftID: String!
+  encryptedDraft: String!
+  encryptedKey: String!
+}
+
+input CreateSrpMetamaskRequest
+  @join__type(graph: EDITOR)
+{
+  acceptInviteStep2Request: AcceptInviteStep2Request
+  captchaToken: String!
+  challengeJwt: String!
+  challengeSignature: String!
+  encryptedUserData: String!
+  platformInfo: PlatformInfo
+  publicKey: PublicKey!
+  salt: String!
+  signingPublicKey: String!
+  userAttributionData: UserAttributionInput!
+  verifier: String!
+  walletAddress: String!
+}
+
+input CreateSrpRequest
+  @join__type(graph: EDITOR)
+{
+  acceptInviteStep2Request: AcceptInviteStep2Request
+  captchaToken: String!
+  encryptedUserData: String!
+  platformInfo: PlatformInfo
+  publicKey: PublicKey!
+  salt: String!
+  signingPublicKey: String!
+  skiffMailAlias: String
+  udToken: String
+  userAttributionData: UserAttributionInput!
+  verifier: String!
+}
+
+type CreateSrpResponse
+  @join__type(graph: EDITOR)
+{
+  cacheKey: String
+  createdMailAccount: Boolean
+  email: String
+  jwt: String
+  recoveryEmail: String
+  rootOrgID: String
+  status: LoginMutationStatus!
+  userID: String
+  walletAddress: String
+}
+
+input CreateTeamRequest
+  @join__type(graph: EDITOR)
+{
+  everyoneDocumentPermissionProxy: DocumentPermissionProxyInput!
+  icon: String!
+  name: String!
+  orgID: String!
+  rootDocument: NewDocRequest!
+}
+
+input CreateUdAliasRequest
+  @join__type(graph: SKEMAIL)
+{
+  udToken: String!
+}
+
+type CreateUploadAvatarLinkResponse
+  @join__type(graph: EDITOR)
+{
+  profileCustomURI: String!
+  writeUrl: String!
+}
+
+input CreateUploadContactAvatarLinkRequest
+  @join__type(graph: EDITOR)
+{
+  contactEmail: String!
+}
+
+input CreateUserLabelRequest
+  @join__type(graph: SKEMAIL)
+{
+  color: String!
+  labelName: String!
+  variant: UserLabelVariant!
+}
+
+input CreateWalletChallengeRequest
+  @join__type(graph: EDITOR)
+{
+  walletAddress: String!
+}
+
+input CreateWalletChallengeRequestSkemail
+  @join__type(graph: SKEMAIL)
+{
+  walletAddress: String!
+}
+
+type CreateWalletChallengeResponse
+  @join__type(graph: EDITOR)
+{
+  token: String!
+}
+
+type CreateWalletChallengeResponseSkemail
+  @join__type(graph: SKEMAIL)
+{
+  token: String!
+}
+
+type CreditAmount
+  @join__type(graph: EDITOR)
+{
+  cents: Int!
+  editorStorageBytes: String!
+  skemailStorageBytes: String!
+}
+
+input CreditAmountInput
+  @join__type(graph: EDITOR)
+{
+  cents: Int!
+  editorStorageBytes: String!
+  skemailStorageBytes: String!
+}
+
+enum CreditInfo
+  @join__type(graph: EDITOR)
+{
+  CREDITS_FROM_ANDROID_APP
+  CREDITS_FROM_GMAIL_IMPORT
+  CREDITS_FROM_GOOGLE_DRIVE_IMPORTS
+  CREDITS_FROM_IOS_APP
+  CREDITS_FROM_MAC_APP
+  CREDITS_FROM_OUTLOOK_IMPORT
+  CREDITS_FROM_REFERRALS
+  CURRENT_CREDITS
+  TOTAL_CREDITS_EARNED
+}
+
+type CreditInfoResponse
+  @join__type(graph: EDITOR)
+{
+  amount: CreditAmount!
+  count: Int!
+  info: CreditInfo!
+}
+
+enum CreditTransactionReason
+  @join__type(graph: EDITOR)
+{
+  ANDROID_APP
+  ENS_NAME
+  GMAIL_IMPORT
+  GOOGLE_DRIVE_IMPORT
+  IOS_APP
+  MAC_APP
+  MANUAL
+  OUTLOOK_IMPORT
+  REDEEMED_STRIPE_COUPON
+  REFEREE
+  REFERRAL
+  REVERT_SKIFF_CREDIT_COUPON_PRORATION
+  SKIFF_CREDIT_COUPON_PRORATION
+  STRIPE_CREDIT
+  STRIPE_DEBIT
+}
+
+type CustomDomainRecord
+  @join__type(graph: SKEMAIL)
+{
+  createdAt: Date!
+  dnsRecords: [DNSRecord!]!
+  domain: String!
+  domainID: String!
+  skiffManaged: Boolean!
+  verificationStatus: String!
+}
+
+type CustomDomainSubscriptionInfo
+  @join__type(graph: EDITOR)
+{
+  cancelAtPeriodEnd: Boolean!
+  domainID: String!
+  supposedEndDate: Date!
+}
+
+scalar Date
+  @join__type(graph: EDITOR)
+  @join__type(graph: SKALENDAR)
+  @join__type(graph: SKEMAIL)
+
+enum DateFormat
+  @join__type(graph: EDITOR)
+{
+  DD_MM_YYYY
+  MM_DD_YYYY
+  YYYY_MM_DD
+}
+
+type DefaultDisplayPictureData
+  @join__type(graph: SKEMAIL)
+{
+  profilePictureData: String!
+}
+
+input DeleteAccountRequest
+  @join__type(graph: EDITOR)
+{
+  loginSrpRequest: LoginSrpRequest!
+  signature: String!
+}
+
+type DeleteAccountResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+input DeleteContactRequest
+  @join__type(graph: SKEMAIL)
+{
+  emailAddress: String!
+}
+
+input DeleteCustomDomainAliasRequest
+  @join__type(graph: SKEMAIL)
+{
+  captchaToken: String!
+  emailAlias: String!
+  userID: String
+}
+
+input DeleteCustomDomainRequest
+  @join__type(graph: SKEMAIL)
+{
+  domainID: String!
+}
+
+input DeleteDocRequest
+  @join__type(graph: EDITOR)
+{
+  docsToDelete: [DocToDelete!]!
+}
+
+type DeleteDocResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+input DeleteDraftRequest
+  @join__type(graph: SKEMAIL)
+{
+  draftID: String!
+}
+
+input DeleteInviteRequest
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  email: String!
+}
+
+type DeleteInviteResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+input DeleteLinkRequest
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+}
+
+type DeleteLinkResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+input DeleteMailAccountRequest
+  @join__type(graph: SKEMAIL)
+{
+  signature: String!
+}
+
+type DeleteMailAccountResponse
+  @join__type(graph: SKEMAIL)
+{
+  status: RequestStatus!
+}
+
+input DeleteMailFilterInput
+  @join__type(graph: SKEMAIL)
+{
+  mailFilterID: String!
+}
+
+input DeleteSnapshotRequest
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  versions: [Int!]!
+}
+
+type DeleteSnapshotResponse
+  @join__type(graph: EDITOR)
+{
+  document: Document
+}
+
+input DeleteTeamRequest
+  @join__type(graph: EDITOR)
+{
+  teamID: String!
+}
+
+input DeleteThreadRequest
+  @join__type(graph: SKEMAIL)
+{
+  threadIDs: [String!]!
+}
+
+input DeleteUserLabelRequest
+  @join__type(graph: SKEMAIL)
+{
+  labelID: String!
+}
+
+input DeleteUserOrganizationMembershipRequest
+  @join__type(graph: EDITOR)
+{
+  orgID: String!
+  userID: String!
+}
+
+input DisableEmailAutoForwardingRequest
+  @join__type(graph: SKEMAIL)
+{
+  client: EmailAutoForwardingClient!
+}
+
+input DisableMfaRequest
+  @join__type(graph: EDITOR)
+{
+  credentialID: String
+  disableTotp: Boolean!
+  loginSrpRequest: LoginSrpRequest!
+}
+
+type DisableMfaResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+type DisplayPictureData
+  @join__type(graph: EDITOR)
+{
+  profileAccentColor: String
+  profileCustomURI: String
+  profileIcon: String
+}
+
+type DisplayPictureDataSkemail
+  @join__type(graph: SKEMAIL)
+{
+  profileAccentColor: String
+  profileCustomURI: String
+  profileIcon: String
+}
+
+type DNSRecord
+  @join__type(graph: SKEMAIL)
+{
+  data: String!
+  error: DnsRecordStatusError
+  name: String!
+  type: DNSRecordType!
+}
+
+type DnsRecordStatusError
+  @join__type(graph: SKEMAIL)
+{
+  errorData: DnsRecordStatusErrorData
+  errorType: String!
+}
+
+type DnsRecordStatusErrorData
+  @join__type(graph: SKEMAIL)
+{
+  retrievedRecord: SingleRetrievedRecord
+}
+
+enum DNSRecordType
+  @join__type(graph: SKEMAIL)
+{
+  CNAME
+  MX
+  TXT
+}
+
+input DocToDelete
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  signature: String!
+}
+
+type Document
+  @join__type(graph: EDITOR)
+{
+  collaborators: [DocumentCollaborator!]!
+  contents: EncryptedContentsOutput!
+  createdAt: Date
+  currentUserPermissionLevel: PermissionLevel!
+  docID: String!
+  documentType: NwContentType!
+  hasChildren: Boolean!
+  hierarchicalPermissionChain: [HierarchicalPermissionChainLink!]!
+  invites: [PendingUserInvite!]!
+  link: LinkOutput
+  metadata: EncryptedMetadataOutput!
+  newHierarchicalKeyRequired: Boolean!
+  newSessionKeyRequired: Boolean!
+  parentID: String
+  parentKeysClaim: String
+  parentKeysClaimEncryptedByKey: String
+  parentPublicHierarchicalKey: String
+  parentsBreadcrumb: [Document!]!
+  permissionProxies: [DocumentPermissionProxy!]!
+  previousParentID: String
+  publicHierarchicalKey: String
+  publicOrgData: [PublicOrgData]
+  snapshots: [DocumentSnapshot!]!
+  team: Team
+  trashedAt: String
+  updatedAt: Date
+}
+
+type DocumentCollaborator
+  @join__type(graph: EDITOR)
+{
+  expiryDate: Date
+  permissionLevel: PermissionLevel!
+  sourceDocID: String!
+  user: User!
+}
+
+enum DocumentEventType
+  @join__type(graph: EDITOR)
+{
+  COMMENT_REPLY
+  DOCUMENT_EDIT
+  DOCUMENT_SHARE
+  NEW_COMMENT
+  NEW_COMMENT_MENTION
+  NEW_MENTION
+}
+
+enum DocumentOperation
+  @join__type(graph: EDITOR)
+{
+  DELETE
+  SAVE
+  SHARE
+  UNSHARE
+  UPGRADE_KEYS
+}
+
+type DocumentPermissionProxy
+  @join__type(graph: EDITOR)
+{
+  sourceDocID: String!
+  sourceDocPublicHierarchicalKey: String!
+  sourceKeysClaim: String!
+  sourceTeam: Team!
+}
+
+input DocumentPermissionProxyInput
+  @join__type(graph: EDITOR)
+{
+  sourceDocID: String!
+  sourceDocPublicHierarchicalKey: String!
+  sourceKeysClaim: String!
+  sourceKeysClaimEncryptedByKey: String!
+  targetDocID: String!
+  targetDocPublicHierarchicalKey: String!
+}
+
+type DocumentSnapshot
+  @join__type(graph: EDITOR)
+{
+  createdAt: Date!
+  data: String!
+  hierarchicalPermissionChain: [HierarchicalPermissionChainLink!]!
+  version: Int!
+}
+
+enum DocumentVisibility
+  @join__type(graph: EDITOR)
+{
+  ALL
+  DRIVE
+  PAGES
+}
+
+type Domain
+  @join__type(graph: SKEMAIL)
+{
+  available: Boolean!
+  currency: String
+  domain: String!
+  period: Int
+  price: Float
+}
+
+type DomainAliasData
+  @join__type(graph: SKEMAIL)
+{
+  displayEmailAlias: String!
+  emailAlias: String
+  isCatchall: Boolean!
+  userID: String!
+}
+
+type DomainDetails
+  @join__type(graph: SKEMAIL)
+{
+  domain: String!
+  expiresAt: String!
+  renewAuto: Boolean!
+  renewalDetails: RenewalDetails!
+  status: String!
+}
+
+type DowngradeProgress
+  @join__type(graph: EDITOR)
+{
+  currentStorageInMb: Int!
+  customDomains: Int!
+  emailAliases: Int!
+  shortAliases: Int!
+  userFolders: Int!
+  userLabels: Int!
+  userMailFilters: Int!
+  workspaceUsers: Int!
+}
+
+type Draft
+  @join__type(graph: SKEMAIL)
+{
+  draftID: String!
+  encryptedDraft: String!
+  encryptedKey: String!
+  updatedAt: Date
+}
+
+input EditOrganizationRequest
+  @join__type(graph: EDITOR)
+{
+  displayPictureData: UpdateDisplayPictureRequest
+  name: String
+  orgID: String!
+}
+
+type EditOrganizationResponse
+  @join__type(graph: EDITOR)
+{
+  organization: Organization!
+}
+
+input EditTeamRequest
+  @join__type(graph: EDITOR)
+{
+  icon: String
+  name: String
+  teamID: String!
+}
+
+input EditUserLabelRequest
+  @join__type(graph: SKEMAIL)
+{
+  color: String
+  labelID: String!
+  labelName: String
+  variant: UserLabelVariant
+}
+
+type Email
+  @join__type(graph: SKEMAIL)
+{
+  attachmentMetadata: [EncryptedAttachmentMetadata!]!
+  bcc: [AddressObject!]!
+  cc: [AddressObject!]!
+  createdAt: Date!
+  encryptedHtml: EncryptedDataOutput!
+  encryptedRawMimeUrl: String
+  encryptedSessionKey: EncryptedSessionKeyOutput!
+  encryptedSubject: EncryptedDataOutput!
+  encryptedText: EncryptedDataOutput!
+  encryptedTextAsHtml: EncryptedDataOutput!
+  encryptedTextSnippet: EncryptedDataOutput
+  from: AddressObject!
+  id: String!
+  replyTo: AddressObject
+  scheduleSendAt: Date
+  threadID: String
+  to: [AddressObject!]!
+}
+
+enum EmailAutoForwardingClient
+  @join__type(graph: SKEMAIL)
+{
+  Gmail
+  Outlook
+}
+
+"""
+The user's email auto-forwarding settings for a given external email client.
+"""
+type EmailAutoForwardingClientSettings
+  @join__type(graph: SKEMAIL)
+{
+  enabled: Boolean!
+}
+
+type EmailAutoForwardingSettings
+  @join__type(graph: SKEMAIL)
+{
+  gmail: EmailAutoForwardingClientSettings!
+  outlook: EmailAutoForwardingClientSettings!
+}
+
+type EmailsWithUnreadICSResponse
+  @join__type(graph: SKEMAIL)
+{
+  emails: [Email!]!
+  hasMore: Boolean!
+}
+
+input EnableEmailAutoForwardingRequest
+  @join__type(graph: SKEMAIL)
+{
+  client: EmailAutoForwardingClient!
+  code: String!
+}
+
+input EncryptedAttachmentInput
+  @join__type(graph: SKEMAIL)
+{
+  encryptedContent: EncryptedFileInput!
+  encryptedMetadata: EncryptedDataInput!
+}
+
+type EncryptedAttachmentMetadata
+  @join__type(graph: SKEMAIL)
+{
+  attachmentID: String!
+  encryptedData: EncryptedDataOutput!
+  encryptedFileSizeBytes: Int
+}
+
+input EncryptedChunk
+  @join__type(graph: EDITOR)
+{
+  chunkNumber: Int!
+  content: String!
+  signature: String!
+  signedBy: String!
+}
+
+type EncryptedChunkOutput
+  @join__type(graph: EDITOR)
+{
+  chunkNumber: Int!
+  content: String!
+  signature: String!
+  signedBy: String!
+}
+
+input EncryptedContents
+  @join__type(graph: EDITOR)
+{
+  contentsArr: [EncryptedChunk!]!
+}
+
+type EncryptedContentsOutput
+  @join__type(graph: EDITOR)
+{
+  contentsArr: [EncryptedChunkOutput!]!
+}
+
+input EncryptedDataInput
+  @join__type(graph: SKEMAIL)
+{
+  encryptedData: String!
+}
+
+type EncryptedDataOutput
+  @join__type(graph: SKEMAIL)
+{
+  encryptedData: String!
+}
+
+input EncryptedFileInput
+  @join__type(graph: SKEMAIL)
+{
+  encryptedFile: Upload!
+}
+
+input EncryptedMetadata
+  @join__type(graph: EDITOR)
+{
+  encryptedMetadata: String!
+  signature: String!
+  signedBy: String!
+}
+
+type EncryptedMetadataOutput
+  @join__type(graph: EDITOR)
+{
+  encryptedMetadata: String!
+  signature: String!
+  signedBy: String!
+}
+
+input EncryptedSessionKeyInput
+  @join__type(graph: SKEMAIL)
+{
+  encryptedBy: PublicKey!
+  encryptedSessionKey: String!
+}
+
+type EncryptedSessionKeyOutput
+  @join__type(graph: SKEMAIL)
+{
+  encryptedBy: PublicKey!
+  encryptedSessionKey: String!
+}
+
+input EnrollMfaRequest
+  @join__type(graph: EDITOR)
+{
+  dataMFA: String!
+  loginSrpRequest: LoginSrpRequest!
+  signature: String!
+}
+
+type EnrollMfaResponse
+  @join__type(graph: EDITOR)
+{
+  backupCodes: [String!]!
+  status: RequestStatus!
+}
+
+enum EntityType
+  @join__type(graph: EDITOR)
+{
+  ORG
+  USER
+}
+
+input EventAroundDateInput
+  @join__type(graph: SKALENDAR)
+{
+  calendarID: String!
+  date: Date!
+}
+
+input EventsInput
+  @join__type(graph: SKALENDAR)
+{
+  calendarID: String!
+  eventsIDs: [String!]!
+}
+
+enum EventType
+  @join__type(graph: EDITOR)
+{
+  ACTIVE_STATUS
+  DELETE_DOCUMENT
+  DOCUMENT_RESTORE
+  DOCUMENT_UPDATE
+  FILESYSTEM_UPDATE
+  JOIN_DOCUMENT_ROOM
+  LEAVE_DOCUMENT_ROOM
+  LOGOUT
+  METADATA_UPDATE
+  SHARE_DOCUMENT
+  UNSHARE_DOCUMENT
+}
+
+enum EventUpdateType
+  @join__type(graph: SKALENDAR)
+{
+  Content
+  Preferences
+  RSVP
+}
+
+scalar ExternalAttendeeType
+  @join__type(graph: SKALENDAR)
+
+input FilesystemNode
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+}
+
+type FilterAction
+  @join__type(graph: SKEMAIL)
+{
+  actionType: ActionType!
+  serializedData: String
+}
+
+input FilterActionInput
+  @join__type(graph: SKEMAIL)
+{
+  actionType: ActionType!
+  serializedData: String
+}
+
+enum FilterField
+  @join__type(graph: SKEMAIL)
+{
+  CONTAINS
+}
+
+enum FilterType
+  @join__type(graph: SKEMAIL)
+{
+  AND
+  BCC
+  BODY
+  CC
+  FROM
+  NOT
+  OR
+  RECIPIENT
+  SUBJECT
+  TO
+}
+
+input GenerateCustomDomainRecordsRequest
+  @join__type(graph: SKEMAIL)
+{
+  domain: String!
+}
+
+type GenerateCustomDomainRecordsResponse
+  @join__type(graph: SKEMAIL)
+{
+  dkimRecords: [DNSRecord!]!
+  dmarcRecord: DNSRecord!
+  domainID: String!
+  mxRecords: [DNSRecord!]!
+  spfRecords: DNSRecord!
+}
+
+input GenerateDocPublicLinkAuthTokenStep1Request
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+}
+
+type GenerateDocPublicLinkAuthTokenStep1Response
+  @join__type(graph: EDITOR)
+{
+  salt: String!
+  serverEphemeralPublic: String!
+}
+
+input GenerateDocPublicLinkAuthTokenStep2Request
+  @join__type(graph: EDITOR)
+{
+  clientEphemeralPublic: String!
+  clientSessionProof: String!
+  docID: String!
+  serverEphemeralPublic: String!
+}
+
+type GenerateDocPublicLinkAuthTokenStep2Response
+  @join__type(graph: EDITOR)
+{
+  encryptedPrivateHierarchicalKey: String!
+  jwt: String!
+  serverSessionProof: String!
+}
+
+type GenerateWebAuthnChallengeResponse
+  @join__type(graph: EDITOR)
+{
+  options: JSON!
+}
+
+type GenerateWebAuthnRegistrationResponse
+  @join__type(graph: EDITOR)
+{
+  options: JSON!
+}
+
+input GetAliasValidRequest
+  @join__type(graph: EDITOR)
+{
+  alias: String!
+}
+
+input GetBillingPortalSessionRequest
+  @join__type(graph: EDITOR)
+{
+  redirectURL: String
+}
+
+input GetCheckoutSessionRequest
+  @join__type(graph: EDITOR)
+{
+  interval: SubscriptionInterval!
+  redirectURL: String
+  subscriptionPlan: SubscriptionPlan!
+}
+
+input GetCoinbaseCheckoutIDRequest
+  @join__type(graph: EDITOR)
+{
+  plan: SubscriptionPlan!
+}
+
+type GetCoinbaseCheckoutIDResponse
+  @join__type(graph: EDITOR)
+{
+  coinbaseCheckoutID: String!
+}
+
+input GetContactsRequest
+  @join__type(graph: SKEMAIL)
+{
+  emailAddresses: [String!]!
+}
+
+input GetCreditsRequest
+  @join__type(graph: EDITOR)
+{
+  entityID: String!
+  entityType: EntityType!
+  include: [CreditInfo!]!
+}
+
+type GetCreditsResponse
+  @join__type(graph: EDITOR)
+{
+  credits: [CreditInfoResponse!]!
+}
+
+type GetCurrentUserCustomDomainsResponse
+  @join__type(graph: SKEMAIL)
+{
+  domains: [CustomDomainRecord!]!
+}
+
+input GetCustomDomainCheckoutSessionRequest
+  @join__type(graph: EDITOR)
+{
+  customDomain: String!
+  redirectURL: String
+}
+
+input GetDefaultProfilePictureRequest
+  @join__type(graph: SKEMAIL)
+{
+  messageID: String!
+}
+
+input GetDocumentRequest
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+}
+
+input GetDocumentsRequest
+  @join__type(graph: EDITOR)
+{
+  activeProductApp: ProductApp!
+  docIDs: [String!]
+  manuallySharedOnRootDocumentsOfOrgRootDocumentID: String
+  parentID: String
+  personalRootDocuments: Boolean
+  sharedOnRootDocuments: Boolean
+  trashedChildren: Boolean
+}
+
+type GetDomainSuggestionsResponse
+  @join__type(graph: SKEMAIL)
+{
+  domains: [String!]
+}
+
+input GetMailFiltersInput
+  @join__type(graph: SKEMAIL)
+{
+  clientside: Boolean
+}
+
+input GetMboxImportUrlRequest
+  @join__type(graph: SKEMAIL)
+{
+  fileSizeInBytes: Int!
+}
+
+type GetMboxImportUrlResponse
+  @join__type(graph: SKEMAIL)
+{
+  fileID: String!
+  uploadData: String!
+}
+
+input GetRecoveryPublicKeysAndDataRequest
+  @join__type(graph: EDITOR)
+{
+  username: String!
+}
+
+input GetSearchIndexProgressRequest
+  @join__type(graph: SKEMAIL)
+{
+  newestThreadUpdatedAtInIndex: Date!
+  oldestThreadUpdatedAtInIndex: Date!
+}
+
+input GetTemplatesRequest
+  @join__type(graph: EDITOR)
+{
+  templatesIDs: [String!]
+}
+
+input GetUserRequest
+  @join__type(graph: EDITOR)
+{
+  challengeJwt: String
+  challengeSignature: String
+  emailPasscode: String
+  isNotLoggedIn: Boolean
+  paperShareHash: String
+  userID: String
+  username: String
+}
+
+input GetUsersRequest
+  @join__type(graph: EDITOR)
+{
+  userIDs: [String!]!
+}
+
+input GetValidPaperShareHashRequest
+  @join__type(graph: EDITOR)
+{
+  paperShareHash: String!
+  username: String!
+}
+
+input GrantCreditsRequest
+  @join__type(graph: EDITOR)
+{
+  creditAmount: CreditAmountInput!
+  creditTransactionReason: CreditTransactionReason!
+}
+
+type GrantCreditsResponse
+  @join__type(graph: EDITOR)
+{
+  creditsGranted: CreditAmount!
+  remainingCreditsToEarnForReason: CreditAmount!
+}
+
+type HierarchicalPermissionChainLink
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  encryptedSessionKey: String
+  encryptedSessionKeyEncryptedByKey: String
+  keysClaim: String
+  keysClaimEncryptedByKey: String
+  permission: PermissionEntry
+  previousLinkDocID: String
+}
+
+enum ImportClients
+  @join__type(graph: SKEMAIL)
+{
+  Gmail
+  Outlook
+}
+
+input ImportEmlEmailRequest
+  @join__type(graph: SKEMAIL)
+{
+  emlFiles: [Upload!]!
+  role: Role
+}
+
+input ImportGmailRequest
+  @join__type(graph: SKEMAIL)
+{
+  code: String!
+  subscribeToAutoImport: Boolean
+}
+
+input ImportMboxRequest
+  @join__type(graph: SKEMAIL)
+{
+  fileID: String!
+}
+
+type IndexableDocument
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  updatedAt: Date!
+}
+
+type InternalAttendee
+  @join__type(graph: SKALENDAR)
+{
+  calendarID: String!
+  deleted: Boolean!
+  displayName: String
+  email: String!
+  encryptedByKey: String!
+  encryptedSessionKey: String!
+  optional: Boolean!
+  permission: AttendeePermission!
+  status: AttendeeStatus!
+  updatedAt: Date!
+}
+
+input InternalAttendeeInput
+  @join__type(graph: SKALENDAR)
+{
+  calendarID: String!
+  deleted: Boolean!
+  displayName: String
+  email: String!
+  encryptedByKey: String!
+  encryptedSessionKey: String!
+  optional: Boolean!
+  permission: AttendeePermission!
+  status: AttendeeStatus!
+  updatedAt: Date!
+}
+
+scalar InternalAttendeeType
+  @join__type(graph: SKALENDAR)
+
+type Invoice
+  @join__type(graph: EDITOR)
+{
+  amountDue: Int
+  created: Date
+  invoiceTiers: [String!]
+  status: String
+  url: String
+}
+
+type InvoiceHistory
+  @join__type(graph: EDITOR)
+{
+  invoiceHistory: [Invoice]
+}
+
+scalar join__FieldSet
+
+enum join__Graph {
+  EDITOR @join__graph(name: "editor", url: "http://skeditor-server-app.skeditor-server-app:8080/graphql")
+  SKALENDAR @join__graph(name: "skalendar", url: "http://skalendar-server.skalendar-server:8080/graphql")
+  SKEMAIL @join__graph(name: "skemail", url: "http://skemail-subgraph.skemail-subgraph:8080/graphql")
+}
+
+scalar JSON
+  @join__type(graph: EDITOR)
+
+type LastUpdateKeyMap
+  @join__type(graph: SKALENDAR)
+{
+  deleted: Date
+  endDate: Date
+  parentRecurrenceID: Date
+  recurrenceDate: Date
+  recurrenceRule: Date
+  sequence: Date
+  startDate: Date
+}
+
+input LastUpdateKeyMapInput
+  @join__type(graph: SKALENDAR)
+{
+  deleted: Date
+  endDate: Date
+  parentRecurrenceID: Date
+  recurrenceDate: Date
+  recurrenceRule: Date
+  sequence: Date
+  startDate: Date
+}
+
+type LastViewedReferralCreditResponse
+  @join__type(graph: EDITOR)
+{
+  amount: CreditAmount!
+  count: Int!
+}
+
+scalar link__Import
+
+enum link__Purpose {
+  """
+  `SECURITY` features provide metadata necessary to securely resolve fields.
+  """
+  SECURITY
+
+  """
+  `EXECUTION` features provide metadata necessary for operation execution.
+  """
+  EXECUTION
+}
+
+type LinkOutput
+  @join__type(graph: EDITOR)
+{
+  encryptedLinkKey: String!
+  permissionLevel: PermissionLevel!
+  salt: String!
+}
+
+enum LoginMutationStatus
+  @join__type(graph: EDITOR)
+{
+  AUTHENTICATED
+  AUTH_FAILURE
+  CHANGE_TEMPORARY_PASSWORD
+  CREATED
+  INVALID_JWT
+  REJECTED
+  TOKEN_NEEDED
+  UPDATED
+  USERNAME_INVALID
+  WEBAUTHN_TOKEN_NEEDED
+}
+
+input LoginSrpRequest
+  @join__type(graph: EDITOR)
+{
+  captchaToken: String
+  clientEphemeralPublic: String
+  clientSessionProof: String
+  platformInfo: PlatformInfo
+  step: Int!
+  tokenMFA: String
+  username: String!
+  verifyWebAuthnData: JSON
+}
+
+type LoginSrpResponse
+  @join__type(graph: EDITOR)
+{
+  cacheKey: String
+  email: String
+  encryptedDocumentData: String
+  encryptedMetamaskSecret: String
+  encryptedUserData: String
+  jwt: String
+  mfaTypes: [String!]
+  publicData: PublicData
+  publicKey: PublicKey
+  recoveryEmail: String
+  rootOrgID: String
+  salt: String
+  serverEphemeralPublic: String
+  serverSessionProof: String
+  signingPublicKey: String
+  status: LoginMutationStatus
+  unverifiedRecoveryEmail: String
+  userID: String
+  walletAddress: String
+  webAuthnChallengeResponse: GenerateWebAuthnChallengeResponse
+}
+
+type Mailbox
+  @join__type(graph: SKEMAIL)
+{
+  pageInfo: MailboxPageInfo!
+  threads: [UserThread!]!
+}
+
+input MailboxCursor
+  @join__type(graph: SKEMAIL)
+{
+  date: Date!
+  threadID: String!
+}
+
+type MailboxCursorResponse
+  @join__type(graph: SKEMAIL)
+{
+  date: Date!
+  threadID: String!
+}
+
+input MailboxFilters
+  @join__type(graph: SKEMAIL)
+{
+  attachments: Boolean
+  read: Boolean
+}
+
+type MailboxPageInfo
+  @join__type(graph: SKEMAIL)
+{
+  cursor: MailboxCursorResponse
+  hasNextPage: Boolean!
+}
+
+input MailboxRequest
+  @join__type(graph: SKEMAIL)
+{
+  clientsideFiltersApplied: Boolean
+  cursor: MailboxCursor
+  emailsUpdatedAfterDate: Date @deprecated(reason: "Use lastUpdatedDate instead")
+  emailsUpdatedBeforeDate: Date @deprecated(reason: "Use lastUpdatedDate instead")
+  filters: MailboxFilters
+  isAliasInbox: Boolean
+  label: String
+  lastUpdatedDate: Date
+  limit: Int
+  noExcludedLabel: Boolean
+  platformInfo: PlatformInfo
+  polling: Boolean
+  refetching: Boolean
+  updatedAtOrderDirection: AscDesc
+  useUpdatedAtField: Boolean
+}
+
+type MailFilter
+  @join__type(graph: SKEMAIL)
+{
+  actions: [FilterAction!]!
+  clientside: Boolean!
+  encryptedByKey: String
+  encryptedSessionKey: String
+  filter: MailFilterField!
+  mailFilterID: String!
+  name: String
+}
+
+type MailFilterField
+  @join__type(graph: SKEMAIL)
+{
+  filterField: FilterField
+  filterType: FilterType!
+  serializedData: String
+  subFilter: [MailFilterField!]
+}
+
+input MailFilterInput
+  @join__type(graph: SKEMAIL)
+{
+  filterField: FilterField
+  filterType: FilterType!
+  serializedData: String
+  subFilter: [MailFilterInput!]
+}
+
+input ManageOrganizationPaymentDetailsRequest
+  @join__type(graph: EDITOR)
+{
+  orgID: String!
+}
+
+type ManageOrganizationPaymentDetailsResponse
+  @join__type(graph: EDITOR)
+{
+  redirectURL: String!
+}
+
+input MarkEmailAsReadICSRequest
+  @join__type(graph: SKEMAIL)
+{
+  emailIDs: [String!]!
+  reason: String
+}
+
+input MarkThreadsAsClientsideFilteredInput
+  @join__type(graph: SKEMAIL)
+{
+  threadIDs: [String!]!
+}
+
+type MFAFactors
+  @join__type(graph: EDITOR)
+{
+  backupCodes: [String!]
+  totpData: String
+  webAuthnKeys: [WebAuthnKey!]
+}
+
+enum MFATypes
+  @join__type(graph: EDITOR)
+{
+  BACKUP_CODE
+  TOTP
+  WEBAUTHN
+}
+
+input ModifyLabelsRequest
+  @join__type(graph: SKEMAIL)
+{
+  systemLabels: [SystemLabels!]
+  threadIDs: [String!]!
+  userLabels: [String!]
+}
+
+type ModifyLabelsResponse
+  @join__type(graph: SKEMAIL)
+{
+  updatedThreads: [UpdatedThreadLabels!]!
+}
+
+input MoveDocRequest
+  @join__type(graph: EDITOR)
+{
+  activeProductApp: ProductApp!
+  currentEncryptedSessionKey: String!
+  currentPublicHierarchicalKey: String!
+  docID: String!
+  newParentID: String!
+  newParentKeysClaim: String!
+  newParentKeysClaimEncryptedByKey: String!
+  publicHierarchicalKeyOfParent: String!
+}
+
+type MoveDocResponse
+  @join__type(graph: EDITOR)
+{
+  document: Document!
+}
+
+type Mutation
+  @join__type(graph: EDITOR)
+  @join__type(graph: SKALENDAR)
+  @join__type(graph: SKEMAIL)
+{
+  acceptInviteStep1(request: AcceptInviteStep1Request!): AcceptInviteStep1Response! @join__field(graph: EDITOR)
+  addEmail(request: AddEmailRequest!): AddEmailResponse! @join__field(graph: EDITOR)
+  addPendingInvite(request: AddPendingInviteRequest!): AddPendingInviteResponse! @join__field(graph: EDITOR)
+  adjustBusinessPlan(request: AdjustBusinessPlanRequest!): AdjustBusinessPlanResponse! @join__field(graph: EDITOR)
+  changeLinkPermission(request: ChangeLinkPermissionRequest!): ChangeLinkPermissionResponse! @join__field(graph: EDITOR)
+  clearSessionCache: ClearSessionCacheResponse! @join__field(graph: EDITOR)
+  confirmCacheUpload(request: ConfirmCacheUploadRequest!): ConfirmCacheUploadResponse! @join__field(graph: EDITOR)
+  createCacheElement(request: CreateCacheElementRequest!): CreateCacheElementResponse! @join__field(graph: EDITOR)
+  createOrgUploadAvatarLink: CreateUploadAvatarLinkResponse! @join__field(graph: EDITOR)
+  createSrp(request: CreateSrpRequest!): CreateSrpResponse! @join__field(graph: EDITOR)
+  createSrpMetamask(request: CreateSrpMetamaskRequest!): CreateSrpResponse! @join__field(graph: EDITOR)
+  createTeam(request: CreateTeamRequest!): Team! @join__field(graph: EDITOR)
+  createUploadAvatarLink: CreateUploadAvatarLinkResponse! @join__field(graph: EDITOR)
+  createUploadContactAvatarLink(request: CreateUploadContactAvatarLinkRequest!): CreateUploadAvatarLinkResponse! @join__field(graph: EDITOR)
+  createWalletChallenge(request: CreateWalletChallengeRequest!): CreateWalletChallengeResponse! @join__field(graph: EDITOR)
+  deleteAccount(request: DeleteAccountRequest!): DeleteAccountResponse! @join__field(graph: EDITOR)
+  deleteDoc(request: DeleteDocRequest!): DeleteDocResponse! @join__field(graph: EDITOR)
+  deleteInvite(request: DeleteInviteRequest!): DeleteInviteResponse! @join__field(graph: EDITOR)
+  deleteLink(request: DeleteLinkRequest!): DeleteLinkResponse! @join__field(graph: EDITOR)
+  deleteRecoveryEmail: Boolean! @join__field(graph: EDITOR)
+  deleteSnapshot(request: DeleteSnapshotRequest!): DeleteSnapshotResponse! @join__field(graph: EDITOR)
+  deleteTeam(request: DeleteTeamRequest!): Boolean! @join__field(graph: EDITOR)
+  deleteUserOrganizationMembership(request: DeleteUserOrganizationMembershipRequest!): Boolean! @join__field(graph: EDITOR)
+  disableMfa(request: DisableMfaRequest!): DisableMfaResponse! @join__field(graph: EDITOR)
+  editOrganization(request: EditOrganizationRequest!): EditOrganizationResponse! @join__field(graph: EDITOR)
+  editTeam(request: EditTeamRequest!): Team! @join__field(graph: EDITOR)
+  enrollMfa(request: EnrollMfaRequest!): EnrollMfaResponse! @join__field(graph: EDITOR)
+  generateDocPublicLinkAuthTokenStep1(request: GenerateDocPublicLinkAuthTokenStep1Request!): GenerateDocPublicLinkAuthTokenStep1Response! @join__field(graph: EDITOR)
+  generateDocPublicLinkAuthTokenStep2(request: GenerateDocPublicLinkAuthTokenStep2Request!): GenerateDocPublicLinkAuthTokenStep2Response! @join__field(graph: EDITOR)
+  generateWebAuthnChallenge: GenerateWebAuthnChallengeResponse @join__field(graph: EDITOR)
+  generateWebAuthnRegistration: GenerateWebAuthnRegistrationResponse! @join__field(graph: EDITOR)
+  grantCredits(request: GrantCreditsRequest!): GrantCreditsResponse! @join__field(graph: EDITOR)
+  loginSrp(request: LoginSrpRequest!): LoginSrpResponse! @join__field(graph: EDITOR)
+  manageOrganizationPaymentDetails(request: ManageOrganizationPaymentDetailsRequest!): ManageOrganizationPaymentDetailsResponse! @join__field(graph: EDITOR)
+  markCurrentUserOnboardedWorkspaceMigration: Void @join__field(graph: EDITOR)
+  moveDoc(request: MoveDocRequest!): MoveDocResponse! @join__field(graph: EDITOR)
+  moveMultipleDoc(request: [MoveDocRequest!]!): [MoveDocResponse!]! @join__field(graph: EDITOR)
+  newMultipleDocs(request: [NewDocRequest!]!): [NewDocResponse!]! @join__field(graph: EDITOR)
+  notificationClicked(request: NotificationClickedRequest!): Boolean @join__field(graph: EDITOR)
+  provisionSrp(request: ProvisionSrpRequest!): Boolean! @join__field(graph: EDITOR)
+  referUser(request: ReferUserRequest!): ReferUserResponse! @join__field(graph: EDITOR)
+  regenerateMfaBackupCodes(request: RegenerateMfaBackupCodesRequest!): RegenerateMfaBackupCodesResponse! @join__field(graph: EDITOR)
+  resetAccount(request: ResetAccountRequest!): Boolean @join__field(graph: EDITOR)
+  restoreTrashDoc(request: TrashDocRequest!): MoveDocResponse! @join__field(graph: EDITOR)
+  saveContents(request: SaveContentsRequest!): SaveContentsResponse! @join__field(graph: EDITOR)
+  saveMetadata(request: SaveMetadataRequest!): SaveMetadataResponse! @join__field(graph: EDITOR)
+  sendAccessRequestEmail(request: SendAccessRequestEmailRequest!): Boolean! @join__field(graph: EDITOR)
+  sendDocumentEvent(request: SendDocumentEventRequest!): Boolean @join__field(graph: EDITOR)
+  sendFeedback(request: SendFeedbackRequest!): Boolean! @join__field(graph: EDITOR)
+  setLastViewedReferralCredit(request: SetLastViewedReferralCreditRequest!): Boolean! @join__field(graph: EDITOR)
+  setNotificationPreferences(request: SetNotificationPreferencesRequest!): Boolean @join__field(graph: EDITOR)
+  setUseIPFS(request: SetUseIPFSRequest!): SetUseIPFSResponse! @join__field(graph: EDITOR)
+  setUserPreferences(request: SetUserPreferencesRequest!): UserPreferences @join__field(graph: EDITOR)
+  setupLink(request: SetupLinkRequest!): SetupLinkResponse! @join__field(graph: EDITOR)
+  setupProvisionedUser(request: SetupProvisionedUserRequest!): LoginSrpResponse! @join__field(graph: EDITOR)
+  shareDoc(request: ShareDocRequest!): ShareDocResponse! @join__field(graph: EDITOR)
+  shareTeamDocWithOtherTeam(request: ShareTeamDocWithOtherTeamRequest!): Team! @join__field(graph: EDITOR)
+  storeUnauthenticatedWorkspaceEvent(request: WorkspaceEventRequest!): Boolean! @join__field(graph: EDITOR)
+  storeWorkspaceEvent(request: WorkspaceEventRequest!): Boolean! @join__field(graph: EDITOR)
+  trashDocs(request: [TrashDocRequest!]!): [MoveDocResponse!]! @join__field(graph: EDITOR)
+  unshareDoc(request: UnshareDocRequest!): UnshareDocResponse! @join__field(graph: EDITOR)
+  unshareTeamDocWithOtherTeam(request: UnshareTeamDocWithOtherTeamRequest!): Team! @join__field(graph: EDITOR)
+  updateDisplayName(request: UpdateDisplayNameRequest!): UpdateDisplayNameResponse! @join__field(graph: EDITOR)
+  updateDisplayPicture(request: UpdateDisplayPictureRequest!): User! @join__field(graph: EDITOR)
+  updateDocumentData(request: UpdateDocumentDataRequest!): UpdateDocumentDataResponse! @join__field(graph: EDITOR)
+  updateSrp(request: UpdateSrpRequest!): UpdateSrpResponse! @join__field(graph: EDITOR)
+  updateUploadContactAvatarLink(request: UpdateUploadContactAvatarLinkRequest!): UpdateUploadContactAvatarLinkResponse! @join__field(graph: EDITOR)
+  upgradeHierarchicalKeys(request: UpgradeHierarchicalKeysRequest!): UpgradeHierarchicalKeysResponse! @join__field(graph: EDITOR)
+  upgradeKey(request: UpgradeKeyRequest!): UpgradeKeyResponse! @join__field(graph: EDITOR)
+  uploadRecoveryData(request: UploadRecoveryDataRequest!): UploadRecoveryDataResponse! @join__field(graph: EDITOR)
+  verifyWebAuthnRegistration(request: VerifyWebAuthnRegistrationRequest!): VerifyWebAuthnRegistrationResponse! @join__field(graph: EDITOR)
+  createCalendarUser(request: CreateCalendarUserRequest!): Void @join__field(graph: SKALENDAR)
+  setCalendarPushToken(request: SetCalendarPushTokenRequest!): Void @join__field(graph: SKALENDAR)
+  sync(request: SyncRequest!): SyncResponse @join__field(graph: SKALENDAR) @deprecated(reason: "Added sequence, use sync2 instead")
+  sync2(request: SyncRequest2!): SyncResponse @join__field(graph: SKALENDAR)
+  unsetCalendarPushToken(request: UnsetCalendarPushTokenRequest!): Void @join__field(graph: SKALENDAR)
+  applyLabels(request: ModifyLabelsRequest): ModifyLabelsResponse @join__field(graph: SKEMAIL)
+  blockEmailAddress(request: BlockEmailAddressRequest): Void @join__field(graph: SKEMAIL)
+  createCustomDomainAlias(request: CreateCustomDomainAliasRequest): CreateCustomDomainAliasResponse @join__field(graph: SKEMAIL)
+  createEmailAlias(request: CreateEmailAliasRequest): CreateEmailAliasResponse @join__field(graph: SKEMAIL)
+  createMailFilter(input: CreateMailFilterInput!): Void @join__field(graph: SKEMAIL)
+  createOrUpdateContact(request: CreateOrUpdateContactRequest!): Void @join__field(graph: SKEMAIL)
+  createOrUpdateDraft(request: CreateOrUpdateDraftRequest!): Void @join__field(graph: SKEMAIL)
+  createUdAlias(request: CreateUdAliasRequest): CreateEmailAliasResponse @join__field(graph: SKEMAIL)
+  createUserLabel(request: CreateUserLabelRequest): UserLabel @join__field(graph: SKEMAIL)
+  createWalletChallengeSkemail(request: CreateWalletChallengeRequestSkemail!): CreateWalletChallengeResponseSkemail! @join__field(graph: SKEMAIL)
+  deleteAutoReply: Void @join__field(graph: SKEMAIL)
+  deleteContact(request: DeleteContactRequest!): Void @join__field(graph: SKEMAIL)
+  deleteCustomDomain(request: DeleteCustomDomainRequest!): Void @join__field(graph: SKEMAIL)
+  deleteCustomDomainAlias(request: DeleteCustomDomainAliasRequest): Void @join__field(graph: SKEMAIL)
+  deleteDraft(request: DeleteDraftRequest!): Void @join__field(graph: SKEMAIL)
+  deleteMailAccount(deleteRequest: DeleteMailAccountRequest!): DeleteMailAccountResponse! @join__field(graph: SKEMAIL)
+  deleteMailFilter(input: DeleteMailFilterInput!): Void @join__field(graph: SKEMAIL)
+  deleteThread(request: DeleteThreadRequest): Void @join__field(graph: SKEMAIL)
+  deleteUserLabel(request: DeleteUserLabelRequest): Void @join__field(graph: SKEMAIL)
+  deleteUserSignature: Void @join__field(graph: SKEMAIL)
+  disableEmailAutoForwarding(request: DisableEmailAutoForwardingRequest!): Void @join__field(graph: SKEMAIL)
+  editUserLabel(request: EditUserLabelRequest): UserLabel @join__field(graph: SKEMAIL)
+  enableEmailAutoForwarding(request: EnableEmailAutoForwardingRequest!): Void @join__field(graph: SKEMAIL)
+  generateCustomDomainRecords(request: GenerateCustomDomainRecordsRequest!): GenerateCustomDomainRecordsResponse! @join__field(graph: SKEMAIL)
+  getMboxImportUrl(getImportUrlRequest: GetMboxImportUrlRequest!): GetMboxImportUrlResponse @join__field(graph: SKEMAIL)
+  importEmlEmail(importRequest: ImportEmlEmailRequest!): Void @join__field(graph: SKEMAIL)
+  importGmailEmails(request: ImportGmailRequest!): Void @join__field(graph: SKEMAIL)
+  importMboxEmails(importMboxRequest: ImportMboxRequest!): Void @join__field(graph: SKEMAIL)
+  importOutlookEmails(code: String!): Void @join__field(graph: SKEMAIL)
+  markEmailAsReadICS(request: MarkEmailAsReadICSRequest!): Void @join__field(graph: SKEMAIL)
+  markThreadsAsClientsideFiltered(input: MarkThreadsAsClientsideFilteredInput!): Void @join__field(graph: SKEMAIL)
+  purchaseCustomDomain(request: PurchaseCustomDomainRequest!): PurchaseCustomDomainResponse! @join__field(graph: SKEMAIL)
+  removeLabels(request: ModifyLabelsRequest): ModifyLabelsResponse @join__field(graph: SKEMAIL)
+  replyToMessage(message: ReplyToEmailRequest): ReplyToEmailResponse @join__field(graph: SKEMAIL)
+  saveCustomDomainRecords(request: SaveCustomDomainRequest!): Void @join__field(graph: SKEMAIL)
+  sendMessage(message: SendEmailRequest): SendEmailResponse @join__field(graph: SKEMAIL)
+  setAllThreadsReadStatus(request: SetAllThreadsReadStatusRequest!): Boolean! @join__field(graph: SKEMAIL)
+  setAutoReply(request: SetAutoReplyRequest): Void @join__field(graph: SKEMAIL)
+  setAutoSyncContactsSetting(value: Boolean!): Void @join__field(graph: SKEMAIL)
+  setCatchallAddress(request: SetCatchallAddressRequest!): Boolean! @join__field(graph: SKEMAIL)
+  setDefaultEmailAlias(request: SetDefaultEmailAliasRequest): Boolean! @join__field(graph: SKEMAIL)
+  setPDSubscribeFlag(request: SetPDSubscribeFlagRequest): Void @join__field(graph: SKEMAIL)
+  setPushToken(request: SetPushTokenRequest): Void @join__field(graph: SKEMAIL)
+  setReadStatus(request: SetReadStatusRequest): SetReadStatusResponse @join__field(graph: SKEMAIL)
+  setUserPublicKey(request: SetUserPublicKeyRequest): Void @join__field(graph: SKEMAIL)
+  setUserSignature(request: SetUserSignatureRequest): Void @join__field(graph: SKEMAIL)
+  subscribeNotification(request: SubscribeNotificationRequest): Void @join__field(graph: SKEMAIL)
+  unblockEmailAddress(request: UnblockEmailAddressRequest): Void @join__field(graph: SKEMAIL)
+  unsendMessage(message: UnsendEmailRequest): Email @join__field(graph: SKEMAIL)
+  unsetPushToken(request: UnsetPushTokenRequest): Void @join__field(graph: SKEMAIL)
+  unsubscribeFromGmailImport: Void @join__field(graph: SKEMAIL)
+  unsubscribeNotification: Void @join__field(graph: SKEMAIL)
+  updateEmailAliasActiveState(request: UpdateEmailAliasActiveStateRequest): UpdateEmailAliasActiveStateResponse @join__field(graph: SKEMAIL)
+  updateMailFilter(input: UpdateMailFilterInput!): Void @join__field(graph: SKEMAIL)
+  uploadSpamReport(request: UploadSpamReportRequest!): Void @join__field(graph: SKEMAIL)
+  verifyCustomDomain(domainID: String!): Void @join__field(graph: SKEMAIL)
+  verifyWalletAddressCreateAlias(request: VerifyWalletAddressCreateAliasRequest!): CreateEmailAliasResponse! @join__field(graph: SKEMAIL)
+}
+
+type NativeMailbox
+  @join__type(graph: SKEMAIL)
+{
+  pageInfo: MailboxPageInfo!
+  slimThreads: [SlimUserThread!]!
+  threads: [UserThread!]!
+}
+
+input NativeMailboxRequest
+  @join__type(graph: SKEMAIL)
+{
+  cursor: MailboxCursor
+  lastUpdatedDate: Date
+  limit: Int
+  limitWithSlims: Int
+  onlySlimThreads: Boolean
+  platformInfo: PlatformInfo
+  returnDeleted: Boolean
+  updatedAtOrderDirection: AscDesc
+  useUpdatedAtField: Boolean
+}
+
+input NewDocRequest
+  @join__type(graph: EDITOR)
+{
+  activeProductApp: ProductApp!
+  docID: ID!
+  documentType: NwContentType!
+  encryptedContents: EncryptedContents!
+  encryptedMetadata: EncryptedMetadata!
+  encryptedSessionKey: String!
+  encryptedSessionKeyEncryptedByKey: String!
+  parentDocID: String
+  parentKeysClaim: String
+  parentKeysClaimEncryptedByKey: String
+  parentSignature: String
+  permissions: [PermissionEntryInput!]!
+  publicHierarchicalKey: String!
+  publicHierarchicalKeyOfParent: String
+  signatures: [String!]!
+  templateID: String
+}
+
+type NewDocResponse
+  @join__type(graph: EDITOR)
+{
+  docID: ID!
+  document: Document
+  error: BatchError
+}
+
+enum NotificationChannelType
+  @join__type(graph: EDITOR)
+{
+  EMAIL
+}
+
+input NotificationClickedRequest
+  @join__type(graph: EDITOR)
+{
+  notificationID: String!
+}
+
+enum NwContentType
+  @join__type(graph: EDITOR)
+{
+  FILE
+  FOLDER
+  PDF
+  RICH_TEXT
+}
+
+type Organization
+  @join__type(graph: EDITOR)
+{
+  displayPictureData: DisplayPictureData!
+  everyoneTeam: Team!
+  hasCustomized: Boolean!
+  name: String!
+  orgID: String!
+  personalTeam: Team!
+  rootDocID: String!
+  rootDocPublicHierarchicalKey: String
+  teams: [Team!]!
+}
+
+type PaidUpStatus
+  @join__type(graph: EDITOR)
+{
+  downgradeProgress: DowngradeProgress!
+  paidUp: Boolean!
+}
+
+type PendingDocumentKeyUpgradesCollaborator
+  @join__type(graph: EDITOR)
+{
+  publicKey: PublicKey!
+  userID: String!
+}
+
+type PendingDocumentKeyUpgradesNewHierarchicalKey
+  @join__type(graph: EDITOR)
+{
+  collaboratorsIDs: [String!]!
+  currentPublicHierarchicalKey: String
+  docID: String!
+  encryptedLinkKey: String
+  hierarchicalPermissionChain: [HierarchicalPermissionChainLink!]!
+}
+
+type PendingDocumentKeyUpgradesNewKeysClaim
+  @join__type(graph: EDITOR)
+{
+  currentKeysClaim: String
+  docID: String!
+  hierarchicalPermissionChain: [HierarchicalPermissionChainLink!]!
+  keysClaimSourceDocID: String!
+  keysClaimSourceDocPublicHierarchicalKey: String
+}
+
+type PendingDocumentKeyUpgradesOutput
+  @join__type(graph: EDITOR)
+{
+  collaborators: [PendingDocumentKeyUpgradesCollaborator!]!
+  newHierarchicalKeys: [PendingDocumentKeyUpgradesNewHierarchicalKey!]!
+  newKeysClaims: [PendingDocumentKeyUpgradesNewKeysClaim!]!
+}
+
+input PendingDocumentKeyUpgradesRequest
+  @join__type(graph: EDITOR)
+{
+  rootDocumentId: String!
+}
+
+type PendingUserInvite
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  email: String!
+  permissionLevel: PermissionLevel!
+}
+
+type PermissionEntry
+  @join__type(graph: EDITOR)
+{
+  encryptedBy: PublicKey!
+  encryptedKey: String
+  encryptedPrivateHierarchicalKey: String
+  expiryDate: Date
+  userID: String!
+}
+
+input PermissionEntryInput
+  @join__type(graph: EDITOR)
+{
+  encryptedBy: PublicKey!
+  encryptedPrivateHierarchicalKey: String!
+  expiryDate: Date
+  permissionLevel: PermissionLevel!
+  userID: String!
+}
+
+enum PermissionLevel
+  @join__type(graph: EDITOR)
+{
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+input PlatformInfo
+  @join__type(graph: EDITOR)
+  @join__type(graph: SKEMAIL)
+{
+  browserName: String
+  isAndroid: Boolean!
+  isBgTask: Boolean
+  isIos: Boolean!
+  isMacOs: Boolean!
+  isMobile: Boolean!
+  isReactNative: Boolean
+  isSkiffWindowsDesktop: Boolean
+  languageCode: String
+  manufacturer: String
+  timezone: String
+}
+
+enum ProductApp
+  @join__type(graph: EDITOR)
+{
+  CALENDAR
+  DRIVE
+  MAIL
+  PAGES
+}
+
+input ProvisionEmailDetails
+  @join__type(graph: EDITOR)
+{
+  deliveryEmail: String!
+  temporaryPassword: String!
+}
+
+input ProvisionSrpRequest
+  @join__type(graph: EDITOR)
+{
+  createSrpRequest: CreateSrpRequest!
+  emailAlias: String!
+  newUserID: String!
+  provisionEmailDetails: ProvisionEmailDetails
+  shareDocRequest: ShareDocRequest!
+}
+
+type PublicData
+  @join__type(graph: EDITOR)
+{
+  displayName: String
+  displayPictureData: DisplayPictureData
+}
+
+scalar PublicKey
+  @join__type(graph: EDITOR)
+  @join__type(graph: SKALENDAR)
+  @join__type(graph: SKEMAIL)
+
+scalar PublicKeyWithSignature
+  @join__type(graph: SKALENDAR)
+  @join__type(graph: SKEMAIL)
+
+type PublicOrgData
+  @join__type(graph: EDITOR)
+{
+  displayPictureData: DisplayPictureData
+  name: String!
+  orgID: String!
+}
+
+input PurchaseCustomDomainRequest
+  @join__type(graph: SKEMAIL)
+{
+  domain: String!
+}
+
+type PurchaseCustomDomainResponse
+  @join__type(graph: SKEMAIL)
+{
+  domainID: String!
+}
+
+input PushCalendarEventInput
+  @join__type(graph: SKALENDAR)
+{
+  calendarID: String!
+  creatorCalendarID: String!
+  eventData: CalendarEventData!
+  externalCreator: String
+  internalAttendeeList: [InternalAttendeeInput!]!
+  parentEventID: String!
+  updateTypes: [EventUpdateType!]!
+}
+
+input PushCalendarEventInput2
+  @join__type(graph: SKALENDAR)
+{
+  calendarID: String!
+  creatorCalendarID: String!
+  eventData: CalendarEventData2!
+  externalCreator: String
+  internalAttendeeList: [InternalAttendeeInput!]!
+  parentEventID: String!
+  updateTypes: [EventUpdateType!]!
+}
+
+type Query
+  @join__type(graph: EDITOR)
+  @join__type(graph: SKALENDAR)
+  @join__type(graph: SKEMAIL)
+{
+  aliasValid(request: GetAliasValidRequest!): Boolean! @join__field(graph: EDITOR)
+  allFolderDocuments: [Document!]! @join__field(graph: EDITOR)
+  apiVersion: String @join__field(graph: EDITOR)
+  billingPortal(request: GetBillingPortalSessionRequest): CreateBillingPortalSessionOutput @join__field(graph: EDITOR)
+  checkoutPortal(request: GetCheckoutSessionRequest!): CheckoutSession! @join__field(graph: EDITOR)
+  credits(request: GetCreditsRequest!): GetCreditsResponse! @join__field(graph: EDITOR)
+  currentUser: User @join__field(graph: EDITOR)
+  currentUserAlterEgos: [UserAlterEgo!]! @join__field(graph: EDITOR)
+  customDomainCheckoutPortal(request: GetCustomDomainCheckoutSessionRequest!): CheckoutSession! @join__field(graph: EDITOR)
+  document(request: GetDocumentRequest!): Document! @join__field(graph: EDITOR)
+  documents(request: GetDocumentsRequest!): [Document!]! @join__field(graph: EDITOR)
+  getCoinbaseCheckoutID(request: GetCoinbaseCheckoutIDRequest!): GetCoinbaseCheckoutIDResponse! @join__field(graph: EDITOR)
+  lastViewedReferralCredit: LastViewedReferralCreditResponse! @join__field(graph: EDITOR)
+  organization(id: String!): Organization! @join__field(graph: EDITOR)
+  pendingDocumentKeyUpgrades(request: PendingDocumentKeyUpgradesRequest!): PendingDocumentKeyUpgradesOutput! @join__field(graph: EDITOR)
+  recoveryPublicKeysAndData(request: GetRecoveryPublicKeysAndDataRequest!): RecoveryPublicKeysAndDataOutput @join__field(graph: EDITOR)
+  searchIndexableDocuments: [IndexableDocument!]! @join__field(graph: EDITOR)
+  sessionCache: SessionCacheOutput! @join__field(graph: EDITOR)
+  sessionCacheChallenge(req: SessionCacheInput!): SessionCacheChallengeResponse! @join__field(graph: EDITOR)
+  sessionCacheMobile(req: SessionCacheMobileRequest!): Void @join__field(graph: EDITOR)
+  team(id: String!): Team! @join__field(graph: EDITOR)
+  templates(request: GetTemplatesRequest!): [Template!]! @join__field(graph: EDITOR)
+  user(request: GetUserRequest!): User @join__field(graph: EDITOR)
+  userPreferences: UserPreferences @join__field(graph: EDITOR)
+  users(request: GetUsersRequest!): [User!] @join__field(graph: EDITOR)
+  validPaperShareHash(request: GetValidPaperShareHashRequest!): Boolean! @join__field(graph: EDITOR)
+  calendar(calendarID: String!): Calendar! @join__field(graph: SKALENDAR)
+  events(request: EventsInput!): [CalendarEvent!]! @join__field(graph: SKALENDAR)
+  eventsAroundDate(request: EventAroundDateInput!): [CalendarEvent!]! @join__field(graph: SKALENDAR)
+  userCalendar(calendarID: String!): UserCalendar! @join__field(graph: SKALENDAR)
+  allContacts: [Contact!]! @join__field(graph: SKEMAIL)
+  allDrafts: [Draft!]! @join__field(graph: SKEMAIL)
+  attachments(ids: [String]): [Attachment] @join__field(graph: SKEMAIL)
+  autoReply: AutoReplyOutput @join__field(graph: SKEMAIL)
+  browserPushNotificationsEnabled: Boolean! @join__field(graph: SKEMAIL)
+  checkIfDomainsAvailable(domains: [String!]!): CheckIfDomainsAvailableResponse! @join__field(graph: SKEMAIL)
+  contacts(request: GetContactsRequest!): [Contact!]! @join__field(graph: SKEMAIL)
+  customDomains: [String!]! @join__field(graph: SKEMAIL)
+  decryptionServicePublicKey: PublicKey @join__field(graph: SKEMAIL)
+  defaultProfilePicture(request: GetDefaultProfilePictureRequest!): DefaultDisplayPictureData @join__field(graph: SKEMAIL)
+  emailAutoForwardingSettings: EmailAutoForwardingSettings! @join__field(graph: SKEMAIL)
+  emailsWithUnreadICS: [Email!]! @join__field(graph: SKEMAIL) @deprecated(reason: "Added pagination, use emailsWithUnreadICS2 instead")
+  emailsWithUnreadICS2: EmailsWithUnreadICSResponse! @join__field(graph: SKEMAIL)
+  getAliasesOnDomain(domainID: String!): AliasesOnDomainResponse! @join__field(graph: SKEMAIL)
+  getBonfidaNames(solanaAddress: String!): [String!]! @join__field(graph: SKEMAIL)
+  getCurrentUserCustomDomains: GetCurrentUserCustomDomainsResponse! @join__field(graph: SKEMAIL)
+  getDomainDetails(domain: String!): DomainDetails! @join__field(graph: SKEMAIL)
+  getDomainSuggestions(domain: String!, limit: Int): GetDomainSuggestionsResponse! @join__field(graph: SKEMAIL)
+  getENSName(ethereumAddress: String!): String @join__field(graph: SKEMAIL)
+  getGmailAutoImportStatus: AutoImportStatus! @join__field(graph: SKEMAIL)
+  getGoogleAuthURL: String! @join__field(graph: SKEMAIL)
+  getICNSName(cosmosAddress: String!): String @join__field(graph: SKEMAIL)
+  getOutlookAuthUrl: String! @join__field(graph: SKEMAIL)
+  getStargazeName(cosmosAddress: String!): String @join__field(graph: SKEMAIL)
+  isBlocked(senderAddress: String): Boolean! @join__field(graph: SKEMAIL)
+  isCustomDomain(domains: [String!]!): Boolean! @join__field(graph: SKEMAIL)
+  isHolderOfNFT(nftContractAddress: String!, userAddress: String!): Boolean! @join__field(graph: SKEMAIL)
+  mailFilters(request: GetMailFiltersInput): [MailFilter!]! @join__field(graph: SKEMAIL)
+  mailbox(request: MailboxRequest!): Mailbox @join__field(graph: SKEMAIL)
+  nativeMailbox(request: NativeMailboxRequest!): NativeMailbox @join__field(graph: SKEMAIL)
+  orgMemberDefaultEmailAlias(userID: String!): String @join__field(graph: SKEMAIL)
+  orgMemberEmailAliases(userID: String!): [String!]! @join__field(graph: SKEMAIL)
+  searchIndexProgress(request: GetSearchIndexProgressRequest!): SearchIndexProgress! @join__field(graph: SKEMAIL)
+  status: String @join__field(graph: SKEMAIL)
+  unread(label: String!): Int! @join__field(graph: SKEMAIL)
+  userLabels: [UserLabel!]! @join__field(graph: SKEMAIL)
+  userSignature: UserSignatureOutput @join__field(graph: SKEMAIL)
+  userThread(threadID: String): UserThread @join__field(graph: SKEMAIL)
+  userThreads(returnDeleted: Boolean, threadIDs: [String!]!): [UserThread!]! @join__field(graph: SKEMAIL)
+  usersFromEmailAlias(emailAliases: [String!]!): [User]! @join__field(graph: SKEMAIL)
+  usersFromEmailAliasWithCatchall(emailAliases: [String!]!): [User]! @join__field(graph: SKEMAIL)
+}
+
+type RecoveryPublicKeysAndDataOutput
+  @join__type(graph: EDITOR)
+{
+  encryptedRecoveryData: String
+  publicKey: PublicKey!
+  recoveryServerShare: String
+  recoverySigningPublicKey: PublicKey
+}
+
+enum RecurrenceDay
+  @join__type(graph: SKALENDAR)
+{
+  FRIDAY
+  MONDAY
+  SATURDAY
+  SUNDAY
+  THURSDAY
+  TUESDAY
+  WEDNESDAY
+}
+
+enum RecurrenceFrequency
+  @join__type(graph: SKALENDAR)
+{
+  DAILY
+  HOURLY
+  MINUTELY
+  MONTHLY
+  SECONDLY
+  WEEKLY
+  YEARLY
+}
+
+type RecurrenceRule
+  @join__type(graph: SKALENDAR)
+{
+  byDays: [RecurrenceDay!]
+  count: Int
+  excludeDates: [Date!]!
+  frequency: RecurrenceFrequency!
+  interval: Int
+  isAllDay: Boolean
+  startDate: Date!
+  timezone: String
+  until: Date
+}
+
+input RecurrenceRuleInput
+  @join__type(graph: SKALENDAR)
+{
+  byDays: [RecurrenceDay!]
+  count: Int
+  excludeDates: [Date!]!
+  frequency: RecurrenceFrequency!
+  interval: Int
+  isAllDay: Boolean
+  startDate: Date!
+  timezone: String
+  until: Date
+}
+
+input ReferUserRequest
+  @join__type(graph: EDITOR)
+{
+  email: String!
+  permissionLevel: PermissionLevel
+  referralTemplate: String!
+}
+
+type ReferUserResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+input RegenerateMfaBackupCodesRequest
+  @join__type(graph: EDITOR)
+{
+  loginSrpRequest: LoginSrpRequest!
+  signature: String!
+}
+
+type RegenerateMfaBackupCodesResponse
+  @join__type(graph: EDITOR)
+{
+  backupCodes: [String!]!
+  status: RequestStatus!
+}
+
+type RenewalDetails
+  @join__type(graph: SKEMAIL)
+{
+  price: Float
+}
+
+input ReplyToEmailRequest
+  @join__type(graph: SKEMAIL)
+{
+  attachments: [EncryptedAttachmentInput!]!
+  bcc: [SendAddressRequest!]!
+  captchaToken: String!
+  cc: [SendAddressRequest!]!
+  customMessageID: String
+  encryptedHtml: EncryptedDataInput!
+  encryptedSubject: EncryptedDataInput!
+  encryptedText: EncryptedDataInput!
+  encryptedTextAsHtml: EncryptedDataInput!
+  encryptedTextSnippet: EncryptedDataInput
+  externalEncryptedSessionKey: EncryptedSessionKeyInput
+  from: SendAddressRequest!
+  rawSubject: String!
+  replyID: String!
+  scheduleSendAt: Date
+  to: [SendAddressRequest!]!
+}
+
+type ReplyToEmailResponse
+  @join__type(graph: SKEMAIL)
+{
+  messageID: String!
+  threadID: String!
+}
+
+enum RequestStatus
+  @join__type(graph: EDITOR)
+  @join__type(graph: SKEMAIL)
+{
+  FAILED
+  REJECTED
+  SAVED
+  SUCCESS
+}
+
+input ResetAccountRequest
+  @join__type(graph: EDITOR)
+{
+  emailPasscode: String
+  encryptedUserData: String!
+  salt: String!
+  saltSignature: String!
+  userDataSignature: String!
+  username: String!
+  verifier: String!
+  verifierSignature: String!
+}
+
+enum Role
+  @join__type(graph: SKEMAIL)
+{
+  BCC
+  CC
+  FROM
+  TO
+}
+
+input SaveContentsRequest
+  @join__type(graph: EDITOR)
+{
+  createSnapshot: Boolean
+  docID: String!
+  encryptedContents: EncryptedContents!
+  previousEncryptedContentsHash: String!
+  restoringDocument: Boolean
+}
+
+type SaveContentsResponse
+  @join__type(graph: EDITOR)
+{
+  document: Document!
+}
+
+input SaveCustomDomainRequest
+  @join__type(graph: SKEMAIL)
+{
+  domain: String!
+  domainID: String!
+}
+
+input SaveMetadataRequest
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  encryptedMetadata: EncryptedMetadata!
+  previousEncryptedMetadataHash: String!
+}
+
+type SaveMetadataResponse
+  @join__type(graph: EDITOR)
+{
+  document: Document!
+}
+
+type SearchIndexProgress
+  @join__type(graph: SKEMAIL)
+{
+  isIndexComplete: Boolean!
+  numIndexableThreads: Int!
+  numThreadsIndexed: Int!
+}
+
+input SendAccessRequestEmailRequest
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+}
+
+input SendAddressRequest
+  @join__type(graph: SKEMAIL)
+{
+  address: String!
+  encryptedSessionKey: EncryptedSessionKeyInput
+  name: String
+}
+
+input SendDocumentEventRequest
+  @join__type(graph: EDITOR)
+{
+  audience: [String!]!
+  docID: String!
+  nodeID: String
+  type: DocumentEventType!
+}
+
+input SendEmailRequest
+  @join__type(graph: SKEMAIL)
+{
+  attachments: [EncryptedAttachmentInput!]!
+  bcc: [SendAddressRequest!]!
+  calendarInvite: Boolean
+  captchaToken: String!
+  cc: [SendAddressRequest!]!
+  encryptedHtml: EncryptedDataInput!
+  encryptedSubject: EncryptedDataInput!
+  encryptedText: EncryptedDataInput!
+  encryptedTextAsHtml: EncryptedDataInput!
+  encryptedTextSnippet: EncryptedDataInput
+  externalEncryptedSessionKey: EncryptedSessionKeyInput
+  from: SendAddressRequest!
+  rawSubject: String!
+  scheduleSendAt: Date
+  to: [SendAddressRequest!]!
+}
+
+type SendEmailResponse
+  @join__type(graph: SKEMAIL)
+{
+  messageID: String!
+  threadID: String!
+}
+
+input SendFeedbackRequest
+  @join__type(graph: EDITOR)
+{
+  feedback: String!
+  isMobile: Boolean!
+  isNative: Boolean!
+  origin: String!
+  zendeskUploadTokens: [String!]!
+}
+
+type SessionCacheChallengeResponse
+  @join__type(graph: EDITOR)
+{
+  encryptedChallenge: String!
+  serverPublicKey: String!
+}
+
+input SessionCacheInput
+  @join__type(graph: EDITOR)
+{
+  userID: String!
+}
+
+input SessionCacheMobileRequest
+  @join__type(graph: EDITOR)
+{
+  challenge: String!
+  userID: String!
+}
+
+type SessionCacheOutput
+  @join__type(graph: EDITOR)
+{
+  alternativeCacheKeys: [String!]!
+  cacheKey: String!
+}
+
+input SetAllThreadsReadStatusRequest
+  @join__type(graph: SKEMAIL)
+{
+  label: String!
+  read: Boolean!
+}
+
+input SetAutoReplyRequest
+  @join__type(graph: SKEMAIL)
+{
+  encryptedHtml: EncryptedDataInput!
+  encryptedSkiffSessionKey: EncryptedSessionKeyInput!
+  encryptedSubject: EncryptedDataInput!
+  encryptedText: EncryptedDataInput!
+  encryptedTextAsHtml: EncryptedDataInput!
+  encryptedTextSnippet: EncryptedDataInput
+  encryptedUserSessionKey: EncryptedSessionKeyInput!
+}
+
+input SetCalendarPushTokenRequest
+  @join__type(graph: SKALENDAR)
+{
+  deviceID: String!
+  os: String!
+  token: String!
+}
+
+input SetCatchallAddressRequest
+  @join__type(graph: SKEMAIL)
+{
+  domainID: String!
+  emailAlias: String
+}
+
+input SetDefaultEmailAliasRequest
+  @join__type(graph: SKEMAIL)
+{
+  defaultAlias: String!
+}
+
+input SetLastViewedReferralCreditRequest
+  @join__type(graph: EDITOR)
+{
+  amount: CreditAmountInput!
+  count: Int!
+}
+
+input SetNotificationPreferencesRequest
+  @join__type(graph: EDITOR)
+{
+  email: Boolean!
+  inApp: Boolean!
+}
+
+input SetPDSubscribeFlagRequest
+  @join__type(graph: SKEMAIL)
+{
+  subscribed: Boolean!
+}
+
+input SetPushTokenRequest
+  @join__type(graph: SKEMAIL)
+{
+  deviceID: String!
+  os: String!
+  token: String!
+}
+
+input SetReadStatusRequest
+  @join__type(graph: SKEMAIL)
+{
+  read: Boolean!
+  threadIDs: [String!]!
+}
+
+type SetReadStatusResponse
+  @join__type(graph: SKEMAIL)
+{
+  updatedThreadIDs: [String!]!
+}
+
+input SetupLinkRequest
+  @join__type(graph: EDITOR)
+{
+  currentEncryptedSessionKey: String!
+  currentPublicHierarchicalKey: String!
+  docID: String!
+  encryptedLinkKey: String!
+  encryptedPrivateHierarchicalKey: String!
+  encryptedSessionKey: String!
+  linkKeySignature: String!
+  permissionLevel: PermissionLevel!
+  salt: String!
+  sessionKeySignature: String!
+  verifier: String!
+}
+
+type SetupLinkResponse
+  @join__type(graph: EDITOR)
+{
+  document: Document!
+}
+
+input SetupProvisionedUserRequest
+  @join__type(graph: EDITOR)
+{
+  loginSrpRequest: LoginSrpRequest!
+  updateSrpRequest: UpdateSrpRequest!
+}
+
+input SetUseIPFSRequest
+  @join__type(graph: EDITOR)
+{
+  useIPFS: Boolean!
+}
+
+type SetUseIPFSResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+input SetUserPreferencesRequest
+  @join__type(graph: EDITOR)
+{
+  blockRemoteContent: Boolean
+  dateFormat: String
+  defaultCalendarColor: String
+  hideActivationChecklist: Boolean
+  hourFormat: String
+  leftSwipeGesture: SwipeSetting
+  rightSwipeGesture: SwipeSetting
+  securedBySkiffSigDisabled: Boolean
+  showAliasInboxes: Boolean
+  showPageIcon: Boolean
+  startDayOfTheWeek: Int
+  theme: String
+  threadFormat: ThreadDisplayFormat
+}
+
+input SetUserPublicKeyRequest
+  @join__type(graph: SKEMAIL)
+{
+  publicKey: PublicKeyWithSignature!
+  signingPublicKey: PublicKey!
+}
+
+input SetUserSignatureRequest
+  @join__type(graph: SKEMAIL)
+{
+  sessionKey: EncryptedSessionKeyInput!
+  userSignature: EncryptedDataInput!
+}
+
+type ShareDocEventData
+  @join__type(graph: EDITOR)
+{
+  targetUser: String!
+}
+
+input ShareDocRequest
+  @join__type(graph: EDITOR)
+{
+  currentPublicHierarchicalKey: String!
+  docID: String!
+  newPermissionEntries: [PermissionEntryInput!]!
+  signatures: [String!]!
+}
+
+type ShareDocResponse
+  @join__type(graph: EDITOR)
+{
+  document: Document!
+}
+
+input SharePermissionInput
+  @join__type(graph: EDITOR)
+{
+  expiryDate: Date
+  permissionLevel: PermissionLevel!
+}
+
+input ShareTeamDocWithOtherTeamRequest
+  @join__type(graph: EDITOR)
+{
+  documentPermissionProxy: DocumentPermissionProxyInput!
+}
+
+enum SignatureContext
+  @join__type(graph: EDITOR)
+{
+  DELETE_ACCOUNT
+  DELETE_DOC
+  DELETE_RECOVERY_DATA
+  DISABLE_MFA
+  DOCUMENT_CHUNK
+  DOCUMENT_DATA
+  DOCUMENT_METADATA
+  DOCUMENT_PARENT
+  ENROLL_MFA
+  LINKS_LINK_KEY
+  LINKS_SESSION_KEY
+  MOBILE_LOGIN
+  RECOVERY_DATA
+  REGENERATE_MFA_BACKUP_CODES
+  SESSION_KEY
+  SRP_SALT
+  SRP_VERIFIER
+  UNSHARE_DOC
+  UPDATE_USER_DATA
+  UPLOAD_RECOVERY_ENCRYPTED_USER_DATA
+  UPLOAD_RECOVERY_ENCRYPTION_PUBLIC_KEY
+  UPLOAD_RECOVERY_SERVER_SHARE
+  UPLOAD_RECOVERY_SIGNING_PUBLIC_KEY
+  USER_DATA
+  USER_PUBLIC_KEY
+}
+
+type SingleRetrievedRecord
+  @join__type(graph: SKEMAIL)
+{
+  data: String!
+  priority: String
+}
+
+type SlimUserThread
+  @join__type(graph: SKEMAIL)
+{
+  attributes: ThreadAttributes!
+  deletedAt: Date
+  emailsUpdatedAt: Date!
+  permanentlyDeleted: Boolean!
+  sentLabelUpdatedAt: Date
+  threadID: String!
+  updatedAt: Date!
+}
+
+scalar SocketEvent
+  @join__type(graph: EDITOR)
+
+type StorageUsage
+  @join__type(graph: SKEMAIL)
+{
+  attachmentUsageBytes: String!
+  messageUsageBytes: String!
+}
+
+input SubscribeNotificationRequest
+  @join__type(graph: SKEMAIL)
+{
+  auth: String!
+  endpoint: String!
+  p256dh: String!
+}
+
+type SubscriptionInfo
+  @join__type(graph: EDITOR)
+{
+  billingInterval: SubscriptionInterval
+  cancelAtPeriodEnd: Boolean!
+  isCryptoSubscription: Boolean!
+  quantity: Int
+  stripeStatus: String
+  subscriptionPlan: String!
+  supposedEndDate: Date
+}
+
+enum SubscriptionInterval
+  @join__type(graph: EDITOR)
+{
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionPlan
+  @join__type(graph: EDITOR)
+{
+  BUSINESS
+  ESSENTIAL
+  FREE
+  PRO
+}
+
+enum SwipeSetting
+  @join__type(graph: EDITOR)
+{
+  ARCHIVE
+  DELETE
+  UNREAD
+}
+
+input SyncRequest
+  @join__type(graph: SKALENDAR)
+{
+  calendarID: String!
+  checkpoint: Date
+  events: [PushCalendarEventInput!]!
+}
+
+input SyncRequest2
+  @join__type(graph: SKALENDAR)
+{
+  calendarID: String!
+  checkpoint: Date
+  events: [PushCalendarEventInput2!]!
+}
+
+type SyncResponse
+  @join__type(graph: SKALENDAR)
+{
+  checkpoint: Date
+  events: [CalendarEvent]!
+  state: SyncState!
+}
+
+enum SyncState
+  @join__type(graph: SKALENDAR)
+{
+  CONFLICT
+  SYNCED
+}
+
+enum SystemLabels
+  @join__type(graph: SKEMAIL)
+{
+  ARCHIVE
+  DRAFTS
+  IMPORTS
+  INBOX
+  SCHEDULE_SEND
+  SENT
+  SPAM
+  TRASH
+  VIRUS
+}
+
+type Team
+  @join__type(graph: EDITOR)
+{
+  accessLevel: TeamAccess
+  icon: String!
+  name: String!
+  organization: Organization!
+  personal: Boolean!
+  rootDocument: Document
+  teamID: String!
+}
+
+enum TeamAccess
+  @join__type(graph: EDITOR)
+{
+  EVERYONE
+  INVITE_ONLY
+  PERSONAL
+}
+
+type Template
+  @join__type(graph: EDITOR)
+{
+  contents: TemplateContent!
+  createdAt: Date
+  group: String!
+  metadata: TemplateMetaData!
+  parentID: String
+  templateID: String!
+  updatedAt: Date
+}
+
+type TemplateContent
+  @join__type(graph: EDITOR)
+{
+  pmDoc: JSON!
+}
+
+type TemplateMetaData
+  @join__type(graph: EDITOR)
+{
+  color: String
+  description: String
+  icon: String
+  title: String!
+}
+
+type ThreadAttributes
+  @join__type(graph: SKEMAIL)
+{
+  read: Boolean!
+  systemLabels: [String!]!
+  userLabels: [UserLabel!]!
+}
+
+enum ThreadDisplayFormat
+  @join__type(graph: EDITOR)
+{
+  FULL
+  RIGHT
+}
+
+input TrashDocRequest
+  @join__type(graph: EDITOR)
+{
+  activeProductApp: ProductApp!
+  currentEncryptedSessionKey: String!
+  currentPublicHierarchicalKey: String!
+  docID: String!
+  newParentKeysClaim: String!
+  newParentKeysClaimEncryptedByKey: String!
+  publicHierarchicalKeyOfParent: String!
+}
+
+input UnblockEmailAddressRequest
+  @join__type(graph: SKEMAIL)
+{
+  emailAddressToUnblock: String
+}
+
+input UnsendEmailRequest
+  @join__type(graph: SKEMAIL)
+{
+  messageID: String!
+  threadID: String!
+}
+
+input UnsetCalendarPushTokenRequest
+  @join__type(graph: SKALENDAR)
+{
+  deviceID: String!
+}
+
+input UnsetPushTokenRequest
+  @join__type(graph: SKEMAIL)
+{
+  deviceID: String!
+}
+
+type UnshareDocEventData
+  @join__type(graph: EDITOR)
+{
+  targetUser: String!
+}
+
+input UnshareDocRequest
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  signature: String!
+  usersToUnshare: [String!]!
+}
+
+type UnshareDocResponse
+  @join__type(graph: EDITOR)
+{
+  document: Document!
+}
+
+input UnshareTeamDocWithOtherTeamRequest
+  @join__type(graph: EDITOR)
+{
+  sourceTeamRootDocumentID: String!
+  targetTeamRootDocumentID: String!
+}
+
+input UpdateDisplayNameRequest
+  @join__type(graph: EDITOR)
+{
+  displayName: String!
+}
+
+type UpdateDisplayNameResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+input UpdateDisplayPictureRequest
+  @join__type(graph: EDITOR)
+{
+  profileAccentColor: String
+  profileCustomURI: String
+  profileIcon: String
+}
+
+input UpdateDisplayPictureSkemailRequest
+  @join__type(graph: SKEMAIL)
+{
+  profileAccentColor: String
+  profileCustomURI: String
+  profileIcon: String
+}
+
+input UpdateDocumentDataRequest
+  @join__type(graph: EDITOR)
+{
+  encryptedDocumentData: String!
+  signature: String!
+}
+
+type UpdateDocumentDataResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+type UpdatedThreadLabels
+  @join__type(graph: SKEMAIL)
+{
+  systemLabels: [SystemLabels!]!
+  threadID: String!
+  userLabels: [UserLabel!]!
+}
+
+input UpdateEmailAliasActiveStateRequest
+  @join__type(graph: SKEMAIL)
+{
+  captchaToken: String!
+  emailAlias: String!
+  isActive: Boolean!
+}
+
+type UpdateEmailAliasActiveStateResponse
+  @join__type(graph: SKEMAIL)
+{
+  status: RequestStatus!
+}
+
+input UpdateMailFilterInput
+  @join__type(graph: SKEMAIL)
+{
+  actions: [FilterActionInput!]!
+  encryptedByKey: String
+  encryptedSessionKey: String
+  filter: MailFilterInput!
+  mailFilterID: String!
+  name: String
+}
+
+input UpdateSrpRequest
+  @join__type(graph: EDITOR)
+{
+  encryptedMetamaskSecret: String
+  encryptedUserData: String!
+  loginSrpRequest: LoginSrpRequest
+  salt: String!
+  saltSignature: String!
+  userDataSignature: String!
+  verifier: String!
+  verifierSignature: String!
+}
+
+type UpdateSrpResponse
+  @join__type(graph: EDITOR)
+{
+  status: LoginMutationStatus!
+}
+
+input UpdateUploadContactAvatarLinkRequest
+  @join__type(graph: EDITOR)
+{
+  newContactEmail: String!
+  oldContactEmail: String!
+}
+
+type UpdateUploadContactAvatarLinkResponse
+  @join__type(graph: EDITOR)
+{
+  newProfileCustomURI: String!
+}
+
+input UpgradeHierarchicalKeysNewHierarchicalKeyItem
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  encryptedPrivateHierarchicalKeyByLinkKey: String
+  encryptedSessionKey: String!
+  encryptedSessionKeyEncryptedByKey: String!
+  permissions: [UpgradeHierarchicalKeysRequestPermissionItem!]!
+  previousEncryptedLinkKey: String
+  previousEncryptedSessionKey: String
+  previousPublicHierarchicalKey: String
+  publicHierarchicalKey: String!
+}
+
+input UpgradeHierarchicalKeysNewKeysClaimItem
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  keysClaim: String!
+  keysClaimEncryptedByKey: String!
+  keysClaimSourceDocID: String!
+  keysClaimSourceDocPublicHierarchicalKey: String!
+  previousKeysClaim: String
+}
+
+input UpgradeHierarchicalKeysRequest
+  @join__type(graph: EDITOR)
+{
+  newHierarchicalKeys: [UpgradeHierarchicalKeysNewHierarchicalKeyItem!]!
+  newKeysClaims: [UpgradeHierarchicalKeysNewKeysClaimItem!]!
+}
+
+input UpgradeHierarchicalKeysRequestPermissionItem
+  @join__type(graph: EDITOR)
+{
+  encryptedBy: PublicKey!
+  encryptedPrivateHierarchicalKey: String!
+  userID: String!
+}
+
+type UpgradeHierarchicalKeysResponse
+  @join__type(graph: EDITOR)
+{
+  documents: [Document!]!
+}
+
+input UpgradeKeyRequest
+  @join__type(graph: EDITOR)
+{
+  docID: String!
+  encryptedContents: EncryptedContents!
+  encryptedLinkKey: String
+  encryptedMetadata: EncryptedMetadata!
+  encryptedSessionKey: String!
+  encryptedSessionKeyEncryptedByKey: String!
+  previousEncryptedContentsHash: String!
+  previousEncryptedLinkKey: String
+  privateHierarchicalKeyEncryptedByLinkKey: String
+  publicHierarchicalKey: String!
+  sessionKeyEncryptedByLinkKey: String
+}
+
+type UpgradeKeyResponse
+  @join__type(graph: EDITOR)
+{
+  document: Document!
+}
+
+scalar Upload
+  @join__type(graph: SKEMAIL)
+
+input UploadRecoveryDataRequest
+  @join__type(graph: EDITOR)
+{
+  browserShareHash: String!
+  encryptedRecoveryData: String!
+  encryptedRecoveryDataSignature: String!
+  paperShareHash: String!
+  recoveryEncryptionPublicKey: PublicKey!
+  recoveryServerShare: String!
+  recoveryServerShareSignature: String!
+  recoverySigningPublicKey: PublicKey!
+}
+
+type UploadRecoveryDataResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+input UploadSpamReportRequest
+  @join__type(graph: SKEMAIL)
+{
+  emailID: String!
+  fromAddress: String!
+  rawMime: String
+  threadID: String!
+}
+
+type User
+  @join__type(graph: EDITOR, key: "userID")
+  @join__type(graph: SKALENDAR, key: "userID")
+  @join__type(graph: SKEMAIL, key: "userID")
+{
+  accountTags: [String!] @join__field(graph: EDITOR)
+  canDirectlyUpdateSrp: Boolean @join__field(graph: EDITOR)
+  createdAt: Date! @join__field(graph: EDITOR)
+  customDomainSubscriptionsInfo: [CustomDomainSubscriptionInfo!] @join__field(graph: EDITOR)
+  dataMFA: String @join__field(graph: EDITOR)
+  encryptedMetamaskSecret: String @join__field(graph: EDITOR)
+  encryptedRecoveryData: String @join__field(graph: EDITOR)
+  hasTemporaryPassword: Boolean! @join__field(graph: EDITOR)
+  invoiceHistory: InvoiceHistory! @join__field(graph: EDITOR)
+  mfa: MFAFactors! @join__field(graph: EDITOR)
+  mfaTypes: [String!] @join__field(graph: EDITOR)
+  onboardedWorkspaceMigration: Boolean! @join__field(graph: EDITOR)
+  paidUpStatus: PaidUpStatus @join__field(graph: EDITOR)
+  publicData: PublicData! @join__field(graph: EDITOR)
+  publicKey: PublicKey! @join__field(graph: EDITOR)
+  recoveryEmail: String @join__field(graph: EDITOR)
+  recoveryServerShare: String @join__field(graph: EDITOR)
+  recoverySigningPublicKey: PublicKey @join__field(graph: EDITOR)
+  rootOrgID: String @join__field(graph: EDITOR)
+  rootOrganization: Organization! @join__field(graph: EDITOR)
+  signingPublicKey: String! @join__field(graph: EDITOR)
+  storageUsed: String! @join__field(graph: EDITOR)
+  subscriptionInfo: SubscriptionInfo! @join__field(graph: EDITOR)
+  unverifiedRecoveryEmail: String @join__field(graph: EDITOR)
+  userID: String!
+  userPreferences: UserPreferences @join__field(graph: EDITOR)
+  username: String! @join__field(graph: EDITOR)
+  walletAddress: String @join__field(graph: EDITOR)
+  calendars: [UserCalendar!] @join__field(graph: SKALENDAR)
+  primaryCalendar: Calendar @join__field(graph: SKALENDAR)
+  autoSyncContactsSetting: Boolean @join__field(graph: SKEMAIL)
+  defaultEmailAlias: String @join__field(graph: SKEMAIL)
+  emailAliases: [String!] @join__field(graph: SKEMAIL)
+  skemailStorageUsage: StorageUsage @join__field(graph: SKEMAIL)
+  subscribedToPD: Boolean @join__field(graph: SKEMAIL)
+}
+
+type UserAlterEgo
+  @join__type(graph: EDITOR)
+{
+  orgName: String!
+  userID: String!
+  username: String!
+}
+
+input UserAttributionInput
+  @join__type(graph: EDITOR)
+{
+  attributionContent: String
+  attributionData: String
+  attributionSource: String
+  attributionTitle: String
+  attributionWallet: Boolean
+  referrerUsername: String
+}
+
+type UserCalendar
+  @join__type(graph: SKALENDAR)
+{
+  calendarID: String!
+  encryptedByKey: String!
+  encryptedPrivateKey: String
+  publicKey: String!
+}
+
+enum UserFeature
+  @join__type(graph: EDITOR)
+{
+  EMAIL_NOTIFICATION_DISABLED
+  IN_APP_NOTIFICATION_DISABLED
+  IPFS_ENABLED
+  LOG_MIME
+}
+
+type UserLabel
+  @join__type(graph: SKEMAIL)
+{
+  color: String!
+  labelID: String!
+  labelName: String!
+  variant: UserLabelVariant!
+}
+
+enum UserLabelVariant
+  @join__type(graph: SKEMAIL)
+{
+  ALIAS
+  FOLDER
+  PLAIN
+}
+
+type UserPreferences
+  @join__type(graph: EDITOR)
+{
+  blockRemoteContent: Boolean
+  dateFormat: String
+  defaultCalendarColor: String
+  hideActivationChecklist: Boolean
+  hourFormat: String
+  leftSwipeGesture: SwipeSetting
+  rightSwipeGesture: SwipeSetting
+  securedBySkiffSigDisabled: Boolean
+  showAliasInboxes: Boolean
+  showPageIcon: Boolean
+  startDayOfTheWeek: Int
+  theme: String
+  threadFormat: ThreadDisplayFormat
+}
+
+type UserSignatureOutput
+  @join__type(graph: SKEMAIL)
+{
+  sessionKey: EncryptedSessionKeyOutput!
+  userSignature: EncryptedDataOutput!
+}
+
+enum UserTags
+  @join__type(graph: EDITOR)
+{
+  PILOT_PROGRAM
+  USER_FEATURES
+}
+
+type UserThread
+  @join__type(graph: SKEMAIL)
+{
+  attributes: ThreadAttributes!
+  deletedAt: Date
+  emails: [Email!]!
+  emailsUpdatedAt: Date!
+  permanentlyDeleted: Boolean!
+  sentLabelUpdatedAt: Date
+  threadID: String!
+  updatedAt: Date!
+  userID: String!
+}
+
+input VerifyWalletAddressCreateAliasRequest
+  @join__type(graph: SKEMAIL)
+{
+  challenge: String!
+  challengeSignature: String!
+  isEditorOnboarding: Boolean!
+  source: String!
+  walletType: String!
+}
+
+input VerifyWebAuthnRegistrationRequest
+  @join__type(graph: EDITOR)
+{
+  keyName: String
+  verificationData: JSON!
+}
+
+type VerifyWebAuthnRegistrationResponse
+  @join__type(graph: EDITOR)
+{
+  status: RequestStatus!
+}
+
+scalar Void
+  @join__type(graph: EDITOR)
+  @join__type(graph: SKALENDAR)
+  @join__type(graph: SKEMAIL)
+
+type WebAuthnKey
+  @join__type(graph: EDITOR)
+{
+  credentialID: String!
+  keyName: String
+  lastSuccessfulChallenge: Date
+  transports: [String!]
+}
+
+input WorkspaceEventRequest
+  @join__type(graph: EDITOR)
+{
+  data: String!
+  eventName: WorkspaceEventType!
+  platformInfo: PlatformInfo
+  version: String!
+}
+
+enum WorkspaceEventType
+  @join__type(graph: EDITOR)
+{
+  ACCEPT_INVITE_FAIL
+  ACCOUNT_RECOVERY_FAILURE
+  ACCOUNT_RECOVERY_FORGOT_PASSWORD
+  ACCOUNT_RECOVERY_FORGOT_PASSWORD_MOBILE
+  ACCOUNT_RECOVERY_KEY_RESET
+  ACCOUNT_RECOVERY_NO_ACCOUNT_FOUND
+  ACCOUNT_RECOVERY_NO_BROWSER_SHARE
+  ACCOUNT_RECOVERY_SUCCESS
+  ACCOUNT_RECOVERY_TOGGLE
+  ACTIVATION_CHECKLIST_ITEM_CLICK
+  ACTIVATION_CHECKLIST_PERMANENTLY_HIDE
+  ACTIVATION_CHECKLIST_START_CHECKOUT
+  ACTIVATION_CHECKLIST_TOGGLE
+  ADD_ACCOUNT_START
+  ALIAS_INBOX_DISABLED
+  ALIAS_INBOX_ENABLED
+  ALIAS_NEXT
+  BACKGROUND_TASK_DURATION
+  BUY_CUSTOM_DOMAIN_CLICK
+  BUY_CUSTOM_DOMAIN_WITH_TRIAL_CLICK
+  CLOSE_BANNER
+  CLOSE_DOWNLOAD_CALENDAR_MOBILE_BANNER
+  CLOSE_SKEMAIL_BANNER
+  CREATE_MAIL_FILTER_CLICKED
+  CRYPTO_CHECKOUT_STARTED
+  CUSTOM_DOMAIN_PURCHASED
+  CUSTOM_DOMAIN_SUGGESTIONS_SHOWN
+  DASHBOARD_INVITE_SENT
+  DELINQUENCY_BANNER_CLICK
+  DELINQUENCY_BANNER_SHOWN
+  DELINQUENCY_MODAL_SHOWN
+  DELINQUENCY_MODAL_UPGRADE_CLICK
+  DIRECT_ONBOARDING_CALENDAR
+  DIRECT_ONBOARDING_DRIVE
+  DIRECT_ONBOARDING_MAIL
+  DIRECT_ONBOARDING_PAGES
+  DISABLE_DEFAULT_SIGNATURE
+  DRIVE_IMPORT
+  DRIVE_SIGN_IN_INITIATE
+  DRIVE_SIGN_IN_SUCCESS
+  DRIVE_START
+  ENABLE_DEFAULT_SIGNATURE
+  GENERATE_JITSI_LINK
+  GET_STARTED_CHECKLIST_ALL_COMPLETE
+  GET_STARTED_CHECKLIST_ITEM_CLICK
+  GET_STARTED_CHECKLIST_ITEM_COMPLETE
+  GET_STARTED_CHECKLIST_ITEM_SKIP
+  GET_STARTED_CHECKLIST_PARTIAL_COMPLETE
+  GET_STARTED_CHECKLIST_SKIP_ALL
+  GET_STARTED_STEP_COMPLETE
+  GET_STARTED_STEP_SKIP
+  IPFS_TOGGLE
+  JOYRIDE_SKIP
+  LOGIN_PAGE
+  LOGOUT
+  MAIL_IMPORT_OPEN
+  MOBILE_MAIL_APP_ERROR
+  MOBILE_THREAD_RECOVERED
+  NATIVE_ADD_ACCOUNT
+  NEW_UPLOAD
+  ONBOARDING_DOWNLOAD_RECOVERY_KEY
+  ONBOARDING_PLAN_SELECT
+  ONBOARDING_RECOVERY_INSTRUCTION
+  ONBOARDING_SELECT_CALENDAR
+  ONBOARDING_SELECT_DRIVE
+  ONBOARDING_SELECT_LEARN_MORE
+  ONBOARDING_SELECT_MAIL
+  ONBOARDING_SELECT_PAGES
+  ONBOARDING_SET_RECOVERY_EMAIL
+  ONBOARDING_STEP_FINISHED
+  ONBOARDING_STEP_SHOWN
+  ONBOARDING_VIEW_PLAN_DETAILS_CLICK
+  ONBOARD_INVITE_SENT
+  OPEN_INBOX_FIRST_TIME_FROM_ORG_SELECT
+  OPEN_INBOX_FROM_BANNER
+  OPEN_INBOX_FROM_JOYRIDE
+  OPEN_SKEMAIL_ANDROID_APP_FROM_BANNER
+  OPEN_SKEMAIL_IPHONE_APP_FROM_BANNER
+  PERFORMED_BACKGROUND_TASK
+  PLAN_CHANGE_STARTED
+  PLAN_TABLE_SHOWN
+  PW_NEXT_BTN
+  SEARCH
+  SELECT_THEME
+  SIGNUP_CONNECT_WALLET_START
+  SIGNUP_START
+  SKEMAIL_APP_CREATE_FOLDER
+  SKEMAIL_APP_CREATE_LABEL
+  SKEMAIL_APP_LOADING_TIME
+  SKEMAIL_APP_LOADING_TIMEOUT
+  SKEMAIL_APP_LOGIN
+  SKEMAIL_APP_LOGIN_ATTEMPT
+  SKEMAIL_APP_OPEN_COMPOSE
+  SKEMAIL_APP_SEND_CLICK
+  SKEMAIL_APP_THREAD_LOADING_TIME
+  SWITCH_FROM_EDITOR_TO_EMAIL
+  SWITCH_FROM_EMAIL_TO_EDITOR
+  TOAST_CTA_CLICK
+  TOAST_IMPRESSION
+  TWO_FACTOR_TOGGLE
+  UPGRADE_FROM_SEARCH
+  UPGRADE_FROM_STORAGE
+  UPGRADE_FROM_UPLOAD
+  UPGRADE_STARTED
+  USER_BROWSER
+  USER_MAC_DESKTOP
+  USER_OS
+  USER_PLATFORM
+  USER_REACT_NATIVE
+  USER_SKEMAIL_APP
+}

@@ -14,7 +14,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -41,7 +41,8 @@ import {
 import {
   PaywallErrorCode,
   StorageTypes,
-  FreeTierCustomDomainsFeatureFlag,
+  TrialOfferWithOneClickDomainFeatureFlag,
+  FreeCustomDomainFeatureFlag,
   getMaxCustomDomains,
   FreeTrialIdentifier,
   getFreeTrialTier
@@ -165,6 +166,10 @@ const SetupCustomDomain: React.FC<SetupCustomDomainProps> = ({
 }) => {
   const dispatch = useDispatch();
   const { maxCustomDomains } = useMaxCustomDomains();
+  const flags = useFlags();
+  const freeCustomDomainFlag = flags.freeCustomDomain as FreeCustomDomainFeatureFlag;
+  const hasFreeTrialWithOneClickDomainFF =
+    flags.freeTierOneClickCustomDomains as TrialOfferWithOneClickDomainFeatureFlag;
   const [open, setOpen] = useState<boolean>(false);
   const [domainName, setDomainName] = useState<string>('');
   const [domainID, setDomainID] = useState<string | undefined>();
@@ -185,20 +190,16 @@ const SetupCustomDomain: React.FC<SetupCustomDomainProps> = ({
   const currentUserIsOrgAdmin =
     activeOrg?.organization.everyoneTeam.rootDocument?.currentUserPermissionLevel === PermissionLevel.Admin;
 
-  const featureFlags = useFlags();
-  const hasFreeTierOneClickCustomDomainsFF =
-    featureFlags.freeTierOneClickCustomDomains as FreeTierCustomDomainsFeatureFlag;
-
   const {
     data: { activeSubscription }
   } = useSubscriptionPlan();
 
-  const isFreeTrialOfferAvailable = hasFreeTierOneClickCustomDomainsFF && activeSubscription === SubscriptionPlan.Free;
+  const isFreeTrialOfferAvailable = hasFreeTrialWithOneClickDomainFF && activeSubscription === SubscriptionPlan.Free;
   const freeTrialTier = getFreeTrialTier(FreeTrialIdentifier.CUSTOM_DOMAIN_PURCHASE_TRIAL);
 
   // if a user is entitled to a free trial, we model their max custom domains as the amount they'd be entitled to under that trial
   const trialAdjustedMaxCustomDomains = isFreeTrialOfferAvailable
-    ? getMaxCustomDomains(freeTrialTier)
+    ? getMaxCustomDomains(freeTrialTier, freeCustomDomainFlag)
     : maxCustomDomains;
 
   const [generateCustomDomainRecords] = useGenerateCustomDomainRecordsMutation();

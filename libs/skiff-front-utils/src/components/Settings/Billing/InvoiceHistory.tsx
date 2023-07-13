@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import { Icon, IconText, Icons, MonoTag, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { Icon, IconText, Icons, MonoTag, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { useInvoiceHistory } from 'skiff-front-graphql';
 import styled, { css } from 'styled-components';

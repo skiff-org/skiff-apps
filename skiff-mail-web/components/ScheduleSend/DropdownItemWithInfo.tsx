@@ -1,4 +1,4 @@
-import { ThemeMode, themeNames, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { ThemeMode, themeNames, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import { FC } from 'react';
 import styled from 'styled-components';
 

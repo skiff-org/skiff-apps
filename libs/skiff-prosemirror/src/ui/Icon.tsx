@@ -3,7 +3,7 @@ import './skiff-icon.css';
 import cx from 'classnames';
 import memoize from 'lodash-es/memoize';
 import values from 'lodash-es/values';
-import { Icon as IconType, Icons, ThemeMode } from 'nightwatch-ui';
+import { Icon as IconType, Icons, ThemeMode } from '@skiff-org/skiff-ui';
 import React from 'react';
 
 class Icon extends React.PureComponent<

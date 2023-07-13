@@ -1,5 +1,15 @@
 import dayjs from 'dayjs';
-import { Button, Dropdown, DropdownItem, FilledVariant, Icon, Icons, IconButton, MonoTag, Type } from 'nightwatch-ui';
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  FilledVariant,
+  Icon,
+  Icons,
+  IconButton,
+  MonoTag,
+  Type
+} from '@skiff-org/skiff-ui';
 import { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useGetBillingPortalSessionUrlLazyQuery, useInvoiceHistory, useSubscriptionPlan } from 'skiff-front-graphql';
@@ -81,7 +91,7 @@ const TierSubscription: React.FC<TierSubscriptionProps> = ({ openPlansPage }) =>
 
   const [downgradeModalInfo, setDowngradeModalInfo] = useState<DowngradeModalInfo | null>(null);
 
-  const openStripePlan = async (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const openStripePlan = async () => {
     // Open Stripe portal to set subscription to cancel at period end
     // or un-cancel subscription previously set to cancel
     const { data } = await getBillingPortalSessionUrl({

@@ -1,0 +1,17 @@
+export type MinimumCustomDomainPriceFeatureFlag = boolean;
+export type TrialOfferWithOneClickDomainFeatureFlag = boolean;
+export type SkiffEssentialFeatureFlag = boolean;
+export type AliasInboxFeatureFlag = boolean;
+export type CatchallEnabledFeatureFlag = boolean;
+export type PlanDelinquencyFlag = boolean;
+export type MailFilteringFeatureFlag = boolean;
+export type BannersAfterOnboardingFeatureFlag = boolean;
+export type FrontendMailFilteringFeatureFlag = boolean;
+export type ShowMailAppFooterButtonFeatureFlag = boolean;
+export type TrashFeatureFlag = boolean;
+export type TrialWillCancelReminderEmailFlag = boolean;
+export type SearchIndexProgressFeatureFlag = boolean;
+export type FreeCustomDomainFeatureFlag = boolean;
+export type DecreasedFreeTierCollaboratorLimitFlag = boolean;
+export type AutoForwardingFlag = boolean;
+export type GmailImportImprovementsFlag = boolean;

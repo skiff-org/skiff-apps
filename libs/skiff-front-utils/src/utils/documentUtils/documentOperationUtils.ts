@@ -6,7 +6,7 @@ import {
   encryptSymmetric,
   generateHash,
   generatePublicPrivateKeyPair
-} from 'skiff-crypto';
+} from '@skiff-org/skiff-crypto';
 import {
   GetDocumentFullDocument,
   GetDocumentFullQuery,
@@ -229,7 +229,7 @@ export function upgradeHierarchicalKey(client: ApolloClient<NormalizedCacheObjec
           };
         });
 
-        const decryptedLinkKey =
+        const decryptedLinkKey: string =
           newHierarchicalKeyRequest.encryptedLinkKey &&
           decryptSymmetric(
             newHierarchicalKeyRequest.encryptedLinkKey,

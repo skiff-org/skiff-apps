@@ -1,6 +1,6 @@
 import { TopAppBar } from '@skiff-org/skiff-ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { getThemedColor, Icon, IconText, Size, ThemeMode, useOnClickOutside } from 'nightwatch-ui';
+import { getThemedColor, Icon, IconText, Size, ThemeMode, useOnClickOutside } from '@skiff-org/skiff-ui';
 import { BaseSyntheticEvent, FC, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { HotKeys } from 'react-hotkeys';
@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import { FileTypes, MIMETypes } from 'skiff-front-utils';
 import styled from 'styled-components';
 
-import { useAttachments } from '..';
+import { useAttachments } from '../../Attachments';
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
 import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { isAttachmentPreviewModal } from '../../../redux/reducers/modalTypes';

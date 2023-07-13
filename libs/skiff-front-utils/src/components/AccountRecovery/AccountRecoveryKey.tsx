@@ -1,4 +1,4 @@
-import { AbsolutelyCentered, Button, CircularProgress, Icon, Size, Type, Typography } from 'nightwatch-ui';
+import { AbsolutelyCentered, Button, CircularProgress, Icon, Size, Type, Typography } from '@skiff-org/skiff-ui';
 import React, { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useStoreWorkspaceEventMutation } from 'skiff-front-graphql';

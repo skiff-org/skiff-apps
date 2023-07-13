@@ -1,4 +1,4 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import { Setting, SETTINGS_LABELS, SettingType, SettingValue } from 'skiff-front-utils';
 
 import SkemailCreditManagement from './SkemailCreditManagement';

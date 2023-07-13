@@ -10,7 +10,7 @@ import {
   Type,
   Typography,
   TypographySize
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { bytesToHumanReadable } from 'skiff-utils';
 import styled, { css } from 'styled-components';

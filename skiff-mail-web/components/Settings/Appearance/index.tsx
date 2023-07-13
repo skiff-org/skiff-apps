@@ -1,13 +1,12 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import { useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
-import { Setting, SETTINGS_LABELS, SettingType, SettingValue } from 'skiff-front-utils';
+import { Setting, SETTINGS_LABELS, SettingType, SettingValue, ThemeSelectSettings } from 'skiff-front-utils';
 import { insertIf } from 'skiff-utils';
 
 import DateHourFormat from './DateHourFormat/DateHourFormat';
 import { MailboxViewMode } from './MailboxViewMode/MailboxViewMode';
 import { SwipeSettings } from './Swipe/SwipeSettings';
-import ThemeSelectSettings from './ThemeSelect/ThemeSelectSettings';
 
 export const useAppearanceSettings: () => Setting[] = () => {
   const settings = useMemo<Setting[]>(

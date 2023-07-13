@@ -1,4 +1,12 @@
-import { Icon, IconButton, Size, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import {
+  FilledVariant,
+  Icon,
+  IconButton,
+  Size,
+  Typography,
+  TypographySize,
+  TypographyWeight
+} from '@skiff-org/skiff-ui';
 import { useEffect, useState } from 'react';
 import { isAndroid } from 'react-device-detect';
 import { isMobileApp } from 'skiff-front-utils';
@@ -114,6 +122,7 @@ export default function MobileThreadHeader({
               onClose();
             }}
             size={Size.LARGE}
+            variant={FilledVariant.UNFILLED}
           />
         </BackButtonTitleContainer>
         <NavButtons>
@@ -127,6 +136,7 @@ export default function MobileThreadHeader({
               }
             }}
             size={Size.LARGE}
+            variant={FilledVariant.UNFILLED}
           />
           <IconButton
             disabled={!nextThreadID}
@@ -138,6 +148,7 @@ export default function MobileThreadHeader({
               }
             }}
             size={Size.LARGE}
+            variant={FilledVariant.UNFILLED}
           />
         </NavButtons>
       </HeaderButtonsGroup>

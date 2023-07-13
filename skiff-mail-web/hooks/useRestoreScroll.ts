@@ -10,7 +10,7 @@ import { MailboxThreadInfo } from '../models/thread';
 import { skemailWindowReducer } from '../redux/reducers/windowReducer';
 import { getItemHeight } from '../utils/mailboxUtils';
 
-import { COMPACT_MAILBOX_BREAKPOINT } from './../constants/mailbox.constants';
+import { COMPACT_MAILBOX_BREAKPOINT } from '../constants/mailbox.constants';
 import { useAppSelector } from './redux/useAppSelector';
 
 function easeInOutQuint(t: number) {

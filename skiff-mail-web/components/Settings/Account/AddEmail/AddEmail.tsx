@@ -1,4 +1,4 @@
-import { Typography, TypographyWeight } from 'nightwatch-ui';
+import { Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { TitleActionSection, useToast } from 'skiff-front-utils';

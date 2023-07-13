@@ -71,7 +71,6 @@
     "protobufjs": "^6.11.3",
     "randombytes": "^2.1.0",
     "semver": "^7.3.4",
-    "skiff-graphql": "workspace:libs/skiff-graphql",
     "tslib": "^2.4.0",
     "tweetnacl": "^1.0.3",
     "varint": "^6.0.0"

@@ -1,6 +1,6 @@
 import '../ui/skiff-editor-menus.css';
 
-import { ThemeMode, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { ThemeMode, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import { EditorView } from 'prosemirror-view';
 import React, { ForwardRefRenderFunction, useEffect, useMemo } from 'react';
 import styled from 'styled-components';

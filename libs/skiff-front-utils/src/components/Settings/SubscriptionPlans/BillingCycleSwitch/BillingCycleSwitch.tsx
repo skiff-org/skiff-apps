@@ -1,4 +1,4 @@
-import { Tabs, TabsSize } from 'nightwatch-ui';
+import { Tabs, TabsSize } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { SubscriptionInterval } from 'skiff-graphql';
 import { upperCaseFirstLetter } from 'skiff-utils';

@@ -1,7 +1,7 @@
 import { AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { BANNER_HEIGHT, CustomCircularProgress, Size } from 'nightwatch-ui';
+import { BANNER_HEIGHT, CircularProgress, Size } from '@skiff-org/skiff-ui';
 import { FC, useEffect, useCallback } from 'react';
 import { isAndroid, isMobile, MobileView } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -9,7 +9,7 @@ import {
   AddEmailModal,
   BrowserDesktopView,
   ConfirmModal,
-  isDesktopApp,
+  isReactNativeDesktopApp,
   isMobileApp,
   LogoutModal,
   PaywallModal,
@@ -146,7 +146,7 @@ export const Layout: FC = ({ children }) => {
 
   // On mobile app tell RN that webview has loaded
   useEffect(() => {
-    if (isLoading || isRedirecting || (!isMobileApp() && !isDesktopApp())) return;
+    if (isLoading || isRedirecting || (!isMobileApp() && !isReactNativeDesktopApp())) return;
     sendRNWebviewMsg('loaded', { isLoggedIn });
   }, [isLoading, isRedirecting]);
 
@@ -173,7 +173,7 @@ export const Layout: FC = ({ children }) => {
           justifyContent: 'center'
         }}
       >
-        <CustomCircularProgress size={Size.LARGE} spinner />
+        <CircularProgress size={Size.LARGE} spinner />
       </div>
     );
   }
@@ -208,7 +208,7 @@ export const Layout: FC = ({ children }) => {
       case ModalType.InviteUsers:
         return <InviteUsersMailModal />;
       case ModalType.UnSendMessage:
-        return <UnSendModal />;
+        return <UnSendModal threadID={openModal.threadID} />;
       case ModalType.QrCode:
         return (
           <QrCodeModal

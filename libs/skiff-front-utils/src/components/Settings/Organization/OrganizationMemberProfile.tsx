@@ -1,5 +1,5 @@
 import { ApolloClient, ApolloError, NormalizedCacheObject } from '@apollo/client';
-import { CircularProgress, FilledVariant, Icon, IconButton, Icons } from 'nightwatch-ui';
+import { CircularProgress, FilledVariant, Icon, IconButton, Icons } from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
 import { UserProfileDataFragment, useOrgMemberEmailAliasesQuery } from 'skiff-front-graphql';
 import { PublicData, DocumentCollaborator } from 'skiff-graphql';

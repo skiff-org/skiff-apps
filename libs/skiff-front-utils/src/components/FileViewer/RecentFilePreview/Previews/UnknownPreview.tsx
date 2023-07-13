@@ -1,4 +1,4 @@
-import { Icon, Icons, Size, ThemeMode, Typography, TypographyWeight } from 'nightwatch-ui';
+import { Icon, Icons, Size, ThemeMode, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import styled from 'styled-components';
 import PreviewEmpty from './PreviewEmpty/preview-empty.svg';
 

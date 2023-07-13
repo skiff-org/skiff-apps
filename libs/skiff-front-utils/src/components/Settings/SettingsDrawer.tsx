@@ -3,7 +3,6 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import {
   Color,
   CircularProgress,
-  Drawer,
   Icon,
   Icons,
   IconText,
@@ -14,7 +13,8 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
+import Drawer from '../Drawer';
 import React, { FC, forwardRef, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { upperCaseFirstLetter } from 'skiff-utils';
@@ -155,7 +155,7 @@ interface SettingTabViewProps {
   fullsize?: boolean;
 }
 
-const SettingTabView: FC<SettingTabViewProps> = ({ setting, parentLabel, onBack, onSwipe, isPlansTab, fullsize }) => {
+const SettingTabView: FC<SettingTabViewProps> = ({ setting, onBack, onSwipe, isPlansTab, fullsize }) => {
   useSwipeBack(
     fullsize ? null : SINGLE_SETTING_CONTINER_ID, // In case it open from native mobile we want to disable the web swipe - we handle it on the native side
     SETTING_CONTINER_ID,

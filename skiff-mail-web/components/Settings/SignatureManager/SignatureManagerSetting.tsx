@@ -7,7 +7,7 @@ import {
   stringEncryptAsymmetric,
   stringDecryptAsymmetric,
   decryptSymmetric
-} from 'skiff-crypto';
+} from '@skiff-org/skiff-crypto';
 import {
   useGetUserSignatureQuery,
   GetUserSignatureDocument,
@@ -16,7 +16,7 @@ import {
   UserSignatureDatagram
 } from 'skiff-front-graphql';
 import { useToast, ConfirmModal, TitleActionSection, requireCurrentUserData } from 'skiff-front-utils';
-import { MAX_SIGNATURE_SIZE_KB } from 'skiff-utils';
+import { MAX_SIGNATURE_SIZE_KB, kbToBytes, bytesToHumanReadable } from 'skiff-utils';
 
 import { SettingTextArea } from '../SettingTextArea';
 
@@ -109,7 +109,7 @@ export const SignatureManagerSetting = () => {
       const msg = err.message;
       const body =
         typeof msg === 'string' && msg.includes('too large')
-          ? `Signature must be under ${MAX_SIGNATURE_SIZE_KB} kb`
+          ? `Signature must be under ${bytesToHumanReadable(kbToBytes(MAX_SIGNATURE_SIZE_KB))}`
           : undefined;
       enqueueToast({
         title: `Failed to ${!!currentSignature ? 'update' : 'add'} signature`,

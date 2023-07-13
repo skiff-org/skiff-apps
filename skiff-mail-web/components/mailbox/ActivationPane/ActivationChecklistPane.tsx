@@ -8,7 +8,7 @@ import {
   Icon,
   Icons,
   Size
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useGetCreditsQuery } from 'skiff-front-graphql';
@@ -115,7 +115,7 @@ const activationChecklistItems = ({
 }: {
   mobileAppCreditsEarned: number;
   importMailCreditsEarned: number;
-  recoveryEmail: string | undefined;
+  recoveryEmail: string | null | undefined;
   nonCryptoAliases: string[];
   openMailImportModal: () => void;
   openQrCodeModal: () => void;

@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogTypes, ThemeMode, Typography } from 'nightwatch-ui';
+import { Button, Dialog, DialogTypes, ThemeMode, Typography } from '@skiff-org/skiff-ui';
 import React, { Suspense } from 'react';
 import styled from 'styled-components';
 

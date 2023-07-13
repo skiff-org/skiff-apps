@@ -1,4 +1,4 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import { useCallback, useMemo, useState } from 'react';
 import {
   GetContactAutoSyncSettingsDocument,

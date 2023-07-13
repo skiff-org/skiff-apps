@@ -1,9 +1,7 @@
-import { Button, Dialog, ThemeMode, Type } from 'nightwatch-ui';
+import { Button, Dialog, Type } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
-import { GoogleLoginButton, useTheme } from 'skiff-front-utils';
+import { GoogleLoginButton, Illustration, Illustrations } from 'skiff-front-utils';
 import styled from 'styled-components';
-
-import Illustration, { Illustrations } from '../../../../svgs/Illustration';
 
 const ButtonGroup = styled.div`
   display: flex;
@@ -23,7 +21,6 @@ type GmailImportDialogProps = {
 
 export const GmailImportDialog = (props: GmailImportDialogProps) => {
   const { open, onClose, handleGmailAuth } = props;
-  const { theme } = useTheme();
   return (
     <Dialog
       customContent
@@ -32,10 +29,7 @@ export const GmailImportDialog = (props: GmailImportDialogProps) => {
       open={open}
       title='Connect Gmail'
     >
-      <Illustration
-        illustration={theme === ThemeMode.DARK ? Illustrations.DarkMigrate : Illustrations.LightMigrate}
-        style={{ marginLeft: isMobile ? '-70px' : undefined }}
-      />
+      <Illustration illustration={Illustrations.MigrateMail} style={{ marginLeft: isMobile ? '-70px' : undefined }} />
       <ButtonGroup>
         <GoogleLoginButton onClick={handleGmailAuth} style={{ cursor: 'pointer', height: 42 }} />
         <Button fullWidth onClick={() => void onClose()} type={Type.SECONDARY}>

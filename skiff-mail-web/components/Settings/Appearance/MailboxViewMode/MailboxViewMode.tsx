@@ -1,4 +1,4 @@
-import { Typography } from 'nightwatch-ui';
+import { Typography } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { RadioCheckbox, TitleActionSection, useUserPreference } from 'skiff-front-utils';
 import { ThreadDisplayFormat } from 'skiff-graphql';

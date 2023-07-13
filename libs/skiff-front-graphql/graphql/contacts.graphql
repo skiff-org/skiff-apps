@@ -24,6 +24,12 @@ query getContacts($request: GetContactsRequest!) {
   }
 }
 
+query getDefaultProfilePicture($request: GetDefaultProfilePictureRequest!) {
+  defaultProfilePicture(request: $request) {
+    profilePictureData
+  }
+}
+
 mutation createOrUpdateContact($request: CreateOrUpdateContactRequest!) {
   createOrUpdateContact(request: $request)
 }

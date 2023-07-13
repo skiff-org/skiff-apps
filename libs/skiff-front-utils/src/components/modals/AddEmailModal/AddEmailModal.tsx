@@ -1,13 +1,5 @@
-import {
-  ButtonGroup,
-  ButtonGroupItem,
-  Dialog,
-  DialogTypes,
-  Drawer,
-  InputField,
-  Layout,
-  ThemeMode
-} from 'nightwatch-ui';
+import { ButtonGroup, ButtonGroupItem, Dialog, DialogTypes, InputField, Layout, ThemeMode } from '@skiff-org/skiff-ui';
+import Drawer from '../../Drawer';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { RequestStatus } from 'skiff-graphql';

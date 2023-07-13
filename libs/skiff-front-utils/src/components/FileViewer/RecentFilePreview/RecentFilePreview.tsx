@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Icon, AccentColor, Size, ThemeMode } from 'nightwatch-ui';
+import { Icon, AccentColor, Size, ThemeMode } from '@skiff-org/skiff-ui';
 import React from 'react';
 import styled from 'styled-components';
 

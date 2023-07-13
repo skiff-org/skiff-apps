@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ChipProps } from 'nightwatch-ui';
+import { ChipSize } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { useMediaQuery, useUserPreference } from 'skiff-front-utils';
 import { ThreadDisplayFormat, UserLabelVariant } from 'skiff-graphql';
@@ -14,7 +14,7 @@ interface LinkedLabelChipsProps {
   userLabels: (UserLabelPlain | UserLabelAlias)[];
   threadID: string;
   onClick?: (e: React.MouseEvent) => void;
-  size?: ChipProps['size'];
+  size?: ChipSize;
   deletable?: boolean;
 }
 

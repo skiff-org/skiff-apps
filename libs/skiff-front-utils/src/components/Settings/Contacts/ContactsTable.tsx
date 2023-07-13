@@ -1,4 +1,4 @@
-import { InputField } from 'nightwatch-ui';
+import { InputField } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import {
   useCreateOrUpdateContactMutation,

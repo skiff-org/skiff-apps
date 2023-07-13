@@ -1,6 +1,6 @@
 import './skiff-subpage-tooltip.css';
 
-import { Button, Size } from 'nightwatch-ui';
+import { Button, Size } from '@skiff-org/skiff-ui';
 import React from 'react';
 
 class AddSubpageTooltip extends React.PureComponent<

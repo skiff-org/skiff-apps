@@ -1,9 +1,9 @@
 import { Editor } from '@tiptap/react';
-import { InputField } from 'nightwatch-ui';
+import { InputField } from '@skiff-org/skiff-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { generateSymmetricKey, stringDecryptAsymmetric, stringEncryptAsymmetric } from 'skiff-crypto';
-import { decryptDatagram } from 'skiff-crypto-v2';
+import { generateSymmetricKey, stringDecryptAsymmetric, stringEncryptAsymmetric } from '@skiff-org/skiff-crypto';
+import { decryptDatagramV2 } from '@skiff-org/skiff-crypto';
 import {
   useGetAutoReplyQuery,
   useDeleteAutoReplyMutation,
@@ -191,9 +191,10 @@ export const AutoReplySetting = () => {
         sessionKey.encryptedBy,
         sessionKey.encryptedSessionKey
       );
-      const decryptedSubject = decryptDatagram(MailSubjectDatagram, decryptedSessionKey, encryptedSubject).body.subject;
+      const decryptedSubject = decryptDatagramV2(MailSubjectDatagram, decryptedSessionKey, encryptedSubject).body
+        .subject;
       setCurrentSubject(decryptedSubject);
-      const decryptedHtml = decryptDatagram(MailHtmlDatagram, decryptedSessionKey, encryptedHtml).body.html;
+      const decryptedHtml = decryptDatagramV2(MailHtmlDatagram, decryptedSessionKey, encryptedHtml).body.html;
       setCurrentAutoReply(decryptedHtml);
     } else {
       // auto-reply was deleted

@@ -1,9 +1,9 @@
 import { Editor, EditorContent, useEditor } from '@tiptap/react';
-import { ButtonGroup, ButtonGroupItem, Icon } from 'nightwatch-ui';
-import { MutableRefObject, useEffect, useMemo, useRef } from 'react';
+import { FilledVariant, Icon, IconText } from '@skiff-org/skiff-ui';
+import { MutableRefObject, useCallback, useEffect, useMemo, useRef } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useTheme, useToast } from 'skiff-front-utils';
-import { kbToBytes, MAX_SIGNATURE_SIZE_KB } from 'skiff-utils';
+import { kbToBytes, bytesToHumanReadable, MAX_SIGNATURE_SIZE_KB } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { ColorPopup } from '../MailEditor/Color';
@@ -30,6 +30,14 @@ const EditorContainer = styled.div`
   ::placeholder {
     color: var(--text-disabled);
   }
+`;
+
+const Buttons = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  justify-content: flex-end;
 `;
 
 type SettingTextAreaProps = {
@@ -68,6 +76,7 @@ export const SettingTextArea = ({
   );
   const boundingRef = useRef<HTMLDivElement>(null);
   const editorBoundingRect = boundingRef?.current?.getBoundingClientRect();
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const editor = useEditor({
     editable: true,
@@ -126,6 +135,44 @@ export const SettingTextArea = ({
     }
   });
 
+  const insertImage = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!editor) {
+        return;
+      }
+      const file = e.target.files?.[0];
+      if (!file) {
+        console.error('No file selected');
+        return;
+      }
+      if (file.size > kbToBytes(MAX_SIGNATURE_SIZE_KB)) {
+        enqueueToast({
+          title: 'Image too large',
+          body: `Image must be under ${bytesToHumanReadable(kbToBytes(MAX_SIGNATURE_SIZE_KB))}`
+        });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (readerEvent) => {
+        if (!readerEvent.target) {
+          console.error('No file found');
+          return;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const { schema } = editor.view.state;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        const node = schema.nodes.image.create({
+          src: readerEvent.target.result
+        });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        const transaction = editor.view.state.tr.replaceSelectionWith(node);
+        editor.view.dispatch(transaction);
+      };
+      reader.readAsDataURL(file);
+    },
+    [editor]
+  );
+
   useEffect(() => {
     if (editor) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -167,12 +214,20 @@ export const SettingTextArea = ({
         )}
         <TextAreaButton isEditing={isEditing}>
           {isEditing && (
-            <ButtonGroup iconOnly>
-              <ButtonGroupItem key='save' label='Save' onClick={onSave} />
-              <ButtonGroupItem destructive icon={Icon.Trash} key='delete' label='Delete' onClick={onDelete} />
-            </ButtonGroup>
+            <Buttons>
+              <IconText iconColor='destructive' key='delete' onClick={onDelete} startIcon={Icon.Trash} />
+              <IconText key='image' onClick={() => imageInputRef.current?.click()} startIcon={Icon.Image} />
+              <IconText key='save' label='Save' onClick={onSave} variant={FilledVariant.FILLED} />
+            </Buttons>
           )}
         </TextAreaButton>
+        <input
+          multiple={true}
+          onChange={(e) => void insertImage(e)}
+          ref={imageInputRef}
+          style={{ display: 'none' }}
+          type='file'
+        />
       </EditorContainer>
     </>
   );

@@ -1,11 +1,14 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { isBrowser } from 'react-device-detect';
 import {
   GetUserTagsDocument,
+  CurrentUserSubscribedToPdDocument,
   useSetNotificationPreferencesMutation,
   useBrowserPushNotificationsEnabledQuery,
-  useUnsubscribeNotificationMutation
+  useUnsubscribeNotificationMutation,
+  useCurrentUserSubscribedToPdQuery,
+  useSetPdSubscribeFlagMutation
 } from 'skiff-front-graphql';
 import {
   Setting,
@@ -14,7 +17,9 @@ import {
   SettingValue,
   useToast,
   useRequiredCurrentUserData,
-  useEnableMailPushNotifications
+  useEnableMailPushNotifications,
+  isReactNativeDesktopApp,
+  isWindowsDesktopApp
 } from 'skiff-front-utils';
 import { UserFeature } from 'skiff-graphql';
 import { insertIf } from 'skiff-utils';
@@ -42,9 +47,12 @@ export const useNotificationsSettings: () => Setting[] = () => {
   }, [enqueueToast, error]);
 
   const [setNotificationPreferences] = useSetNotificationPreferencesMutation({ onError: () => setError(true) });
+  const [setPDSubscribeFlag] = useSetPdSubscribeFlagMutation();
+  const { data: subscribedToPdData, loading: subscribedLoading } = useCurrentUserSubscribedToPdQuery();
+  const subscribedToPd = subscribedToPdData?.currentUser?.subscribedToPD ?? true;
 
   // web push
-  const { enableNotifications } = useEnableMailPushNotifications({ client: client });
+  const { enableNotifications } = useEnableMailPushNotifications({ client });
   const [unsubUser] = useUnsubscribeNotificationMutation();
   const { data: browserPushData, loading: browserPushLoading, refetch } = useBrowserPushNotificationsEnabledQuery();
   const browserPushEnabled = browserPushData?.browserPushNotificationsEnabled ?? false;
@@ -58,11 +66,25 @@ export const useNotificationsSettings: () => Setting[] = () => {
     [setNotificationPreferences, userID]
   );
 
+  const updatePDSubscribeFlag = useCallback(
+    (subscribed: boolean) => {
+      void setPDSubscribeFlag({
+        variables: {
+          request: {
+            subscribed
+          }
+        },
+        refetchQueries: [{ query: CurrentUserSubscribedToPdDocument }]
+      });
+    },
+    [setPDSubscribeFlag]
+  );
+
   const emailNotificationsEnabled = !emailDisabled;
 
   const settings = useMemo<Setting[]>(
     () => [
-      ...insertIf<Setting>(isBrowser, {
+      ...insertIf<Setting>(isBrowser && !isReactNativeDesktopApp() && !isWindowsDesktopApp(), {
         type: SettingType.Toggle,
         value: SettingValue.BrowserNotifications,
         label: 'Browser notifications',
@@ -92,9 +114,28 @@ export const useNotificationsSettings: () => Setting[] = () => {
         checked: emailNotificationsEnabled,
         onChange: () => void updateNotificationPreferences({ inApp: true, email: !emailNotificationsEnabled }),
         loading: emailPrefLoading
+      },
+      {
+        type: SettingType.Toggle,
+        value: SettingValue.PrivacyDigest,
+        label: 'Privacy Digest newsletter',
+        icon: Icon.Mailbox,
+        color: 'blue',
+        checked: subscribedToPd,
+        onChange: () => void updatePDSubscribeFlag(!subscribedToPd),
+        loading: subscribedLoading
       }
     ],
-    [emailNotificationsEnabled, emailPrefLoading, browserPushLoading, updateNotificationPreferences, browserPushEnabled]
+    [
+      emailNotificationsEnabled,
+      emailPrefLoading,
+      browserPushLoading,
+      updateNotificationPreferences,
+      browserPushEnabled,
+      subscribedLoading,
+      subscribedToPd,
+      updatePDSubscribeFlag
+    ]
   );
   return settings;
 };

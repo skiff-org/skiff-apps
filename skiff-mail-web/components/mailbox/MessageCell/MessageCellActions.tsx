@@ -1,4 +1,4 @@
-import { Icon, IconButton, Size, TooltipLabelProps, Type } from 'nightwatch-ui';
+import { FilledVariant, Icon, IconButton, Size, TooltipLabelProps, Type } from '@skiff-org/skiff-ui';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { SystemLabels } from 'skiff-graphql';
@@ -44,7 +44,9 @@ export const MessageCellActions = ({ read, thread, label }: MessageCellActionsPr
 
   const handleThrashThread = () =>
     isScheduled
-      ? dispatch(skemailModalReducer.actions.setOpenModal({ type: ModalType.UnSendMessage, thread }))
+      ? // we pass only the ID since 'thread' doesn't have the message body;
+        // and UnSendMessage will retrieve full thread from the ID
+        dispatch(skemailModalReducer.actions.setOpenModal({ type: ModalType.UnSendMessage, threadID: thread.threadID }))
       : trashThreads([thread.threadID], isDraft);
 
   const renderIconButton = (icon: Icon, tooltip: TooltipLabelProps | string, onClick: () => void) => (
@@ -57,6 +59,7 @@ export const MessageCellActions = ({ read, thread, label }: MessageCellActionsPr
       size={Size.SMALL}
       tooltip={tooltip}
       type={Type.SECONDARY}
+      variant={FilledVariant.UNFILLED}
     />
   );
 

@@ -1,7 +1,7 @@
 import { fromByteArray, toByteArray } from 'base64-js';
 import { gunzipSync, gzipSync } from 'fflate';
 import { Range } from 'semver';
-import { Datagram } from 'skiff-crypto';
+import { Datagram } from '@skiff-org/skiff-crypto';
 import { utf8BytesToString, utf8StringToBytes } from 'skiff-utils';
 import isHexadecimal from 'validator/lib/isHexadecimal';
 

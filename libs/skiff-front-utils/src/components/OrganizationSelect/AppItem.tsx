@@ -1,4 +1,4 @@
-import { ThemeMode, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { ThemeMode, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { ProductApp } from 'skiff-graphql';
 

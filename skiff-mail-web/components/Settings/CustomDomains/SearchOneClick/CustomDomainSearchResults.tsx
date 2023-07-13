@@ -2,12 +2,14 @@ import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import range from 'lodash/range';
 import uniq from 'lodash/uniq';
-import { Alignment, ThemeMode, Typography } from 'nightwatch-ui';
+import { Alignment, ThemeMode, Typography } from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
 import { useGetDomainSuggestionsLazyQuery, useCheckIfDomainsAvailableLazyQuery } from 'skiff-front-graphql';
 import { useGetOrganizationQuery } from 'skiff-front-graphql';
 import {
   DEFAULT_WORKSPACE_EVENT_VERSION,
+  Illustration,
+  Illustrations,
   splitEmailToAliasAndDomain,
   useDefaultEmailAlias,
   useRequiredCurrentUserData
@@ -22,7 +24,6 @@ import {
 } from 'skiff-utils';
 import styled from 'styled-components';
 
-import Illustration, { Illustrations } from '../../../../svgs/Illustration';
 import { storeWorkspaceEvent } from '../../../../utils/userUtils';
 
 import {

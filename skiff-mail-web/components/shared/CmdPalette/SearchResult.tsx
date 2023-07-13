@@ -5,14 +5,14 @@ import {
   eventOfClickType,
   getThemedColor,
   Icon,
-  IconProps,
+  IconColor,
   Icons,
   KeyCodeSequence,
   Size,
   ThemeMode,
   Typography,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React from 'react';
 import { useUserLabelsQuery } from 'skiff-front-graphql';
 import { UserLabelVariant } from 'skiff-graphql';
@@ -350,18 +350,13 @@ export default function SearchResult({
                     <Chip
                       color='white'
                       forceTheme={ThemeMode.DARK}
+                      icon={
+                        <Icons color={labelOrFolderColor as IconColor} icon={labelOrFolderIcon} size={Size.SMALL} />
+                      }
                       key={userLabel}
                       label={userLabel}
                       noBorder
                       size={Size.SMALL}
-                      startIcon={
-                        <Icons
-                          color={labelOrFolderColor as IconProps['color']}
-                          forceTheme={ThemeMode.DARK}
-                          icon={labelOrFolderIcon}
-                          size={Size.SMALL}
-                        />
-                      }
                     />
                   );
                 })}

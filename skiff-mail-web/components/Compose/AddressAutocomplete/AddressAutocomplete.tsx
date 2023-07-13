@@ -5,13 +5,10 @@ import {
   InputField,
   Portal,
   ThemeMode,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDrag } from 'react-dnd';
@@ -95,7 +92,13 @@ const MAX_CHIP_TITLE_LEN = 28;
 const abbreviateChipTitle = (title: string) => {
   const atIndex = title.indexOf('@');
   const endIndex = !!atIndex ? title.length - atIndex + 2 : 6;
-  return `${title.slice(0, 5)}...${title.slice(-endIndex)}`;
+  const numStartCharsInAliasToRender = 5;
+  // If the '@' index is less than or equal to the number of chars to render before
+  // abbreviating, do not abbreviate
+  if (atIndex <= numStartCharsInAliasToRender) {
+    return title;
+  }
+  return `${title.slice(0, numStartCharsInAliasToRender)}...${title.slice(-endIndex)}`;
 };
 
 const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
@@ -245,7 +248,34 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
                   >
                     <FloatingDelayGroup delay={{ open: 200, close: 200 }}>
                       <Chip
-                        destructive={!isValidEmail}
+                        avatar={getBadgeIcon(chipLabel, isSkiffInternal, !isValidEmail)}
+                        avatarTooltip={
+                          <>
+                            {isSkiffInternal !== undefined && !isDragging && (
+                              <Typography
+                                forceTheme={ThemeMode.DARK}
+                                size={TypographySize.SMALL}
+                                weight={TypographyWeight.MEDIUM}
+                              >
+                                {!isValidEmail
+                                  ? 'Invalid email'
+                                  : isSkiffInternal
+                                  ? 'End-to-end encrypted'
+                                  : 'Encrypted'}
+                              </Typography>
+                            )}
+                            <AddressContainer>
+                              <Typography
+                                color={!isValidEmail ? 'destructive' : undefined}
+                                forceTheme={ThemeMode.DARK}
+                                size={TypographySize.SMALL}
+                              >
+                                {!!name ? address : tooltipLabel}
+                              </Typography>
+                            </AddressContainer>
+                          </>
+                        }
+                        color={!isValidEmail ? 'destructive' : undefined}
                         key={address}
                         label={title}
                         onClick={(e) => {
@@ -255,35 +285,6 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
                         onDelete={() => {
                           if (onChipDelete) onChipDelete(index);
                         }}
-                        startIcon={
-                          <Tooltip>
-                            <TooltipContent>
-                              {isSkiffInternal !== undefined && !isDragging && (
-                                <Typography
-                                  forceTheme={ThemeMode.DARK}
-                                  size={TypographySize.SMALL}
-                                  weight={TypographyWeight.MEDIUM}
-                                >
-                                  {!isValidEmail
-                                    ? 'Invalid email'
-                                    : isSkiffInternal
-                                    ? 'End-to-end encrypted'
-                                    : 'Encrypted'}
-                                </Typography>
-                              )}
-                              <AddressContainer>
-                                <Typography
-                                  color={!isValidEmail ? 'destructive' : undefined}
-                                  forceTheme={ThemeMode.DARK}
-                                  size={TypographySize.SMALL}
-                                >
-                                  {!!name ? address : tooltipLabel}
-                                </Typography>
-                              </AddressContainer>
-                            </TooltipContent>
-                            <TooltipTrigger>{getBadgeIcon(chipLabel, isSkiffInternal, !isValidEmail)}</TooltipTrigger>
-                          </Tooltip>
-                        }
                       />
                     </FloatingDelayGroup>
                   </div>

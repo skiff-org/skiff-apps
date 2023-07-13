@@ -1,4 +1,4 @@
-import { Icon, Icons, Size, ThemeMode, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { Icon, Icons, Size, ThemeMode, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import React, { FC, useEffect, useRef } from 'react';
 import { DisplayPictureData } from 'skiff-graphql';
 import styled from 'styled-components';

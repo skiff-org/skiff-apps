@@ -1,5 +1,5 @@
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import { useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useGetOrganizationQuery, useSubscriptionPlan } from 'skiff-front-graphql';
@@ -16,7 +16,7 @@ import {
   useRequiredCurrentUserData
 } from 'skiff-front-utils';
 import { PermissionLevel, SubscriptionPlan } from 'skiff-graphql';
-import { MailFilteringFeatureFlag, insertIf } from 'skiff-utils';
+import { AutoForwardingFlag, MailFilteringFeatureFlag, insertIf } from 'skiff-utils';
 
 import client from '../../apollo/client';
 
@@ -27,6 +27,7 @@ import { autoReplySettings } from './AutoReply';
 import { creditSettings } from './CreditManagement';
 import { useCustomDomainsSettings } from './CustomDomains';
 import { useFiltersSettings } from './Filters';
+import { useForwardingSettings } from './Forwarding';
 import { useImportSettings } from './Import';
 import { useNotificationsSettings } from './Notifications';
 import { usePlansSettings } from './Plans';
@@ -41,6 +42,7 @@ export const useAvailableSettings = () => {
   const openPlansPage = () => openSettings({ tab: TabPage.Plans });
   const aliasesSettings = useAliasesSettings();
   const importSettings = useImportSettings();
+  const forwardingSettings = useForwardingSettings();
   const notificationsSettings = useNotificationsSettings();
   const accountSettings = useAccountSettings();
   const appearanceSettings = useAppearanceSettings();
@@ -78,6 +80,7 @@ export const useAvailableSettings = () => {
   const env = getEnvironment(new URL(window.location.origin));
   const hasMailFilteringFeatureFlag =
     env === 'local' || env === 'vercel' || (flags.mailFiltering as MailFilteringFeatureFlag);
+  const hasAutoForwardingFlag = env === 'local' || env === 'vercel' || (flags.autoForwarding as AutoForwardingFlag);
 
   const currentUserIsOrgAdmin =
     activeOrg?.organization.everyoneTeam.rootDocument?.currentUserPermissionLevel === PermissionLevel.Admin;
@@ -152,18 +155,24 @@ export const useAvailableSettings = () => {
         }
       ],
       [SettingsSection.SkiffMail]: [
-        {
+        ...insertIf(currentUserIsOrgAdmin, {
           label: SETTINGS_TABS_LABELS[TabPage.CustomDomains],
           value: TabPage.CustomDomains,
           icon: Icon.AddressField,
           settings: customDomainsSettings
-        },
+        }),
         {
           label: SETTINGS_TABS_LABELS[TabPage.Import],
           value: TabPage.Import,
           icon: Icon.MoveMailbox,
           settings: importSettings
         },
+        ...insertIf(hasAutoForwardingFlag, {
+          label: SETTINGS_TABS_LABELS[TabPage.Forwarding],
+          value: TabPage.Forwarding,
+          icon: Icon.ForwardEmail,
+          settings: forwardingSettings
+        }),
         ...insertIf(hasMailFilteringFeatureFlag, {
           label: SETTINGS_TABS_LABELS[TabPage.Filters],
           value: TabPage.Filters,
@@ -213,7 +222,10 @@ export const useAvailableSettings = () => {
     notificationsSettings,
     signatureSettings,
     hasMailFilteringFeatureFlag,
-    filtersSettings
+    filtersSettings,
+    activeSubscription,
+    showBilling,
+    subscriptionLoading
   ]);
 
   return { availableSettings, loading: activeOrgLoading };

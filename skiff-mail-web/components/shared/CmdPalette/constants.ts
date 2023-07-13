@@ -1,4 +1,4 @@
-import { TypographySize } from 'nightwatch-ui';
+import { TypographySize } from '@skiff-org/skiff-ui';
 
 // Open / close animation duration for dialog
 export const CMD_PALETTE_ANIMATION_DURATION = 200;

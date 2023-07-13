@@ -1,4 +1,4 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import React from 'react';
 
 export enum SidebarSectionType {
@@ -28,7 +28,7 @@ type NodeSection = {
   defaultIsOpenVal?: boolean;
 };
 
-type ContentSection = {
+export type ContentSection = {
   id: string;
   content: SidebarSectionContent;
   isCustom?: false;

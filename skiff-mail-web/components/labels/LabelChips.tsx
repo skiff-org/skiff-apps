@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Avatar, Chip, ChipProps, Icon, Icons, Size } from 'nightwatch-ui';
+import { Avatar, Chip, ChipSize, Icon, Icons } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { useMediaQuery, useUserPreference } from 'skiff-front-utils';
 import { ThreadDisplayFormat, UserLabelVariant } from 'skiff-graphql';
@@ -12,7 +12,7 @@ interface LabelChipsProps {
   userLabels: (UserLabelPlain | UserLabelAlias)[];
   threadID: string;
   onClick?: (e: React.MouseEvent) => void;
-  size?: ChipProps['size'];
+  size?: ChipSize;
 }
 
 export const LabelChips: React.FC<LabelChipsProps> = ({ userLabels, threadID, onClick, size }: LabelChipsProps) => {
@@ -32,16 +32,20 @@ export const LabelChips: React.FC<LabelChipsProps> = ({ userLabels, threadID, on
             ? getURLFromLabel(userLabel)
             : getUrlFromUserLabelAndThreadID(userLabel.name, threadID, userLabel.variant);
 
-        const startIcon =
-          userLabel.variant === UserLabelVariant.Alias ? (
-            <Avatar label={userLabel.name} rounded size={Size.X_SMALL} />
-          ) : (
-            <Icons color={userLabel.color} icon={Icon.Dot} />
-          );
-
         return (
           <Link href={isMobile ? mobileUrl : desktopUrl} key={userLabel.value} passHref>
-            <Chip key={userLabel.value} label={userLabel.name} onClick={onClick} size={size} startIcon={startIcon} />
+            <Chip
+              avatar={userLabel.variant === UserLabelVariant.Alias ? <Avatar label={userLabel.name} /> : undefined}
+              icon={
+                userLabel.variant === UserLabelVariant.Alias ? undefined : (
+                  <Icons color={userLabel.color} icon={Icon.Dot} />
+                )
+              }
+              key={userLabel.value}
+              label={userLabel.name}
+              onClick={onClick}
+              size={size}
+            />
           </Link>
         );
       })}

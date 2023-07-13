@@ -1,4 +1,4 @@
-import { Icon, IconText, Size, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { Icon, IconText, Size, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import React, { RefObject, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -12,11 +12,11 @@ import { isENSName, isWalletAddress } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useDate } from '../../../hooks/useDate';
-import { useDisplayPictureDataFromAddress } from '../../../hooks/useDisplayPictureDataFromAddress';
+import { useDisplayNameFromAddress } from '../../../hooks/useDisplayNameFromAddress';
+import { useDisplayPictureWithDefaultFallback } from '../../../hooks/useDisplayPictureDataFromAddress';
 import { MailboxEmailInfo } from '../../../models/email';
 import { skemailMobileDrawerReducer } from '../../../redux/reducers/mobileDrawerReducer';
 
-import { useDisplayNameFromAddress } from '../../../hooks/useDisplayNameFromAddress';
 import ContactActionDropdown from './ContactActionDropdown';
 
 const SenderBlock = styled.div`
@@ -90,8 +90,7 @@ export const SenderDetails: React.FC<SenderDetailsProps> = ({
   reply
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { from, createdAt, scheduleSendAt } = email;
-
+  const { from, createdAt, scheduleSendAt, id: messageID } = email;
   // All mail should have a scheduleSendAt value since even regular sends are scheduled for 5 seconds after creation
   // Fallback includes for type safety
   const displayedDate = scheduleSendAt ?? createdAt;
@@ -104,7 +103,8 @@ export const SenderDetails: React.FC<SenderDetailsProps> = ({
 
   const { alias: fromAlias } = splitEmailToAliasAndDomain(fromAddress);
   const isWalletEmail = isWalletAddress(fromAlias);
-  const displayPictureData = useDisplayPictureDataFromAddress(fromAddress);
+  const { displayPictureData, unverified } = useDisplayPictureWithDefaultFallback(fromAddress, messageID);
+
   const contactDisplayName = useDisplayNameFromAddress(fromAddress);
   // redux actions
   const dispatch = useDispatch();
@@ -192,6 +192,7 @@ export const SenderDetails: React.FC<SenderDetailsProps> = ({
       <AvatarBlock>
         <UserAvatar
           displayPictureData={displayPictureData}
+          unverified={unverified}
           label={contactDisplayName || displayNameAlias}
           size={Size.LARGE}
         />

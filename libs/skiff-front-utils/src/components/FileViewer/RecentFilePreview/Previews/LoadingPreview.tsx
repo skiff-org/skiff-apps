@@ -1,4 +1,4 @@
-import { CircularProgress, CircularProgressSize, Size, ThemeMode } from 'nightwatch-ui';
+import { CircularProgress, CircularProgressSize, Size, ThemeMode } from '@skiff-org/skiff-ui';
 
 export type LoadingPreviewProps = {
   progress?: number;

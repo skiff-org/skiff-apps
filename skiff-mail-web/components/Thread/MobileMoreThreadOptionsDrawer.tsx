@@ -1,5 +1,5 @@
 import partition from 'lodash/partition';
-import { Drawer, DropdownItem } from 'nightwatch-ui';
+import { Drawer, DropdownItem } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';

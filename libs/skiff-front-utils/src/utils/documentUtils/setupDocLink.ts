@@ -1,6 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import srp from 'secure-remote-password/client';
-import { generateSymmetricKey } from 'skiff-crypto';
+import { generateSymmetricKey } from '@skiff-org/skiff-crypto';
 import {
   createKeyFromSecret,
   createSRPKey,
@@ -8,7 +8,7 @@ import {
   generateHash,
   encryptSymmetric,
   createDetachedSignatureAsymmetric
-} from 'skiff-crypto';
+} from '@skiff-org/skiff-crypto';
 import {
   LinkLinkKeyDatagram,
   LinkPrivateHierarchicalKeyDatagram,

@@ -1,4 +1,4 @@
-import { Type, Color, TextColor } from 'nightwatch-ui';
+import { Type, Color, TextColor } from '@skiff-org/skiff-ui';
 import pluralize from 'pluralize';
 import {
   SubscriptionPlan,

@@ -1,4 +1,4 @@
-import { Icon, Icons, Size } from 'nightwatch-ui';
+import { Icon, Icons, Size } from '@skiff-org/skiff-ui';
 import React, { Suspense } from 'react';
 import { NwContentType } from 'skiff-graphql';
 import styled from 'styled-components';

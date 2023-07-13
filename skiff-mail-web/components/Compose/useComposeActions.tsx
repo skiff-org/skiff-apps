@@ -1,5 +1,5 @@
 import { Editor } from '@tiptap/react';
-import { Button, Icon, IconButton, Type } from 'nightwatch-ui';
+import { Button, FilledVariant, Icon, IconButton, Type } from '@skiff-org/skiff-ui';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -8,10 +8,6 @@ import useScheduleSend from '../ScheduleSend/useScheduleSend';
 
 const DeleteButtonContainer = styled.div`
   margin-left: auto;
-`;
-
-const SendButton = styled(Button)`
-  padding-right: 4px;
 `;
 
 interface ComposeActionsArgs {
@@ -64,6 +60,7 @@ export default function useComposeActions({
           onClick={() => void discardDraft()}
           tooltip='Discard draft'
           type={Type.DESTRUCTIVE}
+          variant={FilledVariant.UNFILLED}
         />
       </div>
     </DeleteButtonContainer>
@@ -71,14 +68,14 @@ export default function useComposeActions({
 
   const desktopSendButton = (
     <div>
-      <SendButton
+      <Button
         dataTest='send-button'
         disabled={messageSizeExceeded}
         key='desktop-send-button'
         onClick={() => void handleSendClick()}
       >
         Send
-      </SendButton>
+      </Button>
     </div>
   );
 
@@ -91,6 +88,7 @@ export default function useComposeActions({
         key='image-compose-button'
         onClick={insertImage}
         tooltip='Insert image'
+        variant={FilledVariant.UNFILLED}
       />
     </div>
   );
@@ -103,6 +101,7 @@ export default function useComposeActions({
         key='link-compose-button'
         onClick={toggleLink}
         tooltip='Insert link'
+        variant={FilledVariant.UNFILLED}
       />
     </div>
   );
@@ -114,6 +113,7 @@ export default function useComposeActions({
         key='attachments-compose-button'
         onClick={openAttachmentSelect}
         tooltip='Add attachments'
+        variant={FilledVariant.UNFILLED}
       />
     </div>
   );

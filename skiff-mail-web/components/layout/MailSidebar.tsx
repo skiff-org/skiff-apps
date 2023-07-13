@@ -1,5 +1,4 @@
-import { useFlags } from 'launchdarkly-react-client-sdk';
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useUserLabelsQuery } from 'skiff-front-graphql';
@@ -15,10 +14,11 @@ import {
   TabPage,
   useDefaultEmailAlias,
   useRequiredCurrentUserData,
-  getEnvironment,
-  MAIL_MOBILE_APP_DOWNLOAD_LINK
+  MAIL_MOBILE_APP_DOWNLOAD_LINK,
+  useGetFF
 } from 'skiff-front-utils';
 import { WorkspaceEventType } from 'skiff-graphql';
+import { GmailImportImprovementsFlag } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useDrafts } from '../../hooks/useDrafts';
@@ -32,7 +32,7 @@ import {
   orderAliasLabels,
   sortByName,
   splitUserLabelsByVariant,
-  SYSTEM_LABELS,
+  getSystemLabels,
   userLabelFromGraphQL
 } from '../../utils/label';
 import { storeWorkspaceEvent } from '../../utils/userUtils';
@@ -69,9 +69,8 @@ export const MailSidebar: React.FC = () => {
     data?.userLabels?.map(userLabelFromGraphQL).sort(sortByName) ?? []
   );
   const [defaultEmailAlias] = useDefaultEmailAlias(user.userID);
-  const flags = useFlags();
-  const env = getEnvironment(new URL(window.location.origin));
-  const showMailAppFooterButton = env === 'local' || env === 'vercel' || (flags.showMailAppFooterButton as boolean);
+  const showMailAppFooterButton = useGetFF<boolean>('showMailAppFooterButton');
+  const hasGmailImportImprovementsFF = useGetFF<GmailImportImprovementsFlag>('gmailImportImprovements');
 
   const openCommandPalette = () =>
     dispatch(skemailModalReducer.actions.setOpenModal({ type: ModalType.CommandPalette }));
@@ -131,10 +130,12 @@ export const MailSidebar: React.FC = () => {
       content: {
         type: SidebarSectionType.NonCollapsible,
         label: 'Mail',
-        items: SYSTEM_LABELS.filter(isDefaultSidebarLabel).map((label) => ({
-          SectionItem: () => <LabelSidebarItem key={label.value} label={label} variant={LabelVariants.System} />,
-          key: label.value
-        })),
+        items: getSystemLabels(hasGmailImportImprovementsFF)
+          .filter(isDefaultSidebarLabel)
+          .map((label) => ({
+            SectionItem: () => <LabelSidebarItem key={label.value} label={label} variant={LabelVariants.System} />,
+            key: label.value
+          })),
         acceptedDragType: DNDItemTypes.MESSAGE_CELL,
         noItemsLabel: 'No inboxes found'
       }

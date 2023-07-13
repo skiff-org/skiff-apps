@@ -1,4 +1,4 @@
-import { Button, InputField, Size } from 'nightwatch-ui';
+import { Button, InputField, Size } from '@skiff-org/skiff-ui';
 import React, { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useStoreWorkspaceEventMutation } from 'skiff-front-graphql';

@@ -13,7 +13,7 @@ import {
   Typography,
   accentColorToPrimaryColor,
   stringToColor
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { CreateUploadAvatarLinkResponse, DisplayPictureData, RequestStatus } from 'skiff-graphql';

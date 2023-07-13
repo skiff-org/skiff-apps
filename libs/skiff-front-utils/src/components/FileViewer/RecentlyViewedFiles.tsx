@@ -1,5 +1,5 @@
 import range from 'lodash/range';
-import { Skeleton, ThemeMode } from 'nightwatch-ui';
+import { Skeleton, ThemeMode } from '@skiff-org/skiff-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
@@ -75,7 +75,7 @@ const RecentlyViewedFiles: React.FC<RecentlyViewedFilesProps> = ({
     <RecentlyViewedContainer ref={previewRef}>
       <RecentlyViewedFilesContainer filePreviewsLength={displayedPreviews.length}>
         {!loading &&
-          displayedPreviews.map((file, index: number) => (
+          displayedPreviews.map((file) => (
             <RecentFilePreview {...file} progress={file.progress || (loading ? 0 : undefined)} theme={theme} />
           ))}
         {loading &&

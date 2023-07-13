@@ -12,8 +12,9 @@ import {
   Typography,
   accentColorToPrimaryColor,
   TypographySize,
-  Size
-} from 'nightwatch-ui';
+  Size,
+  Type
+} from '@skiff-org/skiff-ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -281,33 +282,15 @@ export const CreateOrEditLabelOrFolderModal = () => {
       {/* When on mobile and editing a label, also show delete button*/}
       {isMobile && (
         <ButtonGroup fullWidth layout={Layout.STACKED}>
-          <ButtonGroupItem key='submit' label={!!existingLabel ? 'Save' : 'Create'} onClick={submit} />
-          <ButtonGroupItem
-            destructive
-            hidden={!existingLabel}
-            key='delete'
-            label='Delete'
-            onClick={() => void onDelete()}
-          />
-          <ButtonGroupItem
-            key='cancel'
-            label='Cancel'
-            onClick={() => {
-              onClose();
-            }}
-          />
+          <ButtonGroupItem label={!!existingLabel ? 'Save' : 'Create'} onClick={submit} />
+          <ButtonGroupItem hidden={!existingLabel} label='Delete' onClick={onDelete} type={Type.DESTRUCTIVE} />
+          <ButtonGroupItem label='Cancel' onClick={() => onClose()} />
         </ButtonGroup>
       )}
       {!isMobile && (
         <ButtonGroup>
-          <ButtonGroupItem key='submit' label={!!existingLabel ? 'Save' : 'Create'} onClick={submit} />
-          <ButtonGroupItem
-            key='cancel'
-            label='Cancel'
-            onClick={() => {
-              onClose();
-            }}
-          />
+          <ButtonGroupItem label={!!existingLabel ? 'Save' : 'Create'} onClick={submit} />
+          <ButtonGroupItem label='Cancel' onClick={() => onClose()} />
         </ButtonGroup>
       )}
     </Dialog>

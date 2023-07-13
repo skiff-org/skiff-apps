@@ -1,4 +1,4 @@
-import { Drawer, DropdownItem, Icon } from 'nightwatch-ui';
+import { Drawer, DropdownItem, Icon } from '@skiff-org/skiff-ui';
 import { useDispatch } from 'react-redux';
 import { DrawerOption, DrawerOptions } from 'skiff-front-utils';
 import { SystemLabels, UserLabelVariant } from 'skiff-graphql';

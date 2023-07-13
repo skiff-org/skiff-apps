@@ -1,14 +1,24 @@
 import DOMPurify from 'dompurify';
 import isString from 'lodash/isString';
 import uniqBy from 'lodash/uniqBy';
-import { Avatar, Icon, Size } from 'nightwatch-ui';
+import { Avatar, Icon } from '@skiff-org/skiff-ui';
+import { GetThreadFromIdDocument, GetThreadFromIdQuery } from 'skiff-front-graphql';
 import { formatEmailAddress, UserAvatar } from 'skiff-front-utils';
 import { AddressObject } from 'skiff-graphql';
 
+import client from '../apollo/client';
+
 import { sanitizeSignature } from './signatureUtils';
 
+export const preprocessAddressesForEncryption = (addresses: AddressObject[]) =>
+  uniqBy(
+    addresses.map(({ name, address }) => ({ name, address })),
+    (addr) => addr.address
+  );
+
 export const excludeEmailAliases = (addresses: AddressObject[], emailAliases: string[]) => {
-  const filteredAddresses = addresses.filter(({ address }) => !emailAliases.includes(address));
+  const lowercasedEmailAliases = emailAliases.map((alias) => alias.toLowerCase());
+  const filteredAddresses = addresses.filter(({ address }) => !lowercasedEmailAliases.includes(address.toLowerCase()));
   return uniqBy(filteredAddresses, (addr) => addr.address);
 };
 
@@ -20,16 +30,12 @@ export const filterPopulatedToAddresses = (addresses: AddressObject[], emailAlia
 
 export const getBadgeIcon = (chipLabel: string, isSkiffInternal?: boolean, destructive?: boolean) => {
   if (destructive) {
-    return <Avatar color={destructive ? 'red' : 'green'} icon={Icon.Warning} rounded size={Size.SMALL} />;
+    return <Avatar color={destructive ? 'red' : 'green'} icon={Icon.Warning} />;
   }
   if (isSkiffInternal === undefined) {
-    return <UserAvatar label={chipLabel} rounded size={Size.SMALL} />;
+    return <UserAvatar label={chipLabel} />;
   } else {
-    return isSkiffInternal ? (
-      <Avatar color='green' icon={Icon.ShieldCheck} rounded size={Size.SMALL} />
-    ) : (
-      <Avatar disabled icon={Icon.Lock} rounded size={Size.SMALL} />
-    );
+    return isSkiffInternal ? <Avatar color='green' icon={Icon.ShieldCheck} /> : <Avatar disabled icon={Icon.Lock} />;
   }
 };
 
@@ -55,4 +61,22 @@ export const getMailFooter = (signature?: string, securedBySkiffSigDisabled?: bo
   const securedByHtml =
     '<p>Secured by <a target="_blank" rel="noopener noreferrer nofollow" href="https://skiff.com/mail">Skiff Mail</a>.</p>';
   return DOMPurify.sanitize(`<p></p><p></p>${signatureHtml}${securedBySkiffSigDisabled ? '' : securedByHtml}`);
+};
+
+export const removeEmailFromOptimisticUpdate = (activeThreadID: string, replyEmailID: string) => {
+  // Remove the optimistically inserted email from the cache
+  client.cache.updateQuery<GetThreadFromIdQuery>(
+    { query: GetThreadFromIdDocument, variables: { threadID: activeThreadID } },
+    (existing) => {
+      if (!existing || !existing?.userThread) return;
+      const existingEmails = existing.userThread.emails;
+      return {
+        ...existing,
+        userThread: {
+          ...existing.userThread,
+          emails: existingEmails.filter((email) => email.id !== replyEmailID)
+        }
+      };
+    }
+  );
 };

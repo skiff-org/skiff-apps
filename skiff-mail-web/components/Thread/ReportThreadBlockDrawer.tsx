@@ -1,4 +1,4 @@
-import { Drawer, DropdownItem } from 'nightwatch-ui';
+import { Drawer, DropdownItem } from '@skiff-org/skiff-ui';
 import { useDispatch } from 'react-redux';
 import { DrawerOption, DrawerOptions } from 'skiff-front-utils';
 

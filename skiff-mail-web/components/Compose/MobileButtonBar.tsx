@@ -1,7 +1,8 @@
-import { Button, Icon, IconButton, Size } from 'nightwatch-ui';
+import { Button, FilledVariant, Icon, IconButton, Size } from '@skiff-org/skiff-ui';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
+import { skemailDraftsReducer } from '../../redux/reducers/draftsReducer';
 import { skemailMobileDrawerReducer } from '../../redux/reducers/mobileDrawerReducer';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 
@@ -65,10 +66,12 @@ export default function MobileButtonBar({
         <IconButton
           icon={Icon.Close}
           onClick={() => {
+            dispatch(skemailDraftsReducer.actions.clearCurrentDraftID());
             dispatch(skemailModalReducer.actions.closeCompose());
           }}
           size={Size.LARGE}
           tooltip='Close'
+          variant={FilledVariant.UNFILLED}
         />
       </CloseButtonContainer>
       <IconButtons>
@@ -78,8 +81,14 @@ export default function MobileButtonBar({
           onClick={onAttachmentsClick}
           size={Size.LARGE}
           tooltip='Add attachments'
+          variant={FilledVariant.UNFILLED}
         />
-        <IconButton icon={Icon.OverflowH} onClick={showMoreOptionsDrawer} size={Size.LARGE} />
+        <IconButton
+          icon={Icon.OverflowH}
+          onClick={showMoreOptionsDrawer}
+          size={Size.LARGE}
+          variant={FilledVariant.UNFILLED}
+        />
       </IconButtons>
       <div>
         <Button dataTest='send-button' onClick={() => void handleSendClick()}>

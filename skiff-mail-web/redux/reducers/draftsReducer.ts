@@ -5,11 +5,13 @@ import { DraftInfo } from 'skiff-front-graphql';
 export interface SkemailDraftsReducerState {
   drafts: Array<DraftInfo>;
   currentDraftID: string | null;
+  currentDraftIDToDelete: string | null;
 }
 
 export const initialSkemailDraftsState: SkemailDraftsReducerState = {
   drafts: [],
-  currentDraftID: null
+  currentDraftID: null,
+  currentDraftIDToDelete: null
 };
 
 export const skemailDraftsReducer = createSlice({
@@ -30,6 +32,11 @@ export const skemailDraftsReducer = createSlice({
       }
     },
     setCurrentDraftID: (state, action: PayloadAction<{ draftID: string }>) => {
+      // Before selecting a draft, reset the currentDraftIDToDelete
+      // If we are opening up a new draft, this means there is no current draft we are deleting
+      if (state.currentDraftIDToDelete) {
+        state.currentDraftIDToDelete = null;
+      }
       state.currentDraftID = action.payload.draftID;
     },
     clearCurrentDraftID: (state) => {
@@ -38,6 +45,12 @@ export const skemailDraftsReducer = createSlice({
     deleteDraft: (state, action: PayloadAction<{ draftID: string }>) => {
       const { draftID } = action.payload;
       remove(state.drafts, (draft) => draft.draftID === draftID);
+    },
+    setCurrentDraftIDToDelete: (state, action: PayloadAction<{ draftID: string }>) => {
+      state.currentDraftIDToDelete = action.payload.draftID;
+    },
+    clearCurrentDraftIDToDelete: (state) => {
+      state.currentDraftIDToDelete = null;
     }
   }
 });

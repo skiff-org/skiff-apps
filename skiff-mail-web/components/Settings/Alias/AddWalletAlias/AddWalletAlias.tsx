@@ -1,6 +1,15 @@
 import { ApolloError } from '@apollo/client';
 import { Keplr } from '@keplr-wallet/types/build/wallet/keplr';
-import { Button, Tooltip, TooltipContent, TooltipPlacement, TooltipTrigger, Type, Typography } from 'nightwatch-ui';
+import {
+  Button,
+  Icons,
+  Tooltip,
+  TooltipContent,
+  TooltipPlacement,
+  TooltipTrigger,
+  Type,
+  Typography
+} from '@skiff-org/skiff-ui';
 import React, { Suspense, useState } from 'react';
 import { isFirefox } from 'react-device-detect';
 import { useUserLabelsLazyQuery, useVerifyWalletAddressCreateAliasMutation } from 'skiff-front-graphql';
@@ -219,11 +228,10 @@ export const AddWalletAlias = ({ walletAliases, requestHcaptchaToken, includeDel
       <WalletButtonContainer>
         <Button
           fullWidth
-          iconColor='source'
+          icon={<Icons color='source' icon={icon} />}
           key={`add-${walletName}`}
           loading={!!isAddingWallet[provider]}
           onClick={onClick}
-          startIcon={icon}
           type={Type.SECONDARY}
         >
           {isAddingWallet[provider] ? `Check wallet...` : walletName}

@@ -1,4 +1,4 @@
-import { DropdownItem, IconText, IconTextSize, Select, Size, ThemeMode, TypographyWeight } from 'nightwatch-ui';
+import { DropdownItem, IconText, IconTextSize, Select, Size, ThemeMode, TypographyWeight } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { useGetDocumentBaseQuery } from 'skiff-front-graphql';
 import { PermissionLevel } from 'skiff-graphql';

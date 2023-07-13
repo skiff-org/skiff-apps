@@ -1,7 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import {
   CircularProgress,
-  Drawer,
   Dropdown,
   DropdownItem,
   FilledVariant,
@@ -10,9 +9,10 @@ import {
   Icons,
   ThemeMode,
   Type
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import Drawer from '../../Drawer';
 import {
   PendingUserInvite,
   UserProfileDataFragment,

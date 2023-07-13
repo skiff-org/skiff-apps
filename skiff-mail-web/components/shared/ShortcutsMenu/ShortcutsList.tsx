@@ -1,4 +1,4 @@
-import { Icon, Icons, KeyCodeSequence, ThemeMode, Typography, TypographyWeight } from 'nightwatch-ui';
+import { Icon, Icons, KeyCodeSequence, ThemeMode, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import styled from 'styled-components';
 
 import { ShortcutItems } from './constants';

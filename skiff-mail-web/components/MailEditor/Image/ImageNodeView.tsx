@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import { imgStyling } from '../nodeStyles';
 
-import { Skeleton } from 'nightwatch-ui';
+import { Skeleton } from '@skiff-org/skiff-ui';
 import { b64ToImageUrl } from './utils';
 
 const StyledImage = styled.img`

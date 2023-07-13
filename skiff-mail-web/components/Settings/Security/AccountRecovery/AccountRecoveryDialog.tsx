@@ -1,4 +1,4 @@
-import { Dialog } from 'nightwatch-ui';
+import { Dialog } from '@skiff-org/skiff-ui';
 import { useCallback, useEffect, useState } from 'react';
 import { uploadRecoveryData } from 'skiff-front-graphql';
 import {

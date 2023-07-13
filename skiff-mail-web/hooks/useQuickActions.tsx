@@ -1,9 +1,9 @@
-import { Icon, IconProps } from 'nightwatch-ui';
+import { Icon, IconProps } from '@skiff-org/skiff-ui';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { TabPage, SettingValue } from 'skiff-front-utils';
+import { TabPage, SettingValue, useGetFF } from 'skiff-front-utils';
 import { SystemLabels } from 'skiff-graphql';
-import { trimAndLowercase } from 'skiff-utils';
+import { GmailImportImprovementsFlag, trimAndLowercase } from 'skiff-utils';
 
 import { useSettings } from '../components/Settings/useSettings';
 import { MIN_SPECIFIED_QUERY_LENGTH } from '../components/shared/CmdPalette/constants';
@@ -31,6 +31,8 @@ const createAction = (
 });
 
 export const useQuickActions = (query: string): Array<SearchAction> => {
+  const hasGmailImportImprovementsFF = useGetFF<GmailImportImprovementsFlag>('gmailImportImprovements');
+
   const [filteredActions, setFilteredActions] = useState<Array<SearchAction>>([]);
   const { composeNewDraft } = useDrafts();
   const dispatch = useDispatch();
@@ -46,7 +48,7 @@ export const useQuickActions = (query: string): Array<SearchAction> => {
     [dispatch]
   );
   const markAllReadClick = async () => {
-    await markAllThreadsAsRead(true, SystemLabels.Inbox);
+    await markAllThreadsAsRead(true, SystemLabels.Inbox, hasGmailImportImprovementsFF);
   };
   const importMail = useCallback(
     () => openSettings({ tab: TabPage.Import, setting: SettingValue.ImportMail }),

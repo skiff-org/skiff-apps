@@ -1,5 +1,5 @@
-import { themeNames } from 'nightwatch-ui';
-import { isHardToRead, HSLToRGB, RGBToHSL, RGBValue, rgbaToRgb } from 'nightwatch-ui';
+import { themeNames } from '@skiff-org/skiff-ui';
+import { isHardToRead, HSLToRGB, RGBToHSL, RGBValue, rgbaToRgb } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 
 import { b64ToImageUrl } from '../../MailEditor/Image/utils';

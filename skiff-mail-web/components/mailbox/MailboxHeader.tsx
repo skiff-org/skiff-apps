@@ -3,6 +3,7 @@ import Head from 'next/head';
 import {
   Dropdown,
   DropdownItem,
+  FilledVariant,
   Icon,
   IconButton,
   Icons,
@@ -12,7 +13,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { isMobile, MobileView } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -44,6 +45,7 @@ import { FilterModal } from '../Settings/Filters/FilterModal';
 import { useSettings } from '../Settings/useSettings';
 
 import { MailboxActions, MailboxFilters } from './MailboxActions/MailboxActions';
+import { MOCK_MAILBOX_REQUEST, MOCK_NUM_UNREAD } from '__mocks__/mockApiResponse';
 
 interface MailboxHeaderProps {
   showSkeleton: boolean;
@@ -207,7 +209,7 @@ export const MailboxHeader = ({
   // Fallback to search while context is loading/switching
   const label = context?.value || HiddenLabels.Search;
   const labelName = context?.name || 'Search';
-  const { data, refetch: updateNumUnread } = useGetNumUnreadQuery({
+  const { refetch: updateNumUnread } = useGetNumUnreadQuery({
     variables: { label },
     skip: label === SystemLabels.Sent || label === SystemLabels.Drafts,
     pollInterval: POLL_INTERVAL_IN_MS
@@ -251,7 +253,7 @@ export const MailboxHeader = ({
     void updateNumUnread();
   }, [threads]);
 
-  const numUnread = data?.unread ?? 0;
+  const numUnread = MOCK_NUM_UNREAD;
   const user = useRequiredCurrentUserData();
   const mobileMultiItemsActive = useAppSelector((state) => state.mobileDrawer.multipleItemSelector);
   const [shouldSelectAll, setShouldSelectAll] = useState(true);
@@ -284,8 +286,8 @@ export const MailboxHeader = ({
   }, [dispatch, setClearAll]);
 
   const setSelectedThreadIDs = useCallback(
-    (selectedThreadIDs: string[]) =>
-      dispatch(skemailMailboxReducer.actions.setSelectedThreadIDs({ selectedThreadIDs })),
+    (updatedSelectedThreadIDs: string[]) =>
+      dispatch(skemailMailboxReducer.actions.setSelectedThreadIDs({ selectedThreadIDs: updatedSelectedThreadIDs })),
     [dispatch]
   );
 
@@ -364,7 +366,7 @@ export const MailboxHeader = ({
   );
 
   useEffect(() => {
-    // Communicate with react-native and update about unread mail count (for updating iOS badge)
+    // Communicate with react-native and update about unread mail count (for updating iOS badge and macOS badge)
     // If we are on mobile app, send unread count to react-native
     sendRNWebviewMsg('unreadMailCount', { numUnread });
     const interval = setInterval(() => {
@@ -374,6 +376,18 @@ export const MailboxHeader = ({
       clearInterval(interval);
     };
   }, [numUnread]);
+
+  useEffect(() => {
+    // for mobile webview, ensure that we reset shouldSelectAll state when changing labels;
+    // shouldSelectAll determines whether to show 'Select all' or 'Select none' on first selection of a mailbox item
+    // following label change
+    setShouldSelectAll(true);
+  }, [label]);
+
+  const clearLastSelectedIndex = useCallback(() => {
+    setLastSelectedIndex(null);
+  }, [setLastSelectedIndex]);
+
   const getEditButtonName = () => {
     if (inboxIsEmpty) return null;
 
@@ -440,13 +454,20 @@ export const MailboxHeader = ({
             </Typography>
             {!mobileMultiItemsActive && (
               <MailboxActionBar>
-                <IconButton icon={Icon.Filter} onClick={showFilterDrawer} size={Size.LARGE} type={Type.SECONDARY} />
+                <IconButton
+                  icon={Icon.Filter}
+                  onClick={showFilterDrawer}
+                  size={Size.LARGE}
+                  type={Type.SECONDARY}
+                  variant={FilledVariant.UNFILLED}
+                />
                 <IconButton
                   dataTest='mobile-settings-button'
                   icon={Icon.Settings}
                   onClick={showSettingsDrawer}
                   size={Size.LARGE}
                   type={Type.SECONDARY}
+                  variant={FilledVariant.UNFILLED}
                 />
               </MailboxActionBar>
             )}
@@ -495,7 +516,7 @@ export const MailboxHeader = ({
             <TitleSearch>
               <LeftButtons>
                 <MailboxActions
-                  clearLastSelectedIndex={() => setLastSelectedIndex(null)}
+                  clearLastSelectedIndex={clearLastSelectedIndex}
                   label={label}
                   onRefresh={onRefresh}
                   threads={threads}
@@ -512,12 +533,12 @@ export const MailboxHeader = ({
                   {!isDrafts && !isSearch && (
                     <IconText
                       endIcon={Icon.ChevronDown}
-                      filled
                       label={activeFilter}
                       onClick={() => {
                         setOpenFilterDropdown((prev) => !prev);
                       }}
                       ref={filterRef}
+                      variant={FilledVariant.FILLED}
                       weight={TypographyWeight.REGULAR}
                     />
                   )}
@@ -545,11 +566,11 @@ export const MailboxHeader = ({
                   {!isMobile && (
                     <>
                       <IconText
-                        filled
                         onClick={() => {
                           openNewFilterModal();
                         }}
                         startIcon={Icon.FilterPlus}
+                        variant={FilledVariant.FILLED}
                       />
                       {isFilterModalOpen && (
                         <FilterModal
@@ -565,16 +586,9 @@ export const MailboxHeader = ({
                       )}
                     </>
                   )}
-                  <IconText
-                    filled
-                    onClick={async () => {
-                      await navigateToSearch();
-                    }}
-                    startIcon={Icon.Search}
-                  />
+                  <IconText onClick={navigateToSearch} startIcon={Icon.Search} variant={FilledVariant.FILLED} />
                   {!isMobile && (
                     <IconText
-                      filled
                       onClick={() => {
                         void onRefresh();
                         void controls.start({ rotate: rotation });
@@ -593,6 +607,7 @@ export const MailboxHeader = ({
                           <Icons color='secondary' icon={Icon.Reload} />
                         </motion.div>
                       }
+                      variant={FilledVariant.FILLED}
                     />
                   )}
                 </RightButtons>
@@ -602,7 +617,7 @@ export const MailboxHeader = ({
           {isSearch && (
             <ActionSearch>
               <MailboxActions
-                clearLastSelectedIndex={() => setLastSelectedIndex(null)}
+                clearLastSelectedIndex={clearLastSelectedIndex}
                 label={label}
                 onRefresh={onRefresh}
                 threads={threads}

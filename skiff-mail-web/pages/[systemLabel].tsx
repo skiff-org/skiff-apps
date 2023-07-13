@@ -4,7 +4,7 @@ import { Mailbox } from '../components/mailbox/Mailbox';
 import MobileHead from '../components/shared/MobileHead';
 import { FALLBACK_ROUTER_LABEL, RouterLabelContext } from '../context/RouterLabelContext';
 import { useCurrentLabel } from '../hooks/useCurrentLabel';
-import { LABEL_TO_SYSTEM_LABEL, SYSTEM_LABELS, SystemLabel } from '../utils/label';
+import { LABEL_TO_SYSTEM_LABEL, getSystemLabels, SystemLabel } from '../utils/label';
 
 const labelIsSystemLabel = (label: string | null): label is SystemLabels =>
   Object.values(SystemLabels).includes(label as SystemLabels);
@@ -29,7 +29,7 @@ const SystemLabelMailbox = () => {
 // Generate static paths for export
 export function getStaticPaths() {
   return {
-    paths: SYSTEM_LABELS.map(({ value }) => ({
+    paths: getSystemLabels(true).map(({ value }) => ({
       params: { systemLabel: value.toLowerCase() }
     })),
     fallback: false

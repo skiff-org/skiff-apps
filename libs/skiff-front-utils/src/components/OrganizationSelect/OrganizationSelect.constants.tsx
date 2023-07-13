@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { colors, Icon, themeNames } from 'nightwatch-ui';
+import { colors, Icon, themeNames } from '@skiff-org/skiff-ui';
 import { DisplayPictureData, ProductApp } from 'skiff-graphql';
 import styled from 'styled-components';
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { decryptDatagram } from 'skiff-crypto-v2';
+import { decryptDatagramV2 } from '@skiff-org/skiff-crypto';
 import { RawMimeDatagram } from 'skiff-front-graphql';
 
 export const getRawMime = async (encryptedRawMimeUrl: string, decryptedSessionKey: string) => {
@@ -9,6 +9,6 @@ export const getRawMime = async (encryptedRawMimeUrl: string, decryptedSessionKe
     return;
   }
   const data = resp.data;
-  const { rawMime } = decryptDatagram(RawMimeDatagram, decryptedSessionKey, data).body;
+  const { rawMime } = decryptDatagramV2(RawMimeDatagram, decryptedSessionKey, data).body;
   return rawMime;
 };

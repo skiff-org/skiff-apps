@@ -1,6 +1,6 @@
 import { Bech32Address } from '@keplr-wallet/cosmos/build/bech32';
 import { MetaMaskInpageProvider } from '@metamask/providers';
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import { isENSName, isJunoAddress, isICNSName, isSolanaAddress } from 'skiff-utils';
 import isEmail from 'validator/lib/isEmail';
 import isEthereumAddress from 'validator/lib/isEthereumAddress';

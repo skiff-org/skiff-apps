@@ -1,4 +1,4 @@
-import { Drawer, Dropdown, DropdownItem, Icon } from 'nightwatch-ui';
+import { Drawer, Dropdown, DropdownItem, Icon } from '@skiff-org/skiff-ui';
 import { FC } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';

@@ -2,7 +2,7 @@ import isString from 'lodash/isString';
 import {
   BackgroundBlocker,
   ButtonGroupItem,
-  CustomCircularProgress,
+  CircularProgress,
   Dialog,
   DialogTypes,
   Dropdown,
@@ -11,9 +11,10 @@ import {
   InputField,
   Size,
   ThemeMode,
+  Type,
   accentColorToPrimaryColor,
   themeNames
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { RefObject, useRef, useState } from 'react';
 import { useDeleteUserLabelMutation, useEditUserLabelMutation } from 'skiff-front-graphql';
 import { useToast } from 'skiff-front-utils';
@@ -145,7 +146,7 @@ const LabelOptionsDropdown: React.FC<LabelOptionsDropdownProps> = ({
             autoFocus
             borderRadius={6}
             endAdornment={
-              loading ? <CustomCircularProgress forceTheme={ThemeMode.DARK} size={Size.SMALL} spinner /> : undefined
+              loading ? <CircularProgress forceTheme={ThemeMode.DARK} size={Size.SMALL} spinner /> : undefined
             }
             forceTheme={ThemeMode.DARK}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLabelName(e.target.value)}
@@ -202,16 +203,15 @@ const LabelOptionsDropdown: React.FC<LabelOptionsDropdownProps> = ({
         type={DialogTypes.Confirm}
       >
         <ButtonGroupItem
-          destructive
-          key='delete'
           label='Delete'
           onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
             void deleteLabelHandler();
             closeConfirmDialog(e);
           }}
+          type={Type.DESTRUCTIVE}
         />
-        <ButtonGroupItem key='cancel' label='Cancel' onClick={closeConfirmDialog} />
+        <ButtonGroupItem label='Cancel' onClick={closeConfirmDialog} />
       </Dialog>
     </>
   );

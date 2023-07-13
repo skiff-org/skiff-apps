@@ -1,12 +1,18 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { DropdownItem, Icon, Icons, Size, ThemeMode, Typography, Drawer, TypographySize } from 'nightwatch-ui';
+import { DropdownItem, Icon, Icons, Size, ThemeMode, Typography, Drawer, TypographySize } from '@skiff-org/skiff-ui';
 import { FC, useCallback, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { useGetNumUnreadQuery, useUserLabelsQuery } from 'skiff-front-graphql';
-import { DrawerOption, DrawerOptions, useDefaultEmailAlias, useRequiredCurrentUserData } from 'skiff-front-utils';
+import {
+  DrawerOption,
+  DrawerOptions,
+  useDefaultEmailAlias,
+  useGetFF,
+  useRequiredCurrentUserData
+} from 'skiff-front-utils';
 import { SystemLabels, UserLabelVariant } from 'skiff-graphql';
-import { POLL_INTERVAL_IN_MS } from 'skiff-utils';
+import { GmailImportImprovementsFlag, POLL_INTERVAL_IN_MS } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useRouterLabelContext } from '../../../context/RouterLabelContext';
@@ -21,7 +27,7 @@ import {
   LabelType,
   orderAliasLabels,
   splitUserLabelsByVariant,
-  SYSTEM_LABELS,
+  getSystemLabels,
   userLabelFromGraphQL
 } from '../../../utils/label';
 
@@ -117,6 +123,8 @@ const LabelItem: FC<{ label: Label }> = ({ label }) => {
 };
 
 export default function MobileMailboxSelectDrawer() {
+  const hasGmailImportImprovementsFF = useGetFF<GmailImportImprovementsFlag>('gmailImportImprovements');
+
   const dispatch = useDispatch();
   const show = useAppSelector((state) => state.mobileDrawer.showMailboxSelectDrawer);
   const { showAliasInboxes } = useShowAliasInboxes();
@@ -145,7 +153,7 @@ export default function MobileMailboxSelectDrawer() {
       <Spacer />
       <DrawerOptions>
         {renderLabelHeader('Mailbox')}
-        {SYSTEM_LABELS.map((label) => (
+        {getSystemLabels(hasGmailImportImprovementsFF).map((label) => (
           <LabelItem key={label.value} label={label} />
         ))}
         {showAliasInboxes && (

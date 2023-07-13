@@ -1,4 +1,4 @@
-import { ThemeMode } from 'nightwatch-ui';
+import { ThemeMode } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { Suspense, FC } from 'react';
 

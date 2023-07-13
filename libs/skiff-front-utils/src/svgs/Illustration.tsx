@@ -1,4 +1,4 @@
-import { ThemeMode } from 'nightwatch-ui';
+import { ThemeMode } from '@skiff-org/skiff-ui';
 import { lazy, Suspense } from 'react';
 import styled from 'styled-components';
 

@@ -1,4 +1,4 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 
 import { Bold, Italic, Strike, Underline } from '../../Extensions/EditorMarks';
 import { BulletList, OrderedList } from '../../Extensions/EditorNodes';

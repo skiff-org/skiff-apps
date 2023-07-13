@@ -9,7 +9,7 @@ import {
   Size,
   Type,
   Typography
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { Fragment, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSetUserPublicKeyMutation } from 'skiff-front-graphql';
@@ -108,7 +108,7 @@ export const SkemailWelcomeModal: React.FC = () => {
       {isWalletEnabled() && (
         <>
           <div style={{ width: '100%' }}>
-            <Button fullWidth onClick={onConnectWalletClick} startIcon={Icon.Wallet} type={Type.SECONDARY}>
+            <Button fullWidth icon={Icon.Wallet} onClick={onConnectWalletClick} type={Type.SECONDARY}>
               Connect wallet
             </Button>
           </div>

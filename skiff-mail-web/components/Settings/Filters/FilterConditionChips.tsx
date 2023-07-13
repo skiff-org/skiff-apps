@@ -1,5 +1,15 @@
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import { Dropdown, DropdownItem, Icon, IconText, Icons, Size, Typography, TypographyWeight } from 'nightwatch-ui';
+import {
+  Dropdown,
+  DropdownItem,
+  FilledVariant,
+  Icon,
+  IconText,
+  Icons,
+  Size,
+  Typography,
+  TypographyWeight
+} from '@skiff-org/skiff-ui';
 import React, { Dispatch, SetStateAction, useRef, useState } from 'react';
 import { contactToAddressObject, getEnvironment, useGetAllContactsWithOrgMembers } from 'skiff-front-utils';
 import { FrontendMailFilteringFeatureFlag } from 'skiff-utils';
@@ -213,7 +223,6 @@ export const FilterConditionChips: React.FC<FilterConditionChipsProps> = ({
           <Typography color='secondary'>Include emails matching</Typography>
           <IconText
             endIcon={Icon.ChevronDown}
-            filled
             label={
               shouldORFilters ? FILTER_TYPE_TO_OPTION[FilterType.Or].label : FILTER_TYPE_TO_OPTION[FilterType.And].label
             }
@@ -221,6 +230,7 @@ export const FilterConditionChips: React.FC<FilterConditionChipsProps> = ({
               setShowOrOptionsDropdown((prev) => !prev);
             }}
             ref={orOptionsRef}
+            variant={FilledVariant.FILLED}
             weight={TypographyWeight.REGULAR}
           />
           <Dropdown

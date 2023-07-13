@@ -1,4 +1,4 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 
 // The different types of items that will be rendered in each row of the search results body
 export enum SearchItemType {

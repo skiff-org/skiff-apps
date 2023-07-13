@@ -1,7 +1,7 @@
 import crelt from 'crelt';
 import { sanitize } from 'dompurify';
 import first from 'lodash/first';
-import { IconProps, Icons, KeyCodeSequence, Size, ThemeMode } from 'nightwatch-ui';
+import { IconProps, Icons, KeyCodeSequence, Size, ThemeMode } from '@skiff-org/skiff-ui';
 import { EditorState } from 'prosemirror-state';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';

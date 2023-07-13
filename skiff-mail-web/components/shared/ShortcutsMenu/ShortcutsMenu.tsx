@@ -1,5 +1,5 @@
-import { Dialog, ThemeMode } from 'nightwatch-ui';
-import { DialogTypes } from 'nightwatch-ui';
+import { Dialog, ThemeMode } from '@skiff-org/skiff-ui';
+import { DialogTypes } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';

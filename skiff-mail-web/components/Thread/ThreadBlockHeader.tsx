@@ -1,4 +1,4 @@
-import { Typography, TypographySize } from 'nightwatch-ui';
+import { Typography, TypographySize } from '@skiff-org/skiff-ui';
 import { FC, RefObject, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { splitEmailToAliasAndDomain } from 'skiff-front-utils';

@@ -1,4 +1,4 @@
-import { ButtonGroupItem, Dialog } from 'nightwatch-ui';
+import { ButtonGroupItem, Dialog } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import srp from 'secure-remote-password/client';
 import {
@@ -6,7 +6,7 @@ import {
   createKeyFromSecret,
   createPasswordDerivedSecret,
   createSRPKey
-} from 'skiff-crypto';
+} from '@skiff-org/skiff-crypto';
 import {
   encryptPrivateUserData,
   UpdateSrpDocument,
@@ -48,6 +48,7 @@ const ChangePassword: React.FC = () => {
   const [passwordChangeError, setPasswordChangeError] = useState('');
   // if the user's chosen password is strong enough or not (judged by zxcvbn protocol)
   const [strongPassword, setStrongPassword] = useState(true);
+  const [loginSrpRequest, setLoginSrpRequest] = useState<LoginSrpRequest | undefined>();
   const { enqueueToast } = useToast();
 
   const { data: canDirectlyUpdateData } = useCanDirectlyUpdateSrpQuery({ fetchPolicy: 'network-only' });
@@ -77,7 +78,7 @@ const ChangePassword: React.FC = () => {
    * Submit mutation to update SRP variables and change user's password
    * also submit new encryptedUserData
    */
-  const updatePassword = async (loginSrpRequest?: LoginSrpRequest) => {
+  const updatePassword = async () => {
     const salt = srp.generateSalt();
     const masterSecret = await createKeyFromSecret(password, salt);
     const verifierPrivateKey = createSRPKey(masterSecret, salt);
@@ -155,11 +156,7 @@ const ChangePassword: React.FC = () => {
     if (!checkPasswords()) {
       return;
     }
-    if (canSkipLoginSrp) {
-      void updatePassword();
-    } else {
-      setStepPasswordChange(STEPS_PASSWORD_CHANGE.AUTHENTICATE_MODAL);
-    }
+    void updatePassword();
   };
 
   // Submits change password form
@@ -180,7 +177,7 @@ const ChangePassword: React.FC = () => {
       loginError={passwordChangeError}
       onEnterKeyPress={handleChangePasswordKeyPress}
       password={password}
-      passwordLabel='New Password'
+      passwordLabel='New password'
       setConfirmPassword={setConfirmPassword}
       setLoginError={setPasswordChangeError}
       setPassword={setPassword}
@@ -191,14 +188,21 @@ const ChangePassword: React.FC = () => {
   return (
     <>
       <ConfirmPasswordDialog
-        handleSubmit={updatePassword}
+        handleSubmit={(loginSrp) => {
+          setLoginSrpRequest(loginSrp);
+          setStepPasswordChange(STEPS_PASSWORD_CHANGE.CHANGE_MODAL);
+          return new Promise(() => true);
+        }}
         onClose={() => setStepPasswordChange(STEPS_PASSWORD_CHANGE.LANDING_PAGE)}
         open={stepPasswordChange === STEPS_PASSWORD_CHANGE.AUTHENTICATE_MODAL}
       />
       <TitleActionSection
         actions={[
           {
-            onClick: () => setStepPasswordChange(STEPS_PASSWORD_CHANGE.CHANGE_MODAL),
+            onClick: () =>
+              setStepPasswordChange(
+                canSkipLoginSrp ? STEPS_PASSWORD_CHANGE.CHANGE_MODAL : STEPS_PASSWORD_CHANGE.AUTHENTICATE_MODAL
+              ),
             label: 'Update',
             type: 'button'
           }
@@ -207,15 +211,13 @@ const ChangePassword: React.FC = () => {
         title='Change password'
       />
       <Dialog
-        description={
-          canSkipLoginSrp ? 'Make sure to save your new password' : "You'll be asked to authenticate afterwards"
-        }
+        description='Choose a new password'
         inputField={changePasswordBlock}
         onClose={onChangeModalClose}
         open={stepPasswordChange === STEPS_PASSWORD_CHANGE.CHANGE_MODAL}
-        title='Change Password'
+        title='Change password'
       >
-        <ButtonGroupItem label={canSkipLoginSrp ? 'Confirm' : 'Next'} onClick={onSubmitChangePassword} />
+        <ButtonGroupItem label='Confirm' onClick={onSubmitChangePassword} />
         <ButtonGroupItem label='Cancel' onClick={onChangeModalClose} />
       </Dialog>
     </>

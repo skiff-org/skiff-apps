@@ -1,5 +1,5 @@
 import { Editor } from '@tiptap/react';
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 
 import { isLinkEnabled, toggleLink } from '../../mailEditorUtils';
 

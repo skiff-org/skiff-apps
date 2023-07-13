@@ -1,4 +1,4 @@
-import { decryptSymmetric, stringDecryptAsymmetric } from 'skiff-crypto';
+import { decryptSymmetric, stringDecryptAsymmetric } from '@skiff-org/skiff-crypto';
 import { useGetUserSignatureQuery, UserSignatureDatagram } from 'skiff-front-graphql';
 import { useRequiredCurrentUserData } from 'skiff-front-utils';
 

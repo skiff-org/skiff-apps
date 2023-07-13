@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogTypes, Size } from 'nightwatch-ui';
+import { Button, Dialog, DialogTypes, Size } from '@skiff-org/skiff-ui';
 import React, { useEffect } from 'react';
 import { useStoreWorkspaceEventMutation } from 'skiff-front-graphql';
 import { DowngradeProgress } from 'skiff-graphql';

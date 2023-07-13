@@ -1,7 +1,6 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useGetNumUnreadQuery } from 'skiff-front-graphql';
 import {
   fetchUserProfileOrgDataFromID,
   getAliasesForUser,
@@ -17,17 +16,16 @@ import {
   storeLatestUserID,
   getDefaultEmailAlias
 } from 'skiff-front-utils';
-import { SubscriptionPlan, SystemLabels, WorkspaceEventType, ProductApp } from 'skiff-graphql';
-import { POLL_INTERVAL_IN_MS } from 'skiff-utils';
+import { SubscriptionPlan, WorkspaceEventType, ProductApp } from 'skiff-graphql';
 
 import { getRouterUri } from '../../apollo/client';
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
-import { useCurrentLabel } from '../../hooks/useCurrentLabel';
 import { useUsernameFromUser } from '../../hooks/useUsernameFromUser';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
 import { ModalType } from '../../redux/reducers/modalTypes';
 import { storeWorkspaceEvent, useSubscriptionPlan } from '../../utils/userUtils';
 import { useSettings } from '../Settings/useSettings';
+import { MOCK_NUM_UNREAD } from '__mocks__/mockApiResponse';
 
 interface AppSwitcherProps {
   user: models.User;
@@ -43,11 +41,6 @@ interface Account {
 
 const AppSwitcher: React.FC<AppSwitcherProps> = ({ user }) => {
   const dispatch = useDispatch();
-  const { label: currentLabel } = useCurrentLabel();
-  const { data: numUnread } = useGetNumUnreadQuery({
-    variables: { label: currentLabel ?? SystemLabels.Inbox },
-    pollInterval: POLL_INTERVAL_IN_MS
-  });
   const bannersOpen = useAppSelector((state) => state.modal.bannersOpen);
   const openLogout = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -161,7 +154,7 @@ const AppSwitcher: React.FC<AppSwitcherProps> = ({ user }) => {
       blockPointerEvents
       label={formattedUsername}
       numBannersOpen={bannersOpen.length}
-      numUnread={numUnread?.unread}
+      numUnread={MOCK_NUM_UNREAD}
       section={pageSection}
       sidepanelOpen
       storeWorkspaceEvent={() => void storeEvent}

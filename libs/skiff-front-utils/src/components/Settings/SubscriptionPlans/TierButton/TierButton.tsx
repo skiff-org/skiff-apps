@@ -1,4 +1,4 @@
-import { Button, Size, Typography, TypographySize } from 'nightwatch-ui';
+import { Button, Size, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import { useState } from 'react';
 import {
   useGetCheckoutSessionUrlOrStripeUpdateStatusLazyQuery,

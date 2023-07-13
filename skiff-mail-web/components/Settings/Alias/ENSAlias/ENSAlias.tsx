@@ -1,5 +1,6 @@
 import {
   Avatar,
+  FilledVariant,
   Icon,
   IconButton,
   Tooltip,
@@ -8,7 +9,7 @@ import {
   TooltipTrigger,
   Type,
   Typography
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
 import { abbreviateWalletAddress, splitEmailToAliasAndDomain, TitleActionSection } from 'skiff-front-utils';
 import styled from 'styled-components';
@@ -118,6 +119,7 @@ export const ENSAlias: React.FC<ENSAliasProps> = ({ walletAliases }) => {
                   onClick={() => viewOnENS(ensAlias)}
                   tooltip='View on ENS'
                   type={Type.SECONDARY}
+                  variant={FilledVariant.UNFILLED}
                 />
               </div>
             </ENSAliasRow>

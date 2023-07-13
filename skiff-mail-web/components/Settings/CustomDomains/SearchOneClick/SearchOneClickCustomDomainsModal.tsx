@@ -10,14 +10,14 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import { Illustration, Illustrations } from 'skiff-front-utils';
 import { SubscriptionPlan } from 'skiff-graphql';
-import { FreeTierCustomDomainsFeatureFlag } from 'skiff-utils';
+import { TrialOfferWithOneClickDomainFeatureFlag } from 'skiff-utils';
 import styled from 'styled-components';
 
-import Illustration, { Illustrations } from '../../../../svgs/Illustration';
 import { useSubscriptionPlan } from '../../../../utils/userUtils';
 
 import CustomDomainSearchResults from './CustomDomainSearchResults';
@@ -116,12 +116,14 @@ const NameInput = styled.input`
   }
 `;
 
-const SkiffLogo = styled(Illustration)`
-  margin-bottom: 8px;
-`;
-
 const FreeTrialHighlight = styled.span`
   color: var(--text-link);
+`;
+
+const StyledIconButton = styled(IconButton)`
+  aspect-ratio: 1;
+  width: unset;
+  height: 100%;
 `;
 
 interface SearchOneClickCustomDomainsProps {
@@ -136,16 +138,16 @@ const SearchOneClickCustomDomainsModal: React.FC<SearchOneClickCustomDomainsProp
     data: { activeSubscription }
   } = useSubscriptionPlan();
   const featureFlags = useFlags();
-  const hasFreeTierOneClickCustomDomainsFF =
-    featureFlags.freeTierOneClickCustomDomains as FreeTierCustomDomainsFeatureFlag;
-  const isEligibleForFreeTrial = activeSubscription === SubscriptionPlan.Free && hasFreeTierOneClickCustomDomainsFF;
+  const hasFreeTrialWithOneClickDomainFF =
+    featureFlags.freeTierOneClickCustomDomains as TrialOfferWithOneClickDomainFeatureFlag;
+  const isEligibleForFreeTrial = activeSubscription === SubscriptionPlan.Free && hasFreeTrialWithOneClickDomainFF;
 
   return (
     <Dialog customContent onClose={onClose} open={open} type={DialogTypes.Fullscreen}>
       <Wrapper>
         <Container>
           <Header>
-            <SkiffLogo illustration={Illustrations.SkiffLockupIcon} scale={1} />
+            <Illustration illustration={Illustrations.SkiffLockupIcon} style={{ marginBottom: '8px' }} />
             <Typography size={TypographySize.H3} weight={TypographyWeight.BOLD} wrap>
               Customize your email address with one click.
             </Typography>
@@ -179,13 +181,7 @@ const SearchOneClickCustomDomainsModal: React.FC<SearchOneClickCustomDomainsProp
                 placeholder='Type a domain'
                 value={searchInput}
               />
-              <IconButton
-                filled
-                fullHeight
-                icon={Icon.ArrowRight}
-                onClick={() => setSearchQuery(searchInput)}
-                size={Size.LARGE}
-              />
+              <StyledIconButton icon={Icon.ArrowRight} onClick={() => setSearchQuery(searchInput)} size={Size.LARGE} />
             </SearchBar>
             <Button fullWidth onClick={onClose} type={Type.SECONDARY}>
               Back

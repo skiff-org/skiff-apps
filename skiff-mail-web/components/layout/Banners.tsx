@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
-import { BannerTypes, DelinquencyBanner, isDesktopApp, SettingValue, TabPage } from 'skiff-front-utils';
+import { BannerTypes, DelinquencyBanner, isReactNativeDesktopApp, SettingValue, TabPage } from 'skiff-front-utils';
 
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
@@ -33,7 +33,7 @@ const Banners = () => {
   }, [dispatch, isDelinquencyBannerOpen]);
 
   // Hide all banners on desktop
-  if (isDesktopApp()) return null;
+  if (isReactNativeDesktopApp()) return null;
 
   return (
     <>

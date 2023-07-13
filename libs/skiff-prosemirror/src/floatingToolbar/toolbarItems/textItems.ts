@@ -1,5 +1,5 @@
 import crelt from 'crelt';
-import { Icon, IconProps } from 'nightwatch-ui';
+import { Icon, IconProps } from '@skiff-org/skiff-ui';
 import { EditorState, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import { EditorHighlightColorIds, EditorTextColorIds, HIGHLIGHT_COLORS, TEXT_COLORS } from 'skiff-front-utils';

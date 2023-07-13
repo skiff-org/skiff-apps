@@ -1,6 +1,8 @@
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import { Setting, SETTINGS_LABELS, SettingType, SettingValue, useUserPreference } from 'skiff-front-utils';
 import { StorageTypes } from 'skiff-utils';
+
+import DeleteAccount from '../Account/DeleteAccount/DeleteAccount';
 
 import AccountRecovery from './AccountRecovery/AccountRecovery';
 import ChangePassword from './ChangePassword/ChangePassword';
@@ -70,6 +72,14 @@ export const useSecuritySettings: () => Setting[] = () => {
       label: SETTINGS_LABELS[SettingValue.VerificationPhrase],
       icon: Icon.Clipboard,
       color: 'yellow'
+    },
+    {
+      value: SettingValue.DeleteAccount,
+      type: SettingType.Custom,
+      component: <DeleteAccount key='delete-account' />,
+      label: SETTINGS_LABELS[SettingValue.DeleteAccount],
+      icon: Icon.Trash,
+      color: 'red'
     }
   ];
   return securitySettingsArr;

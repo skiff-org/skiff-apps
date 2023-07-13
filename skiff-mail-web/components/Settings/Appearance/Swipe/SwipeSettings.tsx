@@ -1,4 +1,4 @@
-import { Divider, Icon } from 'nightwatch-ui';
+import { Divider, Icon } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { TitleActionSection, useUserPreference } from 'skiff-front-utils';
 import { SwipeSetting } from 'skiff-graphql';

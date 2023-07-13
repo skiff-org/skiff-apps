@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
   ACCENT_COLOR_VALUES,
-  CustomCircularProgress,
+  CircularProgress,
   Icon,
   Icons,
   IconText,
@@ -13,7 +13,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
@@ -44,6 +44,7 @@ import {
   UserLabelPlain
 } from '../../utils/label';
 import LabelOptionsDropdown from '../labels/LabelOptionsDropdown';
+import { MOCK_NUM_UNREAD } from '__mocks__/mockApiResponse';
 
 const IconColorContainer = styled.div<{ $color: string }>`
   background: ${(props) => props.$color};
@@ -111,7 +112,8 @@ const UnreadLabel = styled.div`
 `;
 
 const IconTextContainer = styled.div`
-  min-width: 0px;
+  flex: 1;
+  min-width: 0;
 `;
 
 /* Rules to determine if something can be dropped in another mailbox */
@@ -145,6 +147,8 @@ interface LabelSidebarItemProps {
   variant: LabelVariants;
 }
 
+const MAX_NUM_UNREAD = 500_000;
+
 const LabelSidebarItem: React.FC<LabelSidebarItemProps> = ({ label, variant }: LabelSidebarItemProps) => {
   const { label: routeLabel, userLabelVariant } = useCurrentLabel();
   const router = useRouter();
@@ -160,16 +164,10 @@ const LabelSidebarItem: React.FC<LabelSidebarItemProps> = ({ label, variant }: L
 
   const { moveThreads, applyUserLabel } = useThreadActions();
 
-  const { data } = useGetNumUnreadQuery({
-    variables: { label: label.value },
-    skip: label.value === SystemLabels.Sent || label.value === SystemLabels.Drafts || label.value === FILES_LABEL.value,
-    pollInterval: POLL_INTERVAL_IN_MS
-  });
-
   const { draftThreads } = useDrafts();
   const numDrafts = draftThreads.length;
 
-  const numUnreadInbox = data?.unread ?? 0;
+  const numUnreadInbox = MOCK_NUM_UNREAD;
 
   // Files label does not populate route label like other system labels (since it's handled by pages/files.tsx)
   const filesLabelActive = label.value === FILES_LABEL.value && router.pathname.includes('/files');
@@ -251,31 +249,31 @@ const LabelSidebarItem: React.FC<LabelSidebarItemProps> = ({ label, variant }: L
           onMouseLeave={() => setHover(false)}
           onMouseOver={() => setHover(true)}
         >
-          {hasMoreOptions && (
-            <IconTextWithEndActions
-              endActions={[
-                {
-                  icon: Icon.OverflowH,
-                  onClick: (e?: React.MouseEvent) => {
-                    e?.stopPropagation();
-                    e?.preventDefault();
-                    setShowDropdown((prev) => !prev);
-                  },
-                  buttonRef: ref
-                }
-              ]}
-              showEndActions={hover || showDropdown}
-              {...iconTextProps}
-            />
-          )}
-          {!hasMoreOptions && (
-            <IconTextContainer>
-              <IconText {...iconTextProps} />
-            </IconTextContainer>
-          )}
+          <IconTextContainer>
+            {hasMoreOptions && (
+              <IconTextWithEndActions
+                endActions={[
+                  {
+                    icon: Icon.OverflowH,
+                    onClick: (e?: React.MouseEvent) => {
+                      e?.stopPropagation();
+                      e?.preventDefault();
+                      setShowDropdown((prev) => !prev);
+                    },
+                    buttonRef: ref
+                  }
+                ]}
+                showEndActions={hover || showDropdown}
+                {...iconTextProps}
+              />
+            )}
+            {!hasMoreOptions && <IconText {...iconTextProps} />}
+          </IconTextContainer>
           {numUnreadInbox > 0 && (
             <Typography color={active ? 'primary' : 'secondary'} size={TypographySize.SMALL}>
-              <UnreadLabel>{numUnreadInbox.toLocaleString()}</UnreadLabel>
+              <UnreadLabel>
+                {numUnreadInbox > MAX_NUM_UNREAD ? `${MAX_NUM_UNREAD / 1000}k+` : numUnreadInbox.toLocaleString()}
+              </UnreadLabel>
             </Typography>
           )}
           {label.value === SystemLabels.Drafts && numDrafts > 0 && (
@@ -332,7 +330,7 @@ const ActionSidebarItem: React.FC<ActionSidebarItemProps> = ({
       onClick={onClick}
     >
       <IconText color={color} label={label} startIcon={icon} weight={TypographyWeight.REGULAR} />
-      {(spinner || progress !== undefined) && <CustomCircularProgress progress={progress} spinner={spinner} />}
+      {(spinner || progress !== undefined) && <CircularProgress progress={progress} spinner={spinner} />}
     </SidebarLabel>
   );
 

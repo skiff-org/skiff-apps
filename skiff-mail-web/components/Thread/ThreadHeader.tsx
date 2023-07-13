@@ -1,4 +1,14 @@
-import { Chip, Icon, IconText, Icons, Size, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import {
+  Chip,
+  FilledVariant,
+  Icon,
+  IconText,
+  Icons,
+  Size,
+  Typography,
+  TypographySize,
+  TypographyWeight
+} from '@skiff-org/skiff-ui';
 import React, { ForwardedRef, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -186,20 +196,20 @@ const ThreadHeader = (
       {hasUserLabels && <LinkedLabelChips deletable size={Size.SMALL} threadID={threadId} userLabels={userLabels} />}
       {scheduledSendAt && (
         <Chip
-          endIcon={
-            <Icons
-              icon={Icon.Close}
-              onClick={() => {
-                if (!activeThread) return;
-                dispatch(
-                  skemailModalReducer.actions.setOpenModal({ type: ModalType.UnSendMessage, thread: activeThread })
-                );
-              }}
-            />
-          }
+          icon={Icon.Clock}
           key='schedule'
           label={`Scheduled - ${getTimeAndDate(scheduledSendAt)}`}
-          startIcon={Icon.Clock}
+          onDelete={() => {
+            if (!activeThread) return;
+            dispatch(
+              skemailModalReducer.actions.setOpenModal({
+                type: ModalType.UnSendMessage,
+                // we pass only the ID since 'activeThread' doesn't have the message body;
+                // and UnSendMessage will retrieve full thread from the ID
+                threadID: activeThread.threadID
+              })
+            );
+          }}
         />
       )}
     </LabelsContainer>
@@ -229,11 +239,11 @@ const ThreadHeader = (
             <HeaderButtonsGroup>
               {onExpand && (
                 <IconText
-                  filled
                   onClick={onExpand}
                   size={Size.SMALL}
                   startIcon={isExpanded ? Icon.CollapseV : Icon.ExpandV}
                   tooltip={isExpanded ? 'Collapse' : 'Expand'}
+                  variant={FilledVariant.FILLED}
                 />
               )}
             </HeaderButtonsGroup>

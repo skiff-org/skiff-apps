@@ -1,4 +1,4 @@
-import { CustomCircularProgress, Skeleton, Typography } from 'nightwatch-ui';
+import { CircularProgress, Skeleton, Typography } from '@skiff-org/skiff-ui';
 import { useState } from 'react';
 import { useGetUserCustomDomainSubscriptionsInfoQuery } from 'skiff-front-graphql';
 import { TitleActionSection, useDefaultEmailAlias, useRequiredCurrentUserData } from 'skiff-front-utils';
@@ -96,8 +96,7 @@ const ManageCustomDomains: React.FC<ManageCustomDomainsProps> = ({
                 />
               );
             })}
-
-          {isPolling && <Skeleton height='60px' width='100%' borderRadius={6} />}
+          {isPolling && <Skeleton borderRadius={6} height='60px' width='100%' />}
         </DomainsList>
       )}
       {/* Error state: Not loading, custom domains undefined */}
@@ -105,7 +104,7 @@ const ManageCustomDomains: React.FC<ManageCustomDomainsProps> = ({
         <Typography color='destructive'>Failed to load custom domains, please try again later.</Typography>
       )}
       {/* Loading state */}
-      {loading && <CustomCircularProgress />}
+      {loading && <CircularProgress />}
     </>
   );
 };

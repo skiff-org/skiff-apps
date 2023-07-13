@@ -1,4 +1,4 @@
-import { Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import pluralize from 'pluralize';
 import styled from 'styled-components';
 

@@ -1,5 +1,5 @@
 import uniqueId from 'lodash/uniqueId';
-import { Icon, IconComponent, IconText, IconTextProps } from 'nightwatch-ui';
+import { Icon, IconComponent, IconText, IconTextProps } from '@skiff-org/skiff-ui';
 import React from 'react';
 import styled from 'styled-components';
 

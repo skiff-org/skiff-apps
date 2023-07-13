@@ -1,5 +1,5 @@
-import { generateSymmetricKey } from 'skiff-crypto';
-import { decryptDatagram, decryptSessionKey, encryptDatagram, encryptSessionKey } from 'skiff-crypto-v2';
+import { generateSymmetricKey } from '@skiff-org/skiff-crypto';
+import { decryptDatagramV2, decryptSessionKey, encryptDatagramV2, encryptSessionKey } from '@skiff-org/skiff-crypto';
 import { AddressObjectWithDisplayPicture, requireCurrentUserData } from 'skiff-front-utils';
 import {
   CreateMailFilterInput,
@@ -61,7 +61,7 @@ const encryptConditionValue = (conditionType: ConditionType, conditionValue: str
   const datagram = ENCRYPTED_CONDITION_TYPES_TO_DATAGRAM[conditionType];
   // If there is no datagram, we assume that this condition type does not need to be decrypted
   if (!datagram) return undefined;
-  return encryptDatagram(datagram, {}, { text: conditionValue }, sessionKey).encryptedData;
+  return encryptDatagramV2(datagram, {}, { text: conditionValue }, sessionKey).encryptedData;
 };
 
 /**
@@ -202,7 +202,7 @@ const decryptSerializedData = (conditionType: ConditionType, serializedData: str
   // If there is no datagram, we assume that this condition type does not need to be decrypted
   if (!datagram) return undefined;
   if (!decryptedSessionKey) throw new Error(`Could not decrypt condition: ${conditionType}}`);
-  return decryptDatagram(datagram, decryptedSessionKey, serializedData).body.text;
+  return decryptDatagramV2(datagram, decryptedSessionKey, serializedData).body.text;
 };
 
 /**

@@ -1,4 +1,4 @@
-import { MonoTagProps } from 'nightwatch-ui';
+import { MonoTagProps } from '@skiff-org/skiff-ui';
 import { SubscriptionPlan } from 'skiff-graphql';
 import {
   PerIntervalPrice,

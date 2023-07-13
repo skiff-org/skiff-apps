@@ -1,4 +1,4 @@
-import { ButtonGroup, ButtonGroupItem, Dialog, DialogTypes, Layout, TextArea, Typography } from 'nightwatch-ui';
+import { ButtonGroup, ButtonGroupItem, Dialog, DialogTypes, Layout, TextArea, Typography } from '@skiff-org/skiff-ui';
 import { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';

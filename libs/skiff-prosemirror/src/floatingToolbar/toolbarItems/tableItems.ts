@@ -10,7 +10,7 @@ import {
   toggleTableHeaders
 } from '@skiff-org/prosemirror-tables';
 import crelt from 'crelt';
-import { Icon } from 'nightwatch-ui';
+import { Icon } from '@skiff-org/skiff-ui';
 import { EditorState, Transaction } from 'prosemirror-state';
 import { findParentNodeOfType } from 'prosemirror-utils';
 import { EditorView } from 'prosemirror-view';

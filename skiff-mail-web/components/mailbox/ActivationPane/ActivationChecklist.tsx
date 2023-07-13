@@ -1,4 +1,4 @@
-import { ThemeMode, Typography, getThemedColor, Icons, Icon, Size } from 'nightwatch-ui';
+import { ThemeMode, Typography, getThemedColor, Icons, Icon, Size } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { DEFAULT_WORKSPACE_EVENT_VERSION } from 'skiff-front-utils';
 import { WorkspaceEventType } from 'skiff-graphql';

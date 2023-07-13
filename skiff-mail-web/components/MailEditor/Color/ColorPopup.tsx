@@ -10,7 +10,7 @@ import {
   ACCENT_COLOR_VALUES,
   Portal,
   DROPDOWN_CALLER_CLASSNAME
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import { FC, useEffect, useRef, useState } from 'react';
 import { ColorSelector } from 'skiff-front-utils';
 import styled from 'styled-components';

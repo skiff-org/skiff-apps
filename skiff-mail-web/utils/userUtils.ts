@@ -1,5 +1,5 @@
 import { isAndroid, isIOS, isMacOs, isMobile } from 'react-device-detect';
-import { createDetachedSignatureAsymmetric } from 'skiff-crypto';
+import { createDetachedSignatureAsymmetric } from '@skiff-org/skiff-crypto';
 import {
   DeleteAccountDocument,
   DeleteAccountMutation,

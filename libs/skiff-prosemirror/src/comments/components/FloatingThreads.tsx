@@ -1,5 +1,5 @@
 import clone from 'lodash/clone';
-import { Icon, Icons, Typography, useOnClickOutside } from 'nightwatch-ui';
+import { Icon, Icons, Typography, useOnClickOutside } from '@skiff-org/skiff-ui';
 import { EditorView } from 'prosemirror-view';
 import React, { FC, MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';

@@ -1,5 +1,5 @@
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
-import { Icon, IconButton, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
+import { FilledVariant, Icon, IconButton, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
@@ -64,9 +64,15 @@ const ComposeHeader: FC<ComposeHeaderProps> = (props) => {
             icon={collapsed ? Icon.Expand : Icon.HorizontalRule}
             onClick={toggleCollapse}
             tooltip={collapsed ? 'Expand' : 'Minimize'}
+            variant={FilledVariant.UNFILLED}
           />
           {composeCollapseState === ComposeExpandTypes.Expanded && (
-            <IconButton icon={Icon.Expand} onClick={fullExpand} tooltip='Full screen' />
+            <IconButton
+              icon={Icon.Expand}
+              onClick={fullExpand}
+              tooltip='Full screen'
+              variant={FilledVariant.UNFILLED}
+            />
           )}
           <IconButton
             dataTest={ComposeHeaderDataTest.closeButton}
@@ -75,6 +81,7 @@ const ComposeHeader: FC<ComposeHeaderProps> = (props) => {
               onClose();
             }}
             tooltip='Close'
+            variant={FilledVariant.UNFILLED}
           />
         </FloatingDelayGroup>
       </HeaderButtonsGroup>

@@ -1,4 +1,4 @@
-import { Size } from 'nightwatch-ui';
+import { Size } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { formatName } from 'skiff-front-utils';
 

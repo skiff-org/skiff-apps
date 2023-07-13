@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogTypes, Size, Type } from 'nightwatch-ui';
+import { Button, Dialog, DialogTypes, Size, Type } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { DowngradeProgress } from 'skiff-graphql';
 import { TierName } from 'skiff-utils';

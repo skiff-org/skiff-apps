@@ -1,4 +1,4 @@
-import { ThemeMode } from 'nightwatch-ui';
+import { ThemeMode } from '@skiff-org/skiff-ui';
 import { UserAvatar } from 'skiff-front-utils';
 import { AddressObject } from 'skiff-graphql';
 import styled from 'styled-components';

@@ -12,7 +12,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from 'nightwatch-ui';
+} from '@skiff-org/skiff-ui';
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -242,7 +242,7 @@ function ThreadBlock(props: ThreadBlockProps) {
 
   const forward = () => {
     composeNewDraft();
-    dispatch(skemailModalReducer.actions.forwardCompose({ email, emailAliases, defaultEmailAlias }));
+    dispatch(skemailModalReducer.actions.forwardCompose({ email, emailAliases, defaultEmailAlias, thread }));
   };
 
   const [showMoreOptions, setShowMoreOptions] = useState(false);
@@ -263,7 +263,7 @@ function ThreadBlock(props: ThreadBlockProps) {
     setDisableRemoteContent(
       emailContainsRemoteContent.containsRemoteContent ? disableRemoteContentDefault ?? false : false
     );
-  }, [thread, disableRemoteContentDefault, emailContainsRemoteContent]);
+  }, [thread.threadID, disableRemoteContentDefault, emailContainsRemoteContent.containsRemoteContent]);
 
   const numBlocked = emailContainsRemoteContent.numProxy;
 
@@ -389,13 +389,13 @@ function ThreadBlock(props: ThreadBlockProps) {
               <ActionsBlockContainer>
                 {walletInfo}
                 <ActionsContainer>
-                  <Button onClick={reply} startIcon={Icon.Reply}>
+                  <Button icon={Icon.Reply} onClick={reply}>
                     Reply
                   </Button>
-                  <Button onClick={replyAll} startIcon={Icon.ReplyAll} type={Type.SECONDARY}>
+                  <Button icon={Icon.ReplyAll} onClick={replyAll} type={Type.SECONDARY}>
                     Reply all
                   </Button>
-                  <Button onClick={forward} startIcon={Icon.ForwardEmail} type={Type.SECONDARY}>
+                  <Button icon={Icon.ForwardEmail} onClick={forward} type={Type.SECONDARY}>
                     Forward
                   </Button>
                 </ActionsContainer>

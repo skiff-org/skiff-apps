@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import React, { useCallback, useMemo } from 'react';
 import { GlobalHotKeys, configure } from 'react-hotkeys';
 import { useDispatch } from 'react-redux';
-import { TabPage, isDesktopApp } from 'skiff-front-utils';
+import { TabPage, isReactNativeDesktopApp } from 'skiff-front-utils';
 import { SystemLabels } from 'skiff-graphql';
 
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
@@ -358,7 +358,7 @@ const GlobalHotkeys = () => {
     [GlobalKeyActions.REMOVE_ALL_LABELS]: wrapActionHandler(() => void handleRemoveAllUserLabels(), {}),
     [GlobalKeyActions.OPEN_SHORTCUTS]: wrapActionHandler(openShortcutsHandler, {}),
     [GlobalKeyActions.OPEN_SETTINGS]: wrapActionHandler(() => {
-      if (isDesktopApp()) {
+      if (isReactNativeDesktopApp()) {
         openSettingsPage();
       }
     }, {})

@@ -449,6 +449,7 @@ type CreditInfoResponse {
 
 enum CreditTransactionReason {
   ANDROID_APP
+  ENS_NAME
   GMAIL_IMPORT
   GOOGLE_DRIVE_IMPORT
   IOS_APP
@@ -510,6 +511,10 @@ enum DateFormat {
 type DecryptedAttachment {
   attachmentID: String!
   decryptedMetadata: AttachmentMetadata
+}
+
+type DefaultDisplayPictureData {
+  profilePictureData: String!
 }
 
 input DeleteAccountRequest {
@@ -600,6 +605,10 @@ input DeleteUserLabelRequest {
 input DeleteUserOrganizationMembershipRequest {
   orgID: String!
   userID: String!
+}
+
+input DisableEmailAutoForwardingRequest {
+  client: EmailAutoForwardingClient!
 }
 
 input DisableMfaRequest {
@@ -838,9 +847,31 @@ type Email {
   to: [AddressObject!]!
 }
 
+enum EmailAutoForwardingClient {
+  Gmail
+  Outlook
+}
+
+"""
+The user's email auto-forwarding settings for a given external email client.
+"""
+type EmailAutoForwardingClientSettings {
+  enabled: Boolean!
+}
+
+type EmailAutoForwardingSettings {
+  gmail: EmailAutoForwardingClientSettings!
+  outlook: EmailAutoForwardingClientSettings!
+}
+
 type EmailsWithUnreadICSResponse {
   emails: [Email!]!
   hasMore: Boolean!
+}
+
+input EnableEmailAutoForwardingRequest {
+  client: EmailAutoForwardingClient!
+  code: String!
 }
 
 input EncryptedAttachmentInput {
@@ -912,6 +943,7 @@ type EncryptedSessionKeyOutput {
 
 input EnrollMfaRequest {
   dataMFA: String!
+  loginSrpRequest: LoginSrpRequest!
   signature: String!
 }
 
@@ -1075,6 +1107,10 @@ input GetCustomDomainCheckoutSessionRequest {
   redirectURL: String
 }
 
+input GetDefaultProfilePictureRequest {
+  messageID: String!
+}
+
 input GetDocumentRequest {
   docID: String!
 }
@@ -1095,6 +1131,15 @@ type GetDomainSuggestionsResponse {
 
 input GetMailFiltersInput {
   clientside: Boolean
+}
+
+input GetMboxImportUrlRequest {
+  fileSizeInBytes: Int!
+}
+
+type GetMboxImportUrlResponse {
+  fileID: String!
+  uploadData: String!
 }
 
 input GetRecoveryPublicKeysAndDataRequest {
@@ -1165,8 +1210,7 @@ input ImportGmailRequest {
 }
 
 input ImportMboxRequest {
-  fileSizeInBytes: Int!
-  mboxFile: Upload!
+  fileID: String!
 }
 
 type IndexableDocument {
@@ -1461,16 +1505,19 @@ type Mutation {
   deleteUserLabel(request: DeleteUserLabelRequest): Void
   deleteUserOrganizationMembership(request: DeleteUserOrganizationMembershipRequest!): Boolean!
   deleteUserSignature: Void
+  disableEmailAutoForwarding(request: DisableEmailAutoForwardingRequest!): Void
   disableMfa(request: DisableMfaRequest!): DisableMfaResponse!
   editOrganization(request: EditOrganizationRequest!): EditOrganizationResponse!
   editTeam(request: EditTeamRequest!): Team!
   editUserLabel(request: EditUserLabelRequest): UserLabel
+  enableEmailAutoForwarding(request: EnableEmailAutoForwardingRequest!): Void
   enrollMfa(request: EnrollMfaRequest!): EnrollMfaResponse!
   generateCustomDomainRecords(request: GenerateCustomDomainRecordsRequest!): GenerateCustomDomainRecordsResponse!
   generateDocPublicLinkAuthTokenStep1(request: GenerateDocPublicLinkAuthTokenStep1Request!): GenerateDocPublicLinkAuthTokenStep1Response!
   generateDocPublicLinkAuthTokenStep2(request: GenerateDocPublicLinkAuthTokenStep2Request!): GenerateDocPublicLinkAuthTokenStep2Response!
   generateWebAuthnChallenge: GenerateWebAuthnChallengeResponse
   generateWebAuthnRegistration: GenerateWebAuthnRegistrationResponse!
+  getMboxImportUrl(getImportUrlRequest: GetMboxImportUrlRequest!): GetMboxImportUrlResponse
   grantCredits(request: GrantCreditsRequest!): GrantCreditsResponse!
   importEmlEmail(importRequest: ImportEmlEmailRequest!): Void
   importGmailEmails(request: ImportGmailRequest!): Void
@@ -1686,6 +1733,7 @@ enum PermissionLevel {
 input PlatformInfo {
   browserName: String
   isAndroid: Boolean!
+  isBgTask: Boolean
   isIos: Boolean!
   isMacOs: Boolean!
   isMobile: Boolean!
@@ -1785,8 +1833,10 @@ type Query {
   customDomainCheckoutPortal(request: GetCustomDomainCheckoutSessionRequest!): CheckoutSession!
   customDomains: [String!]!
   decryptionServicePublicKey: PublicKey
+  defaultProfilePicture(request: GetDefaultProfilePictureRequest!): DefaultDisplayPictureData
   document(request: GetDocumentRequest!): Document!
   documents(request: GetDocumentsRequest!): [Document!]!
+  emailAutoForwardingSettings: EmailAutoForwardingSettings!
   emailsWithUnreadICS: [Email!]! @deprecated(reason: "Added pagination, use emailsWithUnreadICS2 instead")
   emailsWithUnreadICS2: EmailsWithUnreadICSResponse!
   events(request: EventsInput!): [CalendarEvent!]!
@@ -2311,6 +2361,7 @@ enum SyncState {
 enum SystemLabels {
   ARCHIVE
   DRAFTS
+  IMPORTS
   INBOX
   SCHEDULE_SEND
   SENT
@@ -2788,12 +2839,13 @@ enum WorkspaceEventType {
   GET_STARTED_STEP_COMPLETE
   GET_STARTED_STEP_SKIP
   IPFS_TOGGLE
-  JOYRIDE
-  JOYRIDE_REPLAY
   JOYRIDE_SKIP
   LOGIN_PAGE
   LOGOUT
   MAIL_IMPORT_OPEN
+  MOBILE_MAIL_APP_ERROR
+  MOBILE_THREAD_RECOVERED
+  NATIVE_ADD_ACCOUNT
   NEW_UPLOAD
   ONBOARDING_DOWNLOAD_RECOVERY_KEY
   ONBOARDING_PLAN_SELECT
@@ -2818,10 +2870,7 @@ enum WorkspaceEventType {
   PLAN_TABLE_SHOWN
   PW_NEXT_BTN
   SEARCH
-  SELECT_PERSONAL_WORKSPACE
-  SELECT_TEAMS_WORKSPACE
   SELECT_THEME
-  SET_DISPLAY_NAME_ONBOARDING
   SIGNUP_CONNECT_WALLET_START
   SIGNUP_START
   SKEMAIL_APP_CREATE_FOLDER
@@ -2833,7 +2882,6 @@ enum WorkspaceEventType {
   SKEMAIL_APP_OPEN_COMPOSE
   SKEMAIL_APP_SEND_CLICK
   SKEMAIL_APP_THREAD_LOADING_TIME
-  SKIP_DISPLAY_NAME_ONBOARDING
   SWITCH_FROM_EDITOR_TO_EMAIL
   SWITCH_FROM_EMAIL_TO_EDITOR
   TOAST_CTA_CLICK

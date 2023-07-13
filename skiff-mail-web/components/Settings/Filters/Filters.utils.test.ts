@@ -1,4 +1,4 @@
-import * as skiffCryptoV2 from 'skiff-crypto-v2';
+import * as skiffCrypto from '@skiff-org/skiff-crypto';
 import { AddressObjectWithDisplayPicture } from 'skiff-front-utils';
 import {
   CreateMailFilterInput,
@@ -24,11 +24,12 @@ import {
 } from './Filters.utils';
 
 // MOCKS
-jest.mock('skiff-crypto-v2', () => ({
+jest.mock('skiff-crypto', () => ({
   __esModule: true,
   encryptSessionKey: () => ({ encryptedKey: '', encryptedBy: { key: '' } }),
-  encryptDatagram: jest.fn(),
-  decryptDatagram: jest.fn()
+  encryptDatagramV2: jest.fn(),
+  decryptDatagramV2: jest.fn(),
+  generateSymmetricKey: jest.fn()
 }));
 
 jest.mock('skiff-front-utils', () => ({
@@ -276,9 +277,9 @@ describe('createCreateMailFilterInput', () => {
 
   it('createCreateMailFilterInput encrypts subject conditions', () => {
     const encryptedSubject = 'encryptedSubject';
-    (skiffCryptoV2.encryptDatagram as jest.Mock).mockReturnValue({ encryptedData: encryptedSubject });
+    (skiffCrypto.encryptDatagramV2 as jest.Mock).mockReturnValue({ encryptedData: encryptedSubject });
     jest
-      .spyOn(skiffCryptoV2, 'encryptSessionKey')
+      .spyOn(skiffCrypto, 'encryptSessionKey')
       .mockImplementation(() => ({ encryptedKey: 'encryptedKey', encryptedBy: { key: 'encryptedByKey' } }));
 
     const conditions: Condition[] = [
@@ -302,9 +303,9 @@ describe('createCreateMailFilterInput', () => {
 
   it('createCreateMailFilterInput encrypts body conditions', () => {
     const encryptedBody = 'encryptedBody';
-    (skiffCryptoV2.encryptDatagram as jest.Mock).mockReturnValue({ encryptedData: encryptedBody });
+    (skiffCrypto.encryptDatagramV2 as jest.Mock).mockReturnValue({ encryptedData: encryptedBody });
     jest
-      .spyOn(skiffCryptoV2, 'encryptSessionKey')
+      .spyOn(skiffCrypto, 'encryptSessionKey')
       .mockImplementation(() => ({ encryptedKey: 'encryptedKey', encryptedBy: { key: 'encryptedByKey' } }));
 
     const conditions: Condition[] = [
@@ -383,7 +384,7 @@ describe('conditionsFromFilterGraphQL', () => {
   it('decrypts subject conditions', () => {
     const encryptedSubject = 'test subject';
     const decryptedSubject = 'test subject';
-    (skiffCryptoV2.decryptDatagram as jest.Mock).mockReturnValue({ body: { text: decryptedSubject } });
+    (skiffCrypto.decryptDatagramV2 as jest.Mock).mockReturnValue({ body: { text: decryptedSubject } });
 
     const graphQLFilter: MailFilterFieldGraphQL = {
       filterType: FilterTypeGraphQL.And,
@@ -405,7 +406,7 @@ describe('conditionsFromFilterGraphQL', () => {
   it('decrypts body conditions', () => {
     const encryptedBody = 'test body';
     const decryptedBody = 'test body';
-    (skiffCryptoV2.decryptDatagram as jest.Mock).mockReturnValue({ body: { text: decryptedBody } });
+    (skiffCrypto.decryptDatagramV2 as jest.Mock).mockReturnValue({ body: { text: decryptedBody } });
 
     const graphQLFilter: MailFilterFieldGraphQL = {
       filterType: FilterTypeGraphQL.And,
