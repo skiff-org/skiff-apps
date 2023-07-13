@@ -7,7 +7,7 @@
   ],
   "packageManager": "yarn@3.5.0",
   "scripts": {
-    "build": "yarn workspace libs build",
+    "build:lib": "yarn workspace libs build",
     "dev": "yarn workspace skiff-mail-web dev"
   }
 }
