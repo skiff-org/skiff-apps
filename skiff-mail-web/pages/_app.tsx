@@ -1,15 +1,13 @@
 import { ApolloProvider } from '@apollo/client';
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
-import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import { AppProps } from 'next/app';
 // import 'nightwatch-ui/dist/esm/index.css';
 import { SnackbarProvider } from 'notistack';
-import { ComponentType, useEffect } from 'react';
+import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Provider } from 'react-redux';
 import { AppThemeProvider, ErrorPage, saveCurrentUserData } from 'skiff-front-utils';
-import { getMailDomain } from 'skiff-utils';
 
 import 'react-image-crop/dist/ReactCrop.css';
 import client from '../apollo/client';
@@ -62,15 +60,4 @@ function CustomApp({ Component, pageProps }: AppProps) {
   );
 }
 
-export default withLDProvider({
-  clientSideID: process.env.NEXT_PUBLIC_LD_CLIENT_SIDE_ID ? process.env.NEXT_PUBLIC_LD_CLIENT_SIDE_ID : '',
-  options: {
-    streamUrl: process.env.NEXT_PUBLIC_SKIP_RELAY_PROXY ? undefined : 'https://relay-proxy.' + getMailDomain() + ':443',
-    baseUrl: process.env.NEXT_PUBLIC_SKIP_RELAY_PROXY ? undefined : 'https://relay-proxy.' + getMailDomain() + ':443',
-    eventsUrl: process.env.NEXT_PUBLIC_SKIP_RELAY_PROXY ? undefined : 'https://relay-proxy.' + getMailDomain() + ':443'
-  },
-  user: {
-    key: 'unauthenticated_user'
-  }
-  // eslint-disable-next-line @typescript-eslint/ban-types
-})(CustomApp as ComponentType<{}>);
+export default CustomApp;
