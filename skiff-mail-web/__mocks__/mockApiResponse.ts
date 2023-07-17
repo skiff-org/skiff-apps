@@ -1,5 +1,3 @@
-import { models } from 'skiff-front-graphql';
-
 export const MOCK_MAILBOX_REQUEST = {
   data: {
     mailbox: {

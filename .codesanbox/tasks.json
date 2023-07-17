@@ -1,0 +1,11 @@
+{
+  "$schema": "https://codesandbox.io/schemas/tasks.json",
+  "setupTasks": ["yarn set version berry", "yarn install", "yarn build:lib"],
+  "tasks": {
+    "start-app": {
+      "name": "Run Skiff Mail",
+      "command": "yarn dev",
+      "runAtStart": true
+    }
+  }
+}
