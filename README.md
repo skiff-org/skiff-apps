@@ -9,27 +9,32 @@ Skiff is a privacy-first, end-to-end encrypted workspace with Mail, Calendar, Pa
 Skiff Mail empowers free and more effective communication through private, end-to-end encrypted email. All messages sent between Skiff users are end-to-end encrypted. Additionally, Skiff never stores unencrypted access to messages sent or received from external mail providers.
 
 ### Reusable components and UI
+
 This library, along with Skiff UI, implements reusable, powerful design components for the Skiff product ecosystem.
 
 ### Fast, instant search
+
 This repository contains an implementation of Skiff's search indexing library, which was documented in [this blog post](https://skiff.com/blog/private-search).
 
 <img width="988" alt="CleanShot 2023-05-13 at 16 28 38@2x" src="https://github.com/skiff-org/skiff-mail/assets/3527315/c310497c-8e68-44d0-9e81-fe7b7855532c">
 
 ### Documentation and whitepaper
+
 Skiff Mail's technical model is documented in [Skiff's whitepaper](https://skiff.com/whitepaper).
 
 ### Mobile friendly
+
 Skiff Mail is designed to be highly compatible with native and web mobile clients. Android and iOS links coming soon!
 
 ![PD - Mobile updates 2](https://github.com/skiff-org/skiff-mail/assets/3527315/bbddbd84-99ac-4543-897f-483af4158ec3)
-
 
 ## Using Skiff Mail
 
 [Join our discord server](https://discord.com/invite/skiff) to give feedback and contribute to the community!
 
-Building and using Skiff Mail locally requires linking Skiff's cryptography and UI libraries, which are open sourced on our organization's GitHub page. Soon, they will be properly included and linked from within this repository.
+To start, check out our [deployed CodeSandbox instance](https://codesandbox.io/p/github/skiff-org/skiff-apps/main).
+
+Instructions for local development can be found in [skiff-mail-web/README.md](skiff-mail-web/README.md). Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for ways to get involved with Skiff open-source development.
 
 ## Questions?
 
