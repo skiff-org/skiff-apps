@@ -18,7 +18,7 @@
   "scripts": {
     "emit-ts": "yarn tsc --build",
     "clean": "rm -rf dist/",
-    "build": "yarn protogen && yarn node build.js",
+    "build": "yarn node build.js",
     "watch": "WATCH=1 yarn build",
     "lint": "yarn run -T eslint . --cache --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "yarn lint --fix",
