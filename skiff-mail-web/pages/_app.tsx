@@ -1,7 +1,7 @@
 import { ApolloProvider } from '@apollo/client';
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
 import { AppProps } from 'next/app';
-// import 'nightwatch-ui/dist/esm/index.css';
+import '@skiff-org/skiff-ui/dist/esm/index.css';
 import { SnackbarProvider } from 'notistack';
 import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
