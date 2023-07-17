@@ -6,7 +6,6 @@
     "skiff-calendar"
   ],
   "packageManager": "yarn@3.5.0",
-  "private": true,
   "scripts": {
     "build:lib": "yarn workspace libs build",
     "dev": "yarn workspace skiff-mail-web dev"
