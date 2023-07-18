@@ -1,4 +1,4 @@
-# Contributing to Skiff UI
+# Contributing to Skiff
 
 Contributions are always welcome! Here are a few guidelines that will help you along the way.
 
@@ -16,11 +16,11 @@ Contributions are always welcome! Here are a few guidelines that will help you a
 
 ## Code of Conduct
 
-Skiff UI contributors adhere to the [Contributor Covenant](https://www.contributor-covenant.org/) as the Code of Conduct. The full text is [available here](./CODE_OF_CONDUCT.md).
+Skiff contributors adhere to the [Contributor Covenant](https://www.contributor-covenant.org/) as the Code of Conduct. The full text is [available here](./CODE_OF_CONDUCT.md).
 
 ## Your first Pull Request
 
-To get familiar with contributing to Skiff UI, you can start by looking at our list of [good first issues](https://github.com/skiff-org/skiff-apps/issues?q=is:open+is:issue+label:"good+first+issue"). These issues are either small in scope or have a clear solution in the ticket description.
+To get familiar with contributing to Skiff, you can start by looking at our list of [good first issues](https://github.com/skiff-org/skiff-apps/issues?q=is:open+is:issue+label:"good+first+issue"). These issues are either small in scope or have a clear solution in the ticket description.
 
 Once you've become familiar, you can also take a look at the list of [dev ready](https://github.com/skiff-org/skiff-apps/issues?q=is:open+is:issue+label:"dev+ready") tickets. These are issues that are slightly larger in scope but have a clear solution in the ticket description.
 

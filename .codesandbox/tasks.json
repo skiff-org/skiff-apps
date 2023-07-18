@@ -1,0 +1,38 @@
+{
+  // These tasks will run in order when initializing your CodeSandbox project.
+  "setupTasks": [
+    {
+      "name": "Set yarn version",
+      "command": "yarn set version berry"
+    },
+    {
+      "name": "Install Dependencies",
+      "command": "yarn install"
+    },
+    {
+      "name": "Build dependencies",
+      "command": "yarn build:lib"
+    },
+    {
+      "name": "Start dev server",
+      "command": "yarn dev"
+    }
+  ],
+
+  // These tasks can be run from CodeSandbox. Running one will open a log in the app.
+  "tasks": {
+    "build:lib": {
+      "name": "build:lib",
+      "command": "yarn build:lib",
+      "runAtStart": false
+    },
+    "dev": {
+      "name": "dev",
+      "command": "yarn dev",
+      "runAtStart": true,
+      "preview": {
+        "port": 4200
+      }
+    }
+  }
+}

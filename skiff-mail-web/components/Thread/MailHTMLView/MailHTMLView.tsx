@@ -7,9 +7,7 @@ import { createPortal } from 'react-dom';
 import { useDispatch } from 'react-redux';
 import {
   contentAsDataUrl,
-  getResourceProxyURL,
   isReactNativeDesktopApp,
-  PLACEHOLDER_CONTENT_URL,
   proxyAttributes,
   rewriteCSSAttribute,
   useTheme
@@ -71,12 +69,6 @@ const MailHTMLView: FC<MailViewProps> = ({ email, attachments, disableRemoteCont
   const { composeNewDraft } = useDrafts();
 
   const originUrl: URL = new URL(window.location.origin);
-  const resourceProxyURLForCSP = getResourceProxyURL(new URL(window.location.origin), false);
-
-  const resourceProxyCspString = resourceProxyURLForCSP.origin.toString() + resourceProxyURLForCSP.pathname.toString();
-  const csp = `default-src 'none'; img-src ${
-    window.location.origin + PLACEHOLDER_CONTENT_URL
-  } blob: data: ${resourceProxyCspString}; style-src 'unsafe-inline'; script-src 'none';`;
 
   const getIframeHtml = (content: string, extraBodyStyle = '') =>
     `
@@ -84,7 +76,6 @@ const MailHTMLView: FC<MailViewProps> = ({ email, attachments, disableRemoteCont
   <html>
     <head>
       <base target="_blank" />
-      <meta http-equiv='Content-Security-Policy' content="${csp}">
       <meta name="viewport" content="width=device-width">
       <style>
         strong {
@@ -309,7 +300,6 @@ const MailHTMLView: FC<MailViewProps> = ({ email, attachments, disableRemoteCont
   return (
     <StylediFrame
       allowFullScreen={false}
-      csp={csp}
       data-test='message-content-iframe'
       frameBorder='0'
       id={MAIL_HTML_IFRAME}
