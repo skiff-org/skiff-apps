@@ -42,11 +42,9 @@ import {
 } from 'skiff-front-utils';
 import { CreditInfo, EntityType, SubscriptionPlan, SystemLabels, ThreadDisplayFormat } from 'skiff-graphql';
 import {
-  ActivationChecklistFeatureFlag,
   filterExists,
-  FrontendMailFilteringFeatureFlag,
   StorageTypes
-} from 'skiff-utils';
+} from 'skiff-utils'
 import styled from 'styled-components';
 
 import { COMPACT_MAILBOX_BREAKPOINT, DEFAULT_MAILBOX_LIMIT } from '../../constants/mailbox.constants';
@@ -154,10 +152,10 @@ export const Mailbox = () => {
   const { value: label, name: labelName } = useRouterLabelContext();
   const prevLabel = usePrevious(label);
   const flags = useFlags();
-  const activationChecklistFF = flags.activationChecklist as ActivationChecklistFeatureFlag;
+  const activationChecklistFF = flags.activationChecklist
   const env = getEnvironment(new URL(window.location.origin));
   const enableActivationChecklist =
-    env === 'local' || env === 'vercel' || activationChecklistFF === ActivationChecklistFeatureFlag.TRIAL;
+    env === 'local' || env === 'vercel' || activationChecklistFF === 'trial'
   // need noSsr in useMediaQuery to avoid the first render returning isCompact as false
   const isCompact = useMediaQuery(`(max-width:${COMPACT_MAILBOX_BREAKPOINT}px)`, { noSsr: true });
   const activeThreadAndEmailIDsFromURL = getInitialThreadParams();
