@@ -145,15 +145,15 @@ export const MessageCell = ({
 
   const getFacepileColor = (isDarkMode: boolean) => {
     if (active) {
-      return isDarkMode ? '#282828' : '#f0f0f0';
+      return isDarkMode ? '#282828' : '##0f1408';
     }
     if (!read) {
-      return isDarkMode ? '#242424' : '#ffffff';
+      return isDarkMode ? '#242424' : '#000000';
     }
     if (hover && read) {
-      return isDarkMode ? '#282828' : '#f0f0f0';
+      return isDarkMode ? '#282828' : '##0f1408';
     }
-    return isDarkMode ? '#1f1f1f' : 'var(--bg-l1-solid)';
+    return isDarkMode ? '#1f1f1f' : '#000000';
   };
   const facepileColor = getFacepileColor(theme === ThemeMode.DARK);
 

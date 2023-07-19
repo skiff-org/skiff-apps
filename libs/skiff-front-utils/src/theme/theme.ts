@@ -195,10 +195,12 @@ const theme = {
     '--cta-primary-hover': `linear-gradient(0deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.16)), rgb(143, 198, 65)`,
     '--cta-primary-active': `linear-gradient(0deg, rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0.24)), rgb(143, 198, 65)`,
     '--cta-primary-disabled': `rgba(143, 198, 65, 0.12)`,
-    '--cta-secondary-default': `rgb(255, 255, 255)`, // white
-    '--cta-secondary-hover': `rgba(143, 198, 65, 0.06)`,
-    '--cta-secondary-active': `rgba(143, 198, 65, 0.08)`,
+
+    '--cta-secondary-default': `rgb(144, 197, 65, 0.16)`, // Homebrew green with opacity
+    '--cta-secondary-hover': `rgba(144, 197, 65, 0.06)`, // Homebrew green with opacity
+    '--cta-secondary-active': `rgba(144, 197, 65, 0.08)`, // Homebrew green with opacity
     '--cta-secondary-disabled': 'transparent',
+
     '--cta-tertiary-default': `transparent`,
     '--cta-tertiary-hover': `rgba(143, 198, 65, 0.08)`,
     '--cta-tertiary-active': `rgba(143, 198, 65, 0.08)`,
@@ -231,7 +233,7 @@ const theme = {
     '--bg-l1-glass': `rgba(40, 40, 40, 0.72)`,
     '--bg-l2-solid': `rgb(60, 60, 60)`, // medium dark grey
     '--bg-l2-glass': `rgba(60, 60, 60, 0.72)`,
-    '--bg-l3-solid': `rgb(80, 80, 80)`, // lighter grey
+    '--bg-l3-solid': `rgb(39 62 16)`, // green
     '--bg-l3-glass': `rgba(80, 80, 80, 0.72)`,
     '--bg-emphasis': `linear-gradient(0deg, rgba(143, 198, 65, 0.16), rgba(143, 198, 65, 0.16)), rgb(0, 0, 0)`, // emphasis with Homebrew green
     '--bg-scrim': `rgba(143, 198, 65, 0.8)`, // heavy Homebrew green
@@ -241,11 +243,11 @@ const theme = {
     '--bg-field-hover': `rgb(20, 20, 20)`,
 
     // overlay
-    '--bg-overlay-primary': `rgba(0, 0, 0, 0.1)`,
-    '--bg-overlay-secondary': `rgba(0, 0, 0, 0.08)`,
-    '--bg-overlay-tertiary': `rgba(0, 0, 0, 0.04)`,
-    '--bg-overlay-quaternary': `rgba(0, 0, 0, 0.01)`,
-    '--bg-overlay-destructive': `rgba(255, 0, 0, 0.24)`, // Homebrew red
+    '--bg-overlay-primary': `rgba(143, 198, 65, 0.1)`, // Homebrew green with opacity
+    '--bg-overlay-secondary': `rgba(143, 198, 65, 0.08)`,
+    '--bg-overlay-tertiary': `rgba(143, 198, 65, 0.06)`,
+    '--bg-overlay-quaternary': `rgba(143, 198, 65, 0.04)`,
+    '--bg-overlay-destructive': `rgba(220, 30, 30, 0.24)`, // Homebrew red
 
     /* shadows - TODO: Remove */
     '--editor-page-shadow': '60 64 67 / 15%) 0 1px 3px 1px',

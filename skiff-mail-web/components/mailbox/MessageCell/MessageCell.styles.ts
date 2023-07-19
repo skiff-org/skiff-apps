@@ -1,4 +1,4 @@
-import { themeNames, CorrectedColorSelect, ThemeMode } from '@skiff-org/skiff-ui';
+import { CorrectedColorSelect, ThemeMode, themeNames } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import styled, { css } from 'styled-components';
 
@@ -145,7 +145,7 @@ export const MessageCellContainer = styled.div<{
   ${(props) =>
     props.active &&
     css`
-      background: var(--border-tertiary) !important;
+      background: var(--bg-overlay-primary) !important;
     `}
   // unread
   ${(props) =>
@@ -158,7 +158,7 @@ export const MessageCellContainer = styled.div<{
     props.hover &&
     props.read &&
     css`
-      background: var(--border-tertiary);
+      background: var(--bg-overlay-primary);
     `}
   ${(props) =>
     props.hover &&
