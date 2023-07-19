@@ -18,11 +18,11 @@ export const ProtonImportDialog = (props: ProtonImportDialogProps) => {
   const { open, onClose, mboxRef, emlRef } = props;
   return (
     <Dialog customContent onClose={() => void onClose()} open={open} title='Import from ProtonMail'>
-      <Typography wrap>
+      <Typography mono uppercase wrap>
         To import from ProtonMail, use the Import/Export app and export an EML file or MBOX file. Then, choose the file
         below to import emails into Skiff.
       </Typography>
-      <Typography wrap>
+      <Typography mono uppercase wrap>
         For more information, visit{' '}
         <a href='https://proton.me/support/export-emails-import-export-app' rel='noopener noreferrer' target='_blank'>
           this link

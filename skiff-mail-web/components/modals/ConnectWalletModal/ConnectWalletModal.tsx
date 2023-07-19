@@ -13,20 +13,21 @@ import {
 } from '@skiff-org/skiff-ui';
 import { FC, useState } from 'react';
 import { useVerifyWalletAddressCreateAliasMutation } from 'skiff-front-graphql';
-import { updateEmailAliases, useToast } from 'skiff-front-utils';
 import {
-  WalletProviderInfo,
-  WALLET_PROVIDERS,
   activateEthProvider,
+  CosmosProvider,
   EthProvider,
   getSolanaProvider,
+  isCosmosProvider,
   isEthProvider,
   isSolProvider,
-  isCosmosProvider,
   SolanaProvider,
-  CosmosProvider,
+  updateEmailAliases,
+  useRequiredCurrentUserData,
+  useToast,
   WalletProvider,
-  useRequiredCurrentUserData
+  WalletProviderInfo,
+  WALLET_PROVIDERS
 } from 'skiff-front-utils';
 import styled from 'styled-components';
 
@@ -230,7 +231,11 @@ export const ConnectWalletModal: FC<ConnectWalletModalProps> = ({
       title='Connect wallet'
       type={DialogTypes.Promotional}
     >
-      {errorMsg && <Typography color='destructive'>{errorMsg}</Typography>}
+      {errorMsg && (
+        <Typography mono uppercase color='destructive'>
+          {errorMsg}
+        </Typography>
+      )}
       <WalletButtons>
         {Object.entries(WALLET_PROVIDERS).map(([provider, providerInfo]) =>
           renderWalletButton(provider as WalletProvider, providerInfo, async () => {

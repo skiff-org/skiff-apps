@@ -1,4 +1,4 @@
-import { Color, Icon, Icons, Size, Typography, TypographySize, isValidIcon } from '@skiff-org/skiff-ui';
+import { Color, Icon, Icons, isValidIcon, Size, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import React, { ReactNode } from 'react';
 import { isMobile } from 'react-device-detect';
 import { DisplayPictureData } from 'skiff-graphql';
@@ -107,9 +107,11 @@ const UserListRow: React.FC<UserListRowProps> = ({
           <UserAvatar displayPictureData={avatarDisplayData} label={displayName} size={Size.X_MEDIUM} />
         )}
         <UsernameDisplayName>
-          <Typography>{formattedDisplayName}</Typography>
+          <Typography mono uppercase>
+            {formattedDisplayName}
+          </Typography>
           {!!subtitle && (
-            <Typography color={subtitleColor ?? 'secondary'} size={TypographySize.SMALL}>
+            <Typography mono uppercase color={subtitleColor ?? 'secondary'} size={TypographySize.SMALL}>
               {subtitle}
             </Typography>
           )}

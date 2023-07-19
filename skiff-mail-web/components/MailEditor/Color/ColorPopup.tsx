@@ -1,16 +1,16 @@
-import { Editor } from '@tiptap/react';
 import {
   accentColorToPrimaryColor,
-  useOnClickOutside,
+  ACCENT_COLOR_VALUES,
+  DROPDOWN_CALLER_CLASSNAME,
+  getThemedColor,
+  Portal,
+  ThemeMode,
   Typography,
   TypographySize,
   TypographyWeight,
-  getThemedColor,
-  ThemeMode,
-  ACCENT_COLOR_VALUES,
-  Portal,
-  DROPDOWN_CALLER_CLASSNAME
+  useOnClickOutside
 } from '@skiff-org/skiff-ui';
+import { Editor } from '@tiptap/react';
 import { FC, useEffect, useRef, useState } from 'react';
 import { ColorSelector } from 'skiff-front-utils';
 import styled from 'styled-components';
@@ -143,6 +143,8 @@ const ColorPopup: FC<ColorPopupPopupProps> = ({ editor, editorContainerRef }) =>
       >
         <HeaderColorBlock>
           <Typography
+            mono
+            uppercase
             color='secondary'
             forceTheme={ThemeMode.DARK}
             size={TypographySize.CAPTION}
@@ -175,6 +177,8 @@ const ColorPopup: FC<ColorPopupPopupProps> = ({ editor, editorContainerRef }) =>
         </HeaderColorBlock>
         <HeaderColorBlock>
           <Typography
+            mono
+            uppercase
             color='secondary'
             forceTheme={ThemeMode.DARK}
             size={TypographySize.CAPTION}

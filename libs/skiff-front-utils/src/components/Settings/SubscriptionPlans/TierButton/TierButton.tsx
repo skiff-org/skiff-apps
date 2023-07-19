@@ -291,7 +291,7 @@ const TierButton = ({
       {/* container is always rendered to prevent layout shifts */}
       <BillingCycleTextContainer>
         {shouldRenderBillingCycleText && (
-          <Typography color={getBillingCycleTextColor(cancelAtPeriodEnd)} size={TypographySize.CAPTION}>
+          <Typography mono uppercase color={getBillingCycleTextColor(cancelAtPeriodEnd)} size={TypographySize.CAPTION}>
             {renderBillingCycleText(supposedEndDate, cancelAtPeriodEnd)}
           </Typography>
         )}

@@ -11,7 +11,7 @@ import {
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
-import React, { Suspense, FC, ReactElement, useRef } from 'react';
+import React, { FC, ReactElement, Suspense, useRef } from 'react';
 import { isMobile } from 'react-device-detect';
 import { DateDisplay, formatName, getNameTooltipLabel } from 'skiff-front-utils';
 
@@ -81,7 +81,9 @@ const CommentReactionsComponent: FC<CommentReactionsProps> = ({
                 <Emoji emoji={reactionId} size={17} />
               </Suspense>
               {reactions[reactionId].length > 1 && (
-                <Typography size={TypographySize.SMALL}>{reactions[reactionId].length}</Typography>
+                <Typography mono uppercase size={TypographySize.SMALL}>
+                  {reactions[reactionId].length}
+                </Typography>
               )}
             </div>
           </TooltipTrigger>
@@ -135,11 +137,13 @@ const CommentHeading: FC<CommentHeadingProps> = ({ time, name }) => (
     <Tooltip placement={TooltipPlacement.RIGHT}>
       <TooltipContent>{getNameTooltipLabel(name)}</TooltipContent>
       <TooltipTrigger>
-        <Typography weight={TypographyWeight.MEDIUM}>{formatName(name)}</Typography>
+        <Typography mono uppercase weight={TypographyWeight.MEDIUM}>
+          {formatName(name)}
+        </Typography>
       </TooltipTrigger>
     </Tooltip>
 
-    <Typography color='secondary'>
+    <Typography mono uppercase color='secondary'>
       <DateDisplay value={time} />
     </Typography>
   </div>
@@ -182,7 +186,11 @@ const Comment: FC<CommentProps> = ({
         ) : (
           <>
             <CommentViewer content={content} oldComment={comment} />
-            {edited && <Typography color='secondary'>(edited)</Typography>}
+            {edited && (
+              <Typography mono uppercase color='secondary'>
+                (edited)
+              </Typography>
+            )}
             {reactions && (
               <CommentReactionsComponent
                 theme={theme}

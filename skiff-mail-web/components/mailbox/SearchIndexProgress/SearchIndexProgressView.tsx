@@ -1,4 +1,4 @@
-import { Typography, TypographyWeight, Size, MonoTag, Alignment } from '@skiff-org/skiff-ui';
+import { Alignment, MonoTag, Size, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import pluralize from 'pluralize';
 import React from 'react';
 import { EmptyMailbox, MailTypography } from 'skiff-front-utils';
@@ -24,8 +24,10 @@ const InfoBox = styled.div`
 
 export const getSearchIndexProgressText = (center?: boolean) => (
   <>
-    <Typography weight={TypographyWeight.MEDIUM}>Creating private search index</Typography>
-    <Typography align={center ? Alignment.CENTER : undefined} color='secondary' wrap={center}>
+    <Typography mono uppercase weight={TypographyWeight.MEDIUM}>
+      Creating private search index
+    </Typography>
+    <Typography mono uppercase align={center ? Alignment.CENTER : undefined} color='secondary' wrap={center}>
       Results will be complete when your device finishes decrypting all mail.
     </Typography>
   </>

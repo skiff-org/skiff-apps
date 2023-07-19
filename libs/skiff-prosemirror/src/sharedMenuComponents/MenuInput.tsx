@@ -1,7 +1,7 @@
 import '../ui/skiff-editor-menus.css';
 
 import { ThemeMode, Typography } from '@skiff-org/skiff-ui';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 
 import { SearchPlaceHolder } from '../slashMenu/InterfacesAndEnums';
 
@@ -9,7 +9,7 @@ import { SearchPlaceHolder } from '../slashMenu/InterfacesAndEnums';
 const MenuInput: FunctionComponent<{ value: string }> = ({ value }) => (
   <div>
     <div className='skiff-editor-menu-input'>
-      <Typography color={value.length === 0 ? 'disabled' : 'primary'} forceTheme={ThemeMode.DARK}>
+      <Typography mono uppercase color={value.length === 0 ? 'disabled' : 'primary'} forceTheme={ThemeMode.DARK}>
         {value.length === 0 ? SearchPlaceHolder : value}
       </Typography>
     </div>

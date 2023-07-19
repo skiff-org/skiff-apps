@@ -44,7 +44,13 @@ const FullContactRow: FC<FullContactRowProps> = ({ address: addrObj, index, labe
     <>
       <FullContactRowContainer key={address}>
         {index === 0 && (
-          <Typography color='secondary' minWidth='unset' size={isMobile ? TypographySize.SMALL : undefined}>
+          <Typography
+            mono
+            uppercase
+            color='secondary'
+            minWidth='unset'
+            size={isMobile ? TypographySize.SMALL : undefined}
+          >
             {label}
           </Typography>
         )}
@@ -52,6 +58,8 @@ const FullContactRow: FC<FullContactRowProps> = ({ address: addrObj, index, labe
         <NameBlock indent={index !== 0 ? label.length : undefined}>
           <span ref={ref}>
             <Typography
+              mono
+              uppercase
               color='link'
               onClick={() => {
                 setShowActionDropdown((prev) => !prev);
@@ -62,7 +70,7 @@ const FullContactRow: FC<FullContactRowProps> = ({ address: addrObj, index, labe
             </Typography>
           </span>
           {!!name && (
-            <Typography color='secondary' size={isMobile ? TypographySize.SMALL : undefined}>
+            <Typography mono uppercase color='secondary' size={isMobile ? TypographySize.SMALL : undefined}>
               <Address>{`<${displayAddress}>`}</Address>
             </Typography>
           )}

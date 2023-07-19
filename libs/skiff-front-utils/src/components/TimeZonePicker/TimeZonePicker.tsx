@@ -1,5 +1,5 @@
+import { ThemeMode, themeNames, Typography } from '@skiff-org/skiff-ui';
 import { getTimeZones, TimeZone } from '@vvo/tzdb';
-import { Typography, ThemeMode, themeNames } from '@skiff-org/skiff-ui';
 import styled from 'styled-components';
 
 export const TimeDiffContainer = styled.span`
@@ -27,7 +27,7 @@ export const stringifyTimeZone = (currTimeZone: TimeZone) =>
 
 export const renderCustomLabel = (currTimeZone: TimeZone) => {
   return (
-    <Typography forceTheme={ThemeMode.DARK}>
+    <Typography mono uppercase forceTheme={ThemeMode.DARK}>
       <TimeDiffContainer>GMT{currTimeZone.currentTimeFormat.split(' ')[0]}</TimeDiffContainer>
       <span>{currTimeZone.alternativeName}</span>
       <CityName>{getCityNameFotTZ(currTimeZone)}</CityName>

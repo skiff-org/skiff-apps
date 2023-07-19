@@ -2,21 +2,21 @@ import { FilledVariant, Icon, IconButton, Icons, Type, Typography, TypographySiz
 import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import {
-  GetUserMfaQuery,
-  LoginSrpRequest,
   checkMFAEnabled,
   disableMfa,
   enrollMfa,
+  GetUserMfaQuery,
+  LoginSrpRequest,
   regenerateMfaBackupCodes,
   useLoginSrpStep2Mutation
 } from 'skiff-front-graphql';
 import {
+  configureMFA,
   DEFAULT_WORKSPACE_EVENT_VERSION,
   MFADialog,
   SettingAction,
   StepsMFA,
   TitleActionSection,
-  configureMFA,
   useRegisterKey,
   useRequiredCurrentUserData,
   useToast
@@ -289,10 +289,12 @@ function SetupMFA() {
               <MfaLeftJustifiedContainer>
                 <Icons color='disabled' icon={Icon.Key} size={20} />
                 <NameUsed>
-                  <Typography>{webauthnData.keyName}</Typography>
+                  <Typography mono uppercase>
+                    {webauthnData.keyName}
+                  </Typography>
                   {!isMobile && (
                     <MonoAdjust>
-                      <Typography color='disabled' mono size={TypographySize.SMALL} uppercase wrap>
+                      <Typography mono uppercase color='disabled' mono size={TypographySize.SMALL} uppercase wrap>
                         &nbsp;·&nbsp;Last used&nbsp;·&nbsp;
                         {webauthnData.lastSuccessfulChallenge
                           ? new Date(webauthnData.lastSuccessfulChallenge).toDateString().toUpperCase()
@@ -325,7 +327,9 @@ function SetupMFA() {
             <MfaDataContainer>
               <MfaLeftJustifiedContainer>
                 <Icons color='disabled' icon={Icon.QrCodeScan} size={20} />
-                <Typography>Authenticator app</Typography>
+                <Typography mono uppercase>
+                  Authenticator app
+                </Typography>
               </MfaLeftJustifiedContainer>
               <MfaRightJustifiedContainer>
                 {userMfaData?.mfa.backupCodes && (

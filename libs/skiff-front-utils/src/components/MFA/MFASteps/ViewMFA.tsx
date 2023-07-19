@@ -1,4 +1,3 @@
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import {
   ButtonGroup,
   ButtonGroupItem,
@@ -12,6 +11,7 @@ import {
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import React, { useState } from 'react';
 import { MfaTypes } from 'skiff-graphql';
 import styled from 'styled-components';
@@ -109,7 +109,7 @@ function ViewQRCode({ closeDialog, qrUrl, setStep, totpSeed, userMfaTypes }: Vie
   const renderClipBoardButton = () => <IconText onClick={copyToClipboard} startIcon={Icon.Copy} />;
 
   const renderDescription = () => (
-    <Typography color='secondary' wrap>
+    <Typography mono uppercase color='secondary' wrap>
       Set up TOTP by scanning the QR code or copying the code into your authenticator app.
     </Typography>
   );
@@ -125,8 +125,10 @@ function ViewQRCode({ closeDialog, qrUrl, setStep, totpSeed, userMfaTypes }: Vie
             }}
           >
             <OptionContainerText>
-              <Typography color='primary'>Have a hardware key?</Typography>
-              <Typography color='secondary' wrap>
+              <Typography mono uppercase color='primary'>
+                Have a hardware key?
+              </Typography>
+              <Typography mono uppercase color='secondary' wrap>
                 Set up biometric authentication or a hardware key.
               </Typography>
             </OptionContainerText>
@@ -136,10 +138,11 @@ function ViewQRCode({ closeDialog, qrUrl, setStep, totpSeed, userMfaTypes }: Vie
             <OrSeparatorContainer>
               <Divider />
               <Typography
+                mono
+                uppercase
                 color='secondary'
                 minWidth='20px'
                 size={TypographySize.SMALL}
-                uppercase
                 weight={TypographyWeight.MEDIUM}
               >
                 or

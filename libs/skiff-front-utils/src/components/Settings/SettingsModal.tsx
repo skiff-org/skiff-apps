@@ -26,9 +26,9 @@ import {
   DEFAULT_WEB_SETTING_INDICES,
   Setting,
   SettingIndices,
-  SETTINGS_TABS_LABELS,
   SettingsSection,
   SettingsTab,
+  SETTINGS_TABS_LABELS,
   SettingType,
   TabPage
 } from './Settings.types';
@@ -173,7 +173,11 @@ const SettingView: FC<SettingViewProps> = ({ setting, index }) => {
       return (
         <Surface size='full-width'>
           {setting.label && <IconText label={setting.label} startIcon={setting.icon} />}
-          {setting.description && <Typography color='secondary'>{setting.description}</Typography>}
+          {setting.description && (
+            <Typography mono uppercase color='secondary'>
+              {setting.description}
+            </Typography>
+          )}
           {setting.component}
         </Surface>
       );
@@ -258,9 +262,11 @@ export const SettingsModal = ({ sections, open, onClose, onChangeIndices, initia
               style={{ border: '1px solid var(--border-secondary)', borderRadius: '8px', overflow: 'hidden' }}
             />
             <AccountName>
-              <Typography maxWidth='160px'>{name}</Typography>
+              <Typography mono uppercase maxWidth='160px'>
+                {name}
+              </Typography>
               {displayName && (
-                <Typography color='disabled' maxWidth='160px' size={TypographySize.SMALL}>
+                <Typography mono uppercase color='disabled' maxWidth='160px' size={TypographySize.SMALL}>
                   {defaultEmailAlias || userProfileData?.username}
                 </Typography>
               )}
@@ -272,7 +278,13 @@ export const SettingsModal = ({ sections, open, onClose, onChangeIndices, initia
               <>
                 <ItemContainer key={label}>
                   <TitleBlock>
-                    <Typography color='disabled' mono size={TypographySize.SMALL} weight={TypographyWeight.MEDIUM}>
+                    <Typography
+                      mono
+                      uppercase
+                      color='disabled'
+                      size={TypographySize.SMALL}
+                      weight={TypographyWeight.MEDIUM}
+                    >
                       {label.toUpperCase()}
                     </Typography>
                   </TitleBlock>
@@ -326,7 +338,7 @@ export const SettingsModal = ({ sections, open, onClose, onChangeIndices, initia
         <Sidebar sections={fileTree} width={240} />
         <View>
           {!EXCLUDE_TITLE.includes(activeTab.tab) && activeTab.tab !== TabPage.Empty && !!activeTab.tab && (
-            <Typography align={Alignment.LEFT} size={TypographySize.H4} weight={TypographyWeight.BOLD}>
+            <Typography mono uppercase align={Alignment.LEFT} size={TypographySize.H4} weight={TypographyWeight.BOLD}>
               {upperCaseFirstLetter(SETTINGS_TABS_LABELS[activeTab.tab])}
             </Typography>
           )}

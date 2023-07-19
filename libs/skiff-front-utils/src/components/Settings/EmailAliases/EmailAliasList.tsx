@@ -81,7 +81,9 @@ const EmailAliasList: React.FC<EmailAliasListProps> = ({
           <EmailAliasRow key={alias} $isLastRow={index === allAliases.length - 1}>
             <EmailAliasUsername>
               <Avatar label={alias} />
-              <Typography>{alias}</Typography>
+              <Typography mono uppercase>
+                {alias}
+              </Typography>
             </EmailAliasUsername>
             <EmailAliasRowEnd>
               {isDefaultEmailAlias && <DefaultEmailTag />}

@@ -1,4 +1,3 @@
-import { AnimatePresence, motion } from 'framer-motion';
 import {
   Button,
   DropdownItem,
@@ -12,6 +11,7 @@ import {
   Type,
   Typography
 } from '@skiff-org/skiff-ui';
+import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
@@ -210,7 +210,9 @@ export default function TitleActionSection(props: TitleSectionProps) {
                               key={item.value}
                               onClick={() => action.onChange(item.value)}
                             >
-                              <Typography>{item.label}</Typography>
+                              <Typography mono uppercase>
+                                {item.label}
+                              </Typography>
                               {item.value === action.value && (
                                 <Icons color='link' icon={Icon.Check} size={Size.X_MEDIUM} />
                               )}

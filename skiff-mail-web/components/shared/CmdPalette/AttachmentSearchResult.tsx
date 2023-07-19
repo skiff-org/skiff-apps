@@ -1,5 +1,5 @@
-import dayjs from 'dayjs';
 import { Icon, Icons, ThemeMode, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
+import dayjs from 'dayjs';
 import { formatTypeSize, getIconFromMIMEType } from 'skiff-front-utils';
 import styled from 'styled-components';
 
@@ -68,6 +68,8 @@ export const AttachmentSearchResult = ({
         <NameEmailBlock>
           <Highlight customColor='white' query={query} size='small' text={fileName} />
           <Typography
+            mono
+            uppercase
             color='secondary'
             forceTheme={ThemeMode.DARK}
             size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}
@@ -75,11 +77,23 @@ export const AttachmentSearchResult = ({
           >{` - ${emailSubject}`}</Typography>
         </NameEmailBlock>
         <DateText>
-          <Typography color='secondary' forceTheme={ThemeMode.DARK} size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}>
+          <Typography
+            mono
+            uppercase
+            color='secondary'
+            forceTheme={ThemeMode.DARK}
+            size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}
+          >
             {dayjs(createdAt).format('MMM D')}
           </Typography>
         </DateText>
-        <Typography color='secondary' forceTheme={ThemeMode.DARK} size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}>
+        <Typography
+          mono
+          uppercase
+          color='secondary'
+          forceTheme={ThemeMode.DARK}
+          size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}
+        >
           {formattedTypeAndSize}
         </Typography>
       </SearchResultContentArea>

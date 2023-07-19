@@ -1,4 +1,3 @@
-import isArray from 'lodash/isArray';
 import {
   ButtonComponent,
   ButtonGroup,
@@ -11,6 +10,7 @@ import {
   Typography,
   TypographySize
 } from '@skiff-org/skiff-ui';
+import isArray from 'lodash/isArray';
 import React, { ReactNode } from 'react';
 import { isMobile } from 'react-device-detect';
 import { CreateUploadAvatarLinkResponse, DisplayPictureData } from 'skiff-graphql';
@@ -181,7 +181,13 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
           <ListHeader>
             {columnHeaders.map((columnHeader) => (
               <ColumnValue $canSetEditing={false} key={`${columnHeader}-header`}>
-                <Typography color='disabled' key={`column-header-${columnHeader}`} mono size={TypographySize.CAPTION}>
+                <Typography
+                  mono
+                  uppercase
+                  color='disabled'
+                  key={`column-header-${columnHeader}`}
+                  size={TypographySize.CAPTION}
+                >
                   {columnHeader}
                 </Typography>
               </ColumnValue>
@@ -199,7 +205,11 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
                     key={`${colKey}-user-profile-column`}
                     onClick={!!setIsEditing ? () => setIsEditing(true) : undefined}
                   >
-                    {(!isEditing || !setValue) && <Typography color={color}>{value}</Typography>}
+                    {(!isEditing || !setValue) && (
+                      <Typography mono uppercase color={color}>
+                        {value}
+                      </Typography>
+                    )}
                     {isEditing && setValue && (
                       <InputField
                         autoFocus={autoFocus}

@@ -42,7 +42,12 @@ const CreditPrompt: React.FC<CreditPromptProps> = ({ action, amount, complete, d
       <AmountBox $complete={complete}>
         {isMobile && complete && <Icons color='green' icon={Icon.Check} size={Size.X_MEDIUM} />}
         {(!complete || !isMobile) && (
-          <Typography color={isMobile && complete ? 'green' : 'secondary'} weight={TypographyWeight.MEDIUM}>
+          <Typography
+            mono
+            uppercase
+            color={isMobile && complete ? 'green' : 'secondary'}
+            weight={TypographyWeight.MEDIUM}
+          >
             ${amount}
           </Typography>
         )}

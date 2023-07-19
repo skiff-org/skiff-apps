@@ -1,4 +1,4 @@
-import { Icon, DropdownItem, Drawer, Icons, Dropdown, Typography } from '@skiff-org/skiff-ui';
+import { Drawer, Dropdown, DropdownItem, Icon, Icons, Typography } from '@skiff-org/skiff-ui';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -6,13 +6,13 @@ import { useGetCurrentUserCustomDomainsQuery } from 'skiff-front-graphql';
 import {
   createAbbreviatedWalletEmail,
   createEmail,
-  splitEmailToAliasAndDomain,
   DrawerOption,
   DrawerOptions,
-  useDefaultEmailAlias,
-  useRequiredCurrentUserData,
   SettingValue,
-  TabPage
+  splitEmailToAliasAndDomain,
+  TabPage,
+  useDefaultEmailAlias,
+  useRequiredCurrentUserData
 } from 'skiff-front-utils';
 import { CustomDomainRecord } from 'skiff-graphql';
 import { CustomDomainStatus, isWalletAddress } from 'skiff-utils';
@@ -189,7 +189,9 @@ const FromAddressField: FC<FromAddressFieldProps> = ({
           onClick={focusAndOpenDropdown}
           ref={fromSelectRef}
         >
-          <Typography>{getAliasDisplayText(userEmail)}</Typography>
+          <Typography mono uppercase>
+            {getAliasDisplayText(userEmail)}
+          </Typography>
           <Icons color='disabled' icon={Icon.ChevronDown} />
         </FromAddressLabel>
       </FieldHeight>

@@ -1,6 +1,6 @@
+import { Drawer, DropdownItem, Icon, Icons, Size, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { DropdownItem, Icon, Icons, Size, ThemeMode, Typography, Drawer, TypographySize } from '@skiff-org/skiff-ui';
 import { FC, useCallback, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { useGetNumUnreadQuery, useUserLabelsQuery } from 'skiff-front-graphql';
@@ -22,12 +22,12 @@ import { skemailMobileDrawerReducer } from '../../../redux/reducers/mobileDrawer
 import {
   getLabelDisplayName,
   getLabelFromPathParams,
+  getSystemLabels,
   getURLFromLabel,
   Label,
   LabelType,
   orderAliasLabels,
   splitUserLabelsByVariant,
-  getSystemLabels,
   userLabelFromGraphQL
 } from '../../../utils/label';
 
@@ -97,7 +97,9 @@ const LabelItem: FC<{ label: Label }> = ({ label }) => {
           </CheckIconContainer>
         )}
         {label.name !== routerLabelName && numUnread > 0 && (
-          <Typography forceTheme={ThemeMode.DARK}>{numUnread}</Typography>
+          <Typography mono uppercase forceTheme={ThemeMode.DARK}>
+            {numUnread}
+          </Typography>
         )}
       </Badge>
     </ForwardAndCount>
@@ -141,7 +143,15 @@ export default function MobileMailboxSelectDrawer() {
   const [defaultEmailAlias] = useDefaultEmailAlias(user.userID);
 
   const renderLabelHeader = (title: string) => (
-    <Typography color='secondary' forceTheme={ThemeMode.DARK} mono selectable={false} size={TypographySize.SMALL}>
+    <Typography
+      mono
+      uppercase
+      color='secondary'
+      forceTheme={ThemeMode.DARK}
+      mono
+      selectable={false}
+      size={TypographySize.SMALL}
+    >
       <LabelHeader>{title.toUpperCase()}</LabelHeader>
     </Typography>
   );

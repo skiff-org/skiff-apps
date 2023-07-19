@@ -47,8 +47,12 @@ const SubscriptionItem: React.FC<SubscriptionItemProps> = ({ icon, title, subtit
           <Icons icon={icon} color='secondary' size={Size.X_MEDIUM} />
         </IconContainer>
         <SubscriptionInfo>
-          <Typography>{title}</Typography>
-          <Typography color='secondary'>{subtitle}</Typography>
+          <Typography mono uppercase>
+            {title}
+          </Typography>
+          <Typography mono uppercase color='secondary'>
+            {subtitle}
+          </Typography>
         </SubscriptionInfo>
       </SubscriptionIconInfo>
       {endAction}

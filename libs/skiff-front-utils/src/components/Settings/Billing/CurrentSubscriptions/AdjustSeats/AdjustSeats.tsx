@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useAdjustBusinessPlanMutation } from 'skiff-front-graphql';
 import { RequestStatus, SubscriptionInterval } from 'skiff-graphql';
-import { PlanPrices, TierName, getMaxUsersPerWorkspace } from 'skiff-utils';
+import { getMaxUsersPerWorkspace, PlanPrices, TierName } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useCurrentOrganization, useToast } from '../../../../../hooks';
@@ -193,18 +193,22 @@ const AdjustSeatsModal: React.FC<AdjustSeatsModalProps> = (props) => {
         title='Adjust seats'
       >
         <ItemContainer>
-          <Typography weight={TypographyWeight.MEDIUM}>Current usage</Typography>
-          <Typography>
+          <Typography mono uppercase weight={TypographyWeight.MEDIUM}>
+            Current usage
+          </Typography>
+          <Typography mono uppercase>
             <LinkColor>{`${minimumSeats} of ${allocatedSeats}`}</LinkColor> seats used
           </Typography>
         </ItemContainer>
         <ItemContainer>
-          <Typography weight={TypographyWeight.MEDIUM}>Adjust seats</Typography>
+          <Typography mono uppercase weight={TypographyWeight.MEDIUM}>
+            Adjust seats
+          </Typography>
           <AdjustButtons>
             {!!activeSubscriptionBillingInterval && (
               <PriceContainer>
                 {seatDifference > 0 && (
-                  <Typography color='secondary'>{`(plus ${formattedTotalPriceDifference} / ${
+                  <Typography mono uppercase color='secondary'>{`(plus ${formattedTotalPriceDifference} / ${
                     isMonthly ? 'month' : 'year'
                   })`}</Typography>
                 )}

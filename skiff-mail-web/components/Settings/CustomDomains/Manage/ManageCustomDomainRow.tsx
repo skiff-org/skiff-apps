@@ -1,6 +1,4 @@
 import { ApolloError } from '@apollo/client';
-import { motion, useAnimation } from 'framer-motion';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import {
   ButtonGroup,
   ButtonGroupItem,
@@ -10,8 +8,8 @@ import {
   DropdownItem,
   FilledVariant,
   Icon,
-  IconText,
   Icons,
+  IconText,
   InputField,
   MonoTag,
   Select,
@@ -20,6 +18,8 @@ import {
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
+import { motion, useAnimation } from 'framer-motion';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import pluralize from 'pluralize';
 import { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -31,11 +31,11 @@ import {
   useVerifyCustomDomainMutation
 } from 'skiff-front-graphql';
 import {
-  CUSTOM_DOMAIN_SETUP_BLOG,
   ConfirmModal,
+  CUSTOM_DOMAIN_SETUP_BLOG,
+  renderDate,
   SettingValue,
   TabPage,
-  renderDate,
   useAllowAddCustomDomainAliases,
   useCreateAlias,
   useCurrentUserEmailAliases,
@@ -54,9 +54,9 @@ import styled, { css } from 'styled-components';
 
 import {
   EXPIRES_SOON_BUFFER_IN_MS,
-  UserFacingCustomDomainStatus,
   getErrorStatusForDnsRecord,
-  getUserFacingVerificationStatus
+  getUserFacingVerificationStatus,
+  UserFacingCustomDomainStatus
 } from '../../../../utils/customDomainUtils';
 import { useSettings } from '../../useSettings';
 import DnsRecordHeader from '../DnsRecordHeader';
@@ -401,7 +401,11 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
   const inputField = (
     <InputField
       autoFocus
-      endAdornment={<Typography>@{domain}</Typography>}
+      endAdornment={
+        <Typography mono uppercase>
+          @{domain}
+        </Typography>
+      }
       errorMsg={error}
       helperText='You can use letters, numbers, periods, dashes, and underscores.'
       onChange={onInputChange}
@@ -566,19 +570,26 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
             {!isMobile && getCustomDomainIcon(userFacingVerificationStatus, expiresSoon)}
             <NameAndInfo>
               <DomainName>
-                <Typography minWidth='80px' weight={TypographyWeight.MEDIUM}>
+                <Typography mono uppercase minWidth='80px' weight={TypographyWeight.MEDIUM}>
                   {domain}
                 </Typography>
               </DomainName>
               <InfoText>
-                <Typography color={getInfoTextColor()} size={TypographySize.SMALL} wrap>
+                <Typography mono uppercase color={getInfoTextColor()} size={TypographySize.SMALL} wrap>
                   {renderInfoText()}
                 </Typography>
                 {!skiffManaged &&
                   !showDomainInfo &&
                   isCurrentUserOrgAdmin &&
                   userFacingVerificationStatus === UserFacingCustomDomainStatus.DNS_RECORD_ERROR && (
-                    <Typography color='link' onClick={() => setShowDomainInfo(true)} size={TypographySize.SMALL} wrap>
+                    <Typography
+                      mono
+                      uppercase
+                      color='link'
+                      onClick={() => setShowDomainInfo(true)}
+                      size={TypographySize.SMALL}
+                      wrap
+                    >
                       &nbsp;Check errors
                     </Typography>
                   )}
@@ -640,7 +651,9 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
           </DividerContainer>
           <CatchallRow>
             <TitleContainer>
-              <Typography>Set a catch-all address</Typography>
+              <Typography mono uppercase>
+                Set a catch-all address
+              </Typography>
             </TitleContainer>
             <div>
               <Select
@@ -704,7 +717,9 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
         <ChooseDefaultList>
           {currentCustomAliases.map((alias) => (
             <LabelRadioSelect key={`${customDomain.domainID}-${alias}`} onClick={() => setNewDefaultAlias(alias)}>
-              <Typography maxWidth='260px'>{alias}</Typography>
+              <Typography mono uppercase maxWidth='260px'>
+                {alias}
+              </Typography>
               {newDefaultAlias === alias && (
                 <CheckedIcon>
                   <CheckedIconDot />
@@ -737,7 +752,7 @@ const ManageCustomDomainRow: React.FC<ManageCustomDomainRowProps> = ({
         title='Fix DNS record configuration'
         type={DialogTypes.Landscape}
       >
-        <Typography color='secondary' size={TypographySize.MEDIUM} wrap>
+        <Typography mono uppercase color='secondary' size={TypographySize.MEDIUM} wrap>
           {`Please visit your DNS provider for '${domain}' to amend the ${pluralize(
             'record',
             erroneousRecords.length

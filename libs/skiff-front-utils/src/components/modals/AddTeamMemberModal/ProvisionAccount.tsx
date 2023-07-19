@@ -16,13 +16,13 @@ import { FC, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useGetOrganizationQuery, useValidateMailAliasLazyQuery } from 'skiff-front-graphql';
 import { getPaywallErrorCode } from 'skiff-graphql';
-import { PaywallErrorCode, insertIf } from 'skiff-utils';
+import { insertIf, PaywallErrorCode } from 'skiff-utils';
 import styled from 'styled-components';
 import isEmail from 'validator/lib/isEmail';
 
 import { useRequiredCurrentUserData } from '../../../apollo';
 import { useAvailableCustomDomains, useToast } from '../../../hooks';
-import { MAIL_DOMAIN, formatUsernameAndCheckExists, generateRandomPassword, provisionNewUser } from '../../../utils';
+import { formatUsernameAndCheckExists, generateRandomPassword, MAIL_DOMAIN, provisionNewUser } from '../../../utils';
 import InputFieldEndAction from '../../InputFieldEndAction';
 import { NewEmailAliasInput } from '../../NewEmailAliasInput';
 
@@ -229,7 +229,9 @@ const ProvisionAccount: FC<ProvisionAccountProps> = ({
     <>
       {showConfirmProvision && (
         <AccountContainer>
-          <Typography forceTheme={isMobile ? ThemeMode.DARK : undefined}>{deliveryEmail}</Typography>
+          <Typography mono uppercase forceTheme={isMobile ? ThemeMode.DARK : undefined}>
+            {deliveryEmail}
+          </Typography>
           <IconText
             color='secondary'
             forceTheme={isMobile ? ThemeMode.DARK : undefined}

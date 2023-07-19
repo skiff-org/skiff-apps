@@ -1,8 +1,7 @@
 import { ApolloError } from '@apollo/client';
-import { motion } from 'framer-motion';
 import {
-  colors,
   CircularProgress,
+  colors,
   Icon,
   Icons,
   Size,
@@ -12,6 +11,7 @@ import {
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
+import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { TabPage, TABS_QUERY_PARAM, useToast } from 'skiff-front-utils';
 import { getPaywallErrorCode } from 'skiff-graphql';
@@ -155,6 +155,8 @@ const CustomDomainSearchRow: React.FC<CustomDomainSearchRowProps> = ({ domainRes
       transition={{ duration: 0.2 }}
     >
       <Typography
+        mono
+        uppercase
         color={domainResult.available ? 'primary' : 'disabled'}
         forceTheme={ThemeMode.DARK}
         size={TypographySize.H3}
@@ -165,16 +167,16 @@ const CustomDomainSearchRow: React.FC<CustomDomainSearchRowProps> = ({ domainRes
       <DomainInfo>
         {domainResult.available && domainResult.price && (
           <DomainPrice>
-            <Typography color='white' size={TypographySize.LARGE} weight={TypographyWeight.MEDIUM}>
+            <Typography mono uppercase color='white' size={TypographySize.LARGE} weight={TypographyWeight.MEDIUM}>
               ${(domainResult.price * GODADDY_PRICE_SCALE_FACTOR).toFixed(2)}
             </Typography>
-            <Typography color='disabled' forceTheme={ThemeMode.DARK}>
+            <Typography mono uppercase color='disabled' forceTheme={ThemeMode.DARK}>
               <DomainRegistrationInterval $isHovering={showArrow}>FIRST YEAR</DomainRegistrationInterval>
             </Typography>
           </DomainPrice>
         )}
         {!domainResult.available && (
-          <Typography color='destructive' forceTheme={ThemeMode.DARK} mono>
+          <Typography mono uppercase color='destructive' forceTheme={ThemeMode.DARK} mono>
             DOMAIN TAKEN
           </Typography>
         )}

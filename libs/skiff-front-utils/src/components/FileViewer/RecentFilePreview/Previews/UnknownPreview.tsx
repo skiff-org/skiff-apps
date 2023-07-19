@@ -28,10 +28,10 @@ const UnknownPreview = ({
     return (
       <UnknownContainer>
         <PreviewEmpty />
-        <Typography color='secondary' forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
+        <Typography mono uppercase color='secondary' forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
           No preview available
         </Typography>
-        <Typography color='disabled' forceTheme={ThemeMode.DARK}>
+        <Typography mono uppercase color='disabled' forceTheme={ThemeMode.DARK}>
           Previews for this file type are not supported.
         </Typography>
       </UnknownContainer>
@@ -45,7 +45,7 @@ const UnknownPreview = ({
         size={Size.X_LARGE}
       />
       {tooLargeForPreview && (
-        <Typography color='disabled' forceTheme={ThemeMode.DARK}>
+        <Typography mono uppercase color='disabled' forceTheme={ThemeMode.DARK}>
           Too large to preview
         </Typography>
       )}

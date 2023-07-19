@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import {
   Chip,
   ClickType,
@@ -13,6 +12,7 @@ import {
   Typography,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
+import dayjs from 'dayjs';
 import React from 'react';
 import { useUserLabelsQuery } from 'skiff-front-graphql';
 import { UserLabelVariant } from 'skiff-graphql';
@@ -204,6 +204,8 @@ export default function SearchResult({
     return (
       <SearchResultHeaderRow isFirstRow={isFirstRow} style={style} tabIndex={-1}>
         <Typography
+          mono
+          uppercase
           color='disabled'
           forceTheme={ThemeMode.DARK}
           mono
@@ -215,6 +217,8 @@ export default function SearchResult({
         </Typography>
         {item.showAllOptions && onClick && (
           <Typography
+            mono
+            uppercase
             color='link'
             forceTheme={ThemeMode.DARK}
             onClick={() => onClick(false)}
@@ -233,7 +237,11 @@ export default function SearchResult({
         <SearchResultRow onMouseEnter={onHover} onMouseUp={onSearchResultClick} style={style} tabIndex={-1}>
           <SelectableChips>
             <FilterChip noBorder prefix={filterPrefix} searchFilter={item} userLabels={userLabels} />
-            {item.query && <Typography forceTheme={ThemeMode.DARK}>{item.query}</Typography>}
+            {item.query && (
+              <Typography mono uppercase forceTheme={ThemeMode.DARK}>
+                {item.query}
+              </Typography>
+            )}
           </SelectableChips>
         </SearchResultRow>
       );
@@ -256,7 +264,11 @@ export default function SearchResult({
               );
             })}
             {!!query.length && <Highlight query={query} text={subject} />}
-            {!query.length && <Typography forceTheme={ThemeMode.DARK}>{subject}</Typography>}
+            {!query.length && (
+              <Typography mono uppercase forceTheme={ThemeMode.DARK}>
+                {subject}
+              </Typography>
+            )}
           </SelectableChips>
         }
       </SearchResultRow>
@@ -331,6 +343,8 @@ export default function SearchResult({
                 />
               ) : (
                 <Typography
+                  mono
+                  uppercase
                   color={item.read === false ? 'primary' : 'secondary'}
                   forceTheme={ThemeMode.DARK}
                   size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}
@@ -373,7 +387,13 @@ export default function SearchResult({
             {itemType === SearchItemType.Skemail && (
               <SkemailMetaDataArea>
                 <UnreadIndicator $cellTransition={false} $forceTheme={ThemeMode.DARK} $read={item.read} />
-                <Typography color='secondary' forceTheme={ThemeMode.DARK} size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}>
+                <Typography
+                  mono
+                  uppercase
+                  color='secondary'
+                  forceTheme={ThemeMode.DARK}
+                  size={SEARCH_ITEM_DEFAULT_TYPOGRAPHY_SIZE}
+                >
                   {dayjs(item.createdAt).format('MMM D')}
                 </Typography>
               </SkemailMetaDataArea>

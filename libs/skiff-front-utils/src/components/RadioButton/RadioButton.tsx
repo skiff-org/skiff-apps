@@ -75,10 +75,17 @@ const RadioButton: React.FC<RadioButtonProps> = ({
       onClick={!disabled ? onClick : undefined}
     >
       <LabelAndDescription>
-        <Typography forceTheme={theme} size={TypographySize.SMALL}>
+        <Typography mono uppercase forceTheme={theme} size={TypographySize.SMALL}>
           {label}
         </Typography>
-        <Typography color={checked ? 'secondary' : 'disabled'} forceTheme={theme} size={TypographySize.SMALL} wrap>
+        <Typography
+          mono
+          uppercase
+          color={checked ? 'secondary' : 'disabled'}
+          forceTheme={theme}
+          size={TypographySize.SMALL}
+          wrap
+        >
           {description}
         </Typography>
       </LabelAndDescription>

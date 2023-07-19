@@ -37,8 +37,10 @@ const DowngradeTodoItem: React.FC<DowngradeTodoItemProps> = ({ checked, title, d
     <TodoItemContainer>
       <Checkbox checked={checked}>{checked && <Icons color='white' icon={Icon.Check} />}</Checkbox>
       <div>
-        <Typography wrap>{title}</Typography>
-        <Typography color='secondary' wrap>
+        <Typography mono uppercase wrap>
+          {title}
+        </Typography>
+        <Typography mono uppercase color='secondary' wrap>
           {description}
         </Typography>
       </div>

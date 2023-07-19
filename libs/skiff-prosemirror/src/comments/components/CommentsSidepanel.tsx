@@ -13,7 +13,7 @@ import {
 } from '@skiff-org/skiff-ui';
 import { MarkType } from 'prosemirror-model';
 import { EditorView } from 'prosemirror-view';
-import React, { FC, MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react'; // eslint-disable-line
+import { FC, MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react'; // eslint-disable-line
 import styled from 'styled-components';
 
 import { getCustomState } from '../..';
@@ -312,10 +312,10 @@ export const CommentsSidepanel: FC<CommentsSidepanelProps> = ({
           ))
         ) : (
           <div className='no-comments-toshow'>
-            <Typography weight={TypographyWeight.BOLD}>{`No ${
+            <Typography mono uppercase weight={TypographyWeight.BOLD}>{`No ${
               currentFilter.label !== 'All' ? `${currentFilter.label.toLowerCase()} ` : ''
             }comments`}</Typography>
-            <Typography color='secondary' wrap align={Alignment.CENTER}>
+            <Typography mono uppercase color='secondary' wrap align={Alignment.CENTER}>
               {currentFilter.label} comments on this page will appear here
             </Typography>
           </div>

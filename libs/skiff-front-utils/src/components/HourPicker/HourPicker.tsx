@@ -1,6 +1,6 @@
+import { getThemedColor, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import { Dayjs } from 'dayjs';
 import debounce from 'lodash/debounce';
-import { getThemedColor, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
@@ -192,6 +192,8 @@ const ScrollableSelectWheel = ({
         return (
           <ScrollItem height={itemHeight} key={item}>
             <Typography
+              mono
+              uppercase
               color={getColor(i, compareCbs)}
               forceTheme={forceTheme}
               size={TypographySize.LARGE}

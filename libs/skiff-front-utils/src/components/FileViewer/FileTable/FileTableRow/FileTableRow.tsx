@@ -17,7 +17,7 @@ import styled, { css } from 'styled-components';
 
 import { IPFS_BASE_URL } from '../../../../constants/routes.constants';
 import { useFilePreview, useMediaQuery } from '../../../../hooks';
-import { FileTypes, fileTypeMatcher } from '../../../../utils';
+import { fileTypeMatcher, FileTypes } from '../../../../utils';
 import Checkbox from '../../../Checkbox';
 import { DateDisplay } from '../../../Date';
 import { ImagePreview, PreviewObject } from '../../RecentFilePreview';
@@ -276,7 +276,9 @@ const FileTableRow: React.FC<FileTableRowProps> = ({
           />
         </CheckboxAndFilePreview>
         <NameContainer>
-          <Typography>{title}</Typography>
+          <Typography mono uppercase>
+            {title}
+          </Typography>
         </NameContainer>
         <EndContainer>
           {!!ipfsData && (
@@ -305,7 +307,7 @@ const FileTableRow: React.FC<FileTableRowProps> = ({
               <MetadataColumn $hide={false}>
                 {/* Always render the outer wrapper, even if fileSize is undefined, to preserve formatting */}
                 {fileSizeText && (
-                  <Typography color='disabled' size={TypographySize.SMALL}>
+                  <Typography mono uppercase color='disabled' size={TypographySize.SMALL}>
                     {fileSizeText}
                   </Typography>
                 )}

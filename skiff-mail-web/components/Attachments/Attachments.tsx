@@ -239,12 +239,22 @@ const Attachments: FC<AttachmentsProps> = ({
                   </Dropshadow>
                   <TextContainer>
                     <Typography
+                      mono
+                      uppercase
                       color={attachmentFailed ? 'destructive' : 'secondary'}
                       minWidth={isMobile ? '240px' : undefined}
                     >
                       {attachmentName}
                     </Typography>
-                    <Typography color='disabled' minWidth='fit-content' mono size={TypographySize.SMALL} uppercase>
+                    <Typography
+                      mono
+                      uppercase
+                      color='disabled'
+                      minWidth='fit-content'
+                      mono
+                      size={TypographySize.SMALL}
+                      uppercase
+                    >
                       {attachmentFailed ? attachment.error : `${uploadSize}`}
                     </Typography>
                   </TextContainer>

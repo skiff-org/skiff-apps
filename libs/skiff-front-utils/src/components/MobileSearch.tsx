@@ -1,5 +1,5 @@
-import debounce from 'lodash/debounce';
 import { InputField, Typography } from '@skiff-org/skiff-ui';
+import debounce from 'lodash/debounce';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -76,7 +76,7 @@ export default function MobileSearch({
         value={value}
       />
       {!!showCancelButton && (
-        <Typography color='link' minWidth='fit-content' onClick={clearSearch}>
+        <Typography mono uppercase color='link' minWidth='fit-content' onClick={clearSearch}>
           Cancel
         </Typography>
       )}

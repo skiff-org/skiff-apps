@@ -17,11 +17,11 @@ import {
   ALIAS_MINIMUM_LENGTH,
   getEditorBasePath,
   getEndAdornment,
+  useCreateAlias,
   useDefaultEmailAlias,
-  useRequiredCurrentUserData,
-  useCreateAlias
+  useRequiredCurrentUserData
 } from 'skiff-front-utils';
-import { StorageTypes, getStorageKey } from 'skiff-utils';
+import { getStorageKey, StorageTypes } from 'skiff-utils';
 
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
 import { skemailModalReducer } from '../../redux/reducers/modalReducer';
@@ -120,7 +120,11 @@ export const SkemailWelcomeModal: React.FC = () => {
         </>
       )}
       <InputField
-        endAdornment={<Typography>{defaultMailDomain}</Typography>}
+        endAdornment={
+          <Typography mono uppercase>
+            {defaultMailDomain}
+          </Typography>
+        }
         errorMsg={error}
         helperText='You can use letters, numbers, and periods.'
         onChange={onInputChange}

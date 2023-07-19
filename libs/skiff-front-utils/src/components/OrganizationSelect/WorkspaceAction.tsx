@@ -1,11 +1,11 @@
 import { Icons, Size, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import {
-  WorkspaceItemContainer,
-  WorkspaceLabels,
   ActionIconWrapper,
-  SectionAction
+  SectionAction,
+  WorkspaceItemContainer,
+  WorkspaceLabels
 } from './OrganizationSelect.constants';
 
 interface WorkspaceActionProps {
@@ -32,6 +32,8 @@ export const WorkspaceAction = (props: WorkspaceActionProps) => {
       )}
       <WorkspaceLabels>
         <Typography
+          mono
+          uppercase
           color={hover && !disabled ? 'primary' : 'secondary'}
           forceTheme={ThemeMode.DARK}
           size={TypographySize.SMALL}

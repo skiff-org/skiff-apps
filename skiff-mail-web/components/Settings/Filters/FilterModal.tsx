@@ -215,7 +215,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
           />
         </FilterDetailsContainer>
         {error && (
-          <Typography color='destructive' size={TypographySize.SMALL}>
+          <Typography mono uppercase color='destructive' size={TypographySize.SMALL}>
             {error}
           </Typography>
         )}

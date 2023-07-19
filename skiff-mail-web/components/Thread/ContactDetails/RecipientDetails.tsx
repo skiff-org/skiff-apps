@@ -1,4 +1,4 @@
-import { Typography, TypographySize, TypographyOverflow } from '@skiff-org/skiff-ui';
+import { Typography, TypographyOverflow, TypographySize } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { formatEmailAddress } from 'skiff-front-utils';
 import { AddressObject } from 'skiff-graphql';
@@ -34,6 +34,8 @@ function RecipientDetails({ email, expanded, showContacts }: RecipientDetailsPro
 
   const contacts = (
     <Typography
+      mono
+      uppercase
       color='secondary'
       size={isMobile ? TypographySize.SMALL : undefined}
       // If we are showing all contacts, make overflow visible to allow horizontal scrolling
@@ -55,7 +57,7 @@ function RecipientDetails({ email, expanded, showContacts }: RecipientDetailsPro
     <RecipientDetailsContainer data-test='contact-details'>
       {expanded && contacts}
       {!expanded && (
-        <Typography color='secondary' size={isMobile ? TypographySize.SMALL : undefined}>
+        <Typography mono uppercase color='secondary' size={isMobile ? TypographySize.SMALL : undefined}>
           {decryptedTextSnippet}
         </Typography>
       )}

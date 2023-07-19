@@ -1,16 +1,16 @@
+import { Icon, Icons, Size, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import range from 'lodash/range';
-import { Icons, Icon, Size, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 
 import {
-  EmptyMailbox,
-  EmptyRows,
-  EmptyMessage,
-  LowOpacityIcons,
   AvatarNameSection,
   EmptyAvatar,
-  EmptyName,
-  EmptySubject,
   EmptyDate,
+  EmptyMailbox,
+  EmptyMessage,
+  EmptyName,
+  EmptyRows,
+  EmptySubject,
+  LowOpacityIcons,
   MailTypography
 } from './EmptyIllustration.styles';
 
@@ -40,10 +40,10 @@ const EmptyIllustration = (props: EmptyIllustrationProps) => {
         })}
       </EmptyRows>
       <MailTypography>
-        <Typography color='secondary' selectable={false} weight={TypographyWeight.MEDIUM}>
+        <Typography mono uppercase color='secondary' selectable={false} weight={TypographyWeight.MEDIUM}>
           {title}
         </Typography>
-        <Typography color='disabled' selectable={false}>
+        <Typography mono uppercase color='disabled' selectable={false}>
           {subtitle}
         </Typography>
       </MailTypography>

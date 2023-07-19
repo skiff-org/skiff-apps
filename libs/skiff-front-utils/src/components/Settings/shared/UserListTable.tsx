@@ -105,7 +105,7 @@ const UserListTable: React.FC<UserListTableProps> = ({
   return (
     <Container>
       <SearchButton>
-        <Typography size={TypographySize.LARGE} weight={TypographyWeight.MEDIUM}>
+        <Typography mono uppercase size={TypographySize.LARGE} weight={TypographyWeight.MEDIUM}>
           {header} {!!headerNumber && <NumberLabel>{headerNumber}</NumberLabel>}
         </Typography>
         <ButtonContainer>
@@ -123,8 +123,9 @@ const UserListTable: React.FC<UserListTableProps> = ({
             {columnHeaders.map((columnHeader, index) => (
               <ListHeader $isFirst={!index} key={`list-header-${header}-${columnHeader}`}>
                 <Typography
-                  color='disabled'
                   mono
+                  uppercase
+                  color='disabled'
                   size={TypographySize.CAPTION}
                   weight={TypographyWeight.MEDIUM}
                   width={isMobile ? undefined : '50%'}
@@ -138,7 +139,7 @@ const UserListTable: React.FC<UserListTableProps> = ({
             <>
               {rows}
               {!rows.length && !!emptyText && (
-                <Typography color='disabled'>
+                <Typography mono uppercase color='disabled'>
                   <NoMembersText>{emptyText}</NoMembersText>
                 </Typography>
               )}

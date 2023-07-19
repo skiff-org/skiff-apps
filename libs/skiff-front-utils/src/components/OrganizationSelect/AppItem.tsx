@@ -1,5 +1,5 @@
 import { ThemeMode, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ProductApp } from 'skiff-graphql';
 
 import { AppContainer, AppIcon, AppIconInfo, AppShadow, Badge, BadgeContainer } from './OrganizationSelect.constants';
@@ -57,7 +57,7 @@ export const AppItem = (props: AppItemProps) => {
       {!!numUnread && app.productApp === ProductApp.Mail && (
         <BadgeContainer $offset={offset}>
           <Badge>
-            <Typography color='white' size={TypographySize.CAPTION} weight={TypographyWeight.MEDIUM}>
+            <Typography mono uppercase color='white' size={TypographySize.CAPTION} weight={TypographyWeight.MEDIUM}>
               {unreadLabel}
             </Typography>
           </Badge>
@@ -67,6 +67,8 @@ export const AppItem = (props: AppItemProps) => {
         <AppIcon $active={active} $inSwitcher height='54px' src={app.icon} width='54px' />
       </AppShadow>
       <Typography
+        mono
+        uppercase
         color={active || hover ? 'primary' : 'secondary'}
         forceTheme={ThemeMode.DARK}
         size={TypographySize.SMALL}

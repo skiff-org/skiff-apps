@@ -1,15 +1,15 @@
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import {
   Dropdown,
   DropdownItem,
   FilledVariant,
   Icon,
-  IconText,
   Icons,
+  IconText,
   Size,
   Typography,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import React, { Dispatch, SetStateAction, useRef, useState } from 'react';
 import { contactToAddressObject, getEnvironment, useGetAllContactsWithOrgMembers } from 'skiff-front-utils';
 import { FrontendMailFilteringFeatureFlag } from 'skiff-utils';
@@ -18,12 +18,12 @@ import styled from 'styled-components';
 import { FilterConditionChip } from './Chips/FilterConditionChip';
 import { ConditionTypeDropdown } from './Dropdowns/ConditionTypeDropdown';
 import {
-  CONDITION_TYPE_TO_COMPARATORS,
   ConditionComparator,
   ConditionType,
-  FILTER_CONDITION_CHIP_HEIGHT,
+  CONDITION_TYPE_TO_COMPARATORS,
   FilterChipDropdown,
-  FilterType
+  FilterType,
+  FILTER_CONDITION_CHIP_HEIGHT
 } from './Filters.constants';
 import { Condition, FilterTypeOption } from './Filters.types';
 import { createConditionID, getAvailableConditionTypes } from './Filters.utils';
@@ -144,7 +144,9 @@ export const FilterConditionChips: React.FC<FilterConditionChipsProps> = ({
     <>
       <AddConditionChipContainer onClick={() => setShowConditionTypeDropdown(true)} ref={addConditionChipRef}>
         <AddConditionLabel>
-          <Typography color='disabled'>Add condition</Typography>
+          <Typography mono uppercase color='disabled'>
+            Add condition
+          </Typography>
         </AddConditionLabel>
         <AddConditionIcon>
           <Icons color='disabled' icon={Icon.Plus} size={Size.X_SMALL} />
@@ -220,7 +222,9 @@ export const FilterConditionChips: React.FC<FilterConditionChipsProps> = ({
       {/** Only render the AND + OR option if there is more than one condition and all conditions have values set */}
       {showAndOrConditionOption && (
         <AndOrOptionContainer>
-          <Typography color='secondary'>Include emails matching</Typography>
+          <Typography mono uppercase color='secondary'>
+            Include emails matching
+          </Typography>
           <IconText
             endIcon={Icon.ChevronDown}
             label={

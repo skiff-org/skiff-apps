@@ -1,9 +1,9 @@
 import { ApolloCache, ApolloError } from '@apollo/client';
+import { ButtonGroup, ButtonGroupItem, Divider, Icon, Typography } from '@skiff-org/skiff-ui';
 import axios from 'axios';
 import { GraphQLError } from 'graphql';
 import * as t from 'io-ts';
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import { ButtonGroup, ButtonGroupItem, Divider, Icon, Typography } from '@skiff-org/skiff-ui';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -39,7 +39,7 @@ import {
   useToast
 } from 'skiff-front-utils';
 import { CreditTransactionReason, ImportClients } from 'skiff-graphql';
-import { AutoForwardingFlag, assertExists, gbToBytes } from 'skiff-utils';
+import { assertExists, AutoForwardingFlag, gbToBytes } from 'skiff-utils';
 import styled from 'styled-components';
 
 import client from '../../../../apollo/client';
@@ -84,8 +84,12 @@ type ConfirmImportModalProps = {
 const ConfirmImportModal = ({ onClose, handleImport, clientName }: ConfirmImportModalProps) => {
   return (
     <>
-      <Typography wrap>Import mail from {clientName}?</Typography>
-      <Typography wrap>We will notify you when the import finished.</Typography>
+      <Typography mono uppercase wrap>
+        Import mail from {clientName}?
+      </Typography>
+      <Typography mono uppercase wrap>
+        We will notify you when the import finished.
+      </Typography>
       <ButtonGroup>
         <ButtonGroupItem key='import' label='Import mail' onClick={handleImport} />
         <ButtonGroupItem key='cancel' label='Cancel' onClick={onClose} />

@@ -1,6 +1,3 @@
-import isString from 'lodash/isString';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
 import {
   ACCENT_COLOR_VALUES,
   CircularProgress,
@@ -14,15 +11,17 @@ import {
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
+import isString from 'lodash/isString';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
-import { useGetNumUnreadQuery } from 'skiff-front-graphql';
 import { IconTextWithEndActions, useTheme } from 'skiff-front-utils';
 import { SystemLabels, UserLabelVariant } from 'skiff-graphql';
-import { POLL_INTERVAL_IN_MS } from 'skiff-utils';
 import styled, { css } from 'styled-components';
 
+import { MOCK_NUM_UNREAD } from '__mocks__/mockApiResponse';
 import { useCurrentLabel } from '../../hooks/useCurrentLabel';
 import { useDrafts } from '../../hooks/useDrafts';
 import { useThreadActions } from '../../hooks/useThreadActions';
@@ -44,7 +43,6 @@ import {
   UserLabelPlain
 } from '../../utils/label';
 import LabelOptionsDropdown from '../labels/LabelOptionsDropdown';
-import { MOCK_NUM_UNREAD } from '__mocks__/mockApiResponse';
 
 const IconColorContainer = styled.div<{ $color: string }>`
   background: ${(props) => props.$color};
@@ -230,7 +228,9 @@ const LabelSidebarItem: React.FC<LabelSidebarItemProps> = ({ label, variant }: L
     color: active ? 'primary' : 'secondary',
     label: displayLabelName,
     startIcon: getLabelIcon(),
-    weight: TypographyWeight.REGULAR
+    weight: TypographyWeight.REGULAR,
+    mono: true,
+    uppercase: true
   };
 
   return (
@@ -270,14 +270,14 @@ const LabelSidebarItem: React.FC<LabelSidebarItemProps> = ({ label, variant }: L
             {!hasMoreOptions && <IconText {...iconTextProps} />}
           </IconTextContainer>
           {numUnreadInbox > 0 && (
-            <Typography color={active ? 'primary' : 'secondary'} size={TypographySize.SMALL}>
+            <Typography mono uppercase color={active ? 'primary' : 'secondary'} size={TypographySize.SMALL}>
               <UnreadLabel>
                 {numUnreadInbox > MAX_NUM_UNREAD ? `${MAX_NUM_UNREAD / 1000}k+` : numUnreadInbox.toLocaleString()}
               </UnreadLabel>
             </Typography>
           )}
           {label.value === SystemLabels.Drafts && numDrafts > 0 && (
-            <Typography color={active ? 'primary' : 'secondary'} size={TypographySize.SMALL}>
+            <Typography mono uppercase color={active ? 'primary' : 'secondary'} size={TypographySize.SMALL}>
               <UnreadLabel>{numDrafts.toLocaleString()}</UnreadLabel>
             </Typography>
           )}
@@ -329,7 +329,7 @@ const ActionSidebarItem: React.FC<ActionSidebarItemProps> = ({
       data-test={dataTest}
       onClick={onClick}
     >
-      <IconText color={color} label={label} startIcon={icon} weight={TypographyWeight.REGULAR} />
+      <IconText mono uppercase color={color} label={label} startIcon={icon} weight={TypographyWeight.REGULAR} />
       {(spinner || progress !== undefined) && <CircularProgress progress={progress} spinner={spinner} />}
     </SidebarLabel>
   );

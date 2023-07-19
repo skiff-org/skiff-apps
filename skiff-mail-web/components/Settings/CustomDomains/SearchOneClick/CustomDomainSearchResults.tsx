@@ -1,11 +1,14 @@
+import { Alignment, ThemeMode, Typography } from '@skiff-org/skiff-ui';
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import range from 'lodash/range';
 import uniq from 'lodash/uniq';
-import { Alignment, ThemeMode, Typography } from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
-import { useGetDomainSuggestionsLazyQuery, useCheckIfDomainsAvailableLazyQuery } from 'skiff-front-graphql';
-import { useGetOrganizationQuery } from 'skiff-front-graphql';
+import {
+  useCheckIfDomainsAvailableLazyQuery,
+  useGetDomainSuggestionsLazyQuery,
+  useGetOrganizationQuery
+} from 'skiff-front-graphql';
 import {
   DEFAULT_WORKSPACE_EVENT_VERSION,
   Illustration,
@@ -16,11 +19,11 @@ import {
 } from 'skiff-front-utils';
 import { WorkspaceEventType } from 'skiff-graphql';
 import {
+  CustomDomainPriceExperimentGroup,
   domainRegex,
-  sanitizeDomain,
   EXAMPLE_CUSTOM_DOMAIN,
   MinimumCustomDomainPriceFeatureFlag,
-  CustomDomainPriceExperimentGroup
+  sanitizeDomain
 } from 'skiff-utils';
 import styled from 'styled-components';
 
@@ -190,10 +193,10 @@ const CustomDomainSearchResults: React.FC<CustomDomainSearchResultsProps> = ({ s
                 ) : (
                   <Illustration illustration={Illustrations.NoResultsFound} />
                 )}
-                <Typography align={Alignment.CENTER} forceTheme={ThemeMode.DARK}>
+                <Typography mono uppercase align={Alignment.CENTER} forceTheme={ThemeMode.DARK}>
                   {!searchQuery ? 'Customize your profile' : 'No results found'}
                 </Typography>
-                <Typography align={Alignment.CENTER} color='secondary' forceTheme={ThemeMode.DARK} wrap>
+                <Typography mono uppercase align={Alignment.CENTER} color='secondary' forceTheme={ThemeMode.DARK} wrap>
                   {!searchQuery
                     ? 'To get domain suggestions relevant to you, update your personal display name or workspace title.'
                     : `Sorry, we couldn’t find any available domains matching ${searchQuery}.`}

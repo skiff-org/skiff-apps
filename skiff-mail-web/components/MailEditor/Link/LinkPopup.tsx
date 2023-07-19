@@ -1,14 +1,14 @@
-import { Editor } from '@tiptap/core';
 import {
+  DROPDOWN_CALLER_CLASSNAME,
+  FilledVariant,
+  getThemedColor,
   Icon,
   IconButton,
-  Typography,
-  Type,
-  getThemedColor,
   ThemeMode,
-  DROPDOWN_CALLER_CLASSNAME,
-  FilledVariant
+  Type,
+  Typography
 } from '@skiff-org/skiff-ui';
+import { Editor } from '@tiptap/core';
 import { FC, useRef } from 'react';
 import styled from 'styled-components';
 
@@ -61,6 +61,8 @@ const LinkPopup: FC<LinkCreatePopupProps> = ({ editor, editorContainerRef }) => 
     >
       <PaddedTypography>
         <Typography
+          mono
+          uppercase
           color='link'
           forceTheme={ThemeMode.DARK}
           onClick={() => {

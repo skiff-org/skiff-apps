@@ -1,13 +1,13 @@
 import {
   Color,
+  getAccentColorValues,
   Icon,
   Icons,
-  getAccentColorValues,
-  Typography,
   isAccentColor,
+  Typography,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import { DEFAULT_FILE_TITLE } from '../../../../constants';
@@ -113,7 +113,9 @@ const SkiffPagePreview = ({
       </FilePreviewName>
       {isShort && (
         <ShortName>
-          <Typography weight={TypographyWeight.BOLD}>{title}</Typography>
+          <Typography mono uppercase weight={TypographyWeight.BOLD}>
+            {title}
+          </Typography>
         </ShortName>
       )}
       {!isShort && <FilePreviewDocThumbnail dangerouslySetInnerHTML={{ __html: data }} ref={docRef} />}

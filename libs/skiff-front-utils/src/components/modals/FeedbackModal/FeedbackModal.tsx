@@ -112,14 +112,14 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ open, onClose, sendFeedba
   return (
     <Dialog customContent onClose={onClose} open={open}>
       <FeedbackTopRow>
-        <Typography size={TypographySize.H3} weight={TypographyWeight.BOLD}>
+        <Typography mono uppercase size={TypographySize.H3} weight={TypographyWeight.BOLD}>
           Send us feedback
         </Typography>
         {isMobile && (
           <IconButton icon={Icon.Close} onClick={onClose} size={Size.SMALL} variant={FilledVariant.UNFILLED} />
         )}
       </FeedbackTopRow>
-      <Typography wrap>
+      <Typography mono uppercase wrap>
         Watch&nbsp;
         <a href={SKIFF_PUBLIC_WEBSITE_VIDEOS} rel='noopener noreferrer' target='_blank'>
           video tutorials

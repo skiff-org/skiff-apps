@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
 import { Tabs, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
+import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { TitleActionSection } from 'skiff-front-utils';
@@ -56,11 +56,17 @@ export const AutoForwardingInstructions: React.FC = () => {
           {instructions.map((instruction, index) => (
             <InstructionItem key={instruction.key}>
               <Number>
-                <Typography color='secondary' size={TypographySize.SMALL} weight={TypographyWeight.MEDIUM}>
+                <Typography
+                  mono
+                  uppercase
+                  color='secondary'
+                  size={TypographySize.SMALL}
+                  weight={TypographyWeight.MEDIUM}
+                >
                   {index + 1}
                 </Typography>
               </Number>
-              <Typography color='secondary' wrap>
+              <Typography mono uppercase color='secondary' wrap>
                 {instruction.value}
               </Typography>
             </InstructionItem>

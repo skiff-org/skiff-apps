@@ -13,10 +13,10 @@ import MentionItem, { MentionMenuPlaceholder } from './MentionItem';
 import useMentionSuggestions from './useMentionSuggestions';
 import {
   InviteMentionType,
-  MENTION_MENU_ID,
   MentionMenuState,
   MentionMetaTypes,
   mentionsKey,
+  MENTION_MENU_ID,
   NonSkiffUserID,
   UserMentionType
 } from './utils';
@@ -98,6 +98,8 @@ const EditorMentionsMenuRenderFunction: ForwardRefRenderFunction<HTMLDivElement,
                 <>
                   <TextContainer>
                     <Typography
+                      mono
+                      uppercase
                       weight={TypographyWeight.MEDIUM}
                       color='secondary'
                       size={TypographySize.SMALL}
@@ -122,6 +124,8 @@ const EditorMentionsMenuRenderFunction: ForwardRefRenderFunction<HTMLDivElement,
                 <>
                   <TextContainer>
                     <Typography
+                      mono
+                      uppercase
                       weight={TypographyWeight.MEDIUM}
                       color='secondary'
                       size={TypographySize.SMALL}
@@ -150,6 +154,8 @@ const EditorMentionsMenuRenderFunction: ForwardRefRenderFunction<HTMLDivElement,
                 <>
                   <TextContainer>
                     <Typography
+                      mono
+                      uppercase
                       weight={TypographyWeight.MEDIUM}
                       color='secondary'
                       size={TypographySize.SMALL}
@@ -177,6 +183,8 @@ const EditorMentionsMenuRenderFunction: ForwardRefRenderFunction<HTMLDivElement,
                 <>
                   <TextContainer>
                     <Typography
+                      mono
+                      uppercase
                       weight={TypographyWeight.MEDIUM}
                       color='secondary'
                       size={TypographySize.SMALL}

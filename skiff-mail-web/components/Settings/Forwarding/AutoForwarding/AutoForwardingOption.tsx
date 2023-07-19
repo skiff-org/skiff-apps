@@ -55,9 +55,11 @@ export const AutoForwardingOption: React.FC<AutoForwardingOptionProps> = ({
         <Icons color={iconColor} icon={icon} size={Size.X_MEDIUM} />
       </AutoForwardClientIcon>
       <Textbox>
-        <Typography>{label}</Typography>
+        <Typography mono uppercase>
+          {label}
+        </Typography>
         {subLabel && (
-          <Typography color='tertiary' size={TypographySize.SMALL}>
+          <Typography mono uppercase color='tertiary' size={TypographySize.SMALL}>
             {subLabel}
           </Typography>
         )}

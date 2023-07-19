@@ -1,9 +1,9 @@
 import { ApolloError } from '@apollo/client';
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
+import { Drawer, Typography } from '@skiff-org/skiff-ui';
 import { Editor } from '@tiptap/react';
 import dayjs from 'dayjs';
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import { Typography, Drawer } from '@skiff-org/skiff-ui';
 import { Node } from 'prosemirror-model';
 import {
   ChangeEvent,
@@ -16,46 +16,48 @@ import {
   useRef,
   useState
 } from 'react';
-import { isMobile, isAndroid } from 'react-device-detect';
+import { isAndroid, isMobile } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  AttachmentPair,
   EmailFragment,
   EmailFragmentDoc,
+  encryptMessage,
+  ThreadFragment,
   useDecryptionServicePublicKeyQuery,
+  useGetOrganizationQuery,
+  useGetThreadFromIdLazyQuery,
   useSendMessageMutation,
   useSendReplyMessageMutation,
-  useUnsendMessageMutation,
-  useGetOrganizationQuery,
-  AttachmentPair,
-  encryptMessage,
   useSubscriptionPlan,
-  ThreadFragment,
-  useGetThreadFromIdLazyQuery
+  useUnsendMessageMutation
 } from 'skiff-front-graphql';
 import {
+  contactToAddressObject,
   convertFileListToArray,
   FileTypes,
+  isMobileApp,
+  isPaidTierExclusiveEmailAddress,
   MIMETypes,
+  useAsyncHcaptcha,
+  useCurrentUserEmailAliases,
   useDefaultEmailAlias,
+  useGetAllContactsWithOrgMembers,
+  useIosBackdropEffect,
+  useRequiredCurrentUserData,
   useTheme,
   useToast,
-  useRequiredCurrentUserData,
-  isPaidTierExclusiveEmailAddress,
-  contactToAddressObject,
-  useGetAllContactsWithOrgMembers,
-  isMobileApp
+  useUserPreference
 } from 'skiff-front-utils';
-import { useUserPreference } from 'skiff-front-utils';
-import { useAsyncHcaptcha, useIosBackdropEffect, useCurrentUserEmailAliases } from 'skiff-front-utils';
 import {
   AddressObject,
   getPaywallErrorCode,
-  SendEmailRequest,
   getTierNameFromSubscriptionPlan,
   PermissionLevel,
+  SendEmailRequest,
   SystemLabels
 } from 'skiff-graphql';
-import { getMaxUsersPerWorkspace, StorageTypes, DecreasedFreeTierCollaboratorLimitFlag } from 'skiff-utils';
+import { DecreasedFreeTierCollaboratorLimitFlag, getMaxUsersPerWorkspace, StorageTypes } from 'skiff-utils';
 import styled from 'styled-components';
 import { v4 } from 'uuid';
 
@@ -84,10 +86,10 @@ import {
 import { getThreadSenders } from '../../utils/mailboxUtils';
 import { resolveAndSetENSDisplayName } from '../../utils/userUtils';
 import {
+  allAttachmentsHaveContent,
   Attachments,
   AttachmentStates,
   createAttachmentHeaders,
-  allAttachmentsHaveContent,
   prepareInlineAttachments,
   uploadFilesAsInlineAttachments,
   useAttachments,
@@ -935,6 +937,8 @@ const Compose: React.FC = () => {
         {!showCc && (
           <FieldButton>
             <Typography
+              mono
+              uppercase
               color='secondary'
               dataTest={ComposeDataTest.showCcButton}
               onClick={() => {
@@ -949,6 +953,8 @@ const Compose: React.FC = () => {
         {!showBcc && (
           <FieldButton>
             <Typography
+              mono
+              uppercase
               color='secondary'
               dataTest={ComposeDataTest.showBccButton}
               onClick={() => {

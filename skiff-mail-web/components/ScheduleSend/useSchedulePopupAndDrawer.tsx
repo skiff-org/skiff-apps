@@ -1,20 +1,20 @@
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { CalendarPicker, CalendarPickerProps } from '@mui/x-date-pickers/CalendarPicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import dayjs, { Dayjs } from 'dayjs';
-import customParserFormat from 'dayjs/plugin/customParseFormat';
 import {
-  Icon,
   Button,
   ButtonGroup,
   ButtonGroupItem,
   Drawer,
+  Icon,
   InputField,
-  Surface,
   Size,
+  Surface,
   Typography,
   TypographySize
 } from '@skiff-org/skiff-ui';
+import dayjs, { Dayjs } from 'dayjs';
+import customParserFormat from 'dayjs/plugin/customParseFormat';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { HourPicker, useTheme, useUserPreference } from 'skiff-front-utils';
@@ -249,8 +249,10 @@ export const useScheduleSendPopupAndDrawer = ({
     <Drawer forceTheme={theme} hideDrawer={() => setOpen(false)} show={open}>
       <DrawerContainer>
         <TextContainer>
-          <Typography size={TypographySize.LARGE}>Select Date</Typography>
-          <Typography color='secondary' size={TypographySize.SMALL}>
+          <Typography mono uppercase size={TypographySize.LARGE}>
+            Select Date
+          </Typography>
+          <Typography mono uppercase color='secondary' size={TypographySize.SMALL}>
             After selecting a date, you can choose a time
           </Typography>
         </TextContainer>

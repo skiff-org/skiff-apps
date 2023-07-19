@@ -90,9 +90,11 @@ const ActionSidebarItem: React.FC<ActionSidebarItemProps> = ({
         color={primaryAction ? color : 'secondary'}
         label={isMinimized ? '' : label}
         startIcon={icon}
+        mono
+        uppercase
         weight={TypographyWeight.REGULAR}
       />
-      <Typography color={primaryAction ? 'primary' : 'secondary'} size={TypographySize.SMALL}>
+      <Typography mono uppercase color={primaryAction ? 'primary' : 'secondary'} size={TypographySize.SMALL}>
         {endLabel}
       </Typography>
     </SidebarLabel>

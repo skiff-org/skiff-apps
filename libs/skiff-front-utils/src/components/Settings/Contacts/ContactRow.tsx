@@ -45,7 +45,9 @@ const ContactRow: React.FC<ContactRowProps> = ({ contact, isLast, orgName, onCli
       <>
         {isOrgMemberContact(contact) && (
           <OrgName>
-            <Typography color='secondary'>{orgName}</Typography>
+            <Typography mono uppercase color='secondary'>
+              {orgName}
+            </Typography>
           </OrgName>
         )}
         <ForwardIconContainer>

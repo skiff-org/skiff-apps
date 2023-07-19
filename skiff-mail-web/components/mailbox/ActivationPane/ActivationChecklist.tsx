@@ -1,4 +1,4 @@
-import { ThemeMode, Typography, getThemedColor, Icons, Icon, Size } from '@skiff-org/skiff-ui';
+import { getThemedColor, Icon, Icons, Size, ThemeMode, Typography } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { DEFAULT_WORKSPACE_EVENT_VERSION } from 'skiff-front-utils';
 import { WorkspaceEventType } from 'skiff-graphql';
@@ -101,7 +101,9 @@ const ActivationChecklistRow: React.FC<ActivationChecklistRowProps> = ({
         <CheckContainer allComplete={allItemsComplete} selfComplete={complete}>
           {complete ? <Icons color='black' icon={Icon.Check} size={Size.X_MEDIUM} /> : null}
         </CheckContainer>
-        <Typography color='white'>{title}</Typography>
+        <Typography mono uppercase color='white'>
+          {title}
+        </Typography>
       </ChecklistRowIconAndText>
       <Icons color='disabled' forceTheme={ThemeMode.DARK} icon={Icon.ChevronRight} size={Size.X_MEDIUM} />
     </ChecklistRowContainer>

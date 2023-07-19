@@ -108,6 +108,8 @@ const MobileAvatar: FC<MobileAvatarProps> = ({
       </AvatarWrapper>
       <DisplayNameContainer>
         <Typography
+          mono
+          uppercase
           dataTest='settings-drawer-display-name'
           selectable={false}
           size={TypographySize.H4}
@@ -118,7 +120,14 @@ const MobileAvatar: FC<MobileAvatarProps> = ({
       </DisplayNameContainer>
       <ActionItem onClick={copyText}>
         <ActionLabel>
-          <Typography color='secondary' dataTest='settings-drawer-full-address' forceTheme={theme} selectable={false}>
+          <Typography
+            mono
+            uppercase
+            color='secondary'
+            dataTest='settings-drawer-full-address'
+            forceTheme={theme}
+            selectable={false}
+          >
             {userFullAddress}
           </Typography>
           <Icons color='secondary' forceTheme={theme} icon={Icon.Copy} size={Size.SMALL} />

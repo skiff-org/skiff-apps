@@ -3,6 +3,7 @@ import {
   ButtonGroup,
   ButtonGroupItem,
   FilledVariant,
+  getThemedColor,
   Icon,
   IconButton,
   Icons,
@@ -10,13 +11,12 @@ import {
   Layout,
   ThemeMode,
   Type,
-  Typography,
-  getThemedColor
+  Typography
 } from '@skiff-org/skiff-ui';
 import { FC, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { PermissionLevel } from 'skiff-graphql';
-import { PaywallErrorCode, isPaywallErrorCode } from 'skiff-utils';
+import { isPaywallErrorCode, PaywallErrorCode } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useShareDocument, useToast } from '../../../hooks';
@@ -191,7 +191,9 @@ const InviteByEmail: FC<InviteByEmailProps> = ({
             <InviteeRow key={`${email}-pending-workspace-invite`}>
               <AvatarAndEmail>
                 <UserAvatar forceTheme={isMobile ? ThemeMode.DARK : undefined} label={email} />
-                <Typography forceTheme={isMobile ? ThemeMode.DARK : undefined}>{email}</Typography>
+                <Typography mono uppercase forceTheme={isMobile ? ThemeMode.DARK : undefined}>
+                  {email}
+                </Typography>
               </AvatarAndEmail>
               <IconButton
                 forceTheme={isMobile ? ThemeMode.DARK : undefined}

@@ -51,7 +51,7 @@ const AddEmail: React.FC<AddEmailProps> = ({ unverifiedRecoveryEmail }) => {
         title='Recovery email address'
       />
       {unverifiedEmail && (
-        <Typography weight={TypographyWeight.MEDIUM}>
+        <Typography mono uppercase weight={TypographyWeight.MEDIUM}>
           Confirmation email sent to {unverifiedEmail}. Click the link in this email to confirm.
         </Typography>
       )}

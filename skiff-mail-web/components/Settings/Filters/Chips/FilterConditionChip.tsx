@@ -1,8 +1,8 @@
-import toLower from 'lodash/toLower';
 import {
   DISPLAY_SCROLLBAR_CSS,
   Dropdown,
   DropdownItem,
+  getThemedColor,
   Icon,
   Icons,
   InputField,
@@ -10,17 +10,17 @@ import {
   ThemeMode,
   Typography,
   TypographySize,
-  TypographyWeight,
-  getThemedColor
+  TypographyWeight
 } from '@skiff-org/skiff-ui';
+import toLower from 'lodash/toLower';
 import React, { ChangeEvent, useRef, useState } from 'react';
 import {
+  abbreviateWalletAddress,
   AddressObjectWithDisplayPicture,
   ContactsDropdownItems,
-  UserAvatar,
-  abbreviateWalletAddress,
   createAbbreviatedWalletEmail,
-  splitEmailToAliasAndDomain
+  splitEmailToAliasAndDomain,
+  UserAvatar
 } from 'skiff-front-utils';
 import { isWalletAddress, trimAndLowercase } from 'skiff-utils';
 import styled, { css } from 'styled-components';
@@ -28,13 +28,13 @@ import styled, { css } from 'styled-components';
 import { ConditionTypeDropdown } from '../Dropdowns/ConditionTypeDropdown';
 import {
   CHIP_TYPOGRAPHY_PADDING,
-  CONDITION_TYPE_TO_LABEL,
   ConditionComparator,
   ConditionType,
+  CONDITION_TYPE_TO_COMPARATORS,
+  CONDITION_TYPE_TO_LABEL,
   DROPDOWN_ANCHOR_GAP,
-  FILTER_CONDITION_CHIP_EDGE_PADDING,
   FilterChipDropdown,
-  CONDITION_TYPE_TO_COMPARATORS
+  FILTER_CONDITION_CHIP_EDGE_PADDING
 } from '../Filters.constants';
 import { Condition, ConditionValue, isAddressType, isContactConditionValue } from '../Filters.types';
 
@@ -409,18 +409,24 @@ export const FilterConditionChip: React.FC<FilterConditionChipProps> = ({
     <>
       <ChipContainer $canEdit={canEdit}>
         <TypeLabel $canEdit={canEdit} onClick={onLabelClick(setShowTypeDropdown, canEdit)} ref={typeRef}>
-          <Typography color='secondary'>{CONDITION_TYPE_TO_LABEL[type]}</Typography>
+          <Typography mono uppercase color='secondary'>
+            {CONDITION_TYPE_TO_LABEL[type]}
+          </Typography>
         </TypeLabel>
         <ComparatorLabel
           $canEdit={canEditComparator}
           onClick={onLabelClick(setShowComparatorDropdown, canEditComparator)}
           ref={comparatorRef}
         >
-          <Typography color='secondary'>{toLower(comparator)}</Typography>
+          <Typography mono uppercase color='secondary'>
+            {toLower(comparator)}
+          </Typography>
         </ComparatorLabel>
         <ValueLabel $canEdit={canEdit} onClick={onLabelClick(setShowValueDropdown, canEdit)} ref={valueRef}>
           <ChipTypography>
             <Typography
+              mono
+              uppercase
               color={value ? 'primary' : 'disabled'}
               weight={value ? TypographyWeight.MEDIUM : TypographyWeight.REGULAR}
             >
@@ -446,7 +452,15 @@ export const FilterConditionChip: React.FC<FilterConditionChipProps> = ({
       </ChipContainer>
       {includeConnector && shouldORFilters !== undefined && (
         <ConditionConnector>
-          <Typography color='disabled' mono size={TypographySize.CAPTION} uppercase weight={TypographyWeight.MEDIUM}>
+          <Typography
+            mono
+            uppercase
+            color='disabled'
+            mono
+            size={TypographySize.CAPTION}
+            uppercase
+            weight={TypographyWeight.MEDIUM}
+          >
             {shouldORFilters ? 'or' : 'and'}
           </Typography>
         </ConditionConnector>

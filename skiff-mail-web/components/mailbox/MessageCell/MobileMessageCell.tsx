@@ -1,24 +1,21 @@
-import dayjs from 'dayjs';
-import isToday from 'dayjs/plugin/isToday';
 import {
+  Facepile,
   Icon,
-  Typography,
   Icons,
   Layout,
   Size,
   ThemeMode,
+  Typography,
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
-import { Facepile } from '@skiff-org/skiff-ui';
+import dayjs from 'dayjs';
+import isToday from 'dayjs/plugin/isToday';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useResizeDetector } from 'react-resize-detector';
-import { useTheme, useUserPreference } from 'skiff-front-utils';
-import { useLongTouch } from 'skiff-front-utils';
-import { sendRNWebviewMsg } from 'skiff-front-utils';
-import { SystemLabels } from 'skiff-graphql';
-import { SwipeSetting } from 'skiff-graphql';
+import { sendRNWebviewMsg, useLongTouch, useTheme, useUserPreference } from 'skiff-front-utils';
+import { SwipeSetting, SystemLabels } from 'skiff-graphql';
 import { StorageTypes } from 'skiff-utils';
 
 import { MOBILE_ITEM_HEIGHT } from '../../../constants/mailbox.constants';
@@ -28,7 +25,7 @@ import { useThreadActions } from '../../../hooks/useThreadActions';
 import { MailboxThreadInfo } from '../../../models/thread';
 import { skemailMailboxReducer } from '../../../redux/reducers/mailboxReducer';
 import { skemailMobileDrawerReducer } from '../../../redux/reducers/mobileDrawerReducer';
-import { LABEL_TO_SYSTEM_LABEL, UserLabelPlain, UserLabelAlias } from '../../../utils/label';
+import { LABEL_TO_SYSTEM_LABEL, UserLabelAlias, UserLabelPlain } from '../../../utils/label';
 import Checkbox from '../../Checkbox';
 import { LabelChip } from '../../labels/LabelChip';
 import { getSwipeBgColor, getSwipeIcon, getSwipeIconColor } from '../../Settings/Appearance/Swipe/SwipeSettings';
@@ -41,22 +38,22 @@ import { COMPLETE_ACTION_THRESHOLD, LONG_TOUCH_DURATION, SWIPE_TRANSITION_DURATI
 import {
   AnimatedCheckbox,
   IconWrapper,
+  LabelsContainer,
   LargeIconTextContainer,
   MobileCheckBoxWrapper,
-  MobileMessageCellContainer,
   MobileLeftSwipeBox,
-  MobileRightSwipeBox,
-  UnreadIndicator,
-  MobilePreviewWrapper,
+  MobileMessageCellContainer,
   MobilePreviewRow,
+  MobilePreviewWrapper,
   MobileRightActions,
+  MobileRightSwipeBox,
   NumThreadBadge,
   PaperClip,
-  LabelsContainer
+  UnreadIndicator
 } from './MessageCell.styles';
 import { MessageCellAvatar } from './MessageCellAvatar';
 import { Swipeable } from './Swipeable';
-import { getStackedFacepileSize, getSenders, waitFor } from './utils';
+import { getSenders, getStackedFacepileSize, waitFor } from './utils';
 
 dayjs.extend(isToday);
 
@@ -195,6 +192,8 @@ export const MobileMessageCell = ({
       <MobilePreviewWrapper>
         <MobilePreviewRow multiSelectOpen={multiSelectOpen}>
           <Typography
+            mono
+            uppercase
             color={read ? 'secondary' : 'primary'}
             size={TypographySize.LARGE}
             weight={read ? TypographyWeight.REGULAR : TypographyWeight.MEDIUM}
@@ -213,7 +212,7 @@ export const MobileMessageCell = ({
                 />
               </PaperClip>
             )}
-            <Typography color='secondary' dataTest='message-cell-date' size={TypographySize.CAPTION}>
+            <Typography mono uppercase color='secondary' dataTest='message-cell-date' size={TypographySize.CAPTION}>
               {getCellDate()}
             </Typography>
           </MobileRightActions>
@@ -221,6 +220,8 @@ export const MobileMessageCell = ({
         <MobilePreviewRow multiSelectOpen={multiSelectOpen}>
           {subject && (
             <Typography
+              mono
+              uppercase
               color={read ? 'secondary' : 'primary'}
               weight={read ? TypographyWeight.REGULAR : TypographyWeight.MEDIUM}
             >
@@ -229,13 +230,17 @@ export const MobileMessageCell = ({
           )}
         </MobilePreviewRow>
         <MobilePreviewRow multiSelectOpen={multiSelectOpen}>
-          <Typography color='secondary' size={TypographySize.CAPTION}>
-            {message && <Typography color='secondary'>{message}</Typography>}
+          <Typography mono uppercase color='secondary' size={TypographySize.CAPTION}>
+            {message && (
+              <Typography mono uppercase color='secondary'>
+                {message}
+              </Typography>
+            )}
           </Typography>
           {renderUserLabelChips()}
           {numEmails && numEmails > 1 && (
             <NumThreadBadge>
-              <Typography size={TypographySize.CAPTION} weight={TypographyWeight.MEDIUM}>
+              <Typography mono uppercase size={TypographySize.CAPTION} weight={TypographyWeight.MEDIUM}>
                 {numEmails}
               </Typography>
             </NumThreadBadge>

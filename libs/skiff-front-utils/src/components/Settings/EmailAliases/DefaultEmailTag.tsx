@@ -19,7 +19,7 @@ const DefaultEmailTag: React.FC = () => {
   const { theme } = useTheme();
   return (
     <DefaultTag $isDarkMode={theme === ThemeMode.DARK}>
-      <Typography color='link' mono size={TypographySize.SMALL}>
+      <Typography mono uppercase color='link' size={TypographySize.SMALL}>
         DEFAULT
       </Typography>
     </DefaultTag>

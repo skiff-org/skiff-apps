@@ -1,5 +1,3 @@
-import dayjs from 'dayjs';
-import isToday from 'dayjs/plugin/isToday';
 import {
   Chip,
   Facepile,
@@ -14,6 +12,8 @@ import {
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
+import dayjs from 'dayjs';
+import isToday from 'dayjs/plugin/isToday';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ConnectDragSource } from 'react-dnd';
 import { useResizeDetector } from 'react-resize-detector';
@@ -222,13 +222,15 @@ export const MessageCell = ({
           </AvatarContainer>
           <EmailSender>
             <Typography
+              mono
+              uppercase
               color={read ? 'secondary' : 'primary'}
               weight={read ? TypographyWeight.REGULAR : TypographyWeight.MEDIUM}
             >
               {renderTextWithQueryMatch(getSenders(displayNamesWithContact))}
             </Typography>
             {renderDraftLabel && (
-              <Typography color='link'>
+              <Typography mono uppercase color='link'>
                 <DraftLabel $includeMargin={!!displayNames.length}>Draft</DraftLabel>
               </Typography>
             )}
@@ -241,6 +243,8 @@ export const MessageCell = ({
         <ContentPreview>
           {subject && (
             <Typography
+              mono
+              uppercase
               color={read ? 'secondary' : 'primary'}
               minWidth='auto'
               weight={read ? TypographyWeight.REGULAR : TypographyWeight.MEDIUM}
@@ -249,7 +253,7 @@ export const MessageCell = ({
             </Typography>
           )}
           {message && (
-            <Typography color={read ? 'disabled' : 'secondary'}>
+            <Typography mono uppercase color={read ? 'disabled' : 'secondary'}>
               <span>&nbsp;–&nbsp;</span>
               {renderTextWithQueryMatch(message)}
             </Typography>
@@ -282,7 +286,7 @@ export const MessageCell = ({
             )}
           </LabelsContainer>
           <EmailContentTop $hide={hover}>
-            <Typography color='disabled' dataTest='message-cell-date' mono size={TypographySize.SMALL}>
+            <Typography mono uppercase color='disabled' dataTest='message-cell-date' mono size={TypographySize.SMALL}>
               {getCellDate()}
             </Typography>
           </EmailContentTop>

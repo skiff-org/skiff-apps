@@ -41,6 +41,8 @@ export default function TopAppBar({ onLeftItemClick, title, currentAttachment, d
     <TopAppBarContainer>
       <TopRow>
         <Typography
+          mono
+          uppercase
           color='link'
           dataTest='attachment-preview-done'
           onClick={onLeftItemClick}
@@ -60,7 +62,7 @@ export default function TopAppBar({ onLeftItemClick, title, currentAttachment, d
           variant={FilledVariant.UNFILLED}
         />
       </TopRow>
-      <Typography size={TypographySize.H3} weight={TypographyWeight.BOLD} wrap>
+      <Typography mono uppercase size={TypographySize.H3} weight={TypographyWeight.BOLD} wrap>
         {title}
       </Typography>
     </TopAppBarContainer>

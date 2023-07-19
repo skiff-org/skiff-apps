@@ -73,7 +73,9 @@ const UnSendModal: React.FC<UnSendModalProps> = ({ threadID }: UnSendModalProps)
       title="Don't send?"
       type={DialogTypes.Confirm}
     >
-      <Typography>This message will be converted back to draft.</Typography>
+      <Typography mono uppercase>
+        This message will be converted back to draft.
+      </Typography>
       <ButtonGroup>
         <ButtonGroupItem
           label='Unschedule'

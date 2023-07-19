@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogTypes, Type, Typography } from '@skiff-org/skiff-ui';
 import React, { useRef, useState } from 'react';
-import ReactCrop, { PercentCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
+import ReactCrop, { centerCrop, makeAspectCrop, PercentCrop } from 'react-image-crop';
 import styled from 'styled-components';
 
 import { dataURLtoFile } from '../../utils/fileUtils';
@@ -111,7 +111,11 @@ export function CropDisplayPictureDialog(props: CropDisplayPictureDialogProps) {
           <ImageToCrop alt='test' onLoad={onImageLoad} ref={imageRef} src={imageSrc} />
         </CropArea>
       </ImageEditArea>
-      {error && <Typography color='destructive'>{error}</Typography>}
+      {error && (
+        <Typography mono uppercase color='destructive'>
+          {error}
+        </Typography>
+      )}
       <ButtonsContainer>
         <Button onClick={handleClose} type={Type.SECONDARY}>
           Cancel

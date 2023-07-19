@@ -1,32 +1,31 @@
 import {
-  Typography,
-  TypographySize,
-  TypographyWeight,
-  ThemeMode,
-  getThemedColor,
   Divider,
+  getThemedColor,
   Icon,
   Icons,
-  Size
+  Size,
+  ThemeMode,
+  Typography,
+  TypographySize,
+  TypographyWeight
 } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useGetCreditsQuery } from 'skiff-front-graphql';
 import {
-  TabPage,
-  useRequiredCurrentUserData,
-  useCurrentUserEmailAliases,
-  MAIL_MOBILE_APP_DOWNLOAD_LINK,
-  SKIFF_PUBLIC_WEBSITE_DOWNLOAD,
+  DEFAULT_WORKSPACE_EVENT_VERSION,
   getCreditCentsForInfoType,
-  useUserPreference,
-  UserPreferenceKey,
+  MAIL_MOBILE_APP_DOWNLOAD_LINK,
   SettingValue,
-  useToast
+  SKIFF_PUBLIC_WEBSITE_DOWNLOAD,
+  TabPage,
+  useCurrentUserEmailAliases,
+  useRequiredCurrentUserData,
+  UserPreferenceKey,
+  useToast,
+  useUserPreference
 } from 'skiff-front-utils';
-import { DEFAULT_WORKSPACE_EVENT_VERSION } from 'skiff-front-utils';
-import { CreditInfo, EntityType, SubscriptionInterval, SubscriptionPlan } from 'skiff-graphql';
-import { WorkspaceEventType } from 'skiff-graphql';
+import { CreditInfo, EntityType, SubscriptionInterval, SubscriptionPlan, WorkspaceEventType } from 'skiff-graphql';
 import { getCategorizedAliases } from 'skiff-utils';
 import styled, { css } from 'styled-components';
 
@@ -244,10 +243,10 @@ const ActivationChecklistPane: React.FC = () => {
             </SuccessIconContainer>
           )}
           <HeaderText>
-            <Typography color='black' size={TypographySize.LARGE} weight={TypographyWeight.MEDIUM} wrap>
+            <Typography mono uppercase color='black' size={TypographySize.LARGE} weight={TypographyWeight.MEDIUM} wrap>
               {allItemsComplete ? 'Redeem your free trial now' : 'Get 2 months of Skiff Essential'}
             </Typography>
-            <Typography color='black' wrap>
+            <Typography mono uppercase color='black' wrap>
               {allItemsComplete
                 ? 'You earned 2 months of Skiff Essential!'
                 : 'Complete these tasks to unlock 15 GB of storage, a custom domain, and unlimited mail filters.'}
@@ -264,6 +263,8 @@ const ActivationChecklistPane: React.FC = () => {
       <Divider color='primary' forceTheme={ThemeMode.DARK} />
       <ActivationChecklistFooter>
         <Typography
+          mono
+          uppercase
           color='disabled'
           forceTheme={ThemeMode.DARK}
           onClick={() => {

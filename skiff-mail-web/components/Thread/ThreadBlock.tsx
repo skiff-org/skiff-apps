@@ -1,5 +1,4 @@
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
-import range from 'lodash/range';
 import {
   Button,
   Icon,
@@ -13,6 +12,7 @@ import {
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
+import range from 'lodash/range';
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -25,7 +25,7 @@ import {
   useTheme,
   useUserPreference
 } from 'skiff-front-utils';
-import { StorageTypes, isENSName } from 'skiff-utils';
+import { isENSName, StorageTypes } from 'skiff-utils';
 import styled, { css } from 'styled-components';
 
 import { useDrafts } from '../../hooks/useDrafts';
@@ -276,10 +276,10 @@ function ThreadBlock(props: ThreadBlockProps) {
       {isWalletLookupSupported(fromAlias) && (
         <ETHBlock data-test={ThreadBlockDataTest.walletBlock}>
           <NameBlock>
-            <Typography color='secondary' mono>
+            <Typography mono uppercase color='secondary' mono>
               {isENSName(fromAlias) ? fromAlias : abbreviateWalletAddress(fromAlias, 12, 12)}
             </Typography>
-            <Typography color='disabled' mono size={TypographySize.CAPTION}>
+            <Typography mono uppercase color='disabled' mono size={TypographySize.CAPTION}>
               SENDER ADDRESS
             </Typography>
           </NameBlock>
@@ -317,6 +317,8 @@ function ThreadBlock(props: ThreadBlockProps) {
                   <Tooltip>
                     <TooltipContent>
                       <Typography
+                        mono
+                        uppercase
                         color='secondary'
                         forceTheme={ThemeMode.DARK}
                         size={TypographySize.CAPTION}
@@ -324,6 +326,8 @@ function ThreadBlock(props: ThreadBlockProps) {
                       >
                         {`${numBlocked} ${numBlocked === 1 ? 'image' : 'images'} blocked `}
                         <Typography
+                          mono
+                          uppercase
                           forceTheme={ThemeMode.DARK}
                           size={TypographySize.CAPTION}
                           weight={TypographyWeight.MEDIUM}
@@ -347,6 +351,8 @@ function ThreadBlock(props: ThreadBlockProps) {
                           {emailContainsRemoteContent.numProxy > MAX_PIXELATED_DISPLAY && (
                             <OverflowContent $isDarkMode={theme === ThemeMode.DARK}>
                               <Typography
+                                mono
+                                uppercase
                                 color='disabled'
                                 mono
                                 size={TypographySize.SMALL}

@@ -29,11 +29,13 @@ const DomainVerificationErrorBanner: React.FC<DomainVerificationErrorBannerProps
     <BannerContainer>
       <Banner>
         <Typography
+          mono
+          uppercase
           color='red'
           size={TypographySize.SMALL}
           weight={TypographyWeight.MEDIUM}
         >{`${errorCount} DNS record ${pluralize('error', errorCount)}`}</Typography>
-        <Typography color='red' onClick={onCTAClick} size={TypographySize.SMALL}>
+        <Typography mono uppercase color='red' onClick={onCTAClick} size={TypographySize.SMALL}>
           Resolve
         </Typography>
       </Banner>

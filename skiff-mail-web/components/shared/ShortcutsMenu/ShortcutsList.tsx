@@ -28,7 +28,7 @@ export const ShortcutsList = () => {
   // renders the header of a section
   const renderHeaderRow = (header) => (
     <Row isHeader={true}>
-      <Typography color='secondary' forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
+      <Typography mono uppercase color='secondary' forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
         {header}
       </Typography>
     </Row>
@@ -39,7 +39,9 @@ export const ShortcutsList = () => {
     <Row isHeader={false}>
       <RowHeader>
         {icon && <Icons color='secondary' forceTheme={ThemeMode.DARK} icon={icon as Icon} />}
-        <Typography forceTheme={ThemeMode.DARK}>{name}</Typography>
+        <Typography mono uppercase forceTheme={ThemeMode.DARK}>
+          {name}
+        </Typography>
       </RowHeader>
       <KeyCodesContainer>
         {shortcuts.map((shortcut, i) => {
@@ -49,7 +51,7 @@ export const ShortcutsList = () => {
             <KeyCodesContainer key={shortcut}>
               <KeyCodeSequence shortcut={shortcut} />
               {!isLastShortcut && (
-                <Typography color='secondary' forceTheme={ThemeMode.DARK}>
+                <Typography mono uppercase color='secondary' forceTheme={ThemeMode.DARK}>
                   or
                 </Typography>
               )}

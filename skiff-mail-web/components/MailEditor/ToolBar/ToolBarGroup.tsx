@@ -1,4 +1,3 @@
-import { Editor } from '@tiptap/core';
 import {
   DROPDOWN_CALLER_CLASSNAME,
   getThemedColor,
@@ -11,6 +10,7 @@ import {
   TypographyWeight,
   useOnClickOutside
 } from '@skiff-org/skiff-ui';
+import { Editor } from '@tiptap/core';
 import { FC, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -139,7 +139,7 @@ const ToolBarDropdownGroup: FC<Omit<ToolbarGroupProps, 'type'>> = ({ commands, e
         }}
         ref={groupContainerRef}
       >
-        <Typography forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
+        <Typography mono uppercase forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
           {currentActive}
         </Typography>
         <Icons color='secondary' forceTheme={ThemeMode.DARK} icon={Icon.ChevronDown} />
@@ -170,7 +170,7 @@ const ToolBarDropdownGroup: FC<Omit<ToolbarGroupProps, 'type'>> = ({ commands, e
                 <IconBox>
                   <Icons color='secondary' forceTheme={ThemeMode.DARK} icon={icon} />
                 </IconBox>
-                <Typography forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
+                <Typography mono uppercase forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
                   {label}
                 </Typography>
               </DropdownItemContainer>

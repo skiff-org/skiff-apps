@@ -1,5 +1,4 @@
 import { Typography, TypographyWeight } from '@skiff-org/skiff-ui';
-import React from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
 
@@ -27,6 +26,8 @@ export default function TitleSection(props: TitleSectionProps) {
     <TitleBlock>
       {title && (
         <Typography
+          mono
+          uppercase
           color={destructive ? 'destructive' : 'primary'}
           weight={isMobile ? TypographyWeight.MEDIUM : undefined}
           wrap
@@ -35,7 +36,7 @@ export default function TitleSection(props: TitleSectionProps) {
         </Typography>
       )}
       {subtitle && (
-        <Typography color='secondary' wrap>
+        <Typography mono uppercase color='secondary' wrap>
           {subtitle}
         </Typography>
       )}

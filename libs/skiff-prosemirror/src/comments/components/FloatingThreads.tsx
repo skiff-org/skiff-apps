@@ -1,5 +1,5 @@
-import clone from 'lodash/clone';
 import { Icon, Icons, Typography, useOnClickOutside } from '@skiff-org/skiff-ui';
+import clone from 'lodash/clone';
 import { EditorView } from 'prosemirror-view';
 import React, { FC, MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -39,7 +39,9 @@ const FloatingThreadCounter: FC<FloatingThreadIconProps> = ({ commentCount, unre
   return (
     <div className='comments-floating-icon'>
       <Icons icon={Icon.Comment} color={unread ? 'orange' : 'secondary'} />
-      <Typography color={unread ? 'orange' : 'secondary'}>{commentCount}</Typography>
+      <Typography mono uppercase color={unread ? 'orange' : 'secondary'}>
+        {commentCount}
+      </Typography>
     </div>
   );
 };

@@ -28,11 +28,15 @@ export const MailboxViewMode: React.FC = () => {
     <>
       <TitleActionSection subtitle='Select a display format for viewing threads' title='Inbox format' />
       <ViewRow key='right-mode' onClick={rightModeOnClick}>
-        <Typography>Split view</Typography>
+        <Typography mono uppercase>
+          Split view
+        </Typography>
         <RadioCheckbox checked={threadFormat === ThreadDisplayFormat.Right} />
       </ViewRow>
       <ViewRow key='full-mode' onClick={fullModeOnClick}>
-        <Typography>Full view</Typography>
+        <Typography mono uppercase>
+          Full view
+        </Typography>
         <RadioCheckbox checked={threadFormat === ThreadDisplayFormat.Full} />
       </ViewRow>
     </>

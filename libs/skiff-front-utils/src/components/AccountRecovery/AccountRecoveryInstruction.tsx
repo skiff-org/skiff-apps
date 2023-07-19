@@ -1,4 +1,3 @@
-import { motion, useMotionValue, useTransform } from 'framer-motion';
 import {
   Alignment,
   Button,
@@ -16,6 +15,7 @@ import {
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useStoreWorkspaceEventMutation } from 'skiff-front-graphql';
@@ -284,14 +284,14 @@ function AccountRecoveryInstruction({
       {isSignUp && (
         <Description>
           <Icons color='secondary' icon={Icon.Envelope} />
-          <Typography color='secondary' wrap>
+          <Typography mono uppercase color='secondary' wrap>
             Add a backup email, for additional protection.
           </Typography>
         </Description>
       )}
       <Description>
         {isSignUp && <Icons color='secondary' icon={Icon.Key} />}
-        <Typography color='secondary' wrap>
+        <Typography mono uppercase color='secondary' wrap>
           Download one-time code. If you lose this code, we can&apos;t recover your account in case you forget your
           password.
         </Typography>
@@ -314,7 +314,7 @@ function AccountRecoveryInstruction({
         >
           <PhraseContainer>
             {recoveryPaperShare && (
-              <Typography dataTest='recovery-key-text' wrap>
+              <Typography mono uppercase dataTest='recovery-key-text' wrap>
                 {recoveryPaperShare}
               </Typography>
             )}
@@ -345,16 +345,16 @@ function AccountRecoveryInstruction({
       />
       <CardTitleSection>
         <Icons color='secondary' icon={Icon.Key} size={Size.X_LARGE} />
-        <Typography size={TypographySize.H2} weight={TypographyWeight.BOLD} wrap>
+        <Typography mono uppercase size={TypographySize.H2} weight={TypographyWeight.BOLD} wrap>
           {abbrUsername}’s secret recovery key
         </Typography>
-        <Typography color='secondary' size={TypographySize.H3} wrap>
+        <Typography mono uppercase color='secondary' size={TypographySize.H3} wrap>
           Download to recover account
         </Typography>
       </CardTitleSection>
       <KeyTextBlock>
         {recoveryPaperShare && (
-          <Typography color='secondary' dataTest='recovery-key-text' wrap>
+          <Typography mono uppercase color='secondary' dataTest='recovery-key-text' wrap>
             {recoveryPaperShare}
           </Typography>
         )}
@@ -393,7 +393,7 @@ function AccountRecoveryInstruction({
         {isSignUp && (
           <>
             <Spacer />
-            <Typography align={Alignment.CENTER} color='secondary' onClick={() => void submit()}>
+            <Typography mono uppercase align={Alignment.CENTER} color='secondary' onClick={() => void submit()}>
               Download key only
             </Typography>
           </>

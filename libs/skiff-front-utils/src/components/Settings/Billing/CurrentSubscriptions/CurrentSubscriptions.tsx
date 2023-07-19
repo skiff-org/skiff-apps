@@ -25,7 +25,9 @@ const Container = styled.div`
 const CurrentSubscriptions: React.FC<CurrentSubscriptionsProps> = ({ openPlansPage }) => {
   return (
     <Container>
-      <Typography>Current subscriptions</Typography>
+      <Typography mono uppercase>
+        Current subscriptions
+      </Typography>
       <TierSubscription openPlansPage={openPlansPage} />
       <DomainSubscriptions />
     </Container>

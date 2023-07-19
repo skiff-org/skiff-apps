@@ -1,4 +1,3 @@
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import {
   Button,
   ButtonGroup,
@@ -15,6 +14,7 @@ import {
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -24,28 +24,28 @@ import {
   useSaveCustomDomainRecordsMutation
 } from 'skiff-front-graphql';
 import {
-  TitleActionSection,
-  useToast,
   DEFAULT_WORKSPACE_EVENT_VERSION,
-  useRequiredCurrentUserData
+  TitleActionSection,
+  useLocalSetting,
+  useRequiredCurrentUserData,
+  useToast
 } from 'skiff-front-utils';
-import { useLocalSetting } from 'skiff-front-utils';
 import {
-  DnsRecord,
-  PermissionLevel,
   CustomDomainRecord,
+  DnsRecord,
   getPaywallErrorCode,
-  WorkspaceEventType,
-  SubscriptionPlan
+  PermissionLevel,
+  SubscriptionPlan,
+  WorkspaceEventType
 } from 'skiff-graphql';
 import {
+  FreeCustomDomainFeatureFlag,
+  FreeTrialIdentifier,
+  getFreeTrialTier,
+  getMaxCustomDomains,
   PaywallErrorCode,
   StorageTypes,
-  TrialOfferWithOneClickDomainFeatureFlag,
-  FreeCustomDomainFeatureFlag,
-  getMaxCustomDomains,
-  FreeTrialIdentifier,
-  getFreeTrialTier
+  TrialOfferWithOneClickDomainFeatureFlag
 } from 'skiff-utils';
 import styled from 'styled-components';
 
@@ -53,8 +53,7 @@ import { useMaxCustomDomains } from '../../../hooks/useMaxCustomDomains';
 import { usePaywall } from '../../../hooks/usePaywall';
 import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { ModalType } from '../../../redux/reducers/modalTypes';
-import { storeWorkspaceEvent } from '../../../utils/userUtils';
-import { useSubscriptionPlan } from '../../../utils/userUtils';
+import { storeWorkspaceEvent, useSubscriptionPlan } from '../../../utils/userUtils';
 
 import DnsRecordHeader from './DnsRecordHeader';
 import DnsRecordRow from './DnsRecordRow';
@@ -372,6 +371,8 @@ const SetupCustomDomain: React.FC<SetupCustomDomainProps> = ({
 
   const renderSetupDnsPrompt = () => (
     <Typography
+      mono
+      uppercase
       color='secondary'
       size={TypographySize.SMALL}
       weight={isMobile ? TypographyWeight.MEDIUM : TypographyWeight.BOLD}
@@ -418,10 +419,16 @@ const SetupCustomDomain: React.FC<SetupCustomDomainProps> = ({
         <Surface size='full-width' style={{ background: themeNames.light['--icon-link'], position: 'relative' }}>
           <BannerContainer>
             <TextContainer>
-              <Typography forceTheme={ThemeMode.DARK} size={TypographySize.LARGE} weight={TypographyWeight.MEDIUM}>
+              <Typography
+                mono
+                uppercase
+                forceTheme={ThemeMode.DARK}
+                size={TypographySize.LARGE}
+                weight={TypographyWeight.MEDIUM}
+              >
                 {oneClickCustomDomainBannerCopy.title}
               </Typography>
-              <Typography color='secondary' forceTheme={ThemeMode.DARK}>
+              <Typography mono uppercase color='secondary' forceTheme={ThemeMode.DARK}>
                 {oneClickCustomDomainBannerCopy.body}
               </Typography>
             </TextContainer>
@@ -451,7 +458,7 @@ const SetupCustomDomain: React.FC<SetupCustomDomainProps> = ({
         </Surface>
       )}
       {!showBuyCustomDomains && !isMobile && (
-        <Typography size={TypographySize.H3} weight={TypographyWeight.BOLD}>
+        <Typography mono uppercase size={TypographySize.H3} weight={TypographyWeight.BOLD}>
           Custom domains
         </Typography>
       )}
@@ -475,8 +482,10 @@ const SetupCustomDomain: React.FC<SetupCustomDomainProps> = ({
         <>
           {showBuyCustomDomains && (
             <OneClickDomainCalloutText>
-              <Typography color='secondary'>Want to find a new domain?</Typography>
-              <Typography color='link' onClick={onClickBuy}>
+              <Typography mono uppercase color='secondary'>
+                Want to find a new domain?
+              </Typography>
+              <Typography mono uppercase color='link' onClick={onClickBuy}>
                 &nbsp;Try automatic setup
               </Typography>
             </OneClickDomainCalloutText>

@@ -1,10 +1,9 @@
-import { sanitize } from 'dompurify';
 import { Typography } from '@skiff-org/skiff-ui';
+import { sanitize } from 'dompurify';
 import { DOMSerializer, Node } from 'prosemirror-model';
 import { EditorState } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import React, { MutableRefObject, useEffect, useMemo } from 'react';
-import { useRef } from 'react';
+import React, { MutableRefObject, useEffect, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 
 import { ProsemirrorDocJson } from '../../Types';
@@ -39,7 +38,9 @@ export const CommentViewer = React.forwardRef<HTMLDivElement, CommentViewerProps
   if (!content && oldComment) {
     return (
       <OldCommentContainer>
-        <Typography wrap>{oldComment}</Typography>
+        <Typography mono uppercase wrap>
+          {oldComment}
+        </Typography>
       </OldCommentContainer>
     );
   }

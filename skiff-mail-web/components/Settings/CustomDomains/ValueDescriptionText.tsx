@@ -1,4 +1,4 @@
-import { Typography, TypographySize, Icons, Icon, Size } from '@skiff-org/skiff-ui';
+import { Icon, Icons, Size, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import styled, { css } from 'styled-components';
@@ -85,6 +85,8 @@ const ValueDescriptionText: React.FC<ValueDescriptionTextProps> = ({
 
   const copiableText = () => (
     <Typography
+      mono
+      uppercase
       color={getTextColor()}
       mono={!!header}
       onClick={header ? undefined : copyValueToClipboard}
@@ -98,7 +100,7 @@ const ValueDescriptionText: React.FC<ValueDescriptionTextProps> = ({
     <ValueDescriptionContainer $width={getWidthPx()}>
       {incorrectData && (
         <TextAndCorrectnessIcon>
-          <Typography color='red' size={isMobile ? TypographySize.CAPTION : TypographySize.SMALL}>
+          <Typography mono uppercase color='red' size={isMobile ? TypographySize.CAPTION : TypographySize.SMALL}>
             {incorrectData}
           </Typography>
           <Icons color='red' icon={Icon.Warning} size={Size.X_SMALL} />

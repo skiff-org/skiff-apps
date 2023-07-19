@@ -1,8 +1,8 @@
+import { Button, Icon, IconButton, Icons, ThemeMode, Type, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import isEqual from 'lodash/isEqual';
 import last from 'lodash/last';
-import { Button, Icon, IconButton, Icons, ThemeMode, Type, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BrowserView, MobileView, isMobile } from 'react-device-detect';
+import { BrowserView, isMobile, MobileView } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import { useIsCustomDomainQuery } from 'skiff-front-graphql';
 import {
@@ -30,6 +30,7 @@ import { getActiveSystemLabel } from '../../utils/label';
 import { getScheduledSendAtDateForThread, updateThreadAsReadUnread } from '../../utils/mailboxUtils';
 import { BOTTOM_NAVIGATION_HEIGHT, THREAD_BODY_ID } from '../mailbox/consts';
 
+import { getMockedThread } from '__mocks__/mockApiResponse';
 import ApplyUserLabelDrawer from './ApplyUserLabelDrawer';
 import MoveThreadDrawer from './MoveThreadMobileDrawer';
 import { ReplyDrawer } from './ReplyDrawer';
@@ -38,7 +39,6 @@ import { ThreadNavigationIDs } from './Thread.types';
 import ThreadBlock from './ThreadBlock';
 import ThreadHeader from './ThreadHeader';
 import { useThreadOptions } from './useThreadOptions';
-import { getMockedThread } from '__mocks__/mockApiResponse';
 
 const Compose = React.lazy(() => import('../Compose/Compose'));
 
@@ -438,7 +438,7 @@ function Thread({
             isDarkMode={theme === ThemeMode.DARK}
             onClick={() => setThreadIsCollapsed(false)}
           >
-            <Typography color='link' weight={TypographyWeight.BOLD}>
+            <Typography mono uppercase color='link' weight={TypographyWeight.BOLD}>
               {numCollapsed} more {numCollapsed > 1 ? 'messages' : 'message'}
             </Typography>
             <Icons color='link' icon={Icon.ExpandV} />

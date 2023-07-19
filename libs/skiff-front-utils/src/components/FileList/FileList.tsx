@@ -67,8 +67,10 @@ const FileList: React.FC<FileListProps> = ({ files, onFileRemoved }) => (
         <ImageText>
           <IconContainer src={URL.createObjectURL(file)} />
           <LabelContainer>
-            <Typography weight={TypographyWeight.MEDIUM}>{file.name.split('.')[0]}</Typography>
-            <Typography color='secondary'>
+            <Typography mono uppercase weight={TypographyWeight.MEDIUM}>
+              {file.name.split('.')[0]}
+            </Typography>
+            <Typography mono uppercase color='secondary'>
               {file.type.split('/')[1].toUpperCase()} / {bytesToHumanReadable(file.size)}
             </Typography>
           </LabelContainer>

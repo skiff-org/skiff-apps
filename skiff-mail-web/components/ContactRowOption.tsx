@@ -1,9 +1,7 @@
 import { Size, ThemeMode, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
-import React from 'react';
-import { FC } from 'react';
+import React, { FC } from 'react';
 import { isMobile } from 'react-device-detect';
-import { AddressObjectWithDisplayPicture, UserAvatar } from 'skiff-front-utils';
-import { formatEmailAddress, getAddrDisplayName } from 'skiff-front-utils';
+import { AddressObjectWithDisplayPicture, formatEmailAddress, getAddrDisplayName, UserAvatar } from 'skiff-front-utils';
 import styled from 'styled-components';
 
 const AddressRowContainer = styled.div<{ onClick?: React.MouseEventHandler }>`
@@ -49,7 +47,9 @@ const ContactRowOption: FC<ContactRowOptionProps> = ({ address, onClick }) => {
       <MobileAddressRowContainer onClick={onClick}>
         <UserAvatar displayPictureData={displayPictureData} label={displayName} size={Size.LARGE} />
         <AddressRowText>
-          <Typography size={TypographySize.LARGE}>{formattedDisplayName}</Typography>
+          <Typography mono uppercase size={TypographySize.LARGE}>
+            {formattedDisplayName}
+          </Typography>
         </AddressRowText>
       </MobileAddressRowContainer>
     );
@@ -59,10 +59,16 @@ const ContactRowOption: FC<ContactRowOptionProps> = ({ address, onClick }) => {
     <AddressRowContainer onClick={onClick}>
       <UserAvatar displayPictureData={displayPictureData} forceTheme={ThemeMode.DARK} label={displayName} />
       <AddressRowText>
-        <Typography forceTheme={ThemeMode.DARK} size={TypographySize.SMALL} weight={TypographyWeight.MEDIUM}>
+        <Typography
+          mono
+          uppercase
+          forceTheme={ThemeMode.DARK}
+          size={TypographySize.SMALL}
+          weight={TypographyWeight.MEDIUM}
+        >
           {formattedDisplayName}
         </Typography>
-        <Typography color='secondary' forceTheme={ThemeMode.DARK} size={TypographySize.SMALL}>
+        <Typography mono uppercase color='secondary' forceTheme={ThemeMode.DARK} size={TypographySize.SMALL}>
           {formatEmailAddress(emailAddress)}
         </Typography>
       </AddressRowText>

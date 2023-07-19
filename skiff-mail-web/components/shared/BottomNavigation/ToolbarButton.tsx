@@ -38,7 +38,11 @@ export default function ToolbarButton({ icon, label, onClick, link, disabled }: 
           <Icons color={link ? 'link' : iconColor} icon={icon} size={Size.X_MEDIUM} />
         </EnlargeIcon>
       )}
-      {!!label && <Typography color={link ? 'link' : iconColor}>{label}</Typography>}
+      {!!label && (
+        <Typography mono uppercase color={link ? 'link' : iconColor}>
+          {label}
+        </Typography>
+      )}
     </BottomNavigationAction>
   );
 }

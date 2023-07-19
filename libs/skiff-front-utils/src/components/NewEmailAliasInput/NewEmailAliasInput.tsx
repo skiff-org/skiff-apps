@@ -173,7 +173,7 @@ export const NewEmailAliasInput: React.FC<NewEmailAliasInputProps> = ({
           disabled={disabled || isWalletAlias} // wallet aliases are pre-filled
           endAdornment={
             !showMultipleDomains && (
-              <Typography forceTheme={isMobile ? forceTheme : undefined}>
+              <Typography mono uppercase forceTheme={isMobile ? forceTheme : undefined}>
                 {disableSkiffDomain ? `@${customDomains[0]}` : defaultMailDomain}
               </Typography>
             )

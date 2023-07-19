@@ -1,13 +1,12 @@
 import { Icons, Size, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
-import React from 'react';
 
 import {
-  WorkspaceSection,
-  Sections,
   ActionItem,
   ActionLabel,
   Actions,
-  SectionAction
+  SectionAction,
+  Sections,
+  WorkspaceSection
 } from './OrganizationSelect.constants';
 import { WorkspaceAction } from './WorkspaceAction';
 import { WorkspaceItem } from './WorkspaceItem';
@@ -38,7 +37,7 @@ export const OrgSection = (props: OrgSectionProps) => {
             {actions.map((action) => (
               <ActionItem data-test={action?.dataTest} key={action?.key} onClick={action.onClick}>
                 <ActionLabel $disabled={disabled}>
-                  <Typography color='secondary' forceTheme={ThemeMode.DARK} size={TypographySize.SMALL}>
+                  <Typography mono uppercase color='secondary' forceTheme={ThemeMode.DARK} size={TypographySize.SMALL}>
                     {action.label}
                   </Typography>
                   {action?.icon && (

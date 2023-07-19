@@ -6,8 +6,8 @@ import {
   Divider,
   InputField,
   Layout,
-  Typography,
-  Size
+  Size,
+  Typography
 } from '@skiff-org/skiff-ui';
 import { FC, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -129,7 +129,9 @@ const ConfirmDeleteAccountModal: FC<ConfirmDeleteAccountModalProps> = ({ open, o
       type={DialogTypes.Default}
     >
       <WorkspaceNameContainer>
-        <Typography wrap>To proceed, please type in the following affirmation</Typography>
+        <Typography mono uppercase wrap>
+          To proceed, please type in the following affirmation
+        </Typography>
         <InputField
           error={workspaceInputError}
           onChange={(e) => {
@@ -152,7 +154,9 @@ const ConfirmDeleteAccountModal: FC<ConfirmDeleteAccountModalProps> = ({ open, o
               }}
             />
           </CheckboxContainer>
-          <Typography wrap>I understand all my data will be lost if I delete my account</Typography>
+          <Typography mono uppercase wrap>
+            I understand all my data will be lost if I delete my account
+          </Typography>
         </ConfirmationLine>
         <ConfirmationLine>
           <CheckboxContainer>
@@ -165,7 +169,7 @@ const ConfirmDeleteAccountModal: FC<ConfirmDeleteAccountModalProps> = ({ open, o
               }}
             />
           </CheckboxContainer>
-          <Typography wrap>
+          <Typography mono uppercase wrap>
             I understand that all my email addresses will be permanently lost and cannot be reclaimed
           </Typography>
         </ConfirmationLine>
@@ -179,7 +183,7 @@ const ConfirmDeleteAccountModal: FC<ConfirmDeleteAccountModalProps> = ({ open, o
               label={nextAdmin.publicData.displayName || nextAdmin.username || 'A'}
               size={Size.SMALL}
             />
-            <Typography color='secondary' wrap>
+            <Typography mono uppercase color='secondary' wrap>
               {nextAdmin.publicData.displayName || nextAdmin.username} will become the new admin
             </Typography>
           </NextAdminLine>

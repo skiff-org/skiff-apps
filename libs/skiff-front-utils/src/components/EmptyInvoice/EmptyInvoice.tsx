@@ -13,10 +13,10 @@ const EmptyInvoice = (props: EmptyIllustrationProps) => {
     <Center>
       <EmptyInvoiceIllustration />
       <MailTypography>
-        <Typography color='secondary' selectable={false} weight={TypographyWeight.MEDIUM}>
+        <Typography mono uppercase color='secondary' selectable={false} weight={TypographyWeight.MEDIUM}>
           {title}
         </Typography>
-        <Typography color='disabled' selectable={false}>
+        <Typography mono uppercase color='disabled' selectable={false}>
           {subtitle}
         </Typography>
       </MailTypography>

@@ -1,5 +1,5 @@
-import { Editor } from '@tiptap/react';
 import { FilledVariant, Icon, IconButton, Size, Typography } from '@skiff-org/skiff-ui';
+import { Editor } from '@tiptap/react';
 import { MouseEventHandler, useEffect, useState } from 'react';
 import { isIOS } from 'react-device-detect';
 import styled from 'styled-components';
@@ -131,7 +131,9 @@ export function MobileComposeToolbar({ editor, optionButtons }: ActionBarProps) 
           </ActionBarButtons>
         </ActionBarButtonsScrollView>
         <div onClick={editor.commands.blur}>
-          <Typography color='link'>Done</Typography>
+          <Typography mono uppercase color='link'>
+            Done
+          </Typography>
         </div>
       </ActionBarContainer>
     </>

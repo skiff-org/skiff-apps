@@ -1,5 +1,5 @@
 import { Dropdown, DropdownItem, Icon, IconButton, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
-import React, { FC, useRef } from 'react';
+import { FC, useRef } from 'react';
 import { isMobile } from 'react-device-detect';
 
 import usePopup from '../hooks/usePopup';
@@ -60,7 +60,7 @@ const CommentMenu: FC<CommentMenuProps> = ({
     <div className={`comment-options ${onlyOnHover && !openDropdown && !reactionPikerOpen ? 'onlyonhover' : ''}`}>
       {badge && (
         <div style={{ background: badge.color }} className='badge'>
-          <Typography color='white' size={TypographySize.SMALL}>
+          <Typography mono uppercase color='white' size={TypographySize.SMALL}>
             {badge.text}
           </Typography>
         </div>

@@ -10,7 +10,7 @@ import {
   TypographyWeight
 } from '@skiff-org/skiff-ui';
 import { useCallback } from 'react';
-import { UserAvatar, copyToClipboardWebAndMobile, useToast } from 'skiff-front-utils';
+import { copyToClipboardWebAndMobile, UserAvatar, useToast } from 'skiff-front-utils';
 import { DisplayPictureData } from 'skiff-graphql';
 import { isSkiffAddress } from 'skiff-utils';
 import styled from 'styled-components';
@@ -124,10 +124,10 @@ export const SenderInfo = ({
         )}
       </AvatarContainer>
       <NameContainer>
-        <Typography forceTheme={forceTheme} weight={TypographyWeight.BOLD}>
+        <Typography mono uppercase forceTheme={forceTheme} weight={TypographyWeight.BOLD}>
           {displayName}
         </Typography>
-        <Typography color='disabled' forceTheme={forceTheme} size={TypographySize.SMALL}>
+        <Typography mono uppercase color='disabled' forceTheme={forceTheme} size={TypographySize.SMALL}>
           {emailAlias}
         </Typography>
       </NameContainer>

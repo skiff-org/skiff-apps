@@ -1,5 +1,4 @@
 import { Icon, Icons, IconText, Typography } from '@skiff-org/skiff-ui';
-import React from 'react';
 import styled from 'styled-components';
 
 import { PreviewSize } from '../RecentFilePreview.types';
@@ -28,7 +27,10 @@ const ErrorPreview = ({ error, refetch, size }: ErrorPreviewProps) => {
 
   return (
     <ErrorContainer>
-      <Typography> Error: {error} </Typography>
+      <Typography mono uppercase>
+        {' '}
+        Error: {error}{' '}
+      </Typography>
       <IconText color='link' disableHover endIcon={Icon.Reload} label='Try fetching again' onClick={refetch} />
     </ErrorContainer>
   );

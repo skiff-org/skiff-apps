@@ -25,7 +25,7 @@ function PaymentDetails() {
   return (
     <>
       {!isMobile && (
-        <Typography size={TypographySize.LARGE} weight={TypographyWeight.MEDIUM}>
+        <Typography mono uppercase size={TypographySize.LARGE} weight={TypographyWeight.MEDIUM}>
           Payment details
         </Typography>
       )}

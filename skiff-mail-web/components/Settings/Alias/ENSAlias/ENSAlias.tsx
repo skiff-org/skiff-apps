@@ -102,11 +102,13 @@ export const ENSAlias: React.FC<ENSAliasProps> = ({ walletAliases }) => {
               <ENSAliasEmails>
                 <Avatar label={ensAlias} />
                 <div>
-                  <Typography>{ensAlias}</Typography>
+                  <Typography mono uppercase>
+                    {ensAlias}
+                  </Typography>
                   <Tooltip placement={TooltipPlacement.RIGHT}>
                     <TooltipContent>{`${walletAlias}@${mailDomain}`}</TooltipContent>
                     <TooltipTrigger>
-                      <Typography color='secondary'>
+                      <Typography mono uppercase color='secondary'>
                         {`${abbreviateWalletAddress(walletAlias)}@${mailDomain}`}
                       </Typography>
                     </TooltipTrigger>

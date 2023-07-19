@@ -1,5 +1,4 @@
 import { ThemeMode, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
-import React from 'react';
 import styled from 'styled-components';
 
 type SectionHeaderProps = {
@@ -35,7 +34,7 @@ function FeatureTableSectionHeader({ sectionName, theme, showEssential, isFirstS
         >
           {/* only the first column in the grid has copy */}
           {i === 0 && (
-            <Typography size={TypographySize.MEDIUM} weight={TypographyWeight.MEDIUM}>
+            <Typography mono uppercase size={TypographySize.MEDIUM} weight={TypographyWeight.MEDIUM}>
               {sectionName}
             </Typography>
           )}

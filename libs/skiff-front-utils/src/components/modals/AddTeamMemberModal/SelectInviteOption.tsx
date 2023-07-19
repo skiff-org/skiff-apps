@@ -1,4 +1,4 @@
-import { Icon, Icons, ThemeMode, Typography, getThemedColor } from '@skiff-org/skiff-ui';
+import { getThemedColor, Icon, Icons, ThemeMode, Typography } from '@skiff-org/skiff-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
@@ -42,10 +42,10 @@ const SelectInviteOption: React.FC<SelectInviteOptionProps> = ({ onClickSendInvi
     <>
       <OptionContainer onClick={onClickSendInvite}>
         <OptionContainerText>
-          <Typography color='primary' forceTheme={isMobile ? ThemeMode.DARK : undefined}>
+          <Typography mono uppercase color='primary' forceTheme={isMobile ? ThemeMode.DARK : undefined}>
             Send an invite
           </Typography>
-          <Typography color='secondary' forceTheme={isMobile ? ThemeMode.DARK : undefined} wrap>
+          <Typography mono uppercase color='secondary' forceTheme={isMobile ? ThemeMode.DARK : undefined} wrap>
             Allow new member to set up their own account
           </Typography>
         </OptionContainerText>
@@ -53,10 +53,10 @@ const SelectInviteOption: React.FC<SelectInviteOptionProps> = ({ onClickSendInvi
       </OptionContainer>
       <OptionContainer onClick={onClickProvisionUser}>
         <OptionContainerText>
-          <Typography color='primary' forceTheme={isMobile ? ThemeMode.DARK : undefined}>
+          <Typography mono uppercase color='primary' forceTheme={isMobile ? ThemeMode.DARK : undefined}>
             Provision an account
           </Typography>
-          <Typography color='secondary' forceTheme={isMobile ? ThemeMode.DARK : undefined} wrap>
+          <Typography mono uppercase color='secondary' forceTheme={isMobile ? ThemeMode.DARK : undefined} wrap>
             Create an alias and password for new member
           </Typography>
         </OptionContainerText>

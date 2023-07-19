@@ -1,8 +1,8 @@
 import '../../ui/comments.css';
 import '../../ui/emoji-mart-styles.css';
 
-import cx from 'classnames';
 import { Icon, Icons, Typography, useOnClickOutside } from '@skiff-org/skiff-ui';
+import cx from 'classnames';
 import { MarkType } from 'prosemirror-model';
 import { EditorView } from 'prosemirror-view';
 import React, { FC, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -190,7 +190,9 @@ const Thread: FC<ThreadProps> = ({
             {nodeRefText && (
               <span className='comment-node-ref'>
                 <Icons icon={Icon.ChevronRight} color='orange' />
-                <Typography>{nodeRefText}</Typography>
+                <Typography mono uppercase>
+                  {nodeRefText}
+                </Typography>
               </span>
             )}
             <CommentMenu
@@ -298,7 +300,9 @@ const Thread: FC<ThreadProps> = ({
                         }}
                         className='comment-fold'
                       >
-                        <Typography color='link'>{commentsToDisplay.length - 4} replies</Typography>
+                        <Typography mono uppercase color='link'>
+                          {commentsToDisplay.length - 4} replies
+                        </Typography>
                       </div>
                     )}
                   </Fragment>

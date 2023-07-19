@@ -3,9 +3,9 @@ import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import { useGetMailFiltersQuery } from 'skiff-front-graphql';
 import {
+  contactToAddressObject,
   DEFAULT_WORKSPACE_EVENT_VERSION,
   TitleActionSection,
-  contactToAddressObject,
   useGetAllContactsWithOrgMembers
 } from 'skiff-front-utils';
 import { WorkspaceEventType } from 'skiff-graphql';
@@ -84,7 +84,7 @@ export const Filters: React.FC = () => {
       <Container>
         <HeaderContainer>
           <TitleRow>
-            <Typography size={TypographySize.H4} weight={TypographyWeight.BOLD}>
+            <Typography mono uppercase size={TypographySize.H4} weight={TypographyWeight.BOLD}>
               Filters
             </Typography>
             {!isMobile && filters?.length !== 0 && !isLoading && (

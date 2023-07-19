@@ -18,10 +18,10 @@ import { SubscriptionInterval, SubscriptionPlan } from 'skiff-graphql';
 import styled from 'styled-components';
 
 import {
-  FEATURE_TABLE_RESPONSIVE_BREAKPOINT,
+  allFeatures,
   FeatureData,
   FeatureItem,
-  allFeatures,
+  FEATURE_TABLE_RESPONSIVE_BREAKPOINT,
   narrowViewFeatures,
   subscriptionTiers
 } from '../../../../constants/plans.constants';
@@ -185,7 +185,9 @@ function FeatureTableContent({
                     <Tooltip placement={TooltipPlacement.RIGHT}>
                       <TooltipContent>{hint}</TooltipContent>
                       <TooltipTrigger>
-                        <Typography size={TypographySize.SMALL}>{label}</Typography>
+                        <Typography mono uppercase size={TypographySize.SMALL}>
+                          {label}
+                        </Typography>
                       </TooltipTrigger>
                     </Tooltip>
                   </TableRow>
@@ -203,7 +205,12 @@ function FeatureTableContent({
                       >
                         {value && (
                           <TableRow>
-                            <Typography color={isSpotlightPlan ? 'primary' : 'secondary'} size={TypographySize.SMALL}>
+                            <Typography
+                              mono
+                              uppercase
+                              color={isSpotlightPlan ? 'primary' : 'secondary'}
+                              size={TypographySize.SMALL}
+                            >
                               {value}
                             </Typography>
                           </TableRow>
@@ -250,7 +257,7 @@ function FeatureTableContent({
           <NarrowViewFeatureList>
             {index > 0 && (
               <TierRow>
-                <Typography color='secondary' weight={TypographyWeight.MEDIUM}>
+                <Typography mono uppercase color='secondary' weight={TypographyWeight.MEDIUM}>
                   Everything in the {getTierTitle(supportedTiers[index - 1])} plan and...
                 </Typography>
               </TierRow>
@@ -268,7 +275,9 @@ function FeatureTableContent({
                     typeof value === 'string' ? value + ' ' + feature.label.toLowerCase() : feature.label;
                   const featureComponent = (
                     <TierRow key={`${feature.label}-${tier}`}>
-                      <Typography color='secondary'>{featureCopy}</Typography>
+                      <Typography mono uppercase color='secondary'>
+                        {featureCopy}
+                      </Typography>
                     </TierRow>
                   );
                   if ((index === 0 && enabled) || (index === 0 && value)) {

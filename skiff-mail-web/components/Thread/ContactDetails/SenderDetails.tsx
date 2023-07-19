@@ -3,10 +3,10 @@ import React, { RefObject, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import {
-  UserAvatar,
   createAbbreviatedWalletEmail,
   getAddrDisplayName,
-  splitEmailToAliasAndDomain
+  splitEmailToAliasAndDomain,
+  UserAvatar
 } from 'skiff-front-utils';
 import { isENSName, isWalletAddress } from 'skiff-utils';
 import styled from 'styled-components';
@@ -116,7 +116,7 @@ export const SenderDetails: React.FC<SenderDetailsProps> = ({
   const renderDateAndActionsButton = () => (
     <ThreadActionButtonContainer>
       {!isMobile && (
-        <Typography color='disabled' minWidth='fit-content' size={TypographySize.SMALL}>
+        <Typography mono uppercase color='disabled' minWidth='fit-content' size={TypographySize.SMALL}>
           {`${getMonthAndDay(displayedDate)}, ${getTime(displayedDate)}`}
         </Typography>
       )}
@@ -154,6 +154,8 @@ export const SenderDetails: React.FC<SenderDetailsProps> = ({
       <NameAndDate>
         <Name ref={fromContactRef}>
           <Typography
+            mono
+            uppercase
             color={showContacts ? 'link' : 'primary'}
             inline
             onClick={showContacts ? () => setShowFromContactDropdown((prev) => !prev) : undefined}
@@ -177,7 +179,7 @@ export const SenderDetails: React.FC<SenderDetailsProps> = ({
     if (fromDisplayName) {
       return (
         <Email>
-          <Typography color='secondary' inline size={isMobile ? TypographySize.SMALL : undefined}>
+          <Typography mono uppercase color='secondary' inline size={isMobile ? TypographySize.SMALL : undefined}>
             &lt;{isWalletEmail ? createAbbreviatedWalletEmail(alias, domain) : fromAddress}&gt;
           </Typography>
         </Email>

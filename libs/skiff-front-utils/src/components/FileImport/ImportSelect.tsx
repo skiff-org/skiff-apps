@@ -81,9 +81,11 @@ const ImportSelect: React.FC<ImportSelectProps> = ({
         </ImportClientIcon>
       )}
       <Textbox>
-        <Typography color={disabled ? 'disabled' : color}>{label}</Typography>
+        <Typography mono uppercase color={disabled ? 'disabled' : color}>
+          {label}
+        </Typography>
         {sublabel && (
-          <Typography color={disabled ? 'disabled' : 'tertiary'} size={TypographySize.SMALL} wrap={wrap}>
+          <Typography mono uppercase color={disabled ? 'disabled' : 'tertiary'} size={TypographySize.SMALL} wrap={wrap}>
             {sublabel}
           </Typography>
         )}

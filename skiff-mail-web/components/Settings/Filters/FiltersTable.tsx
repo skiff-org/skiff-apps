@@ -79,10 +79,10 @@ export const FiltersTable: React.FC<FiltersTableProps> = ({ filters, isFiltersLo
         <EmptyContainer>
           <Illustration illustration={Illustrations.FilterEmpty} />
           <EmptyFilterText>
-            <Typography color='secondary' weight={TypographyWeight.MEDIUM}>
+            <Typography mono uppercase color='secondary' weight={TypographyWeight.MEDIUM}>
               No filters yet
             </Typography>
-            <Typography align={Alignment.CENTER} color='disabled' wrap>
+            <Typography mono uppercase align={Alignment.CENTER} color='disabled' wrap>
               Organize your inbox by creating filters {isMobile && 'through a desktop web browser or the desktop app'}
             </Typography>
           </EmptyFilterText>

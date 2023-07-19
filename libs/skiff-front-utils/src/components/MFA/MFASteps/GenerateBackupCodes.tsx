@@ -117,7 +117,7 @@ function GenerateBackupCodes({ username, backupCodes, getNewCodes }: GenerateBac
       {backupCodes?.map((code) => {
         return (
           <CodeField key={code}>
-            <Typography color='secondary' mono>
+            <Typography mono uppercase color='secondary'>
               {code}
             </Typography>
           </CodeField>
@@ -128,7 +128,7 @@ function GenerateBackupCodes({ username, backupCodes, getNewCodes }: GenerateBac
 
   return (
     <Container>
-      <Typography color='secondary' wrap>
+      <Typography mono uppercase color='secondary' wrap>
         Use these codes to access your account if you can&apos;t receive two-factor authentication codes. Each code may
         only be used once.
       </Typography>
@@ -142,7 +142,9 @@ function GenerateBackupCodes({ username, backupCodes, getNewCodes }: GenerateBac
         <>
           {!backupCodes.length && (
             <BackupCodesLayout>
-              <Typography color='disabled'>No backup codes found.</Typography>
+              <Typography mono uppercase color='disabled'>
+                No backup codes found.
+              </Typography>
             </BackupCodesLayout>
           )}
           {/* Backup codes loaded */}

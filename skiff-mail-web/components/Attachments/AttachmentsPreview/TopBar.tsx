@@ -1,13 +1,13 @@
 import {
   FilledVariant,
+  getThemedColor,
   Icon,
   IconButton,
   IconText,
   Size,
   ThemeMode,
   Typography,
-  TypographyWeight,
-  getThemedColor
+  TypographyWeight
 } from '@skiff-org/skiff-ui';
 import { FC } from 'react';
 import { Email, SystemLabels, UserThread } from 'skiff-graphql';
@@ -63,13 +63,13 @@ const TopBar: FC<TopBarProps> = ({ attachment, thread, email, onPrev, onNext, cl
   const activeThreadQuery = { threadID, emailID };
 
   const PrimaryText: React.FC = ({ children }) => (
-    <Typography forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
+    <Typography mono uppercase forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM}>
       {children}
     </Typography>
   );
 
   const SecondaryText: React.FC = ({ children }) => (
-    <Typography color='secondary' forceTheme={ThemeMode.DARK}>
+    <Typography mono uppercase color='secondary' forceTheme={ThemeMode.DARK}>
       {children}
     </Typography>
   );

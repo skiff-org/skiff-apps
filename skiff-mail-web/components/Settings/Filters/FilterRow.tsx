@@ -1,4 +1,4 @@
-import { Typography, Icon, TypographySize, Icons, TypographyWeight, Size } from '@skiff-org/skiff-ui';
+import { Icon, Icons, Size, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -9,7 +9,7 @@ import styled from 'styled-components';
 
 import { skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { ModalType } from '../../../redux/reducers/modalTypes';
-import { UserLabelPlain, UserLabelFolder, getSystemLabels } from '../../../utils/label';
+import { getSystemLabels, UserLabelFolder, UserLabelPlain } from '../../../utils/label';
 
 import { ActionChip } from './Chips/ActionChip';
 import { FilterConditionChip } from './Chips/FilterConditionChip';
@@ -134,15 +134,15 @@ export const FilterRow: React.FC<FilterRowProps> = ({ filter, index, labels, fol
     >
       <FilterContent>
         <RowTitle>
-          <Typography size={TypographySize.SMALL} weight={TypographyWeight.MEDIUM}>
+          <Typography mono uppercase size={TypographySize.SMALL} weight={TypographyWeight.MEDIUM}>
             Filter {index + 1}
           </Typography>
           {filter.name && (
             <>
-              <Typography color='secondary' size={TypographySize.SMALL} weight={TypographyWeight.BOLD}>
+              <Typography mono uppercase color='secondary' size={TypographySize.SMALL} weight={TypographyWeight.BOLD}>
                 &#183;
               </Typography>
-              <Typography color='secondary' size={TypographySize.SMALL}>
+              <Typography mono uppercase color='secondary' size={TypographySize.SMALL}>
                 {filter.name}
               </Typography>
             </>

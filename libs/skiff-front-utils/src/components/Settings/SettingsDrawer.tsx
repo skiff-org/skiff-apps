@@ -1,8 +1,6 @@
-import { animate, motion, useMotionValue } from 'framer-motion';
-import escapeRegExp from 'lodash/escapeRegExp';
 import {
-  Color,
   CircularProgress,
+  Color,
   Icon,
   Icons,
   IconText,
@@ -14,11 +12,13 @@ import {
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
-import Drawer from '../Drawer';
+import { animate, motion, useMotionValue } from 'framer-motion';
+import escapeRegExp from 'lodash/escapeRegExp';
 import React, { FC, forwardRef, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { upperCaseFirstLetter } from 'skiff-utils';
 import styled from 'styled-components';
+import Drawer from '../Drawer';
 
 import { useIosBackdropEffect, useSwipeBack } from '../../hooks';
 import { useTheme } from '../../theme/AppThemeProvider';
@@ -188,7 +188,7 @@ const SettingTabView: FC<SettingTabViewProps> = ({ setting, onBack, onSwipe, isP
                 </LeftButtonAbsolute>
               </LeftButton>
               <HeaderButton>
-                <Typography size={TypographySize.H4} weight={TypographyWeight.MEDIUM}>
+                <Typography mono uppercase size={TypographySize.H4} weight={TypographyWeight.MEDIUM}>
                   {setting.label}
                 </Typography>
               </HeaderButton>
@@ -197,7 +197,7 @@ const SettingTabView: FC<SettingTabViewProps> = ({ setting, onBack, onSwipe, isP
           {/* Don't show additional header for Plans tab */}
           {!isPlansTab && <IconText label={setting.label} />}
           {setting.description && (
-            <Typography color='secondary' wrap>
+            <Typography mono uppercase color='secondary' wrap>
               {setting.description}
             </Typography>
           )}
@@ -218,7 +218,7 @@ const SettingTabView: FC<SettingTabViewProps> = ({ setting, onBack, onSwipe, isP
                 </LeftButtonAbsolute>
               </LeftButton>
               <HeaderButton>
-                <Typography size={TypographySize.H4} weight={TypographyWeight.MEDIUM}>
+                <Typography mono uppercase size={TypographySize.H4} weight={TypographyWeight.MEDIUM}>
                   {setting.label}
                 </Typography>
               </HeaderButton>
@@ -327,7 +327,7 @@ const DrawerSettingOption = forwardRef<HTMLDivElement, DrawerSettingOptionProps>
           )}
         </SettingIconText>
         <RightSection $isLast={isLast}>
-          <Typography selectable={false} weight={TypographyWeight.MEDIUM}>
+          <Typography mono uppercase selectable={false} weight={TypographyWeight.MEDIUM}>
             {setting.label}
           </Typography>
           {getInteractivePart(setting)}
@@ -488,7 +488,7 @@ const SettingsDrawer: FC<SettingsDrawerProps> = ({
             }}
           >
             <SettingHeader>
-              <Typography color='disabled' mono selectable={false} size={TypographySize.SMALL} uppercase>
+              <Typography mono uppercase color='disabled' selectable={false} size={TypographySize.SMALL}>
                 {tab.label}
               </Typography>
             </SettingHeader>
@@ -516,7 +516,9 @@ const SettingsDrawer: FC<SettingsDrawerProps> = ({
         ))}
       {!settingsToShow.length && (
         <NoResultsContainer>
-          <Typography color='secondary'>No results</Typography>
+          <Typography mono uppercase color='secondary'>
+            No results
+          </Typography>
         </NoResultsContainer>
       )}
     </>

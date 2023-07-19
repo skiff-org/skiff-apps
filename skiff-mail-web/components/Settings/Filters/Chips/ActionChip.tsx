@@ -2,11 +2,17 @@ import { ACCENT_COLOR_VALUES, Icon, IconProps, Icons, Size, Typography, Typograp
 import React from 'react';
 import { useGetFF } from 'skiff-front-utils';
 import { ActionType } from 'skiff-graphql';
-import { GmailImportImprovementsFlag, assertUnreachable } from 'skiff-utils';
+import { assertUnreachable, GmailImportImprovementsFlag } from 'skiff-utils';
 import styled from 'styled-components';
 
-import { SystemLabel, UserLabelFolder, UserLabelPlain, isFolder, isSystemLabel } from '../../../../utils/label';
-import { getSystemLabels } from '../../../../utils/label';
+import {
+  getSystemLabels,
+  isFolder,
+  isSystemLabel,
+  SystemLabel,
+  UserLabelFolder,
+  UserLabelPlain
+} from '../../../../utils/label';
 import { CHIP_TYPOGRAPHY_PADDING, FILTER_CONDITION_CHIP_EDGE_PADDING } from '../Filters.constants';
 import { Action } from '../Filters.types';
 
@@ -105,7 +111,9 @@ export const ActionChip: React.FC<ActionChipProps> = ({ action, labelsAndFolders
       return (
         <>
           <ChipTypography>
-            <Typography weight={TypographyWeight.MEDIUM}>{moveToTarget.name}</Typography>
+            <Typography mono uppercase weight={TypographyWeight.MEDIUM}>
+              {moveToTarget.name}
+            </Typography>
           </ChipTypography>
           {getLabelIcon(moveToTarget)}
         </>
@@ -116,19 +124,27 @@ export const ActionChip: React.FC<ActionChipProps> = ({ action, labelsAndFolders
       return (
         <>
           <ChipTypography>
-            <Typography color='disabled'>Deleted label</Typography>
+            <Typography mono uppercase color='disabled'>
+              Deleted label
+            </Typography>
           </ChipTypography>
           {getLabelIcon(undefined)}
         </>
       );
     }
-    return <Typography weight={TypographyWeight.MEDIUM}>{value}</Typography>;
+    return (
+      <Typography mono uppercase weight={TypographyWeight.MEDIUM}>
+        {value}
+      </Typography>
+    );
   };
 
   return (
     <ChipContainer>
       <TypeLabel $includeBorder={!!value}>
-        <Typography color='secondary'>{getActionLabel()}</Typography>
+        <Typography mono uppercase color='secondary'>
+          {getActionLabel()}
+        </Typography>
       </TypeLabel>
       {value && <ValueLabel>{renderValueLabel()}</ValueLabel>}
     </ChipContainer>

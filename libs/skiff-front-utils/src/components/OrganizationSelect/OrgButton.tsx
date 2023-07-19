@@ -10,15 +10,15 @@ import { UserAvatar } from '../UserAvatar';
 
 import {
   ActiveWorkspaceLabel,
+  AppIcon,
   ORG_SELECTOR_ID,
   SidebarButton,
   SidebarButtonContainer,
   SidebarWrapper,
-  WorkspaceOptionItem,
-  AppIcon,
   SKIFF_APPS,
   WorkspaceIcon,
-  WorkspaceIconContainer
+  WorkspaceIconContainer,
+  WorkspaceOptionItem
 } from './OrganizationSelect.constants';
 
 interface OrgButtonProps {
@@ -66,8 +66,10 @@ export const OrgButton = (props: OrgButtonProps) => {
           {sidepanelOpen && (
             <>
               <ActiveWorkspaceLabel>
-                <Typography>{loading ? '' : `Skiff ${appConfig?.label ?? ''}`}</Typography>
-                <Typography color='secondary' size={TypographySize.SMALL}>
+                <Typography mono uppercase>
+                  {loading ? '' : `Skiff ${appConfig?.label ?? ''}`}
+                </Typography>
+                <Typography mono uppercase color='secondary' size={TypographySize.SMALL}>
                   {loading ? '' : activeWorkspace?.label}
                 </Typography>
               </ActiveWorkspaceLabel>

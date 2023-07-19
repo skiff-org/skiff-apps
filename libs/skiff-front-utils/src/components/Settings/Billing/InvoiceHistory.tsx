@@ -1,6 +1,6 @@
+import { Icon, Icons, IconText, MonoTag, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import dayjs from 'dayjs';
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import { Icon, IconText, Icons, MonoTag, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
 import { isMobile } from 'react-device-detect';
 import { useInvoiceHistory } from 'skiff-front-graphql';
 import styled, { css } from 'styled-components';
@@ -116,7 +116,7 @@ function InvoiceHistory() {
   return (
     <>
       {!isMobile && (
-        <Typography size={TypographySize.LARGE} weight={TypographyWeight.MEDIUM}>
+        <Typography mono uppercase size={TypographySize.LARGE} weight={TypographyWeight.MEDIUM}>
           Invoice alerts
         </Typography>
       )}
@@ -126,7 +126,7 @@ function InvoiceHistory() {
             {headers.map((header, index) => {
               return (
                 <StyledTh $collapse={!isMobile && index === headers.length - 1}>
-                  <Typography mono uppercase color='disabled' size={TypographySize.CAPTION}>
+                  <Typography uppercase mono color='disabled' size={TypographySize.CAPTION}>
                     {header}
                   </Typography>
                 </StyledTh>
@@ -144,11 +144,13 @@ function InvoiceHistory() {
               <tbody>
                 <StyledTr>
                   <StyledTd>
-                    <Typography>{dayjs(created).format('MMM DD, YYYY')}</Typography>
+                    <Typography mono uppercase>
+                      {dayjs(created).format('MMM DD, YYYY')}
+                    </Typography>
                   </StyledTd>
                   {!(amountDue === null || amountDue === undefined) && (
                     <StyledTd>
-                      <Typography>{`$${(amountDue / 100).toFixed(2)}`}</Typography>
+                      <Typography mono uppercase>{`$${(amountDue / 100).toFixed(2)}`}</Typography>
                     </StyledTd>
                   )}
                   <StyledTd>
@@ -157,7 +159,9 @@ function InvoiceHistory() {
                         const lastTier = index === invoiceTiers.length - 1;
                         return (
                           <>
-                            <Typography>{tier}</Typography>
+                            <Typography mono uppercase>
+                              {tier}
+                            </Typography>
                             {!lastTier && <Icons color='disabled' icon={Icon.ArrowRight} />}
                           </>
                         );

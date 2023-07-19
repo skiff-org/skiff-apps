@@ -1,8 +1,8 @@
+import { generateVerificationPhraseFromSigningKey } from '@skiff-org/skiff-crypto';
 import { Icon, Typography } from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { generateVerificationPhraseFromSigningKey } from '@skiff-org/skiff-crypto';
-import { TitleActionSection, useToast, useRequiredCurrentUserData } from 'skiff-front-utils';
+import { TitleActionSection, useRequiredCurrentUserData, useToast } from 'skiff-front-utils';
 import styled from 'styled-components';
 
 const PhraseField = styled.div`
@@ -73,7 +73,9 @@ function ViewVerificationPhrase() {
         {verificationPhrases.map((phrase) => {
           return (
             <PhraseField key={phrase}>
-              <Typography color='secondary'>{phrase}</Typography>
+              <Typography mono uppercase color='secondary'>
+                {phrase}
+              </Typography>
             </PhraseField>
           );
         })}

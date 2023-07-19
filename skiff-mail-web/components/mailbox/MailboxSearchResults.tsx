@@ -1,9 +1,9 @@
+import { FilledVariant, Icon, IconButton, InputField, Type, Typography } from '@skiff-org/skiff-ui';
 import { AnimatePresence } from 'framer-motion';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import uniq from 'lodash/uniq';
 import uniqBy from 'lodash/uniqBy';
 import { useRouter } from 'next/router';
-import { FilledVariant, Icon, IconButton, InputField, Type, Typography } from '@skiff-org/skiff-ui';
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,10 +11,9 @@ import Autosizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { useGetThreadsFromIDsQuery } from 'skiff-front-graphql';
-import { EmptyIllustration, useMediaQuery, usePrevious, useUserPreference } from 'skiff-front-utils';
-import { getEnvironment } from 'skiff-front-utils';
+import { EmptyIllustration, getEnvironment, useMediaQuery, usePrevious, useUserPreference } from 'skiff-front-utils';
 import { SystemLabels, ThreadDisplayFormat } from 'skiff-graphql';
-import { filterExists, StorageTypes, SearchIndexProgressFeatureFlag } from 'skiff-utils';
+import { filterExists, SearchIndexProgressFeatureFlag, StorageTypes } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { COMPACT_MAILBOX_BREAKPOINT } from '../../constants/mailbox.constants';
@@ -356,7 +355,7 @@ export const MailboxSearchResults = () => {
               autoFocus
               endAdornment={
                 activeQuery && (
-                  <Typography color='secondary' onClick={reset}>
+                  <Typography mono uppercase color='secondary' onClick={reset}>
                     Clear
                   </Typography>
                 )

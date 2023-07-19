@@ -1,13 +1,13 @@
-import { Icon, Icons, Typography, TypographySize, ThemeMode } from '@skiff-org/skiff-ui';
+import { Icon, Icons, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import { useState } from 'react';
 
 import { UserAvatar } from '../UserAvatar';
 
 import {
   ActiveCheck,
+  WorkspaceAvatar,
   WorkspaceItemContainer,
   WorkspaceLabels,
-  WorkspaceAvatar,
   WorkspaceOptionItem
 } from './OrganizationSelect.constants';
 
@@ -38,6 +38,8 @@ export const WorkspaceItem = (props: WorkspaceItemProps) => {
       </WorkspaceAvatar>
       <WorkspaceLabels>
         <Typography
+          mono
+          uppercase
           color={workspace?.active || hover ? 'primary' : 'secondary'}
           forceTheme={ThemeMode.DARK}
           size={TypographySize.SMALL}
@@ -46,6 +48,8 @@ export const WorkspaceItem = (props: WorkspaceItemProps) => {
         </Typography>
         {sublabel && (
           <Typography
+            mono
+            uppercase
             color={hover && !workspace?.active ? 'primary' : 'disabled'}
             forceTheme={ThemeMode.DARK}
             size={TypographySize.CAPTION}

@@ -160,6 +160,8 @@ function AccountRecoveryKey({
         <>
           <PhraseContainer $isBlurred={isBlurred}>
             <Typography
+              mono
+              uppercase
               color={isBlurred ? 'disabled' : 'secondary'}
               dataTest='recovery-key-text'
               selectable={!isBlurred}

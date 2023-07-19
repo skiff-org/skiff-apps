@@ -1,4 +1,4 @@
-import { Drawer, Icon, Icons, Size, themeNames, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
+import { Drawer, Icon, Icons, Size, ThemeMode, themeNames, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { DrawerBlocksContainer } from 'skiff-front-utils';
@@ -67,6 +67,8 @@ const DrawerBlock = ({ icon, label, active, onClick }: DrawerBlockProps) => {
         <Icons color={active ? 'primary' : 'disabled'} forceTheme={ThemeMode.DARK} icon={icon} size={Size.X_MEDIUM} />
       </ScaledIcon>
       <Typography
+        mono
+        uppercase
         color={active ? 'primary' : 'disabled'}
         forceTheme={ThemeMode.DARK}
         mono

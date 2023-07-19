@@ -1,6 +1,6 @@
 import { Size, ThemeMode, Typography } from '@skiff-org/skiff-ui';
 import { EditorView } from 'prosemirror-view';
-import React, { FunctionComponent, useMemo } from 'react';
+import { FunctionComponent, useMemo } from 'react';
 import { formatName } from 'skiff-front-utils';
 import { NwContentType } from 'skiff-graphql';
 
@@ -33,7 +33,9 @@ export const MentionMenuPlaceholder: FunctionComponent<{
       tabIndex={0}
     >
       {placeHolder.icon}
-      <Typography forceTheme={ThemeMode.DARK}>{formatName(placeHolder.label)}</Typography>
+      <Typography mono uppercase forceTheme={ThemeMode.DARK}>
+        {formatName(placeHolder.label)}
+      </Typography>
     </div>
   );
 };
@@ -84,7 +86,9 @@ const MentionItem: FunctionComponent<{
       tabIndex={0}
     >
       {icon}
-      <Typography forceTheme={ThemeMode.DARK}>{formatName(item.name)}</Typography>
+      <Typography mono uppercase forceTheme={ThemeMode.DARK}>
+        {formatName(item.name)}
+      </Typography>
     </div>
   );
 };

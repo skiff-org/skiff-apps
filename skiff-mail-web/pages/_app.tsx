@@ -1,7 +1,7 @@
 import { ApolloProvider } from '@apollo/client';
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
-import { AppProps } from 'next/app';
 import '@skiff-org/skiff-ui/dist/esm/index.css';
+import { AppProps } from 'next/app';
 import { SnackbarProvider } from 'notistack';
 import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
@@ -10,19 +10,19 @@ import { Provider } from 'react-redux';
 import { AppThemeProvider, ErrorPage, saveCurrentUserData } from 'skiff-front-utils';
 
 import 'react-image-crop/dist/ReactCrop.css';
+import { MOCK_USER } from '__mocks__/mockUser';
 import client from '../apollo/client';
-import { MailDragLayer } from '../components/Compose/AddressAndSubjectFields/MailDragLayer';
-import '../components/MailEditor/editor.css';
-import '../components/ScheduleSend/DatePicker.scss';
 import '../components/app.global.css';
+import { MailDragLayer } from '../components/Compose/AddressAndSubjectFields/MailDragLayer';
 import '../components/labels/LabelDropdown.scss';
 import { Layout } from '../components/layout/Layout';
 import { MessageDragLayer } from '../components/mailbox/MessageCell/MessageDragLayer';
+import '../components/MailEditor/editor.css';
+import '../components/ScheduleSend/DatePicker.scss';
 import '../components/shared/CmdPalette/CmdPalette.css';
 import MobileHead from '../components/shared/MobileHead';
 import store from '../redux/store/reduxStore';
 import { CustomHTML5Backend } from '../utils/dragAndDrop';
-import { MOCK_USER } from '__mocks__/mockUser';
 
 function CustomApp({ Component, pageProps }: AppProps) {
   useEffect(() => {

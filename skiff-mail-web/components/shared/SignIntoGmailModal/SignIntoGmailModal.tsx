@@ -55,10 +55,10 @@ export const SignIntoGmailModal: React.FC<SignIntoGmailModalProps> = ({
           <Illustration illustration={Illustrations.ConnectGmail} theme={theme} />
         </IllustrationContainer>
         <Header>
-          <Typography align={Alignment.CENTER} size={TypographySize.H4} weight={TypographyWeight.MEDIUM}>
+          <Typography mono uppercase align={Alignment.CENTER} size={TypographySize.H4} weight={TypographyWeight.MEDIUM}>
             {actionLabel} your Gmail messages to Skiff
           </Typography>
-          <Typography align={Alignment.CENTER} color='secondary' size={TypographySize.MEDIUM}>
+          <Typography mono uppercase align={Alignment.CENTER} color='secondary' size={TypographySize.MEDIUM}>
             You will be directed to sign in with Google
           </Typography>
         </Header>

@@ -2,8 +2,7 @@ import { Divider, Icon, IconButton, ThemeMode, Type, Typography, useOnClickOutsi
 import { Node } from 'prosemirror-model';
 import { EditorState, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import React from 'react';
-import { FC, RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
 import isURL from 'validator/lib/isURL';
@@ -300,7 +299,9 @@ export const ThreadInput: FC<ThreadInputProps> = ({
               top: 9
             }}
           >
-            <Typography color='secondary'>{firstComment ? 'Add a comment' : 'Reply'}</Typography>
+            <Typography mono uppercase color='secondary'>
+              {firstComment ? 'Add a comment' : 'Reply'}
+            </Typography>
           </div>
         )}
         {mentionMenuPluginState?.open && editorRef.current && (

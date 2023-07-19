@@ -48,7 +48,7 @@ const ManageCustomDomains: React.FC<ManageCustomDomainsProps> = ({
 
   const renderDomainsUsed = () =>
     !loading && maxCustomDomains !== undefined && !!customDomains?.length ? (
-      <Typography color='disabled'>
+      <Typography mono uppercase color='disabled'>
         {customDomains?.length ?? 0}/{maxCustomDomains} domains used
       </Typography>
     ) : (
@@ -101,7 +101,9 @@ const ManageCustomDomains: React.FC<ManageCustomDomainsProps> = ({
       )}
       {/* Error state: Not loading, custom domains undefined */}
       {!loading && customDomains === undefined && (
-        <Typography color='destructive'>Failed to load custom domains, please try again later.</Typography>
+        <Typography mono uppercase color='destructive'>
+          Failed to load custom domains, please try again later.
+        </Typography>
       )}
       {/* Loading state */}
       {loading && <CircularProgress />}

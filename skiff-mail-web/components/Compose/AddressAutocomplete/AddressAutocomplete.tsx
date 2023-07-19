@@ -253,6 +253,8 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
                           <>
                             {isSkiffInternal !== undefined && !isDragging && (
                               <Typography
+                                mono
+                                uppercase
                                 forceTheme={ThemeMode.DARK}
                                 size={TypographySize.SMALL}
                                 weight={TypographyWeight.MEDIUM}
@@ -266,6 +268,8 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
                             )}
                             <AddressContainer>
                               <Typography
+                                mono
+                                uppercase
                                 color={!isValidEmail ? 'destructive' : undefined}
                                 forceTheme={ThemeMode.DARK}
                                 size={TypographySize.SMALL}
@@ -328,7 +332,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         <Portal>
           <MobileOptions>
             <PaddedTypography>
-              <Typography color='secondary' size={TypographySize.LARGE}>
+              <Typography mono uppercase color='secondary' size={TypographySize.LARGE}>
                 People
               </Typography>
             </PaddedTypography>

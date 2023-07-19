@@ -39,7 +39,11 @@ const CreditManagement: React.FC<CreditManagementProps> = ({
 
   const renderContents = () => {
     if (currentCreditCents <= 0) {
-      return <Typography color='secondary'>Earn Skiff credits by completing different tasks</Typography>;
+      return (
+        <Typography mono uppercase color='secondary'>
+          Earn Skiff credits by completing different tasks
+        </Typography>
+      );
     }
 
     const shopForPlansButton = (

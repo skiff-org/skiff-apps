@@ -1,7 +1,7 @@
-import '../ui/skiff-editor-menus.css';
 import { ThemeMode, Typography } from '@skiff-org/skiff-ui';
 import { EditorView } from 'prosemirror-view';
-import React, { FunctionComponent, useCallback } from 'react';
+import { FunctionComponent, useCallback } from 'react';
+import '../ui/skiff-editor-menus.css';
 
 import Icon from '../ui/Icon';
 
@@ -40,7 +40,9 @@ const SlashMenuItem: FunctionComponent<{
       >
         {item?.icon}
       </div>
-      <Typography forceTheme={ThemeMode.DARK}>{item.label}</Typography>
+      <Typography mono uppercase forceTheme={ThemeMode.DARK}>
+        {item.label}
+      </Typography>
       {/* add right arrow for deeper menu */}
       {(item.id === MenuItemNamesIds.HEADING ||
         item.id === MenuItemNamesIds.FONT_TYPE ||

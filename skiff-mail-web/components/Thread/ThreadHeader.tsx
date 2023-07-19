@@ -2,8 +2,8 @@ import {
   Chip,
   FilledVariant,
   Icon,
-  IconText,
   Icons,
+  IconText,
   Size,
   Typography,
   TypographySize,
@@ -232,7 +232,7 @@ const ThreadHeader = (
           />
           <ThreadTitleContainer>
             <TitleChip>
-              <Typography size={TypographySize.H3} weight={TypographyWeight.MEDIUM} wrap>
+              <Typography mono uppercase size={TypographySize.H3} weight={TypographyWeight.MEDIUM} wrap>
                 {loading ? '' : text}
               </Typography>
             </TitleChip>

@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import {
   Button,
   Dialog,
@@ -7,16 +6,17 @@ import {
   Size,
   Surface,
   ThemeMode,
+  themeNames,
   Type,
   Typography,
   TypographySize,
-  TypographyWeight,
-  themeNames
+  TypographyWeight
 } from '@skiff-org/skiff-ui';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useGetCoinbaseCheckoutIdLazyQuery, useStoreWorkspaceEventMutation } from 'skiff-front-graphql';
 import { SubscriptionPlan, WorkspaceEventType } from 'skiff-graphql';
-import { TierName, bytesToHumanReadable, getMaxCustomDomains, getStorageLimitInMb, mbToBytes } from 'skiff-utils';
+import { bytesToHumanReadable, getMaxCustomDomains, getStorageLimitInMb, mbToBytes, TierName } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { DEFAULT_WORKSPACE_EVENT_VERSION } from '../../../constants';
@@ -205,10 +205,16 @@ function CryptoBanner({ currentUserID, isUpdatingPlan, setIsUpdatingPlan, startP
       >
         <BannerContainer>
           <TextContainer>
-            <Typography forceTheme={ThemeMode.DARK} size={TypographySize.LARGE} weight={TypographyWeight.MEDIUM}>
+            <Typography
+              mono
+              uppercase
+              forceTheme={ThemeMode.DARK}
+              size={TypographySize.LARGE}
+              weight={TypographyWeight.MEDIUM}
+            >
               Interested in paying with crypto?
             </Typography>
-            <Typography color='secondary' forceTheme={ThemeMode.DARK} size={TypographySize.SMALL}>
+            <Typography mono uppercase color='secondary' forceTheme={ThemeMode.DARK} size={TypographySize.SMALL}>
               Skiff accepts BTC, ETH, and USDC.
             </Typography>
             <ButtonBox>
@@ -275,13 +281,15 @@ function CryptoBanner({ currentUserID, isUpdatingPlan, setIsUpdatingPlan, startP
           }}
         >
           <PriceBox>
-            <Typography color='secondary' weight={TypographyWeight.MEDIUM}>
+            <Typography mono uppercase color='secondary' weight={TypographyWeight.MEDIUM}>
               $36
             </Typography>
           </PriceBox>
           <OptionContainerText>
-            <Typography color='primary'>Essential (Yearly)</Typography>
-            <Typography color='secondary' wrap>
+            <Typography mono uppercase color='primary'>
+              Essential (Yearly)
+            </Typography>
+            <Typography mono uppercase color='secondary' wrap>
               {`${getMaxCustomDomains(TierName.Essential)} custom domain, ${bytesToHumanReadable(
                 mbToBytes(getStorageLimitInMb(TierName.Essential)),
                 0
@@ -296,13 +304,15 @@ function CryptoBanner({ currentUserID, isUpdatingPlan, setIsUpdatingPlan, startP
           }}
         >
           <PriceBox>
-            <Typography color='secondary' weight={TypographyWeight.MEDIUM}>
+            <Typography mono uppercase color='secondary' weight={TypographyWeight.MEDIUM}>
               $96
             </Typography>
           </PriceBox>
           <OptionContainerText>
-            <Typography color='primary'>Pro (Yearly)</Typography>
-            <Typography color='secondary' wrap>
+            <Typography mono uppercase color='primary'>
+              Pro (Yearly)
+            </Typography>
+            <Typography mono uppercase color='secondary' wrap>
               {`${getMaxCustomDomains(TierName.Pro)} custom domains, ${bytesToHumanReadable(
                 mbToBytes(getStorageLimitInMb(TierName.Pro)),
                 0

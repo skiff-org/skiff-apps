@@ -1,9 +1,9 @@
 // TODO: This file is copied from react-client. Solve tsc / composite issues.
 
+import { Color, Typography, TypographySize } from '@skiff-org/skiff-ui';
 import dayjs from 'dayjs';
 import RelativeTimePlugin from 'dayjs/plugin/relativeTime';
 import UpdateLocalePlugin from 'dayjs/plugin/updateLocale';
-import { Typography, TypographySize, Color } from '@skiff-org/skiff-ui';
 import React from 'react';
 
 import { DateInputFormats } from '../../constants';
@@ -67,7 +67,7 @@ const DateDisplay: React.FC<DateDisplayProps> = ({
   const content = getDateContent(value, dateFormat, hourFormat, type, displayTime, displayDate);
 
   const contentElement = (
-    <Typography color={color} mono size={size}>
+    <Typography mono uppercase color={color} size={size}>
       {content}
     </Typography>
   );

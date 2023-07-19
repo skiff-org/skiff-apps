@@ -52,6 +52,8 @@ const ComposeHeader: FC<ComposeHeaderProps> = (props) => {
   return (
     <ComposeHeaderContainer collapsed={collapsed} onClick={collapsed ? expand : undefined}>
       <Typography
+        mono
+        uppercase
         color='primary'
         size={collapsed ? TypographySize.LARGE : TypographySize.H4}
         weight={TypographyWeight.MEDIUM}

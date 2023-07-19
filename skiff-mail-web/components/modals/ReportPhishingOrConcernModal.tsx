@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import { useApplyLabelsMutation, useGetThreadFromIdLazyQuery, useUploadSpamReportMutation } from 'skiff-front-graphql';
-import { useToast, Checkbox } from 'skiff-front-utils';
+import { Checkbox, useToast } from 'skiff-front-utils';
 import { SystemLabels } from 'skiff-graphql';
 import styled from 'styled-components';
 
@@ -186,7 +186,9 @@ export const ReportPhishingOrConcernModal = () => {
             setIncludeEML((currIncludeEMLState) => !currIncludeEMLState);
           }}
         />
-        <Typography>Include email contents</Typography>
+        <Typography mono uppercase>
+          Include email contents
+        </Typography>
       </EMLCheckbox>
       <ButtonGroup layout={isMobile ? Layout.STACKED : Layout.INLINE}>
         <ButtonGroupItem

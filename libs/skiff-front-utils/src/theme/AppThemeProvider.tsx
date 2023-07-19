@@ -1,9 +1,10 @@
+import { LocalStorageThemeMode, StorageOnlyThemeMode, ThemeMode } from '@skiff-org/skiff-ui';
 import noop from 'lodash/noop';
-import { LocalStorageThemeMode, StorageOnlyThemeMode, ThemeMode, themeNames } from '@skiff-org/skiff-ui';
-import React, { ReactNode, createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { ThemeProvider, createGlobalStyle } from 'styled-components';
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import { createGlobalStyle, ThemeProvider } from 'styled-components';
 
 import { sendRNWebviewMsg } from '../utils/mobileUtils';
+import { themeNames } from './theme';
 
 export const THEME_SELECT_VERSION = '0.1.0';
 
@@ -33,7 +34,7 @@ export const THEME_LOCAL_STORAGE_KEY = 'THEME_MODE';
 
 const GlobalStyles = createGlobalStyle`
   body {
-    font-family: 'Skiff Sans Text', sans-serif;
+    font-family: 'Skiff Mono', monospace;
     -webkit-font-smoothing: antialiased;
     font-smoothing: antialiased;
   }

@@ -33,12 +33,12 @@ function PriceBlock(props: PriceBlockProps) {
   return (
     <Container fixedHeight={layoutBreakpoint}>
       <PriceLabelContainer>
-        <Typography size={TypographySize.H3} weight={TypographyWeight.BOLD}>{`$${price}${
+        <Typography mono uppercase size={TypographySize.H3} weight={TypographyWeight.BOLD}>{`$${price}${
           !isFreeTier ? '/mo' : ''
         }`}</Typography>
       </PriceLabelContainer>
       {secondaryText && (
-        <Typography color={secondaryText.color} size={TypographySize.SMALL}>
+        <Typography mono uppercase color={secondaryText.color} size={TypographySize.SMALL}>
           {secondaryText.text}
         </Typography>
       )}

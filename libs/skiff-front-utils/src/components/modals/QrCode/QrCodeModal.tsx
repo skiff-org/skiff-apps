@@ -71,7 +71,7 @@ const QrCodeModal: React.FC<QrCodeModalProps> = ({
           </ButtonContainer>
           {secondaryTextProps && (
             <SecondaryTextContainer>
-              <Typography color='secondary' onClick={secondaryTextProps?.onClick}>
+              <Typography mono uppercase color='secondary' onClick={secondaryTextProps?.onClick}>
                 {secondaryTextProps.label}
               </Typography>
             </SecondaryTextContainer>

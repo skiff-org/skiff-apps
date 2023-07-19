@@ -2,8 +2,8 @@ import {
   Alignment,
   Icons,
   Size,
-  themeNames,
   ThemeMode,
+  themeNames,
   Typography,
   TypographySize,
   TypographyWeight
@@ -55,6 +55,8 @@ export const EnlargedOption = ({
         />
       )}
       <Typography
+        mono
+        uppercase
         align={Alignment.CENTER}
         color={destructive ? 'destructive' : 'primary'}
         forceTheme={ThemeMode.DARK}

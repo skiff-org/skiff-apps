@@ -1,5 +1,6 @@
 import {
   AccentColor,
+  accentColorToPrimaryColor,
   Button,
   ButtonGroupItem,
   CorrectedColorSelect,
@@ -9,10 +10,9 @@ import {
   IconButton,
   InputField,
   Size,
+  stringToColor,
   Type,
-  Typography,
-  accentColorToPrimaryColor,
-  stringToColor
+  Typography
 } from '@skiff-org/skiff-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -334,10 +334,20 @@ function EditProfile(props: EditProfileProps) {
             {/* Conditional rendering here rather than on parents to maintain relative positioning */}
             {!hideDisplayName && (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography color={disabled ? 'disabled' : 'primary'} maxWidth={isMobile ? '180px' : undefined}>
+                <Typography
+                  mono
+                  uppercase
+                  color={disabled ? 'disabled' : 'primary'}
+                  maxWidth={isMobile ? '180px' : undefined}
+                >
                   {displayName}
                 </Typography>
-                <Typography color={disabled ? 'disabled' : 'secondary'} maxWidth={isMobile ? '180px' : undefined}>
+                <Typography
+                  mono
+                  uppercase
+                  color={disabled ? 'disabled' : 'secondary'}
+                  maxWidth={isMobile ? '180px' : undefined}
+                >
                   {sublabel}
                 </Typography>
               </div>

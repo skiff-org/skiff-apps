@@ -1,5 +1,3 @@
-import { motion, useAnimation } from 'framer-motion';
-import Head from 'next/head';
 import {
   Dropdown,
   DropdownItem,
@@ -14,6 +12,8 @@ import {
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
+import { motion, useAnimation } from 'framer-motion';
+import Head from 'next/head';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { isMobile, MobileView } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
@@ -44,8 +44,8 @@ import { storeWorkspaceEvent } from '../../utils/userUtils';
 import { FilterModal } from '../Settings/Filters/FilterModal';
 import { useSettings } from '../Settings/useSettings';
 
+import { MOCK_NUM_UNREAD } from '__mocks__/mockApiResponse';
 import { MailboxActions, MailboxFilters } from './MailboxActions/MailboxActions';
-import { MOCK_MAILBOX_REQUEST, MOCK_NUM_UNREAD } from '__mocks__/mockApiResponse';
 
 interface MailboxHeaderProps {
   showSkeleton: boolean;
@@ -435,6 +435,8 @@ export const MailboxHeader = ({
           <HeaderLabels onClick={onClick}>
             {!inboxIsEmpty && mobileMultiItemsActive && (
               <Typography
+                mono
+                uppercase
                 color='link'
                 onClick={onCancelClick}
                 size={TypographySize.LARGE}
@@ -444,6 +446,8 @@ export const MailboxHeader = ({
               </Typography>
             )}
             <Typography
+              mono
+              uppercase
               color='link'
               onClick={onRightItemClick}
               size={TypographySize.LARGE}
@@ -478,15 +482,21 @@ export const MailboxHeader = ({
               <MailBoxSelector data-test='mailbox-selector-dropdown' onClick={onMailboxSelectorClick}>
                 <UnreadLabel>
                   <Typography
+                    mono
+                    uppercase
                     maxWidth={!!numUnread ? '80%' : undefined} // only set max width if we need to render the numRead count
                     size={TypographySize.H2}
                     weight={TypographyWeight.MEDIUM}
                   >
                     {displayLabelName}
                   </Typography>
-                  <Typography color='secondary' size={TypographySize.H2} weight={TypographyWeight.MEDIUM}>{`${
-                    numUnread > 0 ? ` (${numUnread})` : ''
-                  }`}</Typography>
+                  <Typography
+                    mono
+                    uppercase
+                    color='secondary'
+                    size={TypographySize.H2}
+                    weight={TypographyWeight.MEDIUM}
+                  >{`${numUnread > 0 ? ` (${numUnread})` : ''}`}</Typography>
                   <Icons color='secondary' icon={Icon.ChevronDown} size={Size.X_MEDIUM} />
                 </UnreadLabel>
               </MailBoxSelector>
@@ -522,7 +532,7 @@ export const MailboxHeader = ({
                   threads={threads}
                 />
                 {selectedThreadIDs.length === 0 && (
-                  <Typography weight={TypographyWeight.MEDIUM}>
+                  <Typography mono uppercase weight={TypographyWeight.MEDIUM}>
                     {displayLabelName}
                     <UnreadText>{numUnread > 0 ? ` ${numUnread}` : ''}</UnreadText>
                   </Typography>
@@ -623,7 +633,7 @@ export const MailboxHeader = ({
                 threads={threads}
               />
               {selectedThreadIDs.length === 0 && (
-                <Typography minWidth='fit-content' weight={TypographyWeight.MEDIUM}>
+                <Typography mono uppercase minWidth='fit-content' weight={TypographyWeight.MEDIUM}>
                   {displayLabelName}
                 </Typography>
               )}

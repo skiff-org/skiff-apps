@@ -1,4 +1,4 @@
-import { Typography, IconText, Icon, TypographyWeight } from '@skiff-org/skiff-ui';
+import { Icon, IconText, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
 import { RefObject } from 'react';
 import styled from 'styled-components';
 
@@ -23,7 +23,9 @@ export const FilterActionOption: React.FC<FilterActionOptionProps> = ({
 }: FilterActionOptionProps) => {
   return (
     <FilterActionOptionRowContainer>
-      <Typography>{label}</Typography>
+      <Typography mono uppercase>
+        {label}
+      </Typography>
       <IconText
         endIcon={Icon.ChevronDown}
         label={selectedOption ?? 'None'}

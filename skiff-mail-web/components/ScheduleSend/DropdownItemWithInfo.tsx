@@ -32,10 +32,18 @@ const DropdownItemWithInfo: FC<DropdownItemWithInfoProps> = ({ label, info, onCl
   return (
     <DropdownItem onClick={onClick}>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <Typography forceTheme={ThemeMode.DARK} size={TypographySize.SMALL} weight={TypographyWeight.BOLD}>
+        <Typography
+          mono
+          uppercase
+          forceTheme={ThemeMode.DARK}
+          size={TypographySize.SMALL}
+          weight={TypographyWeight.BOLD}
+        >
           {label}
         </Typography>
         <Typography
+          mono
+          uppercase
           color='secondary'
           forceTheme={ThemeMode.DARK}
           size={TypographySize.SMALL}

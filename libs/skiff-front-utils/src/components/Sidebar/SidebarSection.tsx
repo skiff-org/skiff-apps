@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import SectionHeader from './SectionHeader';
 import { ContentSection, SidebarSectionProps, SidebarSectionType } from './Sidebar.types';
-import { parseLSValue, getCollapsedLSKey, parseValueToLS } from './utils';
+import { getCollapsedLSKey, parseLSValue, parseValueToLS } from './utils';
 
 const NoItemsLabel = styled.div`
   padding: 6px 4px 6px 24px;
@@ -39,7 +39,9 @@ const SectionItems = ({
             items.map(({ SectionItem, key }: any) => <SectionItem key={key} />)
           ) : (
             <NoItemsLabel>
-              <Typography color='disabled'>{noItemsLabel}</Typography>
+              <Typography mono uppercase color='disabled'>
+                {noItemsLabel}
+              </Typography>
             </NoItemsLabel>
           )}
         </LabelList>

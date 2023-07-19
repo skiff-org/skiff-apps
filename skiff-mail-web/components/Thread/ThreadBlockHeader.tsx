@@ -2,7 +2,7 @@ import { Typography, TypographySize } from '@skiff-org/skiff-ui';
 import { FC, RefObject, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { splitEmailToAliasAndDomain } from 'skiff-front-utils';
-import { isWalletAddress, isENSName } from 'skiff-utils';
+import { isENSName, isWalletAddress } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { MailboxEmailInfo } from '../../models/email';
@@ -152,10 +152,18 @@ export const ThreadBlockHeader: FC<ThreadBlockHeaderProps> = ({
           <RecipientDetails email={email} expanded={expanded} showContacts={showContacts} />
           {expanded && (!isMobile || showContacts) && (
             <SubjectBlock>
-              <Typography color='secondary' minWidth='unset' size={isMobile ? TypographySize.SMALL : undefined}>
+              <Typography
+                mono
+                uppercase
+                color='secondary'
+                minWidth='unset'
+                size={isMobile ? TypographySize.SMALL : undefined}
+              >
                 Subject:
               </Typography>
               <Typography
+                mono
+                uppercase
                 color={showContacts ? 'primary' : 'secondary'}
                 size={isMobile ? TypographySize.SMALL : undefined}
                 wrap={showContacts}

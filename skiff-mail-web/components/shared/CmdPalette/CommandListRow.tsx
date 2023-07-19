@@ -1,6 +1,6 @@
-import { Icon, Icons, Size, ThemeMode, Typography, getThemedColor } from '@skiff-org/skiff-ui';
+import { getThemedColor, Icon, Icons, Size, ThemeMode, Typography } from '@skiff-org/skiff-ui';
 import { memo } from 'react';
-import { ListChildComponentProps, areEqual } from 'react-window';
+import { areEqual, ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 
 import { SkemailResultIDs } from '../../../utils/search/searchTypes';
@@ -72,7 +72,7 @@ const NoResults = ({
       <StartElement>
         <Icons color='secondary' forceTheme={ThemeMode.DARK} icon={Icon.Search} size={Size.X_MEDIUM} />
       </StartElement>
-      <Typography color='secondary' forceTheme={ThemeMode.DARK}>
+      <Typography mono uppercase color='secondary' forceTheme={ThemeMode.DARK}>
         Search emails for <Highlight>{query}</Highlight>
       </Typography>
     </NoResult>

@@ -60,10 +60,16 @@ export const ContactsDropdownItem: React.FC<ContactsDropdownItemProps> = ({
       active={active}
       customLabel={
         <ContactInfo>
-          <Typography forceTheme={theme} size={TypographySize.SMALL}>
+          <Typography mono uppercase forceTheme={theme} size={TypographySize.SMALL}>
             {displayName}
           </Typography>
-          <Typography color={displayName ? 'secondary' : 'primary'} forceTheme={theme} size={TypographySize.SMALL}>
+          <Typography
+            mono
+            uppercase
+            color={displayName ? 'secondary' : 'primary'}
+            forceTheme={theme}
+            size={TypographySize.SMALL}
+          >
             {displayEmail}
           </Typography>
         </ContactInfo>

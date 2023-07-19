@@ -25,14 +25,21 @@ export const Highlight = ({ isAction, text, query, sender, read, customColor }: 
 
   if (index < 0) {
     return (
-      <Typography color={textColor} dataTest='highlight' forceTheme={ThemeMode.DARK} weight={typographyWeight}>
+      <Typography
+        mono
+        uppercase
+        color={textColor}
+        dataTest='highlight'
+        forceTheme={ThemeMode.DARK}
+        weight={typographyWeight}
+      >
         {text}
       </Typography>
     );
   }
 
   return (
-    <Typography color={textColor} forceTheme={ThemeMode.DARK} weight={typographyWeight}>
+    <Typography mono uppercase color={textColor} forceTheme={ThemeMode.DARK} weight={typographyWeight}>
       {sender && `${sender} – `}
       <span>{text.slice(0, index)}</span>
       <SearchText $isAction={isAction}>{text.slice(index, index + query.length)}</SearchText>

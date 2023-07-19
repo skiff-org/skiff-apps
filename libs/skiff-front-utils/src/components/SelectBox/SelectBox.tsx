@@ -1,5 +1,4 @@
 import { ThemeMode, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
-import React from 'react';
 import styled from 'styled-components';
 
 import { Illustration, Illustrations } from '../../svgs';
@@ -105,10 +104,10 @@ function SelectBox(props: SelectBoxProps) {
       </IllustrationContainer>
       <ContentContainer>
         <LabelContainer>
-          <Typography color='primary' forceTheme={forceTheme} weight={TypographyWeight.MEDIUM}>
+          <Typography mono uppercase color='primary' forceTheme={forceTheme} weight={TypographyWeight.MEDIUM}>
             {label}
           </Typography>
-          <Typography color='secondary' forceTheme={forceTheme} wrap>
+          <Typography mono uppercase color='secondary' forceTheme={forceTheme} wrap>
             {description}
           </Typography>
         </LabelContainer>

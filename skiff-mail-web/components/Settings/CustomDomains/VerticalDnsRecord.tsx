@@ -4,10 +4,10 @@ import { upperCaseFirstLetter } from 'skiff-utils';
 import styled from 'styled-components';
 
 import {
-  UserFacingCustomDomainStatus,
-  getValueAndPriority,
   DnsRecordColumnHeader,
-  getErrorDataForDnsRecordValue
+  getErrorDataForDnsRecordValue,
+  getValueAndPriority,
+  UserFacingCustomDomainStatus
 } from '../../../utils/customDomainUtils';
 
 import ValueDescriptionText from './ValueDescriptionText';
@@ -53,7 +53,7 @@ const VerticalDnsRecordRow: React.FC<VerticalDnsRecordRowProps> = ({
     <RowContainer>
       <TypeValuePairContainer>
         <ValueTypeContainer>
-          <Typography color='disabled' size={TypographySize.CAPTION}>
+          <Typography mono uppercase color='disabled' size={TypographySize.CAPTION}>
             {upperCaseFirstLetter(valueType)}
           </Typography>
         </ValueTypeContainer>

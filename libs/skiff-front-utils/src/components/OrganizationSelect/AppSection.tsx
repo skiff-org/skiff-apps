@@ -1,5 +1,5 @@
 import { Icon, Icons, Size, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ProductApp } from 'skiff-graphql';
 
 import { useToast } from '../../hooks';
@@ -39,6 +39,8 @@ export const AppSection = (props: AppSectionProps) => {
         onMouseLeave={() => setNameHover(false)}
       >
         <Typography
+          mono
+          uppercase
           color={nameHover && !customOnClicks ? 'primary' : 'secondary'}
           forceTheme={ThemeMode.DARK}
           size={TypographySize.SMALL}

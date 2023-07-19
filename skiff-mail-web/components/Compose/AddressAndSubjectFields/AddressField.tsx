@@ -152,7 +152,7 @@ const AddressField: FC<AddressFieldProps> = ({
       >
         {showField && field !== EmailFieldTypes.SUBJECT && (
           <AddressHeader>
-            <Typography capitalize color={labelColor}>
+            <Typography mono uppercase capitalize color={labelColor}>
               {field}
             </Typography>
           </AddressHeader>

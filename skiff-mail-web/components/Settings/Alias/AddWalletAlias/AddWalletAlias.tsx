@@ -14,29 +14,29 @@ import React, { Suspense, useState } from 'react';
 import { isFirefox } from 'react-device-detect';
 import { useUserLabelsLazyQuery, useVerifyWalletAddressCreateAliasMutation } from 'skiff-front-graphql';
 import {
-  UserAvatar,
   abbreviateWalletAddress,
-  useToast,
+  activateEthProvider,
+  CosmosProvider,
+  DefaultEmailTag,
+  EmailAliasOptions,
+  EthProvider,
+  getSolanaProvider,
+  isCosmosProvider,
   isEthProvider,
   isSolProvider,
-  isCosmosProvider,
-  EthProvider,
-  WalletProvider,
-  SolanaProvider,
-  TitleActionSection,
-  CosmosProvider,
   MultichainProvider,
-  WalletProviderInfo,
-  activateEthProvider,
-  getSolanaProvider,
-  WALLET_PROVIDERS,
-  EmailAliasOptions,
-  useRequiredCurrentUserData,
+  SolanaProvider,
+  splitEmailToAliasAndDomain,
+  TitleActionSection,
   updateEmailAliases,
-  useDeleteEmailAlias,
   useDefaultEmailAlias,
-  DefaultEmailTag,
-  splitEmailToAliasAndDomain
+  useDeleteEmailAlias,
+  UserAvatar,
+  useRequiredCurrentUserData,
+  useToast,
+  WalletProvider,
+  WalletProviderInfo,
+  WALLET_PROVIDERS
 } from 'skiff-front-utils';
 import { isNameServiceAddress } from 'skiff-utils';
 import styled from 'styled-components';
@@ -261,7 +261,9 @@ export const AddWalletAlias = ({ walletAliases, requestHcaptchaToken, includeDel
                   <Tooltip placement={TooltipPlacement.RIGHT}>
                     <TooltipContent>{email}</TooltipContent>
                     <TooltipTrigger>
-                      <Typography>{abbreviatedWalletAddress}</Typography>
+                      <Typography mono uppercase>
+                        {abbreviatedWalletAddress}
+                      </Typography>
                     </TooltipTrigger>
                   </Tooltip>
                 </WalletAlias>
@@ -281,7 +283,7 @@ export const AddWalletAlias = ({ walletAliases, requestHcaptchaToken, includeDel
         </EmailAliasesContainer>
       )}
       {!!walletAliases.length && (
-        <Typography>
+        <Typography mono uppercase>
           <AnotherWalletText>Connect another wallet</AnotherWalletText>
         </Typography>
       )}

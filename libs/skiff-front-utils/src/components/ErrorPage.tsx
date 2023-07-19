@@ -138,10 +138,10 @@ function ErrorPage(props: ErrorPageProps) {
             <Icons icon={Icon.Warning} size={Size.LARGE} />
           </IconContainer>
           <TextContainer>
-            <Typography align={Alignment.CENTER} size={TypographySize.H3} weight={TypographyWeight.BOLD}>
+            <Typography mono uppercase align={Alignment.CENTER} size={TypographySize.H3} weight={TypographyWeight.BOLD}>
               {isDbError ? 'Check your browser settings' : 'Unable to load page'}
             </Typography>
-            <Typography align={Alignment.CENTER} color='secondary' wrap>
+            <Typography mono uppercase align={Alignment.CENTER} color='secondary' wrap>
               {isDbError
                 ? `Unable to load Skiff ${origin} due to browser settings. Try the following:`
                 : ' Please try again or get in touch with our team for further help'}
@@ -149,13 +149,13 @@ function ErrorPage(props: ErrorPageProps) {
           </TextContainer>
           {isDbError && (
             <InfoContainer>
-              <Typography color='secondary'>
+              <Typography mono uppercase color='secondary'>
                 · Disable <Highlight>browser extensions</Highlight>
               </Typography>
-              <Typography color='secondary'>
+              <Typography mono uppercase color='secondary'>
                 · Disable <Highlight>Never Remember History</Highlight> on Firefox
               </Typography>
-              <Typography color='secondary'>
+              <Typography mono uppercase color='secondary'>
                 · Exit <Highlight>Private Window</Highlight> on Firefox
               </Typography>
             </InfoContainer>
@@ -174,7 +174,7 @@ function ErrorPage(props: ErrorPageProps) {
               Reload
             </Button>
           </ButtonContainer>
-          <Typography color='secondary' size={TypographySize.LARGE}>
+          <Typography mono uppercase color='secondary' size={TypographySize.LARGE}>
             Visit our&nbsp;
             <Link
               data-test='go-to-skiff-org'

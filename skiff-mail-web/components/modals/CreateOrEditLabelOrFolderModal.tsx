@@ -1,27 +1,27 @@
 import { ApolloError } from '@apollo/client';
-import { GraphQLError } from 'graphql';
-import isString from 'lodash/isString';
-import { useRouter } from 'next/router';
 import {
+  accentColorToPrimaryColor,
   ButtonGroup,
   ButtonGroupItem,
   Dialog,
   DialogTypes,
   InputField,
   Layout,
-  Typography,
-  accentColorToPrimaryColor,
-  TypographySize,
   Size,
-  Type
+  Type,
+  Typography,
+  TypographySize
 } from '@skiff-org/skiff-ui';
-import React, { useState, useRef, useEffect } from 'react';
+import { GraphQLError } from 'graphql';
+import isString from 'lodash/isString';
+import { useRouter } from 'next/router';
+import React, { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
 import { useCreateUserLabelMutation, useDeleteUserLabelMutation, useEditUserLabelMutation } from 'skiff-front-graphql';
 import { ColorSelector } from 'skiff-front-utils';
 import { UserLabelVariant } from 'skiff-graphql';
-import { PaywallErrorCode, isPaywallErrorCode } from 'skiff-utils';
+import { isPaywallErrorCode, PaywallErrorCode } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../hooks/redux/useAppSelector';
@@ -274,7 +274,7 @@ export const CreateOrEditLabelOrFolderModal = () => {
       </ColorContainer>
       <ErrorContainer>
         {!!errors.length && (
-          <Typography color='destructive' size={TypographySize.SMALL}>
+          <Typography mono uppercase color='destructive' size={TypographySize.SMALL}>
             {errors.map((e) => e.message).join('. ')}
           </Typography>
         )}

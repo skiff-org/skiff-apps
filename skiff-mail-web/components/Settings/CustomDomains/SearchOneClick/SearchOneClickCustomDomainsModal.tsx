@@ -1,4 +1,3 @@
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import {
   Button,
   Dialog,
@@ -11,6 +10,7 @@ import {
   TypographySize,
   TypographyWeight
 } from '@skiff-org/skiff-ui';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { Illustration, Illustrations } from 'skiff-front-utils';
@@ -148,11 +148,11 @@ const SearchOneClickCustomDomainsModal: React.FC<SearchOneClickCustomDomainsProp
         <Container>
           <Header>
             <Illustration illustration={Illustrations.SkiffLockupIcon} style={{ marginBottom: '8px' }} />
-            <Typography size={TypographySize.H3} weight={TypographyWeight.BOLD} wrap>
+            <Typography mono uppercase size={TypographySize.H3} weight={TypographyWeight.BOLD} wrap>
               Customize your email address with one click.
             </Typography>
             <DescriptionWrapper>
-              <Typography color='secondary' wrap>
+              <Typography mono uppercase color='secondary' wrap>
                 {isEligibleForFreeTrial ? (
                   <>
                     Your first domain purchase includes <FreeTrialHighlight>60 days of Skiff Pro </FreeTrialHighlight>

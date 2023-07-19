@@ -9,12 +9,12 @@ import {
   TypographyWeight
 } from '@skiff-org/skiff-ui';
 import React, { useEffect, useState } from 'react';
-import { getEnvironment, saveCurrentUserData, sendUserDataToMobileApp, isMobileApp } from 'skiff-front-utils';
+import { getEnvironment, isMobileApp, saveCurrentUserData, sendUserDataToMobileApp } from 'skiff-front-utils';
 import styled from 'styled-components';
 
+import { MOCK_USER } from '__mocks__/mockUser';
 import MobileHead from '../components/shared/MobileHead';
 import { useNavigate } from '../utils/navigation';
-import { MOCK_USER } from '__mocks__/mockUser';
 
 const StyledPage = styled.div`
   display: flex;
@@ -73,7 +73,13 @@ export function Index() {
         {!loading && (env === 'development' || env === 'local' || env === 'review_app' || env === 'vercel') && (
           <>
             <LoginTextContainer>
-              <Typography align={Alignment.CENTER} size={TypographySize.H3} weight={TypographyWeight.BOLD}>
+              <Typography
+                mono
+                uppercase
+                align={Alignment.CENTER}
+                size={TypographySize.H3}
+                weight={TypographyWeight.BOLD}
+              >
                 Log in to Skemail
               </Typography>
             </LoginTextContainer>
@@ -102,14 +108,14 @@ export function Index() {
               Login
             </Button>
             {error && (
-              <Typography color='destructive' wrap>
+              <Typography mono uppercase color='destructive' wrap>
                 {error}
               </Typography>
             )}
           </>
         )}
         {loading && (
-          <Typography align={Alignment.CENTER} size={TypographySize.H3} weight={TypographyWeight.BOLD}>
+          <Typography mono uppercase align={Alignment.CENTER} size={TypographySize.H3} weight={TypographyWeight.BOLD}>
             Loading...
           </Typography>
         )}

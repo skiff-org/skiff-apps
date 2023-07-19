@@ -154,6 +154,8 @@ export default function MobileThreadHeader({
       </HeaderButtonsGroup>
       <TextContainer>
         <Typography
+          mono
+          uppercase
           id={THREAD_HEADER_ID}
           maxWidth='calc(100vw - 116px)'
           size={TypographySize.H3}

@@ -6,8 +6,8 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import {
-  DRAWER_CLASSNAME,
   Divider,
+  DRAWER_CLASSNAME,
   FilledVariant,
   getThemedColor,
   Icon,
@@ -19,7 +19,7 @@ import {
   TypographySize
 } from '@skiff-org/skiff-ui';
 
-import { ANCHOR, DRAWER_PADDING_LEFT_RIGHT, DrawerProps } from './Drawer.constants';
+import { ANCHOR, DrawerProps, DRAWER_PADDING_LEFT_RIGHT } from './Drawer.constants';
 import { DRAWER_PAPER_CSS, TITLE_CSS } from './Drawer.styles';
 import { upperCaseFirstLetter } from './Drawer.utils';
 
@@ -136,12 +136,13 @@ const Drawer: React.FC<DrawerProps> = ({
       </IconTitle>
     ) : (
       <Typography
+        mono
+        uppercase
         wrap={wrapTitle}
         size={TypographySize.SMALL}
         selectable={selectable}
         color={iconAndTypographyColor}
         forceTheme={forceTheme}
-        mono
       >
         <Title>{formattedTitle}</Title>
       </Typography>

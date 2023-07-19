@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
 import { Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
+import { motion } from 'framer-motion';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 export interface DescriptionItem {
@@ -99,7 +99,7 @@ export const Stepper = ({ descriptionList }: CarouselProps) => {
               weight={TypographyWeight.BOLD}
               wrap
             >
-              <Typography minWidth='100%' size={TypographySize.H2} weight={TypographyWeight.BOLD} wrap>
+              <Typography mono uppercase minWidth='100%' size={TypographySize.H2} weight={TypographyWeight.BOLD} wrap>
                 {descriptionItem.bold}
               </Typography>
               {descriptionItem.text}
