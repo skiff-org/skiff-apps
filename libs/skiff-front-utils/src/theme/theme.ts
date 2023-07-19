@@ -249,6 +249,22 @@ const theme = {
     '--bg-overlay-quaternary': `rgba(143, 198, 65, 0.04)`,
     '--bg-overlay-destructive': `rgba(220, 30, 30, 0.24)`, // Homebrew red
 
+    /* accent */
+    '--accent-orange-primary': `rgba(${colors['--orange-400']}, ${opacities['--88']})`,
+    '--accent-orange-secondary': `rgba(${colors['--orange-400']}, ${opacities['--36']})`,
+    '--accent-green-primary': `rgba(${colors['--green-400']}, ${opacities['--88']})`,
+    '--accent-green-secondary': `rgba(${colors['--green-400']}, ${opacities['--32']})`,
+    '--accent-pink-primary': `rgba(${colors['--pink-400']}, ${opacities['--88']})`,
+    '--accent-pink-secondary': `rgba(${colors['--pink-400']}, ${opacities['--36']})`,
+    '--accent-yellow-primary': `rgba(${colors['--yellow-400']}, ${opacities['--88']})`,
+    '--accent-yellow-secondary': `rgba(${colors['--yellow-400']}, ${opacities['--36']})`,
+    '--accent-blue-primary': `rgba(${colors['--blue-400']}, ${opacities['--88']})`,
+    '--accent-blue-secondary': `rgba(${colors['--blue-400']}, ${opacities['--36']})`,
+    '--accent-red-primary': `rgba(${colors['--red-400']}, ${opacities['--88']})`,
+    '--accent-red-secondary': `rgba(${colors['--red-400']}, ${opacities['--36']})`,
+    '--accent-dark-blue-primary': `rgba(${colors['--dark-blue-400']}, ${opacities['--88']})`,
+    '--accent-dark-blue-secondary': `rgba(${colors['--dark-blue-400']}, ${opacities['--36']})`,
+
     /* shadows - TODO: Remove */
     '--editor-page-shadow': '60 64 67 / 15%) 0 1px 3px 1px',
     '--tab-active-shadow': '0 123 255 / 25%',
