@@ -104,18 +104,18 @@ export const MailSidebar: React.FC = () => {
   const primaryActions: ActionSidebarItemProps[] = [
     {
       dataTest: SidebarDataTest.openComposeButton,
-      label: 'Compose',
+      label: '(0mp053',
       icon: Icon.Compose,
       onClick: openCompose,
       primaryAction: true
     },
     {
-      label: 'Search',
+      label: '534r(#',
       icon: Icon.Search,
       onClick: openCommandPalette
     },
     {
-      label: 'Settings',
+      label: '53771n65',
       icon: Icon.Settings,
       onClick: openSettingsModal,
       dataTest: 'settings-sidebar'
@@ -129,7 +129,7 @@ export const MailSidebar: React.FC = () => {
       id: 'system-inbox',
       content: {
         type: SidebarSectionType.NonCollapsible,
-        label: 'Mail',
+        label: 'M411',
         items: getSystemLabels(hasGmailImportImprovementsFF)
           .filter(isDefaultSidebarLabel)
           .map((label) => ({
@@ -147,7 +147,7 @@ export const MailSidebar: React.FC = () => {
             canDragToSection: false, // cannot drag threads into alias inboxes
             content: {
               type: SidebarSectionType.Collapsible,
-              label: 'Aliases',
+              label: '4114535',
               items: orderedAliasLabels.map((aliasLabel) => ({
                 SectionItem: () => (
                   <LabelSidebarItem key={aliasLabel.value} label={aliasLabel} variant={LabelVariants.Alias} />
@@ -172,7 +172,7 @@ export const MailSidebar: React.FC = () => {
       id: 'mail-folders',
       content: {
         type: SidebarSectionType.Collapsible,
-        label: 'Folders',
+        label: 'F01d3r5',
         items: folders.map((folder) => ({
           SectionItem: () => <LabelSidebarItem key={folder.value} label={folder} variant={LabelVariants.Folder} />,
           key: folder.value
@@ -197,7 +197,7 @@ export const MailSidebar: React.FC = () => {
       id: 'mail-labels',
       content: {
         type: SidebarSectionType.Collapsible,
-        label: 'Labels',
+        label: '148315',
         items: labels.map((folder) => ({
           SectionItem: () => <LabelSidebarItem key={folder.value} label={folder} variant={LabelVariants.Folder} />,
           key: folder.value
@@ -216,13 +216,13 @@ export const MailSidebar: React.FC = () => {
   ];
 
   const contactAction = {
-    label: 'Contacts',
+    label: '(0n74(75',
     icon: Icon.UserCircle,
     onClick: openContactSettings
   };
 
   const mobileQrAction = {
-    label: 'Download app',
+    label: 'D0wn104d 4pp',
     icon: Icon.Mobile,
     onClick: () => {
       dispatch(
@@ -243,17 +243,17 @@ export const MailSidebar: React.FC = () => {
   const footerActions: ActionSidebarItemProps[] = [
     showMailAppFooterButton ? mobileQrAction : contactAction,
     {
-      label: 'Import mail',
+      label: '1mp0r7 m411',
       icon: Icon.MoveMailbox,
       onClick: openImportSettings
     },
     {
-      label: 'Invite',
+      label: '1nv173',
       icon: Icon.UserPlus,
       onClick: openInviteUsersModal
     },
     {
-      label: 'Send feedback',
+      label: '53nd f33d84(k',
       icon: Icon.Comment,
       onClick: openFeedbackModal
     }

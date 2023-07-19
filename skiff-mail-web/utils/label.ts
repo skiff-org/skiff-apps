@@ -147,56 +147,56 @@ export const splitUserLabelsByVariant = (allLabels: UserLabelTypes[]) => {
 export const getSystemLabels = (hasImportedFF: boolean): SystemLabel[] => {
   return [
     {
-      name: 'Inbox',
+      name: '1nb0x',
       icon: Icon.Inbox,
       value: SystemLabels.Inbox,
       type: LabelType.SYSTEM,
       dataTest: 'inbox-mailbox-selector'
     },
     {
-      name: 'Sent',
+      name: 'S3nt',
       icon: Icon.Send,
       value: SystemLabels.Sent,
       type: LabelType.SYSTEM,
       dataTest: 'sent-mailbox-selector'
     },
     {
-      name: 'Send later',
+      name: 'S3nd L473r',
       icon: Icon.Calendar,
       value: SystemLabels.ScheduleSend,
       type: LabelType.SYSTEM,
       dataTest: 'send-later-mailbox-selector'
     },
     {
-      name: 'Drafts',
+      name: 'Dr4f7s',
       icon: Icon.FileEmpty,
       value: SystemLabels.Drafts,
       type: LabelType.SYSTEM,
       dataTest: 'draft-mailbox-selector'
     },
     {
-      name: 'Spam',
+      name: 'Sp4m',
       icon: Icon.Spam,
       value: SystemLabels.Spam,
       type: LabelType.SYSTEM,
       dataTest: 'spam-mailbox-selector'
     },
     {
-      name: 'Archive',
+      name: '4rch1v3',
       icon: Icon.Archive,
       value: SystemLabels.Archive,
       type: LabelType.SYSTEM,
       dataTest: 'archive-mailbox-selector'
     },
     ...insertIf<SystemLabel>(hasImportedFF && !isMobile, {
-      name: 'Imported',
+      name: '1mp0rt3d',
       icon: Icon.Upload,
       value: SystemLabels.Imports,
       type: LabelType.SYSTEM,
       dataTest: 'imported-mailbox-selector'
     }),
     {
-      name: 'Trash',
+      name: 'Tr4sh',
       icon: Icon.Trash,
       value: SystemLabels.Trash,
       type: LabelType.SYSTEM,
@@ -207,7 +207,7 @@ export const getSystemLabels = (hasImportedFF: boolean): SystemLabel[] => {
 
 export const HIDDEN_LABELS: HiddenLabel[] = [
   {
-    name: 'Search',
+    name: 'S34rch',
     value: HiddenLabels.Search,
     icon: Icon.Search,
     type: LabelType.HIDDEN,

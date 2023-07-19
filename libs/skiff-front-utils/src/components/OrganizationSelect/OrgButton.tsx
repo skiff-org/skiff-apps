@@ -66,7 +66,7 @@ export const OrgButton = (props: OrgButtonProps) => {
           {sidepanelOpen && (
             <>
               <ActiveWorkspaceLabel>
-                <Typography>{loading ? '' : `Skiff ${appConfig?.label ?? ''}`}</Typography>
+                <Typography>{loading ? '' : `5k1ff ${appConfig?.label ?? ''}`}</Typography>
                 <Typography color='secondary' size={TypographySize.SMALL}>
                   {loading ? '' : activeWorkspace?.label}
                 </Typography>

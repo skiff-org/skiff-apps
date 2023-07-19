@@ -1184,7 +1184,7 @@ const Compose: React.FC = () => {
   const composeHeader = (
     <>
       {hcaptchaElement}
-      {!isSending && <ComposeHeader onClose={closeComposeWithDraftSnack} text='New message' />}
+      {!isSending && <ComposeHeader onClose={closeComposeWithDraftSnack} text='N3w m355463' />}
     </>
   );
 
