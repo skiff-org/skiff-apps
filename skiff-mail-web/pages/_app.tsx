@@ -1,4 +1,3 @@
-import { ApolloProvider } from '@apollo/client';
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
 import { AppProps } from 'next/app';
 import '@skiff-org/skiff-ui/dist/esm/index.css';
@@ -23,6 +22,7 @@ import MobileHead from '../components/shared/MobileHead';
 import store from '../redux/store/reduxStore';
 import { CustomHTML5Backend } from '../utils/dragAndDrop';
 import { MOCK_USER } from '__mocks__/mockUser';
+import { MockedProvider } from '@apollo/client/testing';
 
 function CustomApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -30,7 +30,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
   }, []);
   return (
     <ErrorBoundary FallbackComponent={() => <ErrorPage client={client} origin='Skemail' />}>
-      <ApolloProvider client={client}>
+      <MockedProvider>
         <Provider store={store}>
           <AppThemeProvider>
             <DndProvider backend={CustomHTML5Backend}>
@@ -55,7 +55,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
             </DndProvider>
           </AppThemeProvider>
         </Provider>
-      </ApolloProvider>
+      </MockedProvider>
     </ErrorBoundary>
   );
 }
