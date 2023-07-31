@@ -162,11 +162,6 @@ export const MOCK_NUM_UNREAD = 0;
 export const MOCK_DRAFTS = [];
 
 export const getMockedThread = (threadID: string | null) => {
-  console.log({
-    threadID,
-    thread1ID: MOCK_THREAD_1.data.userThread.threadID,
-    thread2ID: MOCK_THREAD_2.data.userThread.threadID
-  });
   if (threadID === MOCK_THREAD_1.data.userThread.threadID) {
     return MOCK_THREAD_1;
   }
