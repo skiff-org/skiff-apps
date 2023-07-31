@@ -14,6 +14,7 @@ import { getUserDrafts } from '../utils/draftUtils';
 import { useNavigate } from '../utils/navigation';
 
 import { tryCachedLogin } from './useCachedLogin';
+import { MOCK_DRAFTS } from '__mocks__/mockApiResponse';
 
 const useFetchCurrentUser = () => {
   const { data, loading: queryLoading, error } = useCurrentUserQuery();
@@ -72,8 +73,8 @@ const useFetchCurrentUser = () => {
   useEffect(() => {
     const getDrafts = async () => {
       if (user) {
-        // Fetch drafts from IDB
-        const drafts = await getUserDrafts(user);
+        // Fetch mock drafts from IDB
+        const drafts = MOCK_DRAFTS;
         dispatch(skemailDraftsReducer.actions.setDrafts({ drafts }));
       }
     };
