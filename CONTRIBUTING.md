@@ -86,4 +86,4 @@ The core team will promptly review your Pull Request and either merge it or requ
 
 ### Code style
 
-Make sure to enable lint on-save. You can also run the commands `yarn prettier` and `yarn lint`. This will be checked by CI when you open a Pull request.
+Make sure to enable lint on-save. You can also run the command `yarn lint`. This will be checked by CI when you open a Pull request.
