@@ -1,9 +1,9 @@
 import { Icon, IconProps } from '@skiff-org/skiff-ui';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { TabPage, SettingValue, useGetFF } from 'skiff-front-utils';
-import { SystemLabels } from 'skiff-graphql';
-import { GmailImportImprovementsFlag, trimAndLowercase } from 'skiff-utils';
+import { TabPage, SettingValue, useGetFF, useUserPreference } from 'skiff-front-utils';
+import { SystemLabels, ThreadDisplayFormat } from 'skiff-graphql';
+import { GmailImportImprovementsFlag, trimAndLowercase, StorageTypes } from 'skiff-utils';
 
 import { useSettings } from '../components/Settings/useSettings';
 import { MIN_SPECIFIED_QUERY_LENGTH } from '../components/shared/CmdPalette/constants';
@@ -36,6 +36,7 @@ export const useQuickActions = (query: string): Array<SearchAction> => {
   const [filteredActions, setFilteredActions] = useState<Array<SearchAction>>([]);
   const { composeNewDraft } = useDrafts();
   const dispatch = useDispatch();
+  const [threadFormat, setThreadFormat] = useUserPreference(StorageTypes.THREAD_FORMAT);
   const { openSettings } = useSettings();
   const openCompose = useCallback(() => dispatch(skemailModalReducer.actions.openEmptyCompose()), [dispatch]);
   const addLabel = useCallback(
@@ -46,6 +47,12 @@ export const useQuickActions = (query: string): Array<SearchAction> => {
     () =>
       dispatch(skemailModalReducer.actions.setOpenModal({ type: ModalType.CreateOrEditLabelOrFolder, folder: true })),
     [dispatch]
+  );
+  const toggleThreadFormat = useCallback(
+    () => {
+      // Act like a toggle; if threadFormat is full, set it to right, and vice versa
+      setThreadFormat(threadFormat === ThreadDisplayFormat.Full ? ThreadDisplayFormat.Right : ThreadDisplayFormat.Full);
+    }, [threadFormat, setThreadFormat]
   );
   const markAllReadClick = async () => {
     await markAllThreadsAsRead(true, SystemLabels.Inbox, hasGmailImportImprovementsFF);
@@ -89,7 +96,12 @@ export const useQuickActions = (query: string): Array<SearchAction> => {
       { icon: Icon.Folder },
       undefined // no shortcut
     );
-
+    const toggleThreadFormatAction = createAction(
+      'Toggle full/split view',
+      () => void toggleThreadFormat(),
+      { icon: threadFormat === ThreadDisplayFormat.Full ? Icon.FullView : Icon.SplitView },
+      'T'
+    );
     const importMailAction = createAction(
       'Import mail',
       () => void importMail(),
@@ -102,7 +114,7 @@ export const useQuickActions = (query: string): Array<SearchAction> => {
       { icon: Icon.QuestionCircle },
       '?'
     );
-    return [composeAction, addLabelAction, addFolderAction, markInboxReadAction, importMailAction, openShortcutsAction];
+    return [composeAction, addLabelAction, addFolderAction, toggleThreadFormatAction, markInboxReadAction, importMailAction, openShortcutsAction];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openCompose, addLabel, importMail, addFolder, openShortcuts]);
 
