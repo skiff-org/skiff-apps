@@ -3,8 +3,9 @@ import { useRouter } from 'next/router';
 import React, { useCallback, useMemo } from 'react';
 import { GlobalHotKeys, configure } from 'react-hotkeys';
 import { useDispatch } from 'react-redux';
-import { TabPage, isReactNativeDesktopApp } from 'skiff-front-utils';
-import { SystemLabels } from 'skiff-graphql';
+import { TabPage, isReactNativeDesktopApp, useUserPreference } from 'skiff-front-utils';
+import { SystemLabels, ThreadDisplayFormat } from 'skiff-graphql';
+import { StorageTypes } from 'skiff-utils';
 
 import { useAppSelector } from '../../../hooks/redux/useAppSelector';
 import { useActiveThreadActions } from '../../../hooks/useActiveThreadActions';
@@ -12,6 +13,7 @@ import { useAvailableUserLabels } from '../../../hooks/useAvailableLabels';
 import { useThreadActions } from '../../../hooks/useThreadActions';
 import { skemailHotKeysReducer } from '../../../redux/reducers/hotkeysReducer';
 import { skemailMailboxReducer } from '../../../redux/reducers/mailboxReducer';
+import { skemailSettingsReducer } from 'redux/reducers/settingsReducer';
 import { ComposeExpandTypes, skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { ModalType } from '../../../redux/reducers/modalTypes';
 import { getLabelFromPathParams, isPlainLabel, LABEL_TO_SYSTEM_LABEL } from '../../../utils/label';
@@ -49,6 +51,8 @@ const GlobalHotkeys = () => {
 
   const { archiveThreads, trashThreads, moveThreads, setActiveThreadID, removeUserLabel, activeThreadID } =
     useThreadActions();
+
+  const [threadFormat, setThreadFormat] = useUserPreference(StorageTypes.THREAD_FORMAT);
 
   const { reply, replyAll, forward, activeThreadLabels } = useActiveThreadActions();
 
@@ -220,6 +224,18 @@ const GlobalHotkeys = () => {
     [archiveThreads, isTrashOrArchive, isDrafts, selectedThreadIDs, activeThreadID]
   );
 
+  // change format between split and full
+  const threadFormatHandler = useCallback(
+    (e?: KeyboardEvent) => {
+      e?.preventDefault();
+      e?.stopImmediatePropagation();
+
+      // act like a toggle, if threadFormat is full, set it to right and vice versa
+      setThreadFormat(threadFormat === ThreadDisplayFormat.Full ? ThreadDisplayFormat.Right : ThreadDisplayFormat.Full);
+    },
+    [threadFormat, setThreadFormat]
+  );
+
   // trash threads
   const trashHandler = useCallback(
     (e?: KeyboardEvent) => {
@@ -326,15 +342,15 @@ const GlobalHotkeys = () => {
         preventWhenMetaPressed?: boolean;
       }
     ) =>
-    (e: KeyboardEvent | undefined) => {
-      // Disable all hot keys if a dropdown is open
-      if (e && isDropdownOpen(e)) return;
+      (e: KeyboardEvent | undefined) => {
+        // Disable all hot keys if a dropdown is open
+        if (e && isDropdownOpen(e)) return;
 
-      const inInput = e && INPUT_TAGS.includes((e.target as HTMLElement).tagName.toLowerCase());
-      if (preventWhenTyping && (isComposing || inInput)) return;
-      if (preventWhenMetaPressed && e?.metaKey) return;
-      handler(e);
-    };
+        const inInput = e && INPUT_TAGS.includes((e.target as HTMLElement).tagName.toLowerCase());
+        if (preventWhenTyping && (isComposing || inInput)) return;
+        if (preventWhenMetaPressed && e?.metaKey) return;
+        handler(e);
+      };
 
   const singleKeyHandlers: HotKeyHandlers<typeof globalSingleKeyMap> = {
     [GlobalKeyActions.OPEN_COMMAND_PALETTE]: wrapActionHandler(cmdPHandler, {}),
@@ -345,6 +361,7 @@ const GlobalHotkeys = () => {
     [GlobalKeyActions.ENTER]: wrapActionHandler(enterHandler, {}),
     [GlobalKeyActions.SELECT_THREAD]: wrapActionHandler(selectHandler, {}),
     [GlobalKeyActions.ARCHIVE]: wrapActionHandler(archiveHandler, {}),
+    [GlobalKeyActions.THREAD_FORMAT]: wrapActionHandler(threadFormatHandler, {}),
     [GlobalKeyActions.UNDO]: wrapActionHandler(undoHandler, {}),
     [GlobalKeyActions.REPLY_ALL]: wrapActionHandler(replyAll, { preventWhenMetaPressed: true }),
     [GlobalKeyActions.REPLY]: wrapActionHandler(reply, { preventWhenMetaPressed: true }),

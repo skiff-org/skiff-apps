@@ -6,6 +6,7 @@ export enum GlobalKeyActions {
   DOWN_ARROW = 'DOWN_ARROW',
   ENTER = 'ENTER',
   SELECT_THREAD = 'SELECT_THREAD',
+  THREAD_FORMAT = 'THREAD_FORMAT',
   ARCHIVE = 'ARCHIVE',
   TRASH = 'TRASH',
   UNDO = 'UNDO',
@@ -31,6 +32,7 @@ export const globalSingleKeyMap = {
   [GlobalKeyActions.DOWN_ARROW]: ['s', 'down'],
   [GlobalKeyActions.ENTER]: ['Enter'],
   [GlobalKeyActions.SELECT_THREAD]: 'x',
+  [GlobalKeyActions.THREAD_FORMAT]: 't',  // 't' for toggle
   [GlobalKeyActions.ARCHIVE]: 'e',
   [GlobalKeyActions.UNDO]: 'z',
   /**
