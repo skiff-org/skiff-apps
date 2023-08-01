@@ -13,7 +13,6 @@ import { useAvailableUserLabels } from '../../../hooks/useAvailableLabels';
 import { useThreadActions } from '../../../hooks/useThreadActions';
 import { skemailHotKeysReducer } from '../../../redux/reducers/hotkeysReducer';
 import { skemailMailboxReducer } from '../../../redux/reducers/mailboxReducer';
-import { skemailSettingsReducer } from 'redux/reducers/settingsReducer';
 import { ComposeExpandTypes, skemailModalReducer } from '../../../redux/reducers/modalReducer';
 import { ModalType } from '../../../redux/reducers/modalTypes';
 import { getLabelFromPathParams, isPlainLabel, LABEL_TO_SYSTEM_LABEL } from '../../../utils/label';
