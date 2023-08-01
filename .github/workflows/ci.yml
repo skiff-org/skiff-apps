@@ -6,6 +6,7 @@ on:
 
 jobs:
   lint:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v2.4.1
@@ -16,6 +17,7 @@ jobs:
       - run: yarn lint
 
   build:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v2.4.1
