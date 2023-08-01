@@ -9,6 +9,8 @@
   "scripts": {
     "postinstall": "yarn workspace @skiff-org/skiff-crypto install",
     "build:lib": "yarn workspace libs build",
-    "dev": "yarn workspace skiff-mail-web dev"
+    "dev": "yarn workspace skiff-mail-web dev",
+    "lint": "yarn workspace libs lint && yarn workspace skiff-mail-web lint",
+    "build": "yarn workspace libs build && yarn workspace skiff-mail-web build"
   }
 }
