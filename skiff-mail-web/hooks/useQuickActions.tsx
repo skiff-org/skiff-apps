@@ -97,7 +97,7 @@ export const useQuickActions = (query: string): Array<SearchAction> => {
       undefined // no shortcut
     );
     const toggleThreadFormatAction = createAction(
-      'Toggle full/split view',
+      `Switch to ${threadFormat === ThreadDisplayFormat.Full ? 'split' : 'full'} view`,
       () => void toggleThreadFormat(),
       { icon: threadFormat === ThreadDisplayFormat.Full ? Icon.FullView : Icon.SplitView },
       'T'
