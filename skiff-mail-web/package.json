@@ -43,6 +43,7 @@
     "@tiptap/extension-heading": "^2.0.0-beta.26",
     "@tiptap/extension-highlight": "^2.0.0-beta.220",
     "@tiptap/extension-history": "^2.0.0-beta.21",
+    "@tiptap/extension-horizontal-rule": "^2.0.4",
     "@tiptap/extension-image": "^2.0.0-beta.27",
     "@tiptap/extension-italic": "^2.0.0-beta.26",
     "@tiptap/extension-link": "^2.0.0-beta.36",

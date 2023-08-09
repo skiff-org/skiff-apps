@@ -88,3 +88,10 @@
 .ProseMirror ol ol ol ol {
   list-style-type: decimal;
 }
+
+.ProseMirror hr {
+  margin: 16px auto;
+  background: #7d7d7d;
+  border: none;
+  height: 1px;
+}
