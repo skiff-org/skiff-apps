@@ -1,3 +1,17 @@
+import { MockedResponse } from '@apollo/client/testing';
+import { UserLabelsDocument } from 'skiff-front-graphql';
+
+export const MOCK_USER_LABELS_RESPONSE: MockedResponse = {
+  request: {
+    query: UserLabelsDocument
+  },
+  result: {
+    data: {
+      userLabels: []
+    }
+  }
+};
+
 export const MOCK_MAILBOX_REQUEST = {
   data: {
     mailbox: {

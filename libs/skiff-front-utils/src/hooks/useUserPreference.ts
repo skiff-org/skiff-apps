@@ -97,14 +97,7 @@ export default function useUserPreference<T extends keyof AllUserPreferences>(
   };
 
   const setRemoteValue = async (newValue: AllUserPreferences[T]) => {
-    await setPreference({
-      variables: {
-        request: {
-          [preference]: newValue
-        }
-      },
-      refetchQueries: [{ query: GetUserPreferencesDocument }]
-    });
+    // Note: Removing remote setUserPreference call.
     UserPreferencesEE.emit(preference, newValue);
   };
 
