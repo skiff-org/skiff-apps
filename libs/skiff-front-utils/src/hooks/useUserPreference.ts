@@ -1,10 +1,6 @@
 import EventEmitter from 'eventemitter3';
 import { useState, useEffect } from 'react';
-import {
-  useSetUserPreferencesMutation,
-  useGetUserPreferencesQuery,
-  GetUserPreferencesDocument
-} from 'skiff-front-graphql';
+import { useGetUserPreferencesQuery } from 'skiff-front-graphql';
 
 import {
   DEFAULT_LOCAL_SETTINGS,
@@ -81,7 +77,6 @@ export default function useUserPreference<T extends keyof AllUserPreferences>(
   const [currentValue, setCurrentValue] = useState<AllUserPreferences[T]>(DEFAULT_ALL_USER_PREFERENCES[preference]);
 
   const { data } = useGetUserPreferencesQuery();
-  const [setPreference] = useSetUserPreferencesMutation();
   const preferenceInLocalStorage = isLocalSettingsKey(preference);
 
   /* Define setter functions */
@@ -97,14 +92,7 @@ export default function useUserPreference<T extends keyof AllUserPreferences>(
   };
 
   const setRemoteValue = async (newValue: AllUserPreferences[T]) => {
-    await setPreference({
-      variables: {
-        request: {
-          [preference]: newValue
-        }
-      },
-      refetchQueries: [{ query: GetUserPreferencesDocument }]
-    });
+    // Note: Remiv out remote setUserPreference
     UserPreferencesEE.emit(preference, newValue);
   };
 

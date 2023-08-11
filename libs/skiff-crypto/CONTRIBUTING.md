@@ -76,7 +76,7 @@ The core team will promptly review your Pull Request and either merge it or requ
 ### How to structure Pull Requests?
 
 - All branches should be targeted at `main`.
-- The reference issue number should be include in the branch name.
+- The reference issue number should be included in the branch name.
 - Pull Request titles should be formated as `[Issue #] [Component] Imperative description`. For example, `[#1045] [Button] Add force theme support.`
 - There should be a description for the reviewer on how the code is structured and what to review.
 - All code should be linted, well-formated, and type-safe (running `yarn prettier`, `yarn lint`, and `yarn typescript`)

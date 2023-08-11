@@ -23,6 +23,7 @@ import store from '../redux/store/reduxStore';
 import { CustomHTML5Backend } from '../utils/dragAndDrop';
 import { MOCK_USER } from '__mocks__/mockUser';
 import { MockedProvider } from '@apollo/client/testing';
+import { MOCK_USER_LABELS_RESPONSE } from '__mocks__/mockApiResponse';
 
 function CustomApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -30,7 +31,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
   }, []);
   return (
     <ErrorBoundary FallbackComponent={() => <ErrorPage client={client} origin='Skemail' />}>
-      <MockedProvider>
+      <MockedProvider mocks={[MOCK_USER_LABELS_RESPONSE]}>
         <Provider store={store}>
           <AppThemeProvider>
             <DndProvider backend={CustomHTML5Backend}>
