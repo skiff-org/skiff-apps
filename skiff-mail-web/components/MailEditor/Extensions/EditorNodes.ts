@@ -1,3 +1,4 @@
+import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import Document from '@tiptap/extension-document';
 import Heading from '@tiptap/extension-heading';
 import Paragraph from '@tiptap/extension-paragraph';
@@ -12,7 +13,7 @@ import { OrderedList } from '../OrderedList';
 
 import { EditorExtensionsOptions } from './ExtensionsOptions';
 
-export { BulletList, Document, Heading, ListItem, OrderedList, Paragraph, Text, Blockquote, Image };
+export { HorizontalRule, BulletList, Document, Heading, ListItem, OrderedList, Paragraph, Text, Blockquote, Image };
 
 export const buildEditorNodes = (options?: EditorExtensionsOptions) => [
   Document,
@@ -26,6 +27,11 @@ export const buildEditorNodes = (options?: EditorExtensionsOptions) => [
   BulletList,
   ListItem,
   OrderedList,
+  HorizontalRule.configure({
+    HTMLAttributes: {
+      style: 'border: none; border-top: 1px solid var(--border-primary); margin: 0px; padding: 0px;'
+    }
+  }),
   Image,
   HardBreak,
   Blockquote.configure({
