@@ -101,7 +101,7 @@
     "prosemirror-transform": "^1.4.2",
     "prosemirror-utils": "^0.9.6",
     "prosemirror-view": "^1.23.10",
-    "protobufjs": "^6.11.3",
+    "protobufjs": "^6.11.4",
     "react": "^17.0.2",
     "react-device-detect": "^2.1.2",
     "react-dnd": "^15.1.1",
