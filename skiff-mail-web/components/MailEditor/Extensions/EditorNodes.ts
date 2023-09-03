@@ -16,7 +16,6 @@ import { EditorExtensionsOptions } from './ExtensionsOptions';
 export { HorizontalRule, BulletList, Document, Heading, ListItem, OrderedList, Paragraph, Text, Blockquote, Image };
 
 export const buildEditorNodes = (options?: EditorExtensionsOptions) => [
-  HorizontalRule,
   Document,
   Paragraph.configure({
     HTMLAttributes: {
@@ -28,6 +27,11 @@ export const buildEditorNodes = (options?: EditorExtensionsOptions) => [
   BulletList,
   ListItem,
   OrderedList,
+  HorizontalRule.configure({
+    HTMLAttributes: {
+      style: 'border: none; border-top: 1px solid var(--border-primary); margin: 0px; padding: 0px;'
+    }
+  }),
   Image,
   HardBreak,
   Blockquote.configure({
