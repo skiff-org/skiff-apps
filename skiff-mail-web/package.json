@@ -80,7 +80,7 @@
     "fp-ts": "^2.16.0",
     "framer-motion": "^6.3.3",
     "futoin-hkdf": "^1.5.2",
-    "graphql": "16.5.0",
+    "graphql": "16.8.1",
     "idb-keyval": "^6.1.0",
     "immer": "^9.0.12",
     "io-ts": "^2.2.20",
