@@ -58,7 +58,7 @@
     "base64-js": "^1.5.1",
     "buffer": "^6.0.3",
     "fflate": "^0.7.3",
-    "graphql": "16.5.0",
+    "graphql": "16.8.1",
     "long": "^5.2.0",
     "protobufjs": "^6.11.3",
     "semver": "^7.3.5",
