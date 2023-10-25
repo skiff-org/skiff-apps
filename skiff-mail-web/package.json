@@ -91,7 +91,7 @@
     "lodash": "^4.17.21",
     "long": "^5.2.0",
     "lottie-react": "^2.3.1",
-    "next": "^12.1.6",
+    "next": "^13.5.0",
     "notistack": "^2.0.3",
     "pluralize": "^8.0.0",
     "prosemirror-dev-tools": "^3.1.0",
