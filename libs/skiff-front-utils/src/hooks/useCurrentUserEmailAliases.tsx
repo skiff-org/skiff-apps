@@ -1,5 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import uniq from 'lodash/uniq';
+import uniqBy from 'lodash/uniqBy';
 import { useEffect, useState } from 'react';
 import {
   CurrentUserEmailAliasesDocument,
@@ -17,10 +18,13 @@ import {
   useCurrentUserEmailAliasesQuery,
   useGetBonfidaNamesLazyQuery,
   useGetEnsNameLazyQuery,
-  useGetIcnsNameLazyQuery
+  useGetIcnsNameLazyQuery,
+  useGetUserQuickAliasesQuery
 } from 'skiff-front-graphql';
 import { getJunoAddress, isCosmosHubAddress, isSolanaAddress } from 'skiff-utils';
 import isEthereumAddress from 'validator/lib/isEthereumAddress';
+
+import { WalletAliasWithName } from '../types/emailAliases.types';
 
 /**
  * For each email alias, if it's a ethereum address,
@@ -134,9 +138,20 @@ export const getAllAliasesForCurrentUser = async (client: ApolloClient<Normalize
 };
 
 const useCurrentUserEmailAliases = () => {
-  const { data } = useCurrentUserEmailAliasesQuery();
+  const { data, loading: standardAliasesLoading } = useCurrentUserEmailAliasesQuery();
   const receivedEmailAliases = data?.currentUser?.emailAliases;
+  const { data: quickAliasData, loading: quickAliasesLoading } = useGetUserQuickAliasesQuery({
+    // quick aliases can be passively created at any time on mail receive,
+    // they are not created in response to a user-initiated mutation;
+    // so always update the cache with latest aliases
+    fetchPolicy: 'cache-and-network'
+  });
+  const quickAliases = quickAliasData?.currentUser?.quickAliases?.map((alias) => alias.alias) || [];
+
   const [emailAliases, setEmailAliases] = useState<string[]>(receivedEmailAliases ?? []);
+  const [walletAliasesWithName, setWalletAliasesWithName] = useState<WalletAliasWithName[]>([]);
+  const [processingAliases, setProcessingAliases] = useState(false);
+
   // Ensure cache-first network policies so we're not making unnecessary network requests
   const [getBonfidaQuery] = useGetBonfidaNamesLazyQuery({
     fetchPolicy: 'cache-first'
@@ -154,6 +169,7 @@ const useCurrentUserEmailAliases = () => {
         return;
       }
       const generatedAliases: string[] = [];
+      setProcessingAliases(true);
       await Promise.all(
         receivedEmailAliases.map(async (email) => {
           try {
@@ -163,10 +179,12 @@ const useCurrentUserEmailAliases = () => {
             let dotCosmosName: string | null | undefined;
             let dotJunoName: string | null | undefined;
             let solNames: string[] | undefined;
+
+            const isCosmosHub = isCosmosHubAddress(alias);
             if (isEthereumAddress(alias)) {
               const { data: ensData } = await getENSQuery({ variables: { ethereumAddress: alias } });
               ensName = ensData?.getENSName;
-            } else if (isCosmosHubAddress(alias)) {
+            } else if (isCosmosHub) {
               const { data: cosmosHubIcnsResult } = await getICNSQuery({ variables: { cosmosAddress: alias } });
               dotCosmosName = cosmosHubIcnsResult?.getICNSName;
               const junoAddress = getJunoAddress(alias);
@@ -177,18 +195,47 @@ const useCurrentUserEmailAliases = () => {
               solNames = bonfidaData?.getBonfidaNames;
             }
             const generatedAlias = generateWalletAliases(email, ensName, dotCosmosName, dotJunoName, solNames);
+            // Keep track of the ENS name and the corresponding wallet address
+            if (generatedAlias) {
+              const generatedAliasToWalletAlias = generatedAlias.map((nameAlias) => ({
+                // We typically show the name address (ie ENS) over the wallet address.
+                // However, for Cosmos, we want to prioritize the original address, not the derived address
+                walletAlias: isCosmosHub ? nameAlias : email,
+                nameAlias: isCosmosHub ? email : nameAlias
+              }));
+              setWalletAliasesWithName((prev) =>
+                uniqBy([...prev, ...generatedAliasToWalletAlias], (info) => info.nameAlias)
+              );
+            }
+
             generatedAliases.push(...(generatedAlias || []));
           } catch (e) {
             console.error(`Error when processing alias ${email}:`, e);
           }
         })
       );
-      setEmailAliases(uniq([...generatedAliases, ...receivedEmailAliases]));
+      const uniqAliases = uniq([...generatedAliases, ...receivedEmailAliases]);
+      // sort by domain first, then by alias
+      uniqAliases.sort((a, b) => {
+        const [aliasA, domainA] = a.split('@');
+        const [aliasB, domainB] = b.split('@');
+        if (domainA !== domainB) {
+          return domainA.localeCompare(domainB);
+        }
+        return aliasA.localeCompare(aliasB);
+      });
+      setEmailAliases(uniqAliases);
+      setProcessingAliases(false);
     }
     void fetchAliases();
   }, [receivedEmailAliases, getBonfidaQuery, getENSQuery, getICNSQuery]);
 
-  return emailAliases;
+  return {
+    emailAliases,
+    walletAliasesWithName: walletAliasesWithName,
+    quickAliases,
+    loading: processingAliases || quickAliasesLoading || standardAliasesLoading
+  };
 };
 
 export default useCurrentUserEmailAliases;

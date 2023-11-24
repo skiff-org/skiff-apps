@@ -12,7 +12,7 @@ import {
   Type,
   Typography,
   getThemedColor
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 import { FC, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { PermissionLevel } from 'skiff-graphql';
@@ -165,7 +165,7 @@ const InviteByEmail: FC<InviteByEmailProps> = ({
       <StyledInputFieldContainer>
         <InputField
           autoFocus
-          errorMsg={inputError}
+          error={inputError}
           forceTheme={isMobile ? ThemeMode.DARK : undefined}
           onBlur={addInputValueToEmailsList}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -204,14 +204,13 @@ const InviteByEmail: FC<InviteByEmailProps> = ({
         </InviteeList>
       )}
       <Footer $displayingEmailsList={!!emailsToInvite.length}>
-        <ButtonGroup fullWidth={isMobile} layout={isMobile ? Layout.STACKED : Layout.INLINE}>
-          <ButtonGroupItem
-            forceTheme={isMobile ? ThemeMode.DARK : undefined}
-            label='Invite'
-            loading={isSendingInvites}
-            onClick={() => void inviteUsers()}
-          />
-          <ButtonGroupItem forceTheme={isMobile ? ThemeMode.DARK : undefined} label='Back' onClick={onCancel} />
+        <ButtonGroup
+          forceTheme={isMobile ? ThemeMode.DARK : undefined}
+          fullWidth={isMobile}
+          layout={isMobile ? Layout.STACKED : Layout.INLINE}
+        >
+          <ButtonGroupItem label='Invite' loading={isSendingInvites} onClick={() => void inviteUsers()} />
+          <ButtonGroupItem label='Back' onClick={onCancel} />
         </ButtonGroup>
       </Footer>
     </>

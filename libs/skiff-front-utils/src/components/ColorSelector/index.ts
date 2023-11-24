@@ -1,1 +1,2 @@
-export { default, ColorOption, ColorCircle } from './ColorSelector';
+export { default as ColorPicker } from './ColorPicker';
+export { ColorCircle, ColorOption, default } from './ColorSelector';

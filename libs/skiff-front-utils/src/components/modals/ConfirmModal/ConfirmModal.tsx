@@ -1,6 +1,5 @@
-import { ButtonGroupItem, Dialog, DialogTypes, Type } from '@skiff-org/skiff-ui';
+import { ButtonGroupItem, Dialog, DialogType, ThemeMode, Type } from 'nightwatch-ui';
 import React from 'react';
-import { isMobile } from 'react-device-detect';
 
 export interface ConfirmModalProps {
   open: boolean;
@@ -17,6 +16,7 @@ export interface ConfirmModalProps {
   secondaryName?: string;
   onSecondary?: () => void | Promise<void>;
   disableOffClick?: boolean;
+  forceTheme?: ThemeMode;
   loading?: boolean;
 }
 
@@ -32,6 +32,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   secondaryName,
   onSecondary,
   disableOffClick,
+  forceTheme,
   loading
 }) => {
   if (!open) return null;
@@ -41,11 +42,11 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       dataTest={dataTest}
       description={description}
       disableOffClick={disableOffClick}
-      isMobile={isMobile}
+      forceTheme={forceTheme}
       onClose={onClose}
       open={open}
       title={title}
-      type={DialogTypes.Confirm}
+      type={DialogType.CONFIRM}
     >
       <ButtonGroupItem
         dataTest={`confirm-${confirmName}`}

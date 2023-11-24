@@ -3,12 +3,10 @@
   "version": "0.0.1",
   "subversion": "1",
   "description": "rich text editor built with React and ProseMirror",
-  "author": "Skiff World Inc.",
-  "license": "CC-BY-NC-4.0",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/src/index.d.ts",
-  "packageManager": "yarn@3.5.0",
+  "packageManager": "yarn@4.0.1",
   "scripts": {
     "emit-ts": "yarn tsc --build",
     "clean": "rm -rf dist/",
@@ -24,6 +22,10 @@
     },
     "./style.css": {
       "default": "./dist/cjs/index.css"
+    },
+    "./EditorSchema": {
+      "import": "./dist/esm/EditorSchema.js",
+      "require": "./dist/cjs/EditorSchema.js"
     }
   },
   "devDependencies": {
@@ -35,7 +37,7 @@
     "@types/katex": "^0.11.1",
     "@types/lodash": "4.14.180",
     "@types/lodash-es": "4.17.5",
-    "@types/node": "17.0.45",
+    "@types/node": "20.9.0",
     "@types/orderedmap": "^1.0.0",
     "@types/prosemirror-commands": "1.0.4",
     "@types/prosemirror-gapcursor": "^1.0.4",
@@ -49,7 +51,7 @@
     "@types/prosemirror-state": "1.2.6",
     "@types/prosemirror-transform": "1.1.2",
     "@types/prosemirror-view": "1.23.1",
-    "@types/react": "^17.0.0",
+    "@types/react": "^17.0.0=2",
     "@types/react-dom": "^17.0.0",
     "@types/styled-components": "5.1.15",
     "@types/uuid": "8.3.3",
@@ -59,7 +61,7 @@
     "esbuild-plugin-svgr": "^1.0.1",
     "esbuild-sass-plugin": "^2.2.6",
     "eslint-config-skiff-eslint": "workspace:*",
-    "postcss": "^8.4.12",
+    "postcss": "^8.4.31",
     "postcss-discard-comments": "^5.0.3",
     "prop-types": "15.8.1",
     "prop-types-extra": "1.1.1",
@@ -100,8 +102,7 @@
     "@codemirror/theme-one-dark": "^0.19.1",
     "@codemirror/view": "^0.19.47",
     "@mui/material": "^5.10.0",
-    "@skiff-org/prosemirror-tables": "^3.7.3",
-    "@skiff-org/skiff-ui": "^1.2.5",
+    "@skiff-org/prosemirror-tables": "^3.8.0",
     "@types/prosemirror-markdown": "^1.5.4",
     "classnames": "2.3.1",
     "color": "4.2.1",
@@ -112,6 +113,7 @@
     "katex": "0.13.18",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
+    "nightwatch-ui": "workspace:libs/nightwatch-ui",
     "nullthrows": "1.1.1",
     "orderedmap": "^1.1.1",
     "prosemirror-commands": "^1.1.7",
@@ -139,7 +141,7 @@
     "utility-types": "^3.10.0",
     "uuid": "8.3.2",
     "validator": "^13.7.0",
-    "y-prosemirror": "^1.1.2"
+    "y-prosemirror": "1.2.1"
   },
   "peerDependencies": {
     "@material-ui/core": "^4.12.4",
@@ -148,6 +150,6 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "y-protocols": "^1.0.5",
-    "yjs": "^13.5.34"
+    "yjs": "13.6.7"
   }
 }

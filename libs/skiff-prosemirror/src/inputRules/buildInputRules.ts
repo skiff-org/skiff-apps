@@ -1,8 +1,4 @@
-import {
-  // makeInlineMathInputRule,
-  makeBlockMathInputRule,
-  REGEX_BLOCK_MATH_DOLLARS
-} from '@benrbray/prosemirror-math';
+import { makeBlockMathInputRule, makeInlineMathInputRule, REGEX_BLOCK_MATH_DOLLARS } from '@benrbray/prosemirror-math';
 import {
   ellipsis,
   emDash,
@@ -34,9 +30,19 @@ import strongAndEmphasis from './strongAndEmphasis';
 // // https://github.com/ProseMirror/prosemirror-example-setup/blob/master/src/inputrules.js
 // : (NodeType) → InputRule
 
+// https://github.com/benrbray/prosemirror-math/blob/master/src/plugins/math-inputrules.ts
+const REGEX_INLINE_MATH_DOLLARS = /\$([^\s]+)\$/; // matches strings enclosed in $ without whitespace
+
 /**
  * Returns the input rules the editor uses
  */
+const imageInputRule = new InputRule(/!\[(.*?)\]\((https?:\/\/.*?)(?=\))\)/, (state, match, start, end) => {
+  const [_fullMatch, altText, srcUrl] = match;
+  const attrs = { src: srcUrl, alt: altText };
+
+  const tr = state.tr.replaceWith(start, end, state.schema.nodes.image.create(attrs));
+  return tr;
+});
 
 // Triggers the same function ListToggleCommand would, and deletes two characters the user just entered with the inputRule
 export const orderedListRule = (nodeType: NodeType) => {
@@ -100,10 +106,10 @@ export const headingRule = (nodeType: NodeType, maxLevel: number): InputRule =>
 
 // Changing '-->' and '- >' into UTF 8 arrow char. '--' turns into emDash first so we check for emDash arrow input in rule
 function rightArrowRule() {
-  return new InputRule(/(—> )|(-> )$/, '→ ');
+  return new InputRule(/(-> ?)$/, '→');
 }
 function leftArrowRule() {
-  return new InputRule(/(<— )|(<- )$/, '← ');
+  return new InputRule(/(<- ?)$/, '←');
 }
 function inlineInputRule(pattern: RegExp, nodeType: NodeType, getAttrs?: (match: string[]) => any) {
   return new InputRule(pattern, (state, match, start, end) => {
@@ -145,7 +151,7 @@ function blockInputRule(pattern: RegExp, nodeType: NodeType, schema: Schema) {
 
 export default function buildInputRules(schema: Schema): Plugin {
   // make math input rules for support $...$ | $$
-  // const inlineMathInputRule = makeInlineMathInputRule(REGEX_INLINE_MATH_DOLLARS, schema.nodes.math_inline);
+  const inlineMathInputRule = makeInlineMathInputRule(REGEX_INLINE_MATH_DOLLARS, schema.nodes.math_inline);
   // make math input rules for support $...$ | $$
   const blockMathInputRule = makeBlockMathInputRule(REGEX_BLOCK_MATH_DOLLARS, schema.nodes.math_display);
 
@@ -153,6 +159,7 @@ export default function buildInputRules(schema: Schema): Plugin {
   rules.push(rightArrowRule());
   rules.push(leftArrowRule());
 
+  rules.push(imageInputRule);
   rules.push(headingRule(schema.nodes[HEADING], 6));
   rules.push(linkFormatRule(schema.marks[MARK_LINK], schema));
   rules.push(linkFromBrackets(schema.marks[MARK_LINK], schema));
@@ -172,7 +179,7 @@ export default function buildInputRules(schema: Schema): Plugin {
   rules.push(horizontalRuleStandard(schema));
   rules.push(blockQuote());
 
-  // rules.push(inlineMathInputRule);
+  rules.push(inlineMathInputRule);
   rules.push(blockMathInputRule);
 
   return inputRules({

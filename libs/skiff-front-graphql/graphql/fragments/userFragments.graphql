@@ -34,6 +34,37 @@ fragment UserProfileOrgData on User {
   }
 }
 
+fragment UserOrgPersonalTeamData on User {
+  userID
+  rootOrganization {
+    orgID
+    rootDocID
+    personalTeam {
+      teamID
+      rootDocument {
+        docID
+      }
+    }
+  }
+}
+
+fragment UserOrgEveryoneTeamData on User {
+  userID
+  rootOrganization {
+    orgID
+    rootDocID
+    everyoneTeam {
+      teamID
+      rootDocument {
+        ...DocumentDecryptedMetadata
+        ...DocumentBasicInfoWithoutTeamOrOrg
+        ...DocumentInvites
+        ...DocumentCollaborators
+      }
+    }
+  }
+}
+
 fragment UserProfileDataWithKeys on User {
   ...UserProfileData
   publicKey
@@ -54,6 +85,7 @@ fragment UserWithMailStorageUsed on User {
 }
 
 fragment ContactData on Contact {
+  contactID
   emailAddress
   firstName
   lastName
@@ -65,19 +97,25 @@ fragment ContactData on Contact {
 }
 
 fragment UserPreferencesData on UserPreferences {
+  autoAdvance
+  advanceToNext
   theme
   dateFormat
   hourFormat
   showPageIcon
   defaultCalendarColor
+  defaultCalendarView
+  defaultCalendarViewMobile
   startDayOfTheWeek
   leftSwipeGesture
   rightSwipeGesture
   blockRemoteContent
   securedBySkiffSigDisabled
   showAliasInboxes
+  fileTableFormat
   threadFormat
   hideActivationChecklist
+  tableOfContents
 }
 
 fragment UserPreferencesFragment on User {

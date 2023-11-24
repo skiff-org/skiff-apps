@@ -2,8 +2,6 @@
   "name": "skiff-graphql",
   "version": "0.0.1",
   "description": "Graphql types",
-  "author": "Skiff World Inc.",
-  "license": "CC-BY-NC-4.0",
   "main": "./dist/cjs/index.js",
   "exports": {
     "import": "./dist/esm/index.js",
@@ -14,11 +12,12 @@
     "dist"
   ],
   "types": "dist/src/index.d.ts",
-  "packageManager": "yarn@3.5.0",
+  "packageManager": "yarn@4.0.1",
+  "private": true,
   "scripts": {
     "emit-ts": "yarn tsc --build",
     "clean": "rm -rf dist/",
-    "build": "graphql-codegen --config codegen.yml && yarn node build.js",
+    "build": "yarn graphql-codegen --config codegen.yml && yarn node build.js",
     "watch": "onchange -i ../../supergraph.graphql -- yarn build",
     "lint": "yarn run -T eslint ./src --cache --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "yarn lint --fix"
@@ -37,8 +36,7 @@
     "@graphql-codegen/cli": "^2.6.2",
     "@graphql-codegen/typescript": "^2.4.11",
     "apollo-server-errors": "^3.3.1",
-    "graphql": "16.5.0",
-    "skiff-mail-protos": "workspace:libs/skiff-mail-protos",
+    "graphql": "16.8.1",
     "skiff-utils": "workspace:libs/skiff-utils",
     "tslib": "^2.4.0"
   }

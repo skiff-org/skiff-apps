@@ -58,6 +58,7 @@ fragment EmailWithoutContent on Email {
       contentId
     }
   }
+  notificationsTurnedOffForSender
 }
 
 fragment ThreadWithoutContent on UserThread {
@@ -77,6 +78,7 @@ fragment ThreadWithoutContent on UserThread {
   }
   emailsUpdatedAt
   sentLabelUpdatedAt
+  deletedAt
 }
 
 fragment Email on Email {
@@ -144,6 +146,7 @@ fragment Email on Email {
       contentId
     }
   }
+  notificationsTurnedOffForSender
 }
 
 fragment Thread on UserThread {
@@ -163,6 +166,11 @@ fragment Thread on UserThread {
   }
   emailsUpdatedAt
   sentLabelUpdatedAt
+  deletedAt
+  senderToSilence
+  senderToSilenceMessageCounter
+  senderToSilenceTotalBytes
+  threadContentUpdatedAt
 }
 
 fragment MobileThread on UserThread {
@@ -176,6 +184,7 @@ fragment MobileThread on UserThread {
       labelName
       variant
     }
+    clientsideFiltersApplied
   }
   emails {
     ...Email
@@ -183,6 +192,7 @@ fragment MobileThread on UserThread {
   emailsUpdatedAt
   sentLabelUpdatedAt
   updatedAt
+  deletedAt
   permanentlyDeleted
 }
 
@@ -201,6 +211,7 @@ fragment SlimThread on SlimUserThread {
   emailsUpdatedAt
   sentLabelUpdatedAt
   updatedAt
+  deletedAt
   permanentlyDeleted
 }
 
@@ -216,6 +227,7 @@ fragment SlimThreadWithoutLabels on SlimUserThread {
   emailsUpdatedAt
   sentLabelUpdatedAt
   updatedAt
+  deletedAt
   permanentlyDeleted
 }
 
@@ -246,6 +258,13 @@ query mailbox($request: MailboxRequest!) {
         date
       }
     }
+  }
+}
+
+query filteredThreadIDs($request: FilteredThreadIDsRequest!) {
+  filteredThreadIDs(request: $request) {
+    threadIDs
+    numThreadIDsRemoved
   }
 }
 
@@ -347,6 +366,16 @@ query validateMailAlias($request: GetAliasValidRequest!) {
   aliasValid(request: $request)
 }
 
+mutation updateQuickAliasActiveState($request: UpdateQuickAliasActiveStateRequest) {
+  updateQuickAliasActiveState(request: $request) {
+    status
+  }
+}
+
+mutation updateEmailAliasSendReceiveEnabledState($request: UpdateEmailAliasEnabledStateRequest!) {
+  updateEmailAliasSendReceiveEnabledState(request: $request)
+}
+
 mutation createEmailAlias($request: CreateEmailAliasRequest) {
   createEmailAlias(request: $request) {
     emailAliases
@@ -363,6 +392,10 @@ mutation updateEmailAliasActiveState($request: UpdateEmailAliasActiveStateReques
   updateEmailAliasActiveState(request: $request) {
     status
   }
+}
+
+mutation updateEmailAliasProfile($request: UpdateEmailAliasProfileRequest!) {
+  updateEmailAliasProfile(request: $request)
 }
 
 mutation setAllThreadsReadStatus($request: SetAllThreadsReadStatusRequest!) {
@@ -427,6 +460,13 @@ query getNumUnread($label: String!) {
   unread(label: $label)
 }
 
+query getNumUnreadAllLabels($labels: [String!]!) {
+  unreadAllLabels(labels: $labels) {
+    label
+    count
+  }
+}
+
 mutation blockEmailAddress($request: BlockEmailAddressRequest!) {
   blockEmailAddress(request: $request)
 }
@@ -451,6 +491,19 @@ mutation verifyWalletAddressCreateAlias($request: VerifyWalletAddressCreateAlias
 
 mutation deleteThread($request: DeleteThreadRequest!) {
   deleteThread(request: $request)
+}
+
+mutation bulkDeleteTrashedThreads {
+  bulkDeleteTrashedThreads {
+    jobID
+  }
+}
+
+query getBulkActionJobStatus($request: BulkActionJobStatusRequest!) {
+  bulkActionJobStatus(request: $request) {
+    jobStatus
+    completed
+  }
 }
 
 mutation setPushToken($request: SetPushTokenRequest!) {
@@ -497,4 +550,34 @@ mutation deleteMailFilter($request: DeleteMailFilterInput!) {
 
 mutation markThreadsAsClientsideFiltered($request: MarkThreadsAsClientsideFilteredInput!) {
   markThreadsAsClientsideFiltered(input: $request)
+}
+
+mutation silenceMultipleEmailAddresses($request: SilenceMultipleEmailAddressesRequest!) {
+  silenceMultipleEmailAddresses(request: $request)
+}
+
+mutation markSpamMultipleEmailAddresses($request: MarkSpamMultipleEmailAddressesRequest!) {
+  markSpamMultipleEmailAddresses(request: $request)
+}
+
+mutation markNotSpamMultipleEmailAddresses($request: MarkNotSpamMultipleEmailAddressesRequest!) {
+  markNotSpamMultipleEmailAddresses(request: $request)
+}
+
+mutation bulkTrash($request: BulkTrashRequest!) {
+  bulkTrash(request: $request) {
+    jobID
+  }
+}
+
+mutation markThreadAsOpened($request: MarkThreadAsOpenedInput!) {
+  markThreadAsOpened(request: $request)
+}
+
+mutation muteNotificationForSender($request: MuteNotificationForSenderRequest!) {
+  muteNotificationForSender(request: $request)
+}
+
+mutation unmuteNotificationForSender($request: UnmuteNotificationForSenderRequest!) {
+  unmuteNotificationForSender(request: $request)
 }

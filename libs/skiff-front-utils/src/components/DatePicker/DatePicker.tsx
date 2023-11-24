@@ -1,59 +1,49 @@
-import { CalendarPicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { DateCalendar, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { PickerOnChangeFn } from '@mui/x-date-pickers/internals/hooks/useViews';
-import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
 import locale from 'date-fns/locale/en-US';
-import dayjs, { Dayjs } from 'dayjs';
-import { colors, getThemedColor, Icon, Icons, Size, ThemeMode, themeNames } from '@skiff-org/skiff-ui';
-import React from 'react';
+import { Dayjs } from 'dayjs';
+import { getThemedColor, Icon, Icons, Size, TEXT_COLOR_VALUES, ThemeMode } from 'nightwatch-ui';
+import { TYPOGRAPHY_MEDIUM_CSS } from 'nightwatch-ui';
+import React, { useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import { DayOfWeek } from '../../constants';
-import { StartDayOfTheWeek } from '../../constants';
-import { isSameDate } from '../../utils';
+import { StorageTypes } from '../../../../skiff-utils/src';
+import { DAY_UNIT } from '../../constants';
+import { useUserPreference } from '../../hooks';
+import { dayjs, getUserGuessedTimeZone, getWeekStartAndEndDates } from '../../utils';
 
-interface DatePickerProps {
-  onSelectDate: PickerOnChangeFn<Date> & PickerOnChangeFn<unknown>;
-  selectedDate?: Dayjs;
-  showHeader?: boolean;
-  userStartOfTheWeek?: StartDayOfTheWeek;
-  highlightCurrentWeek?: boolean;
-  forceTheme?: ThemeMode;
-  minDate?: Date;
-  todaysDate: Dayjs;
-}
-interface CustomPickerDayProps extends PickersDayProps<Dayjs> {
-  dayIsBetween: boolean;
-  isFirstDay: boolean;
-  isLastDay: boolean;
-  isToday: boolean;
-}
+import { HEADER_MARGIN_BOTTOM, WEEK_ROW_VERTICAL_MARGIN } from './DatePicker.constants';
+import { DAY_PICKER_LABEL_CSS, DAY_PICKER_BUTTON_CSS } from './DatePicker.styles';
+import { DatePickerProps } from './DatePicker.types';
+import { getDatePickerHeight } from './DatePicker.utils';
+import DatePickerDay from './DatePickerDay';
+import { DatePickerDayProps } from './DatePickerDay/DatePickerDay.types';
 
-export const MOBILE_HEIGHT_WIDTH = 30;
+const FIXED_NUMBER_OF_WEEKS = 6;
 
-const StyledCalendarPicker = styled(CalendarPicker)<{ $forceTheme: ThemeMode; $showHeader: boolean }>`
-  &.MuiCalendarPicker-root {
-    width: ${isMobile ? '100%' : '240px'};
-    height: ${isMobile ? undefined : '285px'};
-    padding: ${(props) => (props.$showHeader ? '8px 4px' : '0px 0px 8px')};
-    box-sizing: border-box;
+const StyledDateCalendar = styled(DateCalendar)<{
+  $shouldDisplayEvents: boolean;
+  $showHeader: boolean;
+  $forceTheme?: ThemeMode;
+}>`
+  &.MuiDateCalendar-root {
+    width: ${isMobile ? '100%' : '238px'};
+    height: ${({ $shouldDisplayEvents, $showHeader }) => getDatePickerHeight($shouldDisplayEvents, $showHeader)}px;
 
     .MuiPickersCalendarHeader-root {
       display: ${(props) => (props.$showHeader ? 'flex' : 'none')};
       justify-content: space-between;
       align-items: center;
-      margin: 0;
-      padding-left: 14px;
-      padding-right: 8px;
+      margin: 0 0 ${HEADER_MARGIN_BOTTOM}px 0;
+      padding: 0 2px 0 12px;
     }
 
-    .MuiPickersCalendarHeader-labelContainer {
-      color: ${(props) => themeNames[props.$forceTheme]['--text-primary']};
-      font-weight: 560;
-      font-size: 17px;
-      line-height: 24px;
+    .MuiPickersCalendarHeader-label {
+      font-family: 'Skiff Sans Display';
+      color: ${(props) => getThemedColor(TEXT_COLOR_VALUES.primary, props.$forceTheme)};
       cursor: auto;
+      ${TYPOGRAPHY_MEDIUM_CSS}
     }
 
     .MuiPickersArrowSwitcher-spacer {
@@ -61,195 +51,143 @@ const StyledCalendarPicker = styled(CalendarPicker)<{ $forceTheme: ThemeMode; $s
     }
 
     .MuiPickersArrowSwitcher-root {
+      gap: 2px;
+
       button {
         margin: 0;
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
+        ${DAY_PICKER_BUTTON_CSS};
 
         &:hover {
-          background: ${(props) => themeNames[props.$forceTheme]['--cta-secondary-hover']};
+          background: ${(props) => getThemedColor('var(--cta-secondary-hover)', props.$forceTheme)};
         }
       }
     }
 
-    .MuiDayPicker-weekDayLabel {
-      color: ${(props) => themeNames[props.$forceTheme]['--text-disabled']};
-      font-size: 13px;
-      line-height: 16px;
-      font-weight: 380;
-      height: ${isMobile ? MOBILE_HEIGHT_WIDTH : 32}px;
-      width: ${isMobile ? 44 : 32}px;
-      margin: 0;
-      justify-self: center;
+    .MuiDayCalendar-weekDayLabel {
+      color: ${(props) => getThemedColor(TEXT_COLOR_VALUES.disabled, props.$forceTheme)};
+      ${DAY_PICKER_LABEL_CSS}
     }
-    .MuiDayPicker-header {
+
+    .MuiDayCalendar-header {
       display: ${isMobile ? 'grid' : 'flex'};
       grid-template-columns: repeat(7, 1fr);
     }
 
-    .MuiDayPicker-slideTransition {
+    .MuiDayCalendar-slideTransition {
       min-height: unset;
 
-      .MuiDayPicker-weekContainer {
-        margin: 2px 0px;
+      .MuiDayCalendar-weekContainer {
+        margin: ${({ $shouldDisplayEvents }) => ($shouldDisplayEvents ? 0 : WEEK_ROW_VERTICAL_MARGIN)}px 0px;
         display: ${isMobile ? 'grid' : 'flex'};
         grid-template-columns: repeat(7, 1fr);
       }
 
       .MuiPickersDay-dayWithMargin {
         background: none;
-        font-weight: 380;
-        font-size: 13px;
-        line-height: 16px;
         transition: none;
-        height: ${isMobile ? MOBILE_HEIGHT_WIDTH : 32}px;
-        width: ${isMobile ? 44 : 32}px;
-        margin: 0;
-        justify-self: center;
-
-        &:hover {
-          background: ${(props) => themeNames[props.$forceTheme]['--cta-secondary-hover']};
-        }
       }
+
       .Mui-disabled {
-        color: ${(props) => getThemedColor('var(--text-primary)', props.$forceTheme)};
+        color: ${(props) => getThemedColor(TEXT_COLOR_VALUES.disabled, props.$forceTheme)} !important;
       }
 
       .MuiPickersDay-dayOutsideMonth {
-        color: ${(props) => themeNames[props.$forceTheme]['--text-disabled']};
-      }
-
-      .MuiPickersDay-today {
-        border: none;
-      }
-
-      .Mui-selected {
-        font-weight: 560;
-        ${(props) =>
-          css`
-            background: ${isMobile ? undefined : themeNames[props.$forceTheme]['--text-always-white']};
-            color: ${themeNames[props.$forceTheme]['--text-always-white']};
-          `}
-        z-index: 1;
-        &::before {
-          position: absolute;
-          content: '';
-          background: rgb(${colors['--orange-500']}) !important;
-          width: ${isMobile ? `${MOBILE_HEIGHT_WIDTH}px` : '100%'};
-          height: ${isMobile ? `${MOBILE_HEIGHT_WIDTH}px` : '100%'};
-          z-index: -1;
-          border-radius: 8px;
-        }
+        color: ${(props) => getThemedColor(TEXT_COLOR_VALUES.tertiary, props.$forceTheme)};
       }
     }
   }
 `;
 
-const StyledCustomPickersDay = styled(PickersDay)<
-  CustomPickerDayProps & { $highlightCurrentWeek: boolean; $forceTheme: ThemeMode }
->`
-  &.MuiPickersDay-root {
-    color: ${(props) => getThemedColor('var(--text-primary)', props.$forceTheme)};
-    border-radius: 8px;
-    background: transparent;
-    font-weight: 380;
-    font-size: 13px;
-    line-height: 16px;
-    height: 32px;
-    width: 32px;
-    &:hover {
-      background: ${(props) => getThemedColor('var(--cta-secondary-hover)', props.$forceTheme)};
-    }
-
-    ${(props) =>
-      props.dayIsBetween && props.$highlightCurrentWeek
-        ? `border-radius: 0px;
-          background: ${themeNames[props.$forceTheme]['--bg-cell-hover']} !important`
-        : ''};
-
-    ${(props) =>
-      props.isFirstDay && props.$highlightCurrentWeek
-        ? `border-top-left-radius: 8px;
-          border-bottom-left-radius: 8px`
-        : ''};
-
-    ${(props) =>
-      props.isLastDay && props.$highlightCurrentWeek
-        ? `border-top-right-radius: 8px;
-          border-bottom-right-radius: 8px`
-        : ''};
-
-    ${(props) => (props.isToday ? `color: rgb(${colors['--orange-500']});` : '')};
-  }
-`;
+const dayjsToDate = (date: Dayjs) => new Date(date.year(), date.month(), date.date());
 
 const DatePicker: React.FC<DatePickerProps> = ({
   onSelectDate,
-  selectedDate,
-  showHeader = true,
-  userStartOfTheWeek = DayOfWeek.Sunday,
+  bgColor,
+  className,
+  datePickerEvents,
+  forceTheme,
   highlightCurrentWeek = false,
-  forceTheme = ThemeMode.LIGHT,
   minDate,
-  todaysDate
+  selectedDate,
+  showHeader = true
 }: DatePickerProps) => {
-  const calendarLeftArrow = () => {
-    return <Icons color='secondary' forceTheme={forceTheme} icon={Icon.Backward} size={Size.SMALL} />;
-  };
-  const calendarRightArrow = () => {
-    return <Icons color='secondary' forceTheme={forceTheme} icon={Icon.Forward} size={Size.SMALL} />;
-  };
+  const [selectedDateValue, setSelectedDateValue] = useState<Date | null>(null);
 
-  const renderWeekDays = (date: Date | any, _: any, pickersDayProps: PickersDayProps<Date> | any) => {
-    const dateValue = dayjs(date);
-    const weekStartDate = todaysDate.startOf('week').add(userStartOfTheWeek, 'day');
-    const weekEndDate = todaysDate.endOf('week').add(userStartOfTheWeek, 'day');
+  useEffect(() => {
+    if (selectedDate) {
+      setSelectedDateValue(dayjsToDate(selectedDate));
+    }
+  }, [selectedDate]);
 
-    const dayIsBetween =
-      dateValue.month() == todaysDate.month() &&
-      dateValue.date() >= weekStartDate.date() &&
-      dateValue.date() <= weekEndDate.date();
-    const isFirstDay = isSameDate(weekStartDate, dateValue);
-    const isLastDay = isSameDate(weekEndDate, dateValue);
-    const isToday = isSameDate(todaysDate, dateValue);
-
-    return (
-      <StyledCustomPickersDay
-        {...pickersDayProps}
-        $forceTheme={forceTheme}
-        $highlightCurrentWeek={highlightCurrentWeek}
-        dayIsBetween={dayIsBetween}
-        isFirstDay={isFirstDay}
-        isLastDay={isLastDay}
-        isToday={isToday}
-      />
-    );
-  };
-
+  const [localStartDay] = useUserPreference(StorageTypes.START_DAY_OF_THE_WEEK);
+  const [userTimeZone] = useUserPreference(StorageTypes.TIME_ZONE);
+  const [userStartOfTheWeek] = useUserPreference(StorageTypes.START_DAY_OF_THE_WEEK);
+  const currTimeZone = useMemo(() => userTimeZone ?? getUserGuessedTimeZone(), [userTimeZone]);
+  const currentDayWithTimeZone = useMemo(() => dayjs().tz(currTimeZone), [currTimeZone]);
+  const { weekStartDate, weekEndDate } = useMemo(
+    (): { weekStartDate: Dayjs; weekEndDate: Dayjs } =>
+      getWeekStartAndEndDates(currentDayWithTimeZone, localStartDay, currTimeZone),
+    [currTimeZone, currentDayWithTimeZone, localStartDay]
+  );
   // Updating a copy of locale rather than modifying it directly to prevent bugs
-  let currLocale = locale;
-  if (locale && locale.options) {
-    currLocale = { ...locale, options: { ...locale.options, weekStartsOn: userStartOfTheWeek } };
-  }
+  const currLocale = useMemo(() => {
+    if (locale && locale.options) {
+      return { ...locale, options: { ...locale.options, weekStartsOn: userStartOfTheWeek } };
+    }
+    return locale;
+  }, [userStartOfTheWeek]);
+
+  const shouldDisplayEvents = !!datePickerEvents;
+
+  const datePickerDayProps: DatePickerDayProps = {
+    selectedDate: selectedDate,
+    forceTheme: forceTheme,
+    highlightCurrentWeek: highlightCurrentWeek,
+    currentDayWithTimeZone: currentDayWithTimeZone,
+    weekStartDate: weekStartDate,
+    weekEndDate: weekEndDate,
+    shouldDisplayEvents: shouldDisplayEvents,
+    datePickerEvents: datePickerEvents,
+    bgColor: bgColor
+  };
+
+  const leftArrowIconProps: { icon: Icon } = {
+    icon: Icon.Backward
+  };
+
+  const rightArrowIconProps: { icon: Icon } = {
+    icon: Icon.Forward
+  };
+
+  const CustomIcon = ({ icon }: { icon: Icon }) => (
+    <Icons color='secondary' forceTheme={forceTheme} icon={icon} size={Size.SMALL} />
+  );
 
   return (
     <LocalizationProvider adapterLocale={currLocale} dateAdapter={AdapterDateFns}>
-      <StyledCalendarPicker
+      <StyledDateCalendar
         $forceTheme={forceTheme}
+        $shouldDisplayEvents={shouldDisplayEvents}
         $showHeader={showHeader}
-        components={{
-          LeftArrowIcon: calendarLeftArrow,
-          RightArrowIcon: calendarRightArrow
-        }}
-        date={selectedDate ? new Date(selectedDate.year(), selectedDate.month(), selectedDate.date()) : null}
+        className={className}
+        fixedWeekNumber={FIXED_NUMBER_OF_WEEKS}
         focusedView={null}
         minDate={minDate}
         onChange={onSelectDate}
         reduceAnimations
-        renderDay={renderWeekDays}
         showDaysOutsideCurrentMonth
-        views={['day']}
+        slotProps={{
+          day: datePickerDayProps,
+          leftArrowIcon: leftArrowIconProps,
+          rightArrowIcon: rightArrowIconProps
+        }}
+        slots={{
+          day: DatePickerDay,
+          leftArrowIcon: CustomIcon,
+          rightArrowIcon: CustomIcon
+        }}
+        value={selectedDateValue}
+        views={[DAY_UNIT]}
       />
     </LocalizationProvider>
   );

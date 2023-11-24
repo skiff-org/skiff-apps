@@ -33,3 +33,37 @@ extend type Email {
 extend type Attachment {
   decryptedSessionKey: String
 }
+
+# CONTACT
+
+type ValueLabel {
+  value: String!
+  label: String!
+}
+
+type DecryptedContactData {
+  decryptedPhoneNumbers: [ValueLabel!]
+  decryptedBirthday: String
+  decryptedNotes: String
+  decryptedCompany: String
+  decryptedJobTitle: String
+  decryptedAddresses: [ValueLabel!]
+  decryptedNickname: String
+  decryptedURL: String
+}
+
+extend type Contact {
+  decryptedData: DecryptedContactData
+  decryptedSessionKey: String
+}
+
+# ALIAS
+
+type DecryptedAliasData {
+  note: String
+}
+
+extend type FullAliasInfo {
+  decryptedSessionKey: String
+  decryptedData: DecryptedAliasData
+}

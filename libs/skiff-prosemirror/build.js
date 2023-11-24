@@ -29,7 +29,7 @@ const spawn = (command, args) => {
 const WATCH = !!process.env.WATCH;
 
 const esbuildConf = (format) => ({
-  entryPoints: ['src/index.ts'],
+  entryPoints: ['src/index.ts', 'src/EditorSchema.ts'],
   bundle: true,
   platform: 'node',
   format: format,

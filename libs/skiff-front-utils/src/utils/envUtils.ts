@@ -7,10 +7,10 @@ export const getEnvironment = (urlOrigin: URL) => {
   if (urlOrigin.origin === 'https://app.skiff.town') {
     return 'development';
   }
-  if (urlOrigin.origin === 'https://app.skiff.city' || urlOrigin.host === 'https://staging.skiff.org') {
+  if (urlOrigin.origin === 'https://app.skiff.city') {
     return 'staging';
   }
-  if (urlOrigin.origin === 'https://app.skiff.com' || urlOrigin.origin === 'https://app.skiff.org') {
+  if (urlOrigin.origin === 'https://app.skiff.com') {
     return 'production';
   }
   if (urlOrigin.origin.endsWith('vercel.app')) {

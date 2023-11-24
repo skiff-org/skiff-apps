@@ -1,7 +1,7 @@
 import { useUsersFromEmailAliasQuery } from 'skiff-front-graphql';
 import { isSkiffAddress } from 'skiff-utils';
 
-export const useDisplayPictureDataFromAddress = (address: string) => {
+export const useDisplayPictureDataFromAddress = (address: string | undefined) => {
   const emailAddress = address ?? undefined;
   // Only Skiff addresses will have profile pictures
   const skipQuery = !emailAddress || !isSkiffAddress(emailAddress, []);

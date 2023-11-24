@@ -3,7 +3,7 @@ import {
   GetUserIdDocument,
   GetUserIdQuery,
   GetUserIdQueryVariables,
-  useGetCollaboratorsQuery
+  useGetDocumentFullQuery
 } from 'skiff-front-graphql';
 import { PaywallErrorCode } from 'skiff-utils';
 import isEmail from 'validator/lib/isEmail';
@@ -32,7 +32,7 @@ const useShareDocument = (client: ApolloClient<NormalizedCacheObject>, docID: st
 
   const { enqueueToast } = useToast();
 
-  const { data } = useGetCollaboratorsQuery({ variables: { request: { docID } }, skip: !docID });
+  const { data } = useGetDocumentFullQuery({ variables: { request: { docID } }, skip: !docID });
 
   const activeOrgData = useCurrentOrganization();
 

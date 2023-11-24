@@ -2,7 +2,7 @@
 import EventEmitter from 'eventemitter3';
 import { useEffect, useState } from 'react';
 
-import { LocalSettings } from '../constants/userPreferences.constants';
+import { LOCAL_SETTINGS_TO_STRING, LocalSettings } from '../constants/userPreferences.constants';
 
 import { getLocalSettingCurrentValue } from './useUserPreference';
 const LocalSettingsEE = new EventEmitter<keyof LocalSettings>();
@@ -17,7 +17,7 @@ export default function useLocalSetting<T extends keyof LocalSettings>(
 ): [LocalSettings[T], (newValue: LocalSettings[T]) => any] {
   const [currentValue, setCurrentValue] = useState<LocalSettings[T]>(getLocalSettingCurrentValue(setting));
   const setter = (newValue: LocalSettings[T]) => {
-    localStorage.setItem(`skiff:${setting}`, newValue.toString());
+    localStorage.setItem(`skiff:${setting}`, LOCAL_SETTINGS_TO_STRING[setting](newValue));
     LocalSettingsEE.emit(setting);
   };
 

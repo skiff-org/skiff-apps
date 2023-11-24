@@ -1,4 +1,4 @@
-import { createJSONWrapperDatagram } from '@skiff-org/skiff-crypto';
+import { createJSONWrapperDatagram } from 'skiff-crypto';
 import { AddressObject } from 'skiff-graphql';
 
 import { ThreadFragment } from '../../generated/graphql';

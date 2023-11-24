@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import {
   Button,
   Dialog,
@@ -12,17 +13,24 @@ import {
   TypographySize,
   TypographyWeight,
   themeNames
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 import { useState } from 'react';
 import { useGetCoinbaseCheckoutIdLazyQuery, useStoreWorkspaceEventMutation } from 'skiff-front-graphql';
 import { SubscriptionPlan, WorkspaceEventType } from 'skiff-graphql';
-import { TierName, bytesToHumanReadable, getMaxCustomDomains, getStorageLimitInMb, mbToBytes } from 'skiff-utils';
+import {
+  TierName,
+  bytesToHumanReadable,
+  getMaxCustomDomains,
+  getStorageLimitInMb,
+  mbToBytes,
+  FreeCustomDomainFeatureFlag
+} from 'skiff-utils';
 import styled from 'styled-components';
 
 import { DEFAULT_WORKSPACE_EVENT_VERSION } from '../../../constants';
+import { useMediaQuery } from '../../../hooks';
 import Illustration, { Illustrations } from '../../../svgs/Illustration';
 
-import { useMediaQuery } from '../../../hooks';
 import CoinbaseIframe from './CoinbaseIframe';
 import {
   BTC_ROTATION,
@@ -174,6 +182,8 @@ interface CryptoBannerProps {
 
 function CryptoBanner({ currentUserID, isUpdatingPlan, setIsUpdatingPlan, startPolling }: CryptoBannerProps) {
   const displayCryptoSymbols = useMediaQuery(`(min-width:${CRYPTO_SYMBOL_BREAKPOINT})`);
+  const flags = useFlags();
+  const freeCustomDomainFlag = flags.freeCustomDomain as FreeCustomDomainFeatureFlag;
   const [showModal, setShowModal] = useState(false);
   const [storeWorkspaceEvent] = useStoreWorkspaceEventMutation();
   const [cryptoPlanOptionDialogOpen, setCryptoPlanOptionDialogOpen] = useState(false);
@@ -209,7 +219,7 @@ function CryptoBanner({ currentUserID, isUpdatingPlan, setIsUpdatingPlan, startP
               Interested in paying with crypto?
             </Typography>
             <Typography color='secondary' forceTheme={ThemeMode.DARK} size={TypographySize.SMALL}>
-              Skiff accepts BTC, ETH, and USDC.
+              Skiff accepts BTC, ETH, USDC and many other cryptocurrencies.
             </Typography>
             <ButtonBox>
               <Button
@@ -282,7 +292,7 @@ function CryptoBanner({ currentUserID, isUpdatingPlan, setIsUpdatingPlan, startP
           <OptionContainerText>
             <Typography color='primary'>Essential (Yearly)</Typography>
             <Typography color='secondary' wrap>
-              {`${getMaxCustomDomains(TierName.Essential)} custom domain, ${bytesToHumanReadable(
+              {`${getMaxCustomDomains(TierName.Essential, freeCustomDomainFlag)} custom domain, ${bytesToHumanReadable(
                 mbToBytes(getStorageLimitInMb(TierName.Essential)),
                 0
               )} storage, extra aliases`}
@@ -303,7 +313,7 @@ function CryptoBanner({ currentUserID, isUpdatingPlan, setIsUpdatingPlan, startP
           <OptionContainerText>
             <Typography color='primary'>Pro (Yearly)</Typography>
             <Typography color='secondary' wrap>
-              {`${getMaxCustomDomains(TierName.Pro)} custom domains, ${bytesToHumanReadable(
+              {`${getMaxCustomDomains(TierName.Pro, freeCustomDomainFlag)} custom domains, ${bytesToHumanReadable(
                 mbToBytes(getStorageLimitInMb(TierName.Pro)),
                 0
               )} storage, extra aliases`}

@@ -10,12 +10,15 @@ declare global {
   }
 }
 
+// Is mobile and in a react native webview
 export const isMobileApp = () => isMobile && !!window.ReactNativeWebView;
 
 export const isReactNativeDesktopApp = () => !isMobile && !!window.ReactNativeWebView;
 export const isWindowsDesktopApp = () => !isMobile && !!window.IsSkiffWindowsDesktop;
+export const isDesktopApp = () => isWindowsDesktopApp() || isReactNativeDesktopApp();
 
-export const isMobileWebView = () => isMobile && !window.ReactNativeWebView;
+// Is mobile but not in a react native webview
+export const isMobileWebBrowser = () => isMobile && !window.ReactNativeWebView;
 
 export const sendRNWebviewMsg = (type: string, payload: Record<string, any>) => {
   if (!isMobileApp() && !isReactNativeDesktopApp()) return;
@@ -35,11 +38,16 @@ export const sendUserDataToMobileApp = (user: models.User) => {
   try {
     // User Object To Save On Native App
     const userData = {
-      privateUserData: { privateKey: user.privateUserData.privateKey },
+      privateUserData: {
+        privateKey: user.privateUserData.privateKey,
+        signingPrivateKey: user.privateUserData.signingPrivateKey,
+        documentKey: user.privateUserData.documentKey
+      },
       publicKey: user.publicKey,
       userID: user.userID,
       username: user.username,
       publicData: user.publicData,
+      signingPublicKey: user.signingPublicKey,
       version: MobileUserDataVersion.V0
     };
     sendRNWebviewMsg('userLoggedIn', userData);

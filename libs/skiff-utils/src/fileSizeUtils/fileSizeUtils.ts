@@ -78,3 +78,38 @@ export const bytesToHumanReadable = (bytes: number, decimalPlaces?: number) => {
 
   return `${bytesToTb(bytes).toFixed(decimalPlaces ?? 1)} TB`;
 };
+
+const units: { [key: string]: number } = {
+  B: 1,
+  KB: 1000,
+  MB: 1000 * 1000,
+  GB: 1000 * 1000 * 1000,
+  TB: 1000 * 1000 * 1000 * 1000
+};
+
+export const fileSizeStringToBytes = (fileSize: string) => {
+  if (!fileSize) {
+    return;
+  }
+  fileSize = fileSize.toUpperCase().replace(/\s/g, '');
+
+  const matched = fileSize.match(/^(\d+(\.\d+)?)([A-Z]+)/);
+
+  if (!matched) {
+    return;
+  }
+
+  const value = parseFloat(matched[1]);
+  const unit = matched[3];
+
+  if (!units[unit]) {
+    return;
+  }
+
+  return value * units[unit];
+};
+
+export const bigIntBytesToMb = (bytes: bigint): number => {
+  const bigIntMb = bytes / BigInt(BYTE_SCALE_FACTOR ** 2);
+  return bigIntMb <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(bigIntMb) : Number.MAX_SAFE_INTEGER;
+};

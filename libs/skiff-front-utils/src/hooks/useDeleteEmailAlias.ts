@@ -20,7 +20,7 @@ const useDeleteEmailAlias = (requestHcaptchaToken: () => Promise<string>) => {
   /** Custom hooks */
   const { enqueueToast } = useToast();
   const { userID } = useRequiredCurrentUserData();
-  const emailAliases = useCurrentUserEmailAliases();
+  const { emailAliases } = useCurrentUserEmailAliases();
   const [defaultEmailAlias] = useDefaultEmailAlias();
 
   /** Graphql */
@@ -33,7 +33,7 @@ const useDeleteEmailAlias = (requestHcaptchaToken: () => Promise<string>) => {
     emailAliasUserID?: string,
     setMemberEmailAliases?: (updatedEmailAliases: string[]) => void
   ) => {
-    const captchaToken = await requestHcaptchaToken();
+    const captchaToken = undefined;
     const errorToast = {
       title: 'Could not delete alias',
       body: 'An error occurred while deleting alias.'

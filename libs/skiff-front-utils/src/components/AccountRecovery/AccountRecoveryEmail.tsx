@@ -1,4 +1,4 @@
-import { Button, InputField, Size } from '@skiff-org/skiff-ui';
+import { Button, InputField, Size } from 'nightwatch-ui';
 import React, { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useStoreWorkspaceEventMutation } from 'skiff-front-graphql';
@@ -21,6 +21,8 @@ type AccountRecoveryEmailProps = {
   decodedJWT?: DecodedJWT;
   /** From the 'email' QueryParam */
   backupEmail?: string;
+  /** Whether next onboarding step is loading */
+  nextStepLoading?: boolean;
   /** Function that adds the new backup email
    * Returns an error message if it fails
    * Only passed if the user is still signing up
@@ -39,7 +41,8 @@ function AccountRecoveryEmail({
   decodedJWT,
   backupEmail,
   runAddEmail,
-  onNext
+  onNext,
+  nextStepLoading
 }: AccountRecoveryEmailProps) {
   // Input field error
   const [error, setError] = useState('');
@@ -124,7 +127,7 @@ function AccountRecoveryEmail({
           <Button
             dataTest='set-recovery-email-button'
             fullWidth={isSignUp}
-            loading={isSubmitting}
+            loading={isSubmitting || nextStepLoading}
             onClick={onSubmit}
             size={isMobile ? Size.LARGE : Size.MEDIUM}
           >
@@ -136,6 +139,7 @@ function AccountRecoveryEmail({
             confirmName='Ignore'
             description={`You did not set a recovery email so account recovery is more difficult if you forget your password.`}
             destructive
+            loading={nextStepLoading}
             onClose={() => setShowMissingEmailModal(false)}
             onConfirm={() => onConfirm()}
             onSecondary={() => setShowMissingEmailModal(false)}
@@ -156,7 +160,7 @@ function AccountRecoveryEmail({
           <InputField
             autoFocus
             dataTest='backup-email-input'
-            errorMsg={error}
+            error={error}
             onChange={(evt: { target: { value: string } }) => {
               setAddedEmail(evt.target.value);
               if (!!error) setError('');

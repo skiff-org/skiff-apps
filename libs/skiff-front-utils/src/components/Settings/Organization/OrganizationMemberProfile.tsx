@@ -1,8 +1,8 @@
 import { ApolloClient, ApolloError, NormalizedCacheObject } from '@apollo/client';
-import { CircularProgress, FilledVariant, Icon, IconButton, Icons } from '@skiff-org/skiff-ui';
+import { CircularProgress, FilledVariant, Icon, IconButton, Icons } from 'nightwatch-ui';
 import React, { useEffect, useState } from 'react';
 import { UserProfileDataFragment, useOrgMemberEmailAliasesQuery } from 'skiff-front-graphql';
-import { PublicData, DocumentCollaborator } from 'skiff-graphql';
+import { DocumentCollaborator, PublicData } from 'skiff-graphql';
 import { isSkiffAddress } from 'skiff-utils';
 import styled from 'styled-components';
 
@@ -29,6 +29,10 @@ const LoadingContainer = styled.span`
   display: center;
 `;
 
+const AliasInputContainer = styled.div`
+  margin-top: 24px;
+`;
+
 interface OrganizationMemberProfileProps {
   // Needed for shareDoc
   client: ApolloClient<NormalizedCacheObject>;
@@ -49,9 +53,8 @@ const OrganizationMemberProfile: React.FC<OrganizationMemberProfileProps> = ({
 
   // state hooks
   const [customDomain, setCustomDomain] = useState<string | undefined>(undefined);
-  const [didSubmit, setDidSubmit] = useState(false);
   const [newAlias, setNewAlias] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | undefined>(undefined);
   const [memberEmailAliases, setMemberEmailAliases] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -180,22 +183,22 @@ const OrganizationMemberProfile: React.FC<OrganizationMemberProfileProps> = ({
         userProfileInfoRows={tableRows}
       >
         {allowAddCustomDomainAliases && !!availableDomains.length && (
-          <NewEmailAliasInput
-            addAlias={() => void onAddAlias()}
-            customDomains={availableDomains}
-            didSubmit={didSubmit}
-            disableSkiffDomain
-            newAlias={newAlias}
-            postSubmitError={error}
-            preSubmitError={error}
-            selectedCustomDomain={customDomain}
-            setAlias={setNewAlias}
-            setCustomDomain={setCustomDomain}
-            setDidSubmit={setDidSubmit}
-            setPostSubmitError={setError}
-            setPreSubmitError={setError}
-            username={newAlias}
-          />
+          <AliasInputContainer>
+            <NewEmailAliasInput
+              addAlias={onAddAlias}
+              customDomains={availableDomains}
+              disableSkiffDomain
+              newAlias={newAlias}
+              postSubmitError={error}
+              preSubmitError={error}
+              selectedCustomDomain={customDomain}
+              setAlias={setNewAlias}
+              setCustomDomain={setCustomDomain}
+              setPostSubmitError={setError}
+              setPreSubmitError={setError}
+              username={newAlias}
+            />
+          </AliasInputContainer>
         )}
       </UserProfileView>
       {/* Captcha for deleting aliases */}

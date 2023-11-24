@@ -21,7 +21,10 @@ const languageLoaders: LanguageLoaders = {
   [CodeBlockLanguages.markdown]: () => import('@codemirror/lang-markdown').then((i) => i.markdown()),
   [CodeBlockLanguages.python]: () => import('@codemirror/lang-python').then((i) => i.python()),
   [CodeBlockLanguages.rust]: () => import('@codemirror/lang-rust').then((i) => i.rust()),
-  [CodeBlockLanguages.wast]: () => import('@codemirror/lang-wast').then((i) => i.wast())
+  [CodeBlockLanguages.wast]: () => import('@codemirror/lang-wast').then((i) => i.wast()),
+  [CodeBlockLanguages.jsx]: () => import('@codemirror/lang-javascript').then((i) => i.jsxLanguage),
+  [CodeBlockLanguages.tsx]: () => import('@codemirror/lang-javascript').then((i) => i.tsxLanguage),
+  [CodeBlockLanguages.typescript]: () => import('@codemirror/lang-javascript').then((i) => i.typescriptLanguage)
 };
 
 export const legacyLanguageLoaders: LanguageLoaders = {
@@ -37,6 +40,12 @@ export const legacyLanguageLoaders: LanguageLoaders = {
     import('@codemirror/legacy-modes/mode/brainfuck').then(({ brainfuck }) => StreamLanguage.define(brainfuck)),
   [LegacyLanguages.clike]: () =>
     import('@codemirror/legacy-modes/mode/clike').then(({ clike }) => StreamLanguage.define(clike)),
+  [LegacyLanguages.csharp]: () =>
+    import('@codemirror/legacy-modes/mode/clike').then(({ csharp }) => StreamLanguage.define(csharp)),
+  [LegacyLanguages.kotlin]: () =>
+    import('@codemirror/legacy-modes/mode/clike').then(({ kotlin }) => StreamLanguage.define(kotlin)),
+  [LegacyLanguages.objectiveC]: () =>
+    import('@codemirror/legacy-modes/mode/clike').then(({ objectiveC }) => StreamLanguage.define(objectiveC)),
   [LegacyLanguages.clojure]: () =>
     import('@codemirror/legacy-modes/mode/clojure').then(({ clojure }) => StreamLanguage.define(clojure)),
   [LegacyLanguages.cmake]: () =>

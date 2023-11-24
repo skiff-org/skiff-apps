@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
-import { colors, Icon, themeNames } from '@skiff-org/skiff-ui';
+import { colors, Icon, themeNames } from 'nightwatch-ui';
 import { DisplayPictureData, ProductApp } from 'skiff-graphql';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
+import { isMobile } from 'react-device-detect';
 import { getCurrentUserData } from '../../apollo/localState';
 import { calendarIcon, driveIcon, mailIcon, pagesIcon } from '../../assets';
 import { EditorAppRoutes, PRODUCT_APP_LABELS } from '../../constants';
@@ -10,8 +11,8 @@ import {
   CALENDAR_REDIRECT_KEY,
   getCalendarBasePath,
   MAIL_REDIRECT_KEY,
-  storeRedirectInLocalStorage,
-  storeLatestUserID
+  storeLatestUserID,
+  storeRedirectInLocalStorage
 } from '../../utils';
 import { getEditorBasePath } from '../../utils/linkToEditorUtils';
 import { getEmailBasePath } from '../../utils/linkToEmailUtils';
@@ -23,6 +24,7 @@ export interface WorkspaceOptionItem {
   label: string;
   onClick: () => void;
   active: boolean;
+  numUnread?: number;
   sublabel?: string;
   orgAvatar?: DisplayPictureData;
   userAvatar?: DisplayPictureData;
@@ -203,6 +205,18 @@ export const AppContainer = styled.div<{ $active: boolean }>`
   }
 `;
 
+export const UnreadBadge = styled.div`
+  display: flex;
+  padding: 2px 6px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  min-width: 30px;
+  box-sizing: border-box;
+  background: ${themeNames.dark['--bg-overlay-primary']};
+`;
+
 export const Badge = styled.div`
   padding: 3px 6px 4px;
   border-radius: 20px;
@@ -283,7 +297,17 @@ export const SidebarButtonContainer = styled.div<{ $macAppMargin: boolean }>`
 
 export const Sections = styled.div`
   max-height: calc(100vh - 300px);
-  overflow: auto;
+  ${isMobile &&
+  css`
+    overflow: auto;
+  `}
+  ${!isMobile &&
+  css`
+    overflow: hidden;
+    :hover {
+      overflow: auto;
+    }
+  `}
   overflow-x: hidden;
   display: flex;
   flex-direction: column;

@@ -91,6 +91,8 @@ query getSubscriptionInfo {
     subscriptionInfo {
       subscriptionPlan
       isCryptoSubscription
+      isAppleSubscription
+      isGoogleSubscription
       cancelAtPeriodEnd
       supposedEndDate
       stripeStatus
@@ -132,6 +134,42 @@ query currentUserEmailAliases {
   currentUser {
     ...UserWithEmailAliases
   }
+}
+
+query getFullAliasInfo {
+  fullAliasInfo {
+    emailAlias
+    displayName
+    encryptedAliasData
+    encryptedByKey
+    encryptedSessionKey
+    areNotificationsEnabled
+    createdAt
+    displayPictureData {
+      profileIcon
+      profileAccentColor
+      profileCustomURI
+    }
+    decryptedSessionKey @client
+    decryptedData @client {
+      note
+    }
+  }
+}
+
+query aliasDisplayInfo($emailAlias: String!) {
+  aliasDisplayInfo(emailAlias: $emailAlias) {
+    displayName
+    displayPictureData {
+      profileIcon
+      profileAccentColor
+      profileCustomURI
+    }
+  }
+}
+
+query getQuickAliasRootDomainsForUser {
+  getQuickAliasRootDomainsForUser
 }
 
 query getRecoveryPublicKeysAndData($request: GetRecoveryPublicKeysAndDataRequest!) {
@@ -181,6 +219,12 @@ query canDirectlyUpdateSrp {
 
 query browserPushNotificationsEnabled {
   browserPushNotificationsEnabled
+}
+
+query spamLists {
+  blockedUsers
+  spamUsers
+  allowedUsers
 }
 
 query currentUserSubscribedToPD {

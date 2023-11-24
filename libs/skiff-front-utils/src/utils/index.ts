@@ -1,51 +1,57 @@
 // For some reason typescript can't resolve these with the * export
+export * from './base64Utils';
+export * from './cacheUtils';
+export * from './creditUtils';
+export * from './cryptoUtils';
+export * from './dateUtils';
+export * from './defaultAliasUtils';
+export * from './documentUtils';
+export * from './domUtils';
+export * from './editorColors';
 export {
-  preSubmitAliasValidation,
-  postSubmitAliasValidation,
   ALIAS_MAXIMUM_LENGTH,
   ALIAS_MINIMUM_LENGTH,
   BANNED_CONTENT_TYPES,
   BANNED_FILE_EXTENSIONS,
   getEndAdornment,
-  isPaidTierExclusiveEmailAddress,
-  isWalletLookupSupported
+  isPaidUpExclusiveEmailAddress,
+  isQuickAlias,
+  isWalletLookupSupported,
+  postSubmitAliasValidation,
+  preSubmitAliasValidation
 } from './emailUtils';
-export * from './fileUtils';
-export * from './domUtils';
+export * from './emlUtils';
 export * from './envUtils';
-export * from './walletUtils';
-export * from './cacheUtils';
-export * from './creditUtils';
-export * from './cryptoUtils';
-export * from './documentUtils';
-export * from './mobileUtils';
-export * from './recoveryUtils';
-export * from './userUtils';
-export * from './linkToCalendarUtils';
-export * from './linkToEmailUtils';
-export * from './linkToEditorUtils';
-export * from './storageUtils';
-export * from './base64Utils';
-export * from './mobileUtils';
-export * from './mfaUtils';
-export * from './loginUtils';
-export * from './reactUtils';
+export * from './event.utils';
 export * from './feedbackUtils';
-export * from './hashUtils';
-export * from './uploadUtils';
-export * from './swipe';
-export * from './defaultAliasUtils';
+export * from './fileUtils';
 export * from './getMailDomain';
-export * from './dateUtils';
-export * from './editorColors';
+export * from './getRandomQuickAliasTag';
+export * from './globalHotKeysUtils';
+export * from './hashUtils';
+export * from './linkToCalendarUtils';
+export * from './linkToEditorUtils';
+export * from './linkToEmailUtils';
+export * from './loginUtils';
+export * from './mailFilteringUtils';
+export * from './mfaUtils';
+export * from './mobileUtils';
+export * from './notificationUtils';
 export * from './planUtils';
+export * from './reactUtils';
+export * from './recoveryUtils';
 // Note: Intentionally not exporting everything from sharingUtils
 export {
+  ShareDocWithUsersRequest,
   changeUserExpiry,
   convertLinkDataIntoURL,
   getUsersToShare,
-  shareDocWithUsers,
-  ShareDocWithUsersRequest
+  shareDocWithUsers
 } from './sharingUtils';
+export * from './storageUtils';
+export * from './stringUtils';
+export * from './swipe';
+export * from './uploadUtils';
+export * from './userUtils';
+export * from './walletUtils';
 export * from './workspaceUtils';
-export * from './notificationUtils';

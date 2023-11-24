@@ -8,7 +8,7 @@ import {
   stringDecryptAsymmetric,
   stringEncryptAsymmetric,
   verifyDetachedSignatureAsymmetric
-} from '@skiff-org/skiff-crypto';
+} from 'skiff-crypto';
 import {
   Document,
   GetPublicKeysDocument,
@@ -18,6 +18,7 @@ import {
 } from 'skiff-front-graphql';
 import {
   AdditionalContext,
+  DocToDelete,
   DocumentDecryptedContents,
   DocumentDecryptedContentsChunk,
   EncryptedChunk,
@@ -323,7 +324,7 @@ export function validatePublicKey(
 export async function fetchPublicKeysFromUserIDs(
   client: ApolloClient<NormalizedCacheObject>,
   userIDs: Array<string>,
-  verifiedKeys: Record<string, string>
+  verifiedKeys: Record<string, string> | undefined
 ) {
   if (userIDs.length === 0) {
     return [];
@@ -402,3 +403,21 @@ export function createDecryptedContents(type: NwContentType, docContent?: string
   }
   return decryptedContents;
 }
+
+/**
+ * Signs a docID to send in DeleteDocRequest.
+ * @param {DocID} docID - Doc ID to sign.
+ * @param {string} signingPrivateKey - Signing private key used to create signature.
+ * @returns {DocToDelete} Signed document ID to delete.
+ */
+export const signDocIDForDeletion = (docID: string, signingPrivateKey: string): DocToDelete => {
+  const signature = createDetachedSignatureAsymmetric(
+    docID, // data to sign is docID (with deletion context inserted)
+    signingPrivateKey,
+    SignatureContext.DeleteDoc
+  );
+  return {
+    docID,
+    signature
+  };
+};

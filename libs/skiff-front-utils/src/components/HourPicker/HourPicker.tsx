@@ -1,8 +1,10 @@
 import { Dayjs } from 'dayjs';
 import debounce from 'lodash/debounce';
-import { getThemedColor, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
+import { getThemedColor, ThemeMode, Typography, TypographySize } from 'nightwatch-ui';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
+
+import { TwelveHourPeriod } from '../../types';
 
 import { getInitialDateObject, TimeFormat } from './hourPickerUtils';
 
@@ -11,7 +13,7 @@ const TWELVE_HOUR_LIST = ['12', ...Array.from({ length: 11 }, (_, i) => String(i
 // 0 - 23
 const TWENTY_FOUR_HOUR_LIST = Array.from({ length: 24 }, (_, i) => String(i));
 
-const TIME_DIVIDERS = ['AM', 'PM'];
+const TIME_DIVIDERS = Object.keys(TwelveHourPeriod);
 
 const getMinutes = (interval = 1) =>
   Array.from({ length: 60 / interval }, (_, i) => i * interval).map((n) => String(n).padStart(2, '0'));

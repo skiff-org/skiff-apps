@@ -1,5 +1,4 @@
-import { DropdownItem, Size, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
-import { useEffect, useRef } from 'react';
+import { DropdownItem, Size, ThemeMode, Typography, TypographySize } from 'nightwatch-ui';
 import { isWalletAddress } from 'skiff-utils';
 import styled from 'styled-components';
 
@@ -24,7 +23,7 @@ interface ContactsDropdownItemProps {
 interface ContactsDropdownItemsProps {
   contactOptions: AddressObjectWithDisplayPicture[];
   onClick: (contact: AddressObjectWithDisplayPicture, label?: string) => void;
-  setHighlightedIdx: React.Dispatch<React.SetStateAction<number | undefined>>;
+  setHighlightedIdx: React.Dispatch<React.SetStateAction<number>>;
   theme?: ThemeMode;
   isOptionActive?: (contact: AddressObjectWithDisplayPicture, label: string) => boolean;
   highlightedIdx?: number;
@@ -41,19 +40,8 @@ export const ContactsDropdownItem: React.FC<ContactsDropdownItemProps> = ({
   const { name, address, displayPictureData } = contact;
   const label = name ?? address;
   const { alias, domain } = splitEmailToAliasAndDomain(address);
-  const itemRef = useRef<HTMLDivElement>(null);
   const displayEmail = isWalletAddress(alias) ? createAbbreviatedWalletEmail(alias, domain) : address;
   const displayName = name && isWalletAddress(name) ? abbreviateWalletAddress(name) : name || displayEmail;
-
-  useEffect(() => {
-    const itemElement = itemRef.current;
-    if (itemElement && highlight && !itemElement.matches(':hover')) {
-      // only on keyboard
-      itemElement.scrollIntoView({
-        block: 'nearest'
-      });
-    }
-  }, [itemRef, highlight, active]);
 
   return (
     <DropdownItem
@@ -71,12 +59,8 @@ export const ContactsDropdownItem: React.FC<ContactsDropdownItemProps> = ({
       highlight={highlight}
       key={label}
       label={label}
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick(contact, label);
-      }}
+      onClick={() => onClick(contact, label)}
       onHover={onHover}
-      ref={itemRef}
       size={Size.LARGE}
       startElement={
         <UserAvatar displayPictureData={displayPictureData} forceTheme={theme} label={label} size={Size.X_MEDIUM} />

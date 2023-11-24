@@ -1,4 +1,4 @@
-import { ThemeMode, Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
+import { ThemeMode, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
 import React, { useState } from 'react';
 import { ProductApp } from 'skiff-graphql';
 
@@ -33,7 +33,7 @@ export const AppItem = (props: AppItemProps) => {
   const unreadLabel = !!numUnread && numUnread > 99 ? '99+' : `${numUnread || ''}`;
   const offset = getBadgeOffset(unreadLabel);
 
-  const active = activeApp === app.label;
+  const active = activeApp.toLowerCase() === app.label.toLowerCase();
   const [hover, setHover] = useState(false);
   const onClick = () => {
     if (customOnClick) {

@@ -1,10 +1,12 @@
-import { Icon } from '@skiff-org/skiff-ui';
+import { Icon } from 'nightwatch-ui';
+import { MouseEvent, RefObject } from 'react';
 
-export interface FileTableAction {
+export interface ActionIcon {
   icon: Icon;
   label?: string;
-  onClick: () => void;
+  onClick: (e?: MouseEvent) => void;
   key: string;
-  tooltip?: string;
+  tooltip: string | JSX.Element;
   dataTest?: string;
+  ref?: RefObject<HTMLDivElement>;
 }

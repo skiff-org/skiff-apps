@@ -29,9 +29,8 @@ export const ANDROID_MAIL_APP_URL = 'https://play.google.com/store/apps/details?
 export const IPHONE_EDITOR_APP_URL = 'https://apps.apple.com/us/app/id1599795319';
 export const ANDROID_EDITOR_APP_URL = 'https://play.google.com/store/apps/details?id=com.skiffmobileapp&hl=en_US&gl=US';
 
-// GitHub macOS app URL
-const GITHUB_MAC_OS_APP_URL =
-  'https://github.com/skiff-org/skiff-org.github.io/raw/main/macos/Skiff%20Desktop%200.3.0.dmg';
+// macOS app URL
+const MAC_OS_APP_URL = 'https://apps.apple.com/us/app/skiff-desktop/id1615488683';
 
 // GitHub macOS app URL
 const GITHUB_WINDOWS_APP_URL = 'https://github.com/skiff-org/skiff-org.github.io/raw/main/windows/beta/SkiffSetup.msi';
@@ -40,7 +39,7 @@ export const GITHUB_APP_URL = () => {
   if (isWindows) {
     return GITHUB_WINDOWS_APP_URL;
   } else if (isMacOs) {
-    return GITHUB_MAC_OS_APP_URL;
+    return MAC_OS_APP_URL;
   } else {
     return GITHUB_WINDOWS_APP_URL;
   }
@@ -48,7 +47,6 @@ export const GITHUB_APP_URL = () => {
 
 export enum QueryParam {
   REFERRAL = 'referral',
-  UD_DOMAIN = 'ud_domain',
   SOURCE = 's',
   CONTENT = 'c',
   WALLET = 'w',
@@ -58,7 +56,9 @@ export enum QueryParam {
   DRIVE = 'drive',
   EMAIL = 'email',
   TITLE = 't',
-  DATA = 'd'
+  DATA = 'd',
+  PLAN = 'plan',
+  PLAN_INTERVAL = 'interval'
 }
 
 export enum EditorAppRoutes {
@@ -77,8 +77,9 @@ export enum EditorAppRoutes {
   EDITOR = '/file/:docID/:deepLink?',
   DRIVE_EDITOR = '/drive/file/:docID/:deepLink?',
   TRASH = '/trash',
+  EXTERNAL = '/external',
+  DRIVE_EXTERNAL = '/drive/external',
   DRIVE_TRASH = '/drive/trash',
-  DOWNLOAD = '/drive/download/:docID',
   LINK = '/docs/:docID/:deepLink?',
   DRIVE_LINK = '/drive/docs/:docID/:deepLink?',
   REQUEST = '/request',

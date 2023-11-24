@@ -1,13 +1,3 @@
-query getCollaborators($request: GetDocumentRequest!) {
-  document(request: $request) {
-    ...DocumentBasicInfo
-    ...DocumentDecryptedMetadata
-    ...DocumentCollaborators
-    ...DocumentTeam
-    ...DocumentInvites
-  }
-}
-
 query getActiveUsers($request: GetDocumentRequest!) {
   document(request: $request) {
     ...DocumentBasicInfo
@@ -62,6 +52,12 @@ query getDocumentBase($request: GetDocumentRequest!) {
 query getDocumentFull($request: GetDocumentRequest!) {
   document(request: $request) {
     ...DocumentFullInfo
+  }
+}
+
+query getNativeDocuments($request: GetDocumentsRequest!) {
+  documents(request: $request) {
+    ...DocumentNativeInfo
   }
 }
 

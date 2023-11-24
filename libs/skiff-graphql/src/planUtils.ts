@@ -11,7 +11,14 @@ export const TIER_NAME_BY_SUBSCRIPTION_PLAN: Record<SubscriptionPlan, TierName> 
   [SubscriptionPlan.Business]: TierName.Business
 };
 
-const TIER_HIERARCHY: Record<TierName, number> = {
+export const SUBSCRIPTION_PLAN_BY_TIER_NAME: Record<TierName, SubscriptionPlan> = {
+  [TierName.Free]: SubscriptionPlan.Free,
+  [TierName.Essential]: SubscriptionPlan.Essential,
+  [TierName.Pro]: SubscriptionPlan.Pro,
+  [TierName.Business]: SubscriptionPlan.Business
+};
+
+export const TIER_HIERARCHY: Record<TierName, number> = {
   [TierName.Free]: 0,
   [TierName.Essential]: 1,
   [TierName.Pro]: 2,
@@ -37,6 +44,10 @@ export const isValidSubscriptionPlan = (planName: string): planName is Subscript
 // which is ultimately dictated by what we name our products on Stripe
 export const getTierNameFromSubscriptionPlan = (subscriptionPlan: SubscriptionPlan) => {
   return TIER_NAME_BY_SUBSCRIPTION_PLAN[subscriptionPlan];
+};
+
+export const getSubscriptionPlanFromTierName = (tierName: TierName) => {
+  return SUBSCRIPTION_PLAN_BY_TIER_NAME[tierName];
 };
 
 interface GetSubscriptionIntervalRelationParams {

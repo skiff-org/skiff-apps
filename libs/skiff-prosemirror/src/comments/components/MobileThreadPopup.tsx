@@ -1,7 +1,8 @@
-import { Drawer, Icon, IconButton, useOnClickOutside } from '@skiff-org/skiff-ui';
+import { FilledVariant, Icon, IconButton, useOnClickOutside } from 'nightwatch-ui';
+import { MarkType } from 'prosemirror-model';
 import { EditorView } from 'prosemirror-view';
 import React, { useMemo, useRef } from 'react';
-import { useTheme } from 'skiff-front-utils';
+import { Drawer, useTheme } from 'skiff-front-utils';
 
 import { MARK_COMMENT } from '../../MarkNames';
 import { MENTIONS_MENU_CLASS } from '../../mentionsMenu/EditorMentionsMenu';
@@ -34,7 +35,8 @@ export const MobileThreadPopup: React.FunctionComponent<MobileThreadPopupProps> 
     [state.activeThread]
   );
 
-  const commentMarkType = view.state.schema.marks[MARK_COMMENT];
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  const commentMarkType = view.state.schema.marks[MARK_COMMENT] as MarkType;
   // Array of Unresolved Thread in the current document
   const allUnresolvedThreads = useMemo(
     () => state.comments.filter((thread) => !thread.comment.resolved),
@@ -78,20 +80,20 @@ export const MobileThreadPopup: React.FunctionComponent<MobileThreadPopupProps> 
       <div className='mobile-avoiding-keyboard' ref={wrapperRef}>
         <div style={{ display: 'flex', position: 'absolute', right: 42, top: 25 }}>
           <IconButton
-            floatRight
             icon={Icon.ChevronUp}
             disabled={currentThreadIndex <= 0}
             onClick={() => {
               scrollToThread(allUnresolvedThreads[currentThreadIndex - 1]);
             }}
+            variant={FilledVariant.UNFILLED}
           />
           <IconButton
-            floatRight
             icon={Icon.ChevronDown}
             disabled={currentThreadIndex + 1 >= allUnresolvedThreads.length}
             onClick={() => {
               scrollToThread(allUnresolvedThreads[currentThreadIndex + 1]);
             }}
+            variant={FilledVariant.UNFILLED}
           />
         </div>
 

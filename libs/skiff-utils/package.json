@@ -2,8 +2,6 @@
   "name": "skiff-utils",
   "version": "0.0.1",
   "description": "global utils function for backend and frontend",
-  "author": "Skiff World Inc.",
-  "license": "CC-BY-NC-4.0",
   "main": "./dist/cjs/index.js",
   "exports": {
     "import": "./dist/esm/index.js",
@@ -14,11 +12,12 @@
     "dist"
   ],
   "types": "dist/src/index.d.ts",
-  "packageManager": "yarn@3.5.0",
+  "packageManager": "yarn@4.0.1",
+  "private": true,
   "scripts": {
     "emit-ts": "yarn tsc --build",
     "clean": "rm -rf dist/",
-    "build": "yarn node build.js",
+    "build": "yarn protogen && yarn node build.js",
     "watch": "WATCH=1 yarn build",
     "lint": "yarn run -T eslint . --cache --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "yarn lint --fix",
@@ -29,8 +28,8 @@
   "devDependencies": {
     "@swc/jest": "0.2.15",
     "@types/jest": "^28.1.1",
-    "@types/jsonwebtoken": "^9.0.0",
     "@types/lodash": "^4",
+    "@types/node": "20.9.0",
     "@types/validator": "13.7.1",
     "esbuild": "^0.15.6",
     "esbuild-node-externals": "^1.5.0",
@@ -43,11 +42,10 @@
     "@aws-sdk/client-s3": "^3.121.0",
     "@cosmjs/encoding": "^0.28.13",
     "@keplr-wallet/cosmos": "^0.10.19",
-    "@metamask/eth-sig-util": "^4.0.1",
     "dayjs": "^1.10.7",
     "lodash": "^4.17.21",
     "long": "^5.2.0",
-    "protobufjs": "^6.11.3",
+    "protobufjs": "^7.2.4",
     "ts-proto": "^1.105.1",
     "tslib": "^2.4.0",
     "validator": "^13.7.0"

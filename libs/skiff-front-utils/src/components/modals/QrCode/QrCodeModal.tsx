@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogTypes, ThemeMode, Typography } from '@skiff-org/skiff-ui';
+import { Button, Dialog, DialogType, ThemeMode, Typography } from 'nightwatch-ui';
 import React, { Suspense } from 'react';
 import styled from 'styled-components';
 
@@ -54,7 +54,7 @@ const QrCodeModal: React.FC<QrCodeModalProps> = ({
       onClose={onClose}
       open={open}
       title={title}
-      type={DialogTypes.Promotional}
+      type={DialogType.PROMOTIONAL}
     >
       <Suspense fallback={null}>
         <QRContainer>

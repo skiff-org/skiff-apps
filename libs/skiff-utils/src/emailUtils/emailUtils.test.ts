@@ -9,15 +9,14 @@ describe('getCategorizedAliases', () => {
       'short@customdomain.town',
       '1234@notskiff.town',
       'longalias@skiff.town',
-      'longalias@customdomain.town',
-      'alias@ud.me'
+      'longalias@customdomain.town'
     ];
     const { shortGenericSkiffAliases, nonCryptoAliases, genericSkiffAliases, cryptoAliases } =
       getCategorizedAliases(aliases);
     expect(shortGenericSkiffAliases.length).toBe(2);
     expect(nonCryptoAliases.length).toBe(6);
     expect(genericSkiffAliases.length).toBe(3);
-    expect(cryptoAliases.length).toBe(1);
+    expect(cryptoAliases.length).toBe(0);
   });
   it('correctly categorizes aliases when no short Skiff aliases present', () => {
     const aliases = ['notshort@skiff.town', 'notshort@customdomain.town', 'longalias@skiff.town', 'a.eth'];

@@ -15,7 +15,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useStoreWorkspaceEventMutation } from 'skiff-front-graphql';
@@ -424,7 +424,7 @@ function AccountRecoveryInstruction({
           <InputField
             autoFocus
             dataTest='backup-email-input'
-            errorMsg={error}
+            error={error}
             onChange={(evt: { target: { value: string } }) => {
               setAddedEmail(evt.target.value);
               if (!!error) setError('');

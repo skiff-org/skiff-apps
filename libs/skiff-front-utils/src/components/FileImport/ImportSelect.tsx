@@ -1,4 +1,15 @@
-import { Button, IconProps, Icons, IconText, Size, Type, Typography, TypographySize } from '@skiff-org/skiff-ui';
+import {
+  Button,
+  FilledVariant,
+  Icon,
+  IconProps,
+  Icons,
+  IconText,
+  Size,
+  Type,
+  Typography,
+  TypographySize
+} from 'nightwatch-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
@@ -9,13 +20,12 @@ interface ImportSelectProps {
   onClick: (e?: React.MouseEvent) => void;
   iconColor?: IconProps['color'];
   color?: 'primary' | 'secondary' | 'tertiary';
-  sublabel?: string;
+  subLabel?: string;
   dataTest?: string;
   disabled?: boolean;
   compact?: boolean;
   wrap?: boolean;
   onClickLabel?: string;
-  destructive?: boolean;
 }
 
 const LargeItemContainer = styled.div`
@@ -44,60 +54,58 @@ const ImportClientIcon = styled.div`
 
 const Textbox = styled.div`
   width: 100%;
+  gap: 2px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const ImportSelect: React.FC<ImportSelectProps> = ({
   icon,
   compact,
   label,
-  sublabel,
+  subLabel,
   onClick,
   dataTest,
   color,
   disabled,
   iconColor,
   wrap = false,
-  onClickLabel,
-  destructive
+  onClickLabel
 }) => {
-  const displayIcon = !isMobile;
-
   const renderCompactButton = () => (
     <IconText
       color={color}
       disabled={disabled}
-      iconColor={iconColor}
       label={label}
       onClick={onClick}
-      startIcon={displayIcon ? icon : undefined}
+      variant={FilledVariant.FILLED}
+      startIcon={!isMobile ? <Icons color={iconColor} icon={icon} /> : undefined}
     />
   );
 
+  const renderImportButton = () => {
+    if (isMobile) return <Icons color='secondary' icon={Icon.ChevronRight} />;
+    return (
+      <Button disabled={disabled} onClick={onClick} type={Type.SECONDARY}>
+        {onClickLabel || 'Import'}
+      </Button>
+    );
+  };
+
   const renderFullButton = () => (
-    <LargeItemContainer>
-      {displayIcon && (
-        <ImportClientIcon>
-          <Icons color={iconColor} disabled={disabled} icon={icon} size={Size.X_MEDIUM} />
-        </ImportClientIcon>
-      )}
+    <LargeItemContainer data-test={dataTest} onClick={isMobile ? onClick : undefined}>
+      <ImportClientIcon>
+        <Icons color={iconColor} disabled={disabled} icon={icon} size={Size.X_MEDIUM} />
+      </ImportClientIcon>
       <Textbox>
         <Typography color={disabled ? 'disabled' : color}>{label}</Typography>
-        {sublabel && (
+        {subLabel && (
           <Typography color={disabled ? 'disabled' : 'tertiary'} size={TypographySize.SMALL} wrap={wrap}>
-            {sublabel}
+            {subLabel}
           </Typography>
         )}
       </Textbox>
-      <div>
-        <Button
-          dataTest={dataTest}
-          disabled={disabled}
-          onClick={onClick}
-          type={destructive ? Type.DESTRUCTIVE : Type.SECONDARY}
-        >
-          {onClickLabel || 'Import'}
-        </Button>
-      </div>
+      {renderImportButton()}
     </LargeItemContainer>
   );
 

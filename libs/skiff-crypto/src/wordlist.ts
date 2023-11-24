@@ -3,7 +3,7 @@
 // Taken from https://github.com/bitcoin/bips/blob/master/bip-0039/english.txt
 /**
  * WARNING: do not add or remove items to this list. Doing so will invalidate the logic for existing encodings.
- * If a word needs to be changed, replace it 'wordList', and reinsert it for lookup in the reverseWordList table.
+ * If a word needs to be changed, replace it in 'wordList', and reinsert it for lookup in the reverseWordList table.
  */
 export const wordlist = [
   'abandon',

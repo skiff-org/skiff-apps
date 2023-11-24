@@ -1,7 +1,6 @@
 import isNumber from 'lodash/isNumber';
-import { css } from 'styled-components';
-
-import { ThemeMode, getThemedColor } from '@skiff-org/skiff-ui';
+import { getThemedColor, ThemeMode } from 'nightwatch-ui';
+import styled, { css } from 'styled-components';
 
 export const DRAWER_PAPER_CSS = ({
   $forceTheme,
@@ -28,4 +27,34 @@ export const DRAWER_PAPER_CSS = ({
 export const TITLE_CSS = css`
   padding: 4px 8px 8px 8px;
   text-transform: uppercase;
+`;
+
+export const DrawerOptions = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+export const DrawerBlocksContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  gap: 8px;
+`;
+
+export const DrawerOption = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-self: flex-end;
+  width: 100%;
+  border-radius: 8px;
+  box-sizing: border-box;
+  cursor: pointer;
+
+  .dropdownItem {
+    // remove right/left padding
+    padding: 8px 0;
+  }
 `;

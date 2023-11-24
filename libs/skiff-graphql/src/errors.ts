@@ -145,6 +145,24 @@ const _WorkspaceUserLimitError = createErrorObject(
 );
 export const WorkspaceUserLimitError: typeof _WorkspaceUserLimitError = _WorkspaceUserLimitError;
 
+const _CatchallAliasLimitError = createErrorObject(
+  PaywallErrorCode.CatchallAlias,
+  'Current plan does not support catch-all aliases.'
+);
+export const CatchallAliasLimitError: typeof _CatchallAliasLimitError = _CatchallAliasLimitError;
+
+const _MailFilterLimitError = createErrorObject(
+  PaywallErrorCode.MailFilterLimit,
+  'Reached mail filter limit for tier.'
+);
+export const MailFilterLimitError: typeof _MailFilterLimitError = _MailFilterLimitError;
+
+const _AnonymousSubdomainLimitError = createErrorObject(
+  PaywallErrorCode.AnonymousSubdomain,
+  'Reached subdomain limit.'
+);
+export const AnonymousSubdomainLimitError: typeof _AnonymousSubdomainLimitError = _AnonymousSubdomainLimitError;
+
 const _InvalidEthereumAddress = createErrorObject('INVALID_ETHEREUM_ADDRESS', 'Not a valid Ethereum address');
 export const InvalidEthereumAddress: typeof _InvalidEthereumAddress = _InvalidEthereumAddress;
 
@@ -171,11 +189,14 @@ export const CustomDomainIsInAllAliasesError: typeof _CustomDomainIsInAllAliases
 const _TrashError = createErrorObject('TRASH_ERROR', 'Trash action failed');
 export const TrashError: typeof _TrashError = _TrashError;
 
-const _MailFilterLimitError = createErrorObject(
-  PaywallErrorCode.MailFilterLimit,
-  'Reached mail filter limit for tier.'
+const _ProvisionTimeExceededError = createErrorObject(
+  'PROVISION_TIME_EXCEEDED_ERROR',
+  'Credentials expired. Please ask your administrator to provision your account again.'
 );
-export const MailFilterLimitError: typeof _MailFilterLimitError = _MailFilterLimitError;
+export const ProvisionTimeExceededError: typeof _ProvisionTimeExceededError = _ProvisionTimeExceededError;
+
+const _AppStoreError = createErrorObject('APP_STORE_ERROR', 'App Store Error');
+export const AppStoreError: typeof _AppStoreError = _AppStoreError;
 
 export type LogicErrorTypes =
   | typeof DocumentContentConflict
@@ -206,7 +227,10 @@ export type LogicErrorTypes =
   | typeof UserFolderLimitError
   | typeof WorkspaceUserLimitError
   | typeof MailFilterLimitError
+  | typeof CatchallAliasLimitError
   | typeof InvalidEthereumAddress
   | typeof InvalidAliasDeletionError
   | typeof CustomDomainIsDefaultAliasError
-  | typeof CustomDomainIsInAllAliasesError;
+  | typeof CustomDomainIsInAllAliasesError
+  | typeof ProvisionTimeExceededError
+  | typeof AppStoreError;

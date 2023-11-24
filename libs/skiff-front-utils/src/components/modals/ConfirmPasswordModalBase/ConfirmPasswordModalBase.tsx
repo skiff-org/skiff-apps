@@ -2,12 +2,12 @@ import {
   ButtonGroup,
   ButtonGroupItem,
   Dialog,
-  DialogTypes,
+  DialogType,
   IconText,
   InputField,
   InputType,
   Size
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
@@ -71,9 +71,6 @@ function ConfirmPasswordModalBase(props: ConfirmPasswordModalBaseProps) {
   }, [encryptedMetamaskSecret]);
 
   const runSubmit = async () => {
-    if (isSubmitting) {
-      return;
-    }
     setIsSubmitting(true);
     await onSubmit(password, tokenMFA);
     setIsSubmitting(false);
@@ -88,7 +85,7 @@ function ConfirmPasswordModalBase(props: ConfirmPasswordModalBaseProps) {
       <InputField
         autoComplete='current-password' // https://www.chromium.org/developers/design-documents/form-styles-that-chromium-understands/
         autoFocus
-        errorMsg={errorMsg}
+        error={errorMsg}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           if (errorMsg !== '') setErrorMsg('');
           setPassword(e.target.value);
@@ -105,7 +102,7 @@ function ConfirmPasswordModalBase(props: ConfirmPasswordModalBaseProps) {
   const tokenMFAField = !showBackupCode ? (
     <InputField
       autoFocus
-      errorMsg={!!errorMsg ? errorMsg : undefined}
+      error={errorMsg}
       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
         if (errorMsg !== '') setErrorMsg('');
         setTokenMFA(e.target.value);
@@ -121,7 +118,7 @@ function ConfirmPasswordModalBase(props: ConfirmPasswordModalBaseProps) {
   ) : (
     <InputField
       autoFocus
-      errorMsg={!!errorMsg ? errorMsg : undefined}
+      error={errorMsg}
       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
         if (errorMsg !== '') setErrorMsg('');
         setTokenMFA(e.target.value);
@@ -152,7 +149,7 @@ function ConfirmPasswordModalBase(props: ConfirmPasswordModalBaseProps) {
       onClose={closeAndResetFields}
       open={open}
       title='Authentication required'
-      type={DialogTypes.Confirm}
+      type={DialogType.CONFIRM}
     >
       {showTokenMFA && (
         <IconText

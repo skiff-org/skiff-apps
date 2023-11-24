@@ -1,9 +1,9 @@
-import { Typography } from '@skiff-org/skiff-ui';
+import { Typography } from 'nightwatch-ui';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import SectionHeader from './SectionHeader';
-import { ContentSection, SidebarSectionProps, SidebarSectionType } from './Sidebar.types';
+import { SidebarSectionProps, SidebarSectionType } from './Sidebar.types';
 import { parseLSValue, getCollapsedLSKey, parseValueToLS } from './utils';
 
 const NoItemsLabel = styled.div`
@@ -64,21 +64,19 @@ const SidebarSection = (section: SidebarSectionProps) => {
     setIsOpen(newValue);
   };
 
-  const { content, canDragToSection } = section as ContentSection;
-
   return (
     <>
       <SectionHeader
-        {...content}
-        canDragToSection={canDragToSection}
+        {...section.content}
+        canDragToSection={section.canDragToSection}
         isOpen={isOpen}
         key={section.id}
         toggleOpenState={toggleCollapseState}
       />
       <SectionItems
         isOpen={isOpen}
-        items={content.items}
-        noItemsLabel={content.noItemsLabel}
+        items={section.content.items}
+        noItemsLabel={section.content.noItemsLabel}
         type={section.content.type}
       />
     </>

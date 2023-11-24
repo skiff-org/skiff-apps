@@ -1,6 +1,6 @@
 import { PermissionLevel, Document } from 'skiff-graphql';
 
-export type DocumentWithDecryptedContents = Pick<Document, 'decryptedContents'>;
+export type DocumentWithDecryptedContents = Pick<Document, 'decryptedContents' | 'decryptedMetadata'>;
 
 /**
  * Interface for a rich text document. Includes actual document data, as well as

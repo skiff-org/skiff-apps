@@ -17,3 +17,15 @@ export const sha256 = async (message: string) => {
   const hashBase64 = fromByteArray(new Uint8Array(hashBuffer)); // convert buffer to base64
   return hashBase64;
 };
+
+/**
+ * Sha256 hash used for Apollo Persisted Queries
+ */
+export async function sha256QueryHash(query: any) {
+  const encoder = new TextEncoder();
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const data = encoder.encode(query);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}

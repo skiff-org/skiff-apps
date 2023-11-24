@@ -1,5 +1,5 @@
 import * as DOMPurify from 'dompurify';
-import { Color, Icon, Icons, Size } from '@skiff-org/skiff-ui';
+import { Color, Icon, Icons, Size } from 'nightwatch-ui';
 import { NodeSpec } from 'prosemirror-model';
 import { renderToStaticMarkup } from 'react-dom/server';
 

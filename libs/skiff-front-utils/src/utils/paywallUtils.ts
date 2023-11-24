@@ -48,6 +48,12 @@ export function getPaywallDescription(
       return `${sharedLowerTierPrefix} use auto-replies.`;
     case PaywallErrorCode.MailFilterLimit: // no limit for highest tier
       return `${sharedLowerTierPrefix} add more custom mail filters.`;
+    case PaywallErrorCode.CatchallAlias: // not relevant for highest tier
+      return `${sharedLowerTierPrefix} set a catch-all alias`;
+    case PaywallErrorCode.EditAliasDisplayInfo:
+      return `${sharedLowerTierPrefix} edit your alias display info.`;
+    case PaywallErrorCode.AnonymousSubdomain:
+      return `${sharedLowerTierPrefix} add more anonymous subdomains.`;
   }
 }
 
@@ -67,15 +73,18 @@ export function getPaywallTitle(paywallErrorCode: PaywallErrorCode): string {
       return 'Custom folder limit reached';
     case PaywallErrorCode.UserLabelLimit:
       return 'Custom label limit reached';
-    case PaywallErrorCode.SecuredBySkiffSig:
-      return 'Not available on free tier';
     case PaywallErrorCode.MessageLimit:
       return 'Daily sending message limit reached';
     case PaywallErrorCode.WorkspaceUserLimit:
       return 'Collaborator limit reached';
-    case PaywallErrorCode.AutoReply:
-      return 'Not available on free tier';
     case PaywallErrorCode.MailFilterLimit:
       return 'Mail filter limit reached';
+    case PaywallErrorCode.AnonymousSubdomain:
+      return 'Anonymous subdomain limit reached';
+    case PaywallErrorCode.SecuredBySkiffSig:
+    case PaywallErrorCode.AutoReply:
+    case PaywallErrorCode.CatchallAlias:
+    case PaywallErrorCode.EditAliasDisplayInfo:
+      return 'Not available on free plan';
   }
 }

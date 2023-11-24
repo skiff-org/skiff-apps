@@ -1,4 +1,4 @@
-import { Icon, InputField, InputType } from '@skiff-org/skiff-ui';
+import { Icon, InputField, InputType } from 'nightwatch-ui';
 import React, { useRef, useState } from 'react';
 import { insertIf } from 'skiff-utils';
 import styled from 'styled-components';
@@ -94,7 +94,7 @@ export default function PasswordAndConfirmPasswordBlock(props: PasswordAndConfir
           autoComplete='new-password' // https://www.chromium.org/developers/design-documents/form-styles-that-chromium-understands/
           dataTest='second-confirm-password-input'
           endAdornment={showPasswordButton}
-          errorMsg={loginError}
+          error={loginError}
           innerRef={confirmPasswordInputRef}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             if (!!loginError) setLoginError('');

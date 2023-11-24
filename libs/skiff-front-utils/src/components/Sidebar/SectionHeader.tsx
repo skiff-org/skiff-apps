@@ -1,9 +1,9 @@
-import { Icon, Icons, IconText, IconTextProps, Size } from '@skiff-org/skiff-ui';
-import React, { useEffect, useState, useRef } from 'react';
+import { Icon, Icons, IconText, IconTextProps, Size } from 'nightwatch-ui';
+import React, { useEffect, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import styled from 'styled-components';
 
-import IconTextWithEndActions, { IconTextEndAction } from '../IconTextWithEndActions';
+import IconTextWithEndActions from '../IconTextWithEndActions';
 
 import { SidebarHeaderProps, SidebarSectionType } from './Sidebar.types';
 
@@ -55,16 +55,15 @@ const SectionHeaderContainer = ({
   acceptedDragType: string;
   children?: React.ReactNode;
 }) => {
-  // TODO: Fix and revert this
-  // This is causing `missing drag and drop context` errors
-  // const [{ isOver }, drop] = useDrop(() => ({
-  //   accept: acceptedDragType,
-  //   collect: (monitor) => ({
-  //     isOver: !!monitor.isOver()
-  //   })
-  // }));
-  const isOver = false;
-  const drop = useRef();
+  const [{ isOver }, drop] = useDrop(
+    () => ({
+      accept: acceptedDragType,
+      collect: (monitor) => ({
+        isOver: !!monitor.isOver()
+      })
+    }),
+    [acceptedDragType]
+  );
 
   useEffect(() => {
     if (isOver) {
@@ -96,7 +95,7 @@ const SectionHeader = ({
   };
 
   const getEndActions = () => {
-    const actions: IconTextEndAction[] = [];
+    const actions = [];
     if (!!titleButton) {
       actions.push({
         icon: <Icons color='secondary' icon={Icon.Plus} />,

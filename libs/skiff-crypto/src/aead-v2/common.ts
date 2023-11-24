@@ -17,9 +17,9 @@
 // and located in `secretbox.ts`.
 
 import { Range } from 'semver';
+import { utf8BytesToString, utf8StringToBytes } from 'skiff-utils';
 
 import { concatUint8Arrays, extractVarintPrefixed, varintPrefixed } from '../aead/typedArraysUtils';
-import { utf8BytesToString, utf8StringToBytes } from 'src/utf8';
 
 interface Typed {
   type: string;
@@ -46,7 +46,7 @@ interface EncryptDatagram<Header, Body> {
   encrypt(datagram: DatagramV2<Header, Body>, header: Header, data: Body): TypedBytesV2;
 }
 
-interface DecryptDatagram<Header, Body> {
+interface decryptDatagramV2<Header, Body> {
   decrypt(
     datagram: DatagramV2<Header, Body>,
     bytes: TypedBytesV2
@@ -58,7 +58,7 @@ interface DecryptDatagram<Header, Body> {
 }
 
 // Envelope is the minimum set of functions needed to encrypt and decrypt a bytestream.
-export type EnvelopeV2<Header, Body> = EncryptDatagram<Header, Body> & DecryptDatagram<Header, Body>;
+export type EnvelopeV2<Header, Body> = EncryptDatagram<Header, Body> & decryptDatagramV2<Header, Body>;
 
 /**
  * AADMeta is a class that encapsulates the additional metadata included in these envelope implementations.

@@ -1,11 +1,14 @@
 import { Bech32Address } from '@keplr-wallet/cosmos/build/bech32';
+import { Keplr } from '@keplr-wallet/types/build/wallet/keplr';
 import { MetaMaskInpageProvider } from '@metamask/providers';
-import { Icon } from '@skiff-org/skiff-ui';
-import { isENSName, isJunoAddress, isICNSName, isSolanaAddress } from 'skiff-utils';
-import isEmail from 'validator/lib/isEmail';
+import { Icon } from 'nightwatch-ui';
+import { isENSName, isICNSName, isJunoAddress, isSolanaAddress } from 'skiff-utils';
 import isEthereumAddress from 'validator/lib/isEthereumAddress';
 
-import { CosmosProvider, EthProvider, SolanaProvider, WalletProvider } from './walletUtils.constants';
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
+import { CreateWalletChallengeSkemailDocument, CreateWalletChallengeSkemailMutation, CreateWalletChallengeSkemailMutationVariables } from 'skiff-front-graphql';
+import { getAndSignChallenge } from './metamaskUtils';
+import { COSMOS_CHAIN_ID, CosmosProvider, EthProvider, SolanaProvider, WalletProvider } from './walletUtils.constants';
 
 /**
  * Create a full email
@@ -53,6 +56,85 @@ export function isCosmosHubAddress(emailAlias: string | undefined): boolean {
     return false;
   }
 }
+
+/**
+ * Gets a token to sign to verify address.
+ * @param {string} walletAddress - Address to verify.
+ * @returns {string} Token to sign.
+ */
+export async function getSkemailChallengeToken(walletAddress: string, client: ApolloClient<NormalizedCacheObject>) {
+  const response = await client.mutate<
+    CreateWalletChallengeSkemailMutation,
+    CreateWalletChallengeSkemailMutationVariables
+  >({
+    mutation: CreateWalletChallengeSkemailDocument,
+    variables: {
+      request: {
+        walletAddress: walletAddress
+      }
+    }
+  });
+  const token = response.data?.createWalletChallengeSkemail.token;
+  return token;
+}
+
+
+/**
+ * Connect an Ethereum wallet and get the challenge signature
+ * @param provider the Ethereum provider to connect to
+ * @returns the challenge and challenge signature
+ */
+export const connectEthWallet = async (provider: any, client: ApolloClient<NormalizedCacheObject>) => {
+  // connect wallet
+  const userAddr = await getEthAddr(provider);
+  if (!userAddr) {
+    throw new Error('Could not get eth address');
+  }
+  const { token, signedToken } = await getAndSignChallenge(userAddr, client, provider);
+  if (!token || !signedToken) {
+    throw new Error('Could not get challenge');
+  }
+  return { challenge: token, challengeSignature: signedToken };
+};
+
+
+/**
+ * Connect an Solana wallet and get the challenge signature
+ * @param provider the Solana provider to connect to
+ * @returns the challenge and challenge signature
+ */
+export const connectSolWallet = async (provider: any, client: ApolloClient<NormalizedCacheObject>) => {
+  // connect to wallet
+  const response = await provider.connect();
+  const publicKey: string = response.publicKey.toString();
+  // get challenge
+  const challenge = await getSkemailChallengeToken(publicKey, client);
+  if (!challenge) {
+    throw new Error('Could not get challenge');
+  }
+  const encodedMessage = new TextEncoder().encode(challenge);
+  // sign challenge
+  const signatureData = await provider.signMessage(encodedMessage, 'utf8');
+  const { base58 } = await import('ethers/lib/utils');
+  return { challenge, challengeSignature: base58.encode(signatureData.signature) };
+};
+
+export const connectCosmosWallet = async (provider: Keplr, client: ApolloClient<NormalizedCacheObject>) => {
+  const { bech32Address: userAddr } = await provider.getKey(COSMOS_CHAIN_ID);
+  if (!userAddr) {
+    throw new Error('Could not get cosmos address');
+  }
+  const token = await getSkemailChallengeToken(userAddr, client);
+  if (!token) {
+    throw new Error('Could not get challenge');
+  }
+  const { signature } = await provider.signArbitrary(COSMOS_CHAIN_ID, userAddr, token);
+  if (!token || !signature) {
+    throw new Error('Could not get challenge');
+  }
+  return { challenge: token, challengeSignature: signature };
+};
+
 
 /**
  * Returns the wallet icon associated with the wallet alias
@@ -113,11 +195,6 @@ export async function decryptSecretWithWallet(
   }
   return decryptedData;
 }
-
-/** Allows alphanumeric + hyphens and underscores */
-export const checkUdToken = (udToken: string) => /^[a-zA-Z0-9\-_\.]+$/g.test(udToken);
-
-export const checkUdUsername = (username: string) => isEmail(`${username}@ud.me`);
 
 /**
  * Abbreviates a wallet address to the first five chars and last four chars, ie. 0xdDD...ab3D
@@ -248,7 +325,11 @@ export const activateEthProvider = (providerName: EthProvider): MetaMaskInpagePr
   const { ethereum } = window as any;
   const provider = getEthProvider(providerName);
   if (provider && provider !== ethereum) {
-    ethereum.setSelectedProvider(provider);
+    if (ethereum) {
+      ethereum.setSelectedProvider(provider);
+    } else {
+      console.error('Error in activeEthProvider: window.ethereum is not defined');
+    }
   }
   return provider as MetaMaskInpageProvider;
 };

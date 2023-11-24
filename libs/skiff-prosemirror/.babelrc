@@ -1,0 +1,18 @@
+{
+  "presets": [
+    "@babel/env",
+    "@babel/preset-typescript",
+    "@babel/preset-react"
+  ],
+  "plugins": [
+    "@babel/proposal-class-properties",
+    "@babel/plugin-transform-classes",
+    "transform-export-extensions",
+    ["@babel/plugin-transform-runtime", {
+      "helpers": true,
+      "corejs": 3,
+      "regenerator": true
+    }],
+    "@babel/plugin-proposal-object-rest-spread"
+  ]
+}

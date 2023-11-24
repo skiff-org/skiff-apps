@@ -1,3 +1,10 @@
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
+import {
+  CanDirectlyUpdateSrpDocument,
+  CanDirectlyUpdateSrpQuery,
+  CanDirectlyUpdateSrpQueryVariables
+} from 'skiff-front-graphql';
+
 export type DecodedJWT = {
   exp: number;
   aud: string;
@@ -41,4 +48,12 @@ export function generateRandomPassword() {
     return characterPool[randomPosition];
   });
   return passwordBytes.join('');
+}
+
+export async function canDirectlyUpdateSrp(client: ApolloClient<NormalizedCacheObject>): Promise<boolean> {
+  const res = await client.query<CanDirectlyUpdateSrpQuery, CanDirectlyUpdateSrpQueryVariables>({
+    query: CanDirectlyUpdateSrpDocument,
+    fetchPolicy: 'network-only'
+  });
+  return !!res.data?.currentUser?.canDirectlyUpdateSrp;
 }

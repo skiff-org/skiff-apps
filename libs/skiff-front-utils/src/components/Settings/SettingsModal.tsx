@@ -1,7 +1,7 @@
 import {
   Alignment,
   Dialog,
-  DialogTypes,
+  DialogType,
   Divider,
   IconText,
   Size,
@@ -10,7 +10,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { DisplayPictureData, useUserProfile } from 'skiff-front-graphql';
 import { upperCaseFirstLetter } from 'skiff-utils';
@@ -22,6 +22,7 @@ import { getDisplayPictureDataFromUser } from '../../utils';
 import { Sidebar, SidebarSectionProps } from '../Sidebar';
 import { UserAvatar } from '../UserAvatar';
 
+import { isMobile } from 'react-device-detect';
 import {
   DEFAULT_WEB_SETTING_INDICES,
   Setting,
@@ -44,7 +45,7 @@ const SidebarView = styled.div`
   overflow: hidden;
 `;
 
-const View = styled.div`
+const View = styled.div<{ $noPadding?: boolean; $noOverflow?: boolean }>`
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -52,11 +53,37 @@ const View = styled.div`
   box-sizing: border-box;
   width: 100%;
   gap: 16px;
-  padding: 28px;
+  padding: ${(props) => (props.$noPadding ? '0px' : '28px')};
   flex: 1;
   align-self: flex-start;
-  overflow-y: auto;
+
   overflow-x: hidden;
+
+  ${(props) =>
+    !isMobile &&
+    !props?.$noOverflow &&
+    css`
+      overflow-y: scroll;
+      ::-webkit-scrollbar-thumb {
+        background: transparent;
+      }
+      :hover::-webkit-scrollbar-thumb {
+        background: var(--border-primary);
+        border-radius: 20px;
+        border: 3px solid transparent;
+        background-clip: content-box;
+      }
+    `}
+  ${(props) =>
+    !isMobile &&
+    !!props?.$noOverflow &&
+    css`
+      overflow: hidden;
+    `}
+  ${isMobile &&
+  css`
+    overflow-y: auto;
+  `}
 `;
 
 const SidebarLabel = styled.div<{ active?: boolean }>`
@@ -82,7 +109,17 @@ const LabelList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2px;
-  overflow: auto;
+  ${isMobile &&
+  css`
+    overflow: auto;
+  `}
+  ${!isMobile &&
+  css`
+    overflow: hidden;
+    :hover {
+      overflow: auto;
+    }
+  `}
 `;
 
 const TitleBlock = styled.div`
@@ -144,7 +181,9 @@ const EXCLUDE_TITLE: Array<TabPage | undefined> = [
   TabPage.Contacts,
   TabPage.CustomDomains,
   TabPage.Org,
-  TabPage.Filters
+  TabPage.Filters,
+  TabPage.QuickAliases,
+  TabPage.Addresses
 ];
 
 const SettingView: FC<SettingViewProps> = ({ setting, index }) => {
@@ -189,6 +228,8 @@ const SettingView: FC<SettingViewProps> = ({ setting, index }) => {
       );
   }
 };
+
+const NO_PADDING_PAGES: Array<TabPage> = [TabPage.Contacts, TabPage.QuickAliases, TabPage.Addresses];
 
 export interface SettingsModalProps {
   sections: Record<string, SettingsTab[]>;
@@ -313,18 +354,12 @@ export const SettingsModal = ({ sections, open, onClose, onChangeIndices, initia
     }
   ];
 
+  const noPadding = NO_PADDING_PAGES.includes(activeTab.tab as TabPage);
   return (
-    <Dialog
-      customContent
-      dataTest='settings-modal'
-      onClose={onClose}
-      open={open}
-      padding={false}
-      type={DialogTypes.Settings}
-    >
+    <Dialog customContent dataTest='settings-modal' noPadding onClose={onClose} open={open} type={DialogType.SETTINGS}>
       <SidebarView>
         <Sidebar sections={fileTree} width={240} />
-        <View>
+        <View $noPadding={noPadding} $noOverflow={noPadding}>
           {!EXCLUDE_TITLE.includes(activeTab.tab) && activeTab.tab !== TabPage.Empty && !!activeTab.tab && (
             <Typography align={Alignment.LEFT} size={TypographySize.H4} weight={TypographyWeight.BOLD}>
               {upperCaseFirstLetter(SETTINGS_TABS_LABELS[activeTab.tab])}

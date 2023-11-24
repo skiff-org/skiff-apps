@@ -22,12 +22,14 @@ import {
 } from '../MarkNames';
 import {
   BLOCKQUOTE,
+  BOOKMARK,
   BULLET_LIST,
   CODE_BLOCK,
   DOC_DESCRIPTION,
   DOC_HEADER_HR,
   DOC_ICON,
   DOC_TITLE,
+  FILE_EMBED,
   HARD_BREAK,
   HEADING,
   HORIZONTAL_RULE,
@@ -41,7 +43,10 @@ import {
   TABLE,
   TEXT,
   TODO_LIST,
-  TOGGLE_LIST
+  TOGGLE_ITEM_CONTENT,
+  TOGGLE_ITEM_TITLE,
+  TOGGLE_LIST,
+  TOGGLE_LIST_ITEM
 } from '../NodeNames';
 
 import {
@@ -50,8 +55,7 @@ import {
   renderHeaderRow,
   renderMention,
   renderOrderedList,
-  renderTodoList,
-  renderToggleList
+  renderTodoList
 } from './utils';
 
 /**
@@ -61,6 +65,7 @@ export const mdSerializer = new MarkdownSerializer(
   {
     [BLOCKQUOTE]: (state, node) => {
       state.wrapBlock('> ', undefined, node, () => state.renderContent(node));
+      state.ensureNewLine();
     },
     [CODE_BLOCK]: (state, node) => {
       // Count the number of consecutive backticks in the code block and then create a string of that many backticks + 1
@@ -98,6 +103,23 @@ export const mdSerializer = new MarkdownSerializer(
       state.renderInline(node);
       state.closeBlock(node);
     },
+    [BOOKMARK]: (state, node) => {
+      const id = node.attrs.id;
+      const visible = node.attrs.visible;
+
+      if (id) {
+        if (visible) {
+          // If visible, render it as a link with the anchor as its href.
+          state.write(`[Bookmark](#${id})`);
+        } else {
+          // If not visible, just render the anchor.
+          // rendering it as a markdown link without a label, which
+          // doesn't produce visible output but does mark the location.
+          state.write(`[](#${id})`);
+        }
+      }
+    },
+    [FILE_EMBED]: () => {},
     [HORIZONTAL_RULE]: (state, node) => {
       state.write(node.attrs.markup || '---');
       state.closeBlock(node);
@@ -112,7 +134,28 @@ export const mdSerializer = new MarkdownSerializer(
       renderTodoList(state, node);
     },
     [TOGGLE_LIST]: (state, node) => {
-      renderToggleList(state, node);
+      // For TOGGLE_LIST, simply iterate over its children.
+      // Each child will be rendered as its own details/summary pair.
+      node.forEach((child) => {
+        state.render(child);
+      });
+    },
+    [TOGGLE_ITEM_TITLE]: (state, node) => {
+      // Begin the details tag and then render the summary.
+      state.write('<details>\n');
+      state.write(`<summary>${node.textContent}</summary>\n`);
+    },
+    [TOGGLE_ITEM_CONTENT]: (state, node) => {
+      state.renderContent(node);
+    },
+    [TOGGLE_LIST_ITEM]: (state, node) => {
+      // Assuming TOGGLE_LIST_ITEM comprises of a title and content.
+      // This will be covered by the other renderers.
+      // After rendering its content, we'll close the details.
+      node.forEach((child) => {
+        state.render(child);
+      });
+      state.write('</details>\n');
     },
     [LIST_ITEM]: (state, node) => {
       state.renderContent(node);
@@ -149,9 +192,7 @@ export const mdSerializer = new MarkdownSerializer(
       state.write(`#${node.textContent || 'Untitled Document'}\n`);
     },
     // TODO: find way to render icons in md
-    [DOC_ICON]: (state, node) => {
-      //state.write(node.attrs.icon || '{}');
-    },
+    [DOC_ICON]: () => {},
     [DOC_DESCRIPTION]: (state, node) => {
       state.write(`${node.textContent || ''}\n`);
     },
@@ -173,7 +214,13 @@ export const mdSerializer = new MarkdownSerializer(
     [SUBPAGE]: (state, node) => {
       // theres no way to get the page title, also, only shared users will be able to use this link.
       const { host, protocol } = window.location;
-      state.write(`[subpage-${node.attrs.docID}](${protocol}${host}/file/${node.attrs.docID})`);
+      state.write(
+        `[subpage-${(node.attrs.docID as string | undefined) ?? ''}](${protocol}${host}/file/${
+          (node.attrs.docID as string | undefined) ?? ''
+        })\n`
+      );
+      state.write('\n');
+      state.ensureNewLine();
     }
   },
   {

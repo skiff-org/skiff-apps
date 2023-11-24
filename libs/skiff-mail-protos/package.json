@@ -12,19 +12,20 @@
     "dist"
   ],
   "types": "dist/src/index.d.ts",
-  "packageManager": "yarn@3.5.0",
+  "packageManager": "yarn@4.0.1",
+  "private": true,
   "scripts": {
-    "emit-ts": "tsc --emitDeclarationOnly",
+    "emit-ts": "yarn tsc --build",
     "clean": "rm -rf dist/",
-    "build": "yarn node build.js",
+    "build": "yarn protogen && yarn node build.js",
     "watch": "WATCH=1 yarn build",
     "lint": "yarn run -T eslint . --cache --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "yarn lint --fix",
-    "protogen": "protoc --ts_proto_opt=esModuleInterop=true --experimental_allow_proto3_optional --proto_path=../../protos/ --ts_proto_out generated/protos com/skiff/skemail/encrypted/encrypted_data.proto com/skiff/skemail/filters/filters.proto"
+    "protogen": "protoc --ts_proto_opt=esModuleInterop=true --experimental_allow_proto3_optional --proto_path=../../protos/ --ts_proto_out generated/protos com/skiff/skemail/encrypted/encrypted_data.proto com/skiff/skemail/filters/filters.proto com/skiff/editor/encrypted/encrypted_data.proto"
   },
   "devDependencies": {
     "@types/jest": "^28.1.1",
-    "@types/node": "^18.7.18",
+    "@types/node": "20.9.0",
     "esbuild": "^0.14.39",
     "esbuild-jest": "^0.5.0",
     "esbuild-node-externals": "^1.5.0",
@@ -34,10 +35,11 @@
   },
   "dependencies": {
     "@apollo/client": "^3.3.20",
-    "graphql": "16.5.0",
+    "graphql": "16.8.1",
     "long": "^5.2.0",
-    "protobufjs": "^6.11.3",
+    "protobufjs": "^7.2.4",
     "skiff-graphql": "workspace:libs/skiff-graphql",
-    "ts-proto": "^1.105.1"
+    "ts-proto": "^1.105.1",
+    "tslib": "^2.4.0"
   }
 }

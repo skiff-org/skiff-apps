@@ -58,6 +58,7 @@ enum AccountRecovery {
 enum ActionType {
   APPLY_LABEL
   APPLY_SYSTEM_LABEL
+  DONT_NOTIFY
   MARK_AS_READ
 }
 
@@ -102,8 +103,23 @@ type AdjustBusinessPlanResponse {
   status: RequestStatus!
 }
 
+type AliasDisplayInfo {
+  displayName: String
+  displayPictureData: DisplayPictureDataSkemail
+  emailAlias: String!
+}
+
 type AliasesOnDomainResponse {
   domainAliases: [DomainAliasData!]!
+}
+
+type AnonymousSubdomain {
+  domain: String!
+  domainID: String!
+}
+
+type AppStoreTestNotificationResponse {
+  testNotificationToken: String
 }
 
 enum AscDesc {
@@ -140,6 +156,11 @@ enum AttendeeStatus {
   YES
 }
 
+enum AuthAction {
+  AutoForward
+  Import
+}
+
 type AutoImportStatus {
   subscribed: Boolean!
 }
@@ -167,6 +188,64 @@ enum BottomDrawerModes {
   CLOSED
   FEEDBACK
   UPLOADS
+}
+
+input BulkActionJobStatusRequest {
+  bulkActionVariant: BulkActionVariant!
+  jobID: String!
+}
+
+type BulkActionJobStatusResponse {
+  completed: Boolean!
+  jobStatus: BullMqJobStatus!
+}
+
+enum BulkActionVariant {
+  MODIFY_LABELS
+  PERMANENTLY_DELETE
+}
+
+type BulkDeleteTrashedThreadsResponse {
+  jobID: String!
+}
+
+type BulkModifyLabelsJobStatusResponse {
+  completed: Boolean!
+  jobStatus: BullMqJobStatus!
+}
+
+input BulkModifyLabelsRequest {
+  systemLabels: [SystemLabels!]
+  targetLabel: String!
+  userLabels: [String!]
+}
+
+type BulkModifyLabelsResponse {
+  jobID: String!
+}
+
+type BulkSilenceSuggestions {
+  silenceSenderDomains: [SilencedDomainAggregation!]!
+  silenceSenderIndividuals: [SilenceSenderBulkSuggestion!]!
+}
+
+input BulkTrashRequest {
+  sender: String!
+}
+
+type BulkTrashResponse {
+  jobID: String!
+}
+
+enum BullMqJobStatus {
+  ACTIVE
+  COMPLETED
+  DELAYED
+  FAILED
+  PRIORITIZED
+  UNKNOWN
+  WAITING
+  WAITING_CHILDREN
 }
 
 enum CacheControlScope {
@@ -198,6 +277,7 @@ type CalendarEvent {
   parentRecurrenceID: String
   recurrenceDate: Date
   recurrenceRule: RecurrenceRule
+  reminders: [EventReminder!]
   sequence: Int!
   startDate: Date!
   updatedAt: Date!
@@ -228,8 +308,14 @@ input CalendarEventData2 {
   parentRecurrenceID: String
   recurrenceDate: Date
   recurrenceRule: RecurrenceRuleInput
+  reminders: [EventReminderInput!]
   sequence: Int!
   startDate: Date!
+}
+
+enum CalendarView {
+  MONTHLY
+  WEEKLY
 }
 
 input ChangeLinkPermissionRequest {
@@ -243,6 +329,11 @@ type ChangeLinkPermissionResponse {
 
 type CheckIfDomainsAvailableResponse {
   domains: [Domain!]
+}
+
+type CheckTestNotificationResponse {
+  sendAttempts: [SendAttemptItem]
+  signedPayload: String
 }
 
 type CheckoutSession {
@@ -265,10 +356,41 @@ type ConfirmCacheUploadResponse {
 }
 
 type Contact {
+  contactID: String!
+  decryptedData: DecryptedContactData
+  decryptedSessionKey: String
   displayPictureData: DisplayPictureDataSkemail
-  emailAddress: String!
+  emailAddress: String
+  encryptedByKey: String
+  encryptedContactData: String
+  encryptedSessionKey: String
   firstName: String
   lastName: String
+  pgpKey: ContactPGPKey
+}
+
+type ContactPGPKey {
+  publicKey: String!
+  trustLevel: PGPTrustLevel
+}
+
+input ContactPGPKeyRequest {
+  publicKey: String!
+  trustLevel: PGPTrustLevel
+}
+
+input CreateAnonymousSubdomainAliasRequest {
+  anonymousSubdomain: String!
+  displayEmailAliasLocalPart: String!
+}
+
+type CreateAnonymousSubdomainAliasResponse {
+  emailAliases: [String!]!
+}
+
+input CreateAnonymousSubdomainInput {
+  rootDomain: String!
+  subDomain: String!
 }
 
 type CreateBillingPortalSessionOutput {
@@ -312,6 +434,12 @@ type CreateEmailAliasResponse {
   emailAliases: [String!]!
 }
 
+input CreateImportSessionRequest {
+  client: ImportClients!
+  code: String!
+  state: String!
+}
+
 input CreateMailFilterInput {
   actions: [FilterActionInput!]!
   encryptedByKey: String!
@@ -320,11 +448,21 @@ input CreateMailFilterInput {
   name: String
 }
 
+"""
+Note: Either contactID or emailAddress MUST be provided.
+contactID for new version. emailAddress for old version.
+empty string for contactID is acceptable and represents create contact on new version.
+"""
 input CreateOrUpdateContactRequest {
+  contactID: String
   displayPictureData: UpdateDisplayPictureSkemailRequest
-  emailAddress: String!
+  emailAddress: String
+  encryptedByKey: String
+  encryptedContactData: String
+  encryptedSessionKey: String
   firstName: String
   lastName: String
+  pgpKey: ContactPGPKeyRequest
 }
 
 input CreateOrUpdateDraftRequest {
@@ -345,7 +483,6 @@ input CreateSrpMetamaskRequest {
   signingPublicKey: String!
   userAttributionData: UserAttributionInput!
   verifier: String!
-  walletAddress: String!
 }
 
 input CreateSrpRequest {
@@ -382,17 +519,15 @@ input CreateTeamRequest {
   rootDocument: NewDocRequest!
 }
 
-input CreateUdAliasRequest {
-  udToken: String!
-}
-
 type CreateUploadAvatarLinkResponse {
   profileCustomURI: String!
   writeUrl: String!
 }
 
+"""Either contactID or contactEmail must be provided, but not both."""
 input CreateUploadContactAvatarLinkRequest {
-  contactEmail: String!
+  contactEmail: String
+  contactID: String
 }
 
 input CreateUserLabelRequest {
@@ -508,9 +643,24 @@ enum DateFormat {
   YYYY_MM_DD
 }
 
+type DecryptedAliasData {
+  note: String
+}
+
 type DecryptedAttachment {
   attachmentID: String!
   decryptedMetadata: AttachmentMetadata
+}
+
+type DecryptedContactData {
+  decryptedAddresses: [ValueLabel!]
+  decryptedBirthday: String
+  decryptedCompany: String
+  decryptedJobTitle: String
+  decryptedNickname: String
+  decryptedNotes: String
+  decryptedPhoneNumbers: [ValueLabel!]
+  decryptedURL: String
 }
 
 type DefaultDisplayPictureData {
@@ -527,11 +677,16 @@ type DeleteAccountResponse {
 }
 
 input DeleteContactRequest {
-  emailAddress: String!
+  contactID: String
+  emailAddress: String
+}
+
+input DeleteContactsRequest {
+  contactIDs: [String!]!
 }
 
 input DeleteCustomDomainAliasRequest {
-  captchaToken: String!
+  captchaToken: String
   emailAlias: String!
   userID: String
 }
@@ -648,6 +803,7 @@ input DocToDelete {
 }
 
 type Document {
+  cloneDocID: String
   collaborators: [DocumentCollaborator!]!
   contents: EncryptedContentsOutput!
   createdAt: Date
@@ -657,6 +813,7 @@ type Document {
   decryptedMetadata: DocumentDecryptedMetadata!
   decryptedPrivateHierarchicalKey: String
   decryptedSessionKey: String!
+  decryptedThumbnail: String
   docID: String!
   documentType: NwContentType!
   hasChildren: Boolean!
@@ -677,6 +834,7 @@ type Document {
   publicOrgData: [PublicOrgData]
   snapshots: [DocumentSnapshot!]!
   team: Team
+  thumbnail: String
   trashedAt: String
   updatedAt: Date
 }
@@ -782,6 +940,8 @@ type DowngradeProgress {
   currentStorageInMb: Int!
   customDomains: Int!
   emailAliases: Int!
+  quickAliasSubdomains: Int!
+  quickAliases: Int!
   shortAliases: Int!
   userFolders: Int!
   userLabels: Int!
@@ -794,6 +954,14 @@ type Draft {
   encryptedDraft: String!
   encryptedKey: String!
   updatedAt: Date
+}
+
+input DuplicateDocDeepRequest {
+  docID: String!
+}
+
+type DuplicateDocDeepResponse {
+  docID: String!
 }
 
 input EditOrganizationRequest {
@@ -841,6 +1009,9 @@ type Email {
   encryptedTextSnippet: EncryptedDataOutput
   from: AddressObject!
   id: String!
+  notificationsTurnedOffForSender: Boolean!
+  pgpID: String
+  pgpKeyIDs: [String!]
   replyTo: AddressObject
   scheduleSendAt: Date
   threadID: String
@@ -864,6 +1035,35 @@ type EmailAutoForwardingSettings {
   outlook: EmailAutoForwardingClientSettings!
 }
 
+input EmailImportCustomDateRange {
+  end: Date!
+  start: Date!
+}
+
+input EmailImportDateRange {
+  clientTimeZone: String!
+  customDateRange: EmailImportCustomDateRange
+  rangeType: EmailImportDateRangeType!
+}
+
+enum EmailImportDateRangeType {
+  ALL
+  CUSTOM
+  LAST_1_MONTH
+  LAST_3_MONTHS
+  LAST_12_MONTHS
+}
+
+type EmailImportMeta {
+  estimatedEmailCount: Int!
+}
+
+input EmailImportMetaRequest {
+  client: ImportClients!
+  dateRange: EmailImportDateRange!
+  importID: String!
+}
+
 type EmailsWithUnreadICSResponse {
   emails: [Email!]!
   hasMore: Boolean!
@@ -872,6 +1072,22 @@ type EmailsWithUnreadICSResponse {
 input EnableEmailAutoForwardingRequest {
   client: EmailAutoForwardingClient!
   code: String!
+  state: String!
+}
+
+input EnableGmailImportRequest {
+  dateRange: EmailImportDateRange!
+  importID: String!
+  includeGmailLabelIDs: [ID!]
+  subscribeToAutoImport: Boolean!
+}
+
+input EnableOutlookImportRequest {
+  dateRange: EmailImportDateRange!
+  importID: String!
+  includeOutlookCategoryIDs: [ID!]!
+  includeOutlookFolderIDs: [ID!]!
+  subscribeToAutoImport: Boolean!
 }
 
 input EncryptedAttachmentInput {
@@ -962,6 +1178,35 @@ input EventAroundDateInput {
   date: Date!
 }
 
+type EventReminder {
+  reminderID: String!
+  timeForAllDay: String
+  timeUnit: EventReminderTimeUnit!
+  timeValue: Int!
+  type: EventReminderType!
+}
+
+input EventReminderInput {
+  reminderID: String!
+  timeForAllDay: String
+  timeUnit: EventReminderTimeUnit!
+  timeValue: Int!
+  type: EventReminderType!
+}
+
+enum EventReminderTimeUnit {
+  DAY
+  HOUR
+  MINUTE
+  WEEK
+}
+
+enum EventReminderType {
+  ALL
+  EMAIL
+  NOTIFICATION
+}
+
 enum EventType {
   ACTIVE_STATUS
   DELETE_DOCUMENT
@@ -980,6 +1225,7 @@ enum EventUpdateType {
   Content
   Preferences
   RSVP
+  Reminders
 }
 
 input EventsInput {
@@ -988,6 +1234,42 @@ input EventsInput {
 }
 
 scalar ExternalAttendeeType
+
+interface ExternalEmailClientLabel {
+  labelID: ID!
+  labelName: String!
+}
+
+type ExternalEmailClientSystemLabel implements ExternalEmailClientLabel {
+  labelID: ID!
+  labelName: String!
+
+  """The corresponding Skiff system label (if one exists)."""
+  skiffSystemLabel: SystemLabels
+}
+
+type ExternalEmailClientUserLabel implements ExternalEmailClientLabel {
+  labelID: ID!
+  labelName: String!
+
+  """
+  The corresponding Skiff user label (if this label corresponds to one of the
+  user's existing labels in Skiff).
+  """
+  skiffUserLabel: UserLabel
+}
+
+enum FeedbackCategoryEnum {
+  BILLING
+  BUG
+  QUESTION
+  REQUEST
+}
+
+enum FileTableDisplayFormat {
+  GRID
+  LIST
+}
 
 input FilesystemNode {
   docID: String!
@@ -1018,6 +1300,31 @@ enum FilterType {
   RECIPIENT
   SUBJECT
   TO
+}
+
+type FilteredThreadIDs {
+  numThreadIDsRemoved: Int!
+  threadIDs: [String!]!
+}
+
+input FilteredThreadIDsRequest {
+  systemLabels: [SystemLabels!]
+  threadIDs: [String!]!
+  userLabelIDs: [String!]
+}
+
+type FullAliasInfo {
+  areNotificationsEnabled: Boolean
+  createdAt: Date!
+  decryptedData: DecryptedAliasData
+  decryptedSessionKey: String
+  displayName: String
+  displayPictureData: DisplayPictureDataSkemail
+  emailAlias: String!
+  encryptedAliasData: String
+  encryptedByKey: String
+  encryptedSessionKey: String
+  isDisabled: Boolean
 }
 
 input GenerateCustomDomainRecordsRequest {
@@ -1064,6 +1371,14 @@ type GenerateWebAuthnRegistrationResponse {
 
 input GetAliasValidRequest {
   alias: String!
+}
+
+type GetAppleSubscriptionPlansResult {
+  plans: [SubscriptionPlanWithSKU!]!
+}
+
+input GetAppleTestNotificationStatusInput {
+  testNotificationToken: String!
 }
 
 input GetBillingPortalSessionRequest {
@@ -1129,6 +1444,10 @@ type GetDomainSuggestionsResponse {
   domains: [String!]
 }
 
+type GetGoogleSubscriptionPlansResult {
+  plans: [GoogleSubscriptionPlanWithSKU!]!
+}
+
 input GetMailFiltersInput {
   clientside: Boolean
 }
@@ -1140,6 +1459,10 @@ input GetMboxImportUrlRequest {
 type GetMboxImportUrlResponse {
   fileID: String!
   uploadData: String!
+}
+
+type GetOrCreateStripeCustomerResponse {
+  stripeCustomerID: String!
 }
 
 input GetRecoveryPublicKeysAndDataRequest {
@@ -1174,6 +1497,21 @@ input GetValidPaperShareHashRequest {
   username: String!
 }
 
+type GmailInboxOrganization {
+  labels: [ExternalEmailClientLabel!]!
+}
+
+input GmailInboxOrganizationRequest {
+  importID: String!
+}
+
+type GoogleSubscriptionPlanWithSKU {
+  skuAnnualOfferId: String!
+  skuMonthlyOfferId: String!
+  skuName: String!
+  tierName: String!
+}
+
 input GrantCreditsRequest {
   creditAmount: CreditAmountInput!
   creditTransactionReason: CreditTransactionReason!
@@ -1196,6 +1534,7 @@ type HierarchicalPermissionChainLink {
 
 enum ImportClients {
   Gmail
+  Mbox
   Outlook
 }
 
@@ -1206,11 +1545,31 @@ input ImportEmlEmailRequest {
 
 input ImportGmailRequest {
   code: String!
+  state: String!
   subscribeToAutoImport: Boolean
 }
 
 input ImportMboxRequest {
   fileID: String!
+}
+
+type ImportSession {
+  importID: String!
+}
+
+enum ImportStatus {
+  COMPLETED
+  FAILED
+  IN_PROGRESS
+  SILENCING_SUGGESTIONS_GENERATED
+  SILENCING_SUGGESTIONS_QUERYING
+  SILENCING_SUGGESTIONS_QUERY_FAILED
+}
+
+type ImportStatusType {
+  importID: String!
+  importedEmailCount: Int
+  status: ImportStatus!
 }
 
 type IndexableDocument {
@@ -1259,6 +1618,11 @@ type InvoiceHistory {
 }
 
 scalar JSON
+
+type LabelUnreadCount {
+  count: Int!
+  label: String!
+}
 
 type LastUpdateKeyMap {
   deleted: Date
@@ -1414,8 +1778,10 @@ input MailboxRequest {
   platformInfo: PlatformInfo
   polling: Boolean
   refetching: Boolean
+  updatedAtField: UpdatedAtField
   updatedAtOrderDirection: AscDesc
-  useUpdatedAtField: Boolean
+  useUpdatedAtField: Boolean @deprecated(reason: "Use updatedAtField instead")
+  userLabels: [String!]
 }
 
 input ManageOrganizationPaymentDetailsRequest {
@@ -1429,6 +1795,18 @@ type ManageOrganizationPaymentDetailsResponse {
 input MarkEmailAsReadICSRequest {
   emailIDs: [String!]!
   reason: String
+}
+
+input MarkNotSpamMultipleEmailAddressesRequest {
+  emailAddressesToMarkNotSpam: [String!]!
+}
+
+input MarkSpamMultipleEmailAddressesRequest {
+  emailAddressesToMarkSpam: [String!]!
+}
+
+input MarkThreadAsOpenedInput {
+  threadID: String!
 }
 
 input MarkThreadsAsClientsideFilteredInput {
@@ -1461,19 +1839,28 @@ type MoveDocResponse {
 }
 
 type Mutation {
+  ValidateAppStoreSubscriptionRequest(request: ValidateAppStoreSubscriptionRequest!): Boolean!
   acceptInviteStep1(request: AcceptInviteStep1Request!): AcceptInviteStep1Response!
   addEmail(request: AddEmailRequest!): AddEmailResponse!
   addPendingInvite(request: AddPendingInviteRequest!): AddPendingInviteResponse!
   adjustBusinessPlan(request: AdjustBusinessPlanRequest!): AdjustBusinessPlanResponse!
   applyLabels(request: ModifyLabelsRequest): ModifyLabelsResponse
   blockEmailAddress(request: BlockEmailAddressRequest): Void
+  bulkApplyLabels(request: BulkModifyLabelsRequest): BulkModifyLabelsResponse
+  bulkDeleteTrashedThreads: BulkDeleteTrashedThreadsResponse
+  bulkRemoveLabels(request: BulkModifyLabelsRequest): BulkModifyLabelsResponse
+  bulkTrash(request: BulkTrashRequest!): BulkTrashResponse
   changeLinkPermission(request: ChangeLinkPermissionRequest!): ChangeLinkPermissionResponse!
+  clearPendingStorageWarning: Void
   clearSessionCache: ClearSessionCacheResponse!
   confirmCacheUpload(request: ConfirmCacheUploadRequest!): ConfirmCacheUploadResponse!
+  createAnonymousSubdomain(request: CreateAnonymousSubdomainInput!): Void
+  createAnonymousSubdomainAlias(request: CreateAnonymousSubdomainAliasRequest): CreateAnonymousSubdomainAliasResponse
   createCacheElement(request: CreateCacheElementRequest!): CreateCacheElementResponse!
   createCalendarUser(request: CreateCalendarUserRequest!): Void
   createCustomDomainAlias(request: CreateCustomDomainAliasRequest): CreateCustomDomainAliasResponse
   createEmailAlias(request: CreateEmailAliasRequest): CreateEmailAliasResponse
+  createImportSession(request: CreateImportSessionRequest!): ImportSession!
   createMailFilter(input: CreateMailFilterInput!): Void
   createOrUpdateContact(request: CreateOrUpdateContactRequest!): Void
   createOrUpdateDraft(request: CreateOrUpdateDraftRequest!): Void
@@ -1481,15 +1868,17 @@ type Mutation {
   createSrp(request: CreateSrpRequest!): CreateSrpResponse!
   createSrpMetamask(request: CreateSrpMetamaskRequest!): CreateSrpResponse!
   createTeam(request: CreateTeamRequest!): Team!
-  createUdAlias(request: CreateUdAliasRequest): CreateEmailAliasResponse
+  createUploadAliasAvatarLink(emailAlias: String!): CreateUploadAvatarLinkResponse!
   createUploadAvatarLink: CreateUploadAvatarLinkResponse!
   createUploadContactAvatarLink(request: CreateUploadContactAvatarLinkRequest!): CreateUploadAvatarLinkResponse!
   createUserLabel(request: CreateUserLabelRequest): UserLabel
   createWalletChallenge(request: CreateWalletChallengeRequest!): CreateWalletChallengeResponse!
   createWalletChallengeSkemail(request: CreateWalletChallengeRequestSkemail!): CreateWalletChallengeResponseSkemail!
   deleteAccount(request: DeleteAccountRequest!): DeleteAccountResponse!
+  deleteAnonymousSubdomain(userDomainID: String!): Void
   deleteAutoReply: Void
   deleteContact(request: DeleteContactRequest!): Void
+  deleteContacts(request: DeleteContactsRequest!): Void
   deleteCustomDomain(request: DeleteCustomDomainRequest!): Void
   deleteCustomDomainAlias(request: DeleteCustomDomainAliasRequest): Void
   deleteDoc(request: DeleteDocRequest!): DeleteDocResponse!
@@ -1507,10 +1896,13 @@ type Mutation {
   deleteUserSignature: Void
   disableEmailAutoForwarding(request: DisableEmailAutoForwardingRequest!): Void
   disableMfa(request: DisableMfaRequest!): DisableMfaResponse!
+  duplicateDocDeep(request: DuplicateDocDeepRequest!): DuplicateDocDeepResponse!
   editOrganization(request: EditOrganizationRequest!): EditOrganizationResponse!
   editTeam(request: EditTeamRequest!): Team!
   editUserLabel(request: EditUserLabelRequest): UserLabel
   enableEmailAutoForwarding(request: EnableEmailAutoForwardingRequest!): Void
+  enableGmailImport(request: EnableGmailImportRequest!): Void
+  enableOutlookImport(request: EnableOutlookImportRequest!): Void
   enrollMfa(request: EnrollMfaRequest!): EnrollMfaResponse!
   generateCustomDomainRecords(request: GenerateCustomDomainRecordsRequest!): GenerateCustomDomainRecordsResponse!
   generateDocPublicLinkAuthTokenStep1(request: GenerateDocPublicLinkAuthTokenStep1Request!): GenerateDocPublicLinkAuthTokenStep1Response!
@@ -1522,14 +1914,18 @@ type Mutation {
   importEmlEmail(importRequest: ImportEmlEmailRequest!): Void
   importGmailEmails(request: ImportGmailRequest!): Void
   importMboxEmails(importMboxRequest: ImportMboxRequest!): Void
-  importOutlookEmails(code: String!): Void
+  importOutlookEmails(code: String!, state: String!): Void
   loginSrp(request: LoginSrpRequest!): LoginSrpResponse!
   manageOrganizationPaymentDetails(request: ManageOrganizationPaymentDetailsRequest!): ManageOrganizationPaymentDetailsResponse!
   markCurrentUserOnboardedWorkspaceMigration: Void
   markEmailAsReadICS(request: MarkEmailAsReadICSRequest!): Void
+  markNotSpamMultipleEmailAddresses(request: MarkNotSpamMultipleEmailAddressesRequest): Void
+  markSpamMultipleEmailAddresses(request: MarkSpamMultipleEmailAddressesRequest): Void
+  markThreadAsOpened(request: MarkThreadAsOpenedInput!): Void
   markThreadsAsClientsideFiltered(input: MarkThreadsAsClientsideFilteredInput!): Void
   moveDoc(request: MoveDocRequest!): MoveDocResponse!
   moveMultipleDoc(request: [MoveDocRequest!]!): [MoveDocResponse!]!
+  muteNotificationForSender(request: MuteNotificationForSenderRequest!): Void
   newMultipleDocs(request: [NewDocRequest!]!): [NewDocResponse!]!
   notificationClicked(request: NotificationClickedRequest!): Boolean
   provisionSrp(request: ProvisionSrpRequest!): Boolean!
@@ -1537,13 +1933,17 @@ type Mutation {
   referUser(request: ReferUserRequest!): ReferUserResponse!
   regenerateMfaBackupCodes(request: RegenerateMfaBackupCodesRequest!): RegenerateMfaBackupCodesResponse!
   removeLabels(request: ModifyLabelsRequest): ModifyLabelsResponse
+  renameWebAuthnDevice(request: RenameWebAuthnDeviceRequest!): Void
   replyToMessage(message: ReplyToEmailRequest): ReplyToEmailResponse
   resetAccount(request: ResetAccountRequest!): Boolean
   restoreTrashDoc(request: TrashDocRequest!): MoveDocResponse!
   saveContents(request: SaveContentsRequest!): SaveContentsResponse!
   saveCustomDomainRecords(request: SaveCustomDomainRequest!): Void
   saveMetadata(request: SaveMetadataRequest!): SaveMetadataResponse!
+  saveThumbnail(request: SaveThumbnailRequest!): SaveThumbnailResponse!
+  scheduleSkemailer(request: ScheduleSkemailerRequest!): ScheduleSkemailerResponse!
   sendAccessRequestEmail(request: SendAccessRequestEmailRequest!): Boolean!
+  sendAnonymousSubdomainTutorialEmail(email: String!): Void
   sendDocumentEvent(request: SendDocumentEventRequest!): Boolean
   sendFeedback(request: SendFeedbackRequest!): Boolean!
   sendMessage(message: SendEmailRequest): SendEmailResponse
@@ -1556,6 +1956,7 @@ type Mutation {
   setLastViewedReferralCredit(request: SetLastViewedReferralCreditRequest!): Boolean!
   setNotificationPreferences(request: SetNotificationPreferencesRequest!): Boolean
   setPDSubscribeFlag(request: SetPDSubscribeFlagRequest): Void
+  setPGPKey(request: SetPGPKey!): Void
   setPushToken(request: SetPushTokenRequest): Void
   setReadStatus(request: SetReadStatusRequest): SetReadStatusResponse
   setUseIPFS(request: SetUseIPFSRequest!): SetUseIPFSResponse!
@@ -1566,6 +1967,7 @@ type Mutation {
   setupProvisionedUser(request: SetupProvisionedUserRequest!): LoginSrpResponse!
   shareDoc(request: ShareDocRequest!): ShareDocResponse!
   shareTeamDocWithOtherTeam(request: ShareTeamDocWithOtherTeamRequest!): Team!
+  silenceMultipleEmailAddresses(request: SilenceMultipleEmailAddressesRequest): Void
   storeUnauthenticatedWorkspaceEvent(request: WorkspaceEventRequest!): Boolean!
   storeWorkspaceEvent(request: WorkspaceEventRequest!): Boolean!
   subscribeNotification(request: SubscribeNotificationRequest): Void
@@ -1573,18 +1975,24 @@ type Mutation {
   sync2(request: SyncRequest2!): SyncResponse
   trashDocs(request: [TrashDocRequest!]!): [MoveDocResponse!]!
   unblockEmailAddress(request: UnblockEmailAddressRequest): Void
+  unmuteNotificationForSender(request: UnmuteNotificationForSenderRequest!): Void
   unsendMessage(message: UnsendEmailRequest): Email
   unsetCalendarPushToken(request: UnsetCalendarPushTokenRequest!): Void
   unsetPushToken(request: UnsetPushTokenRequest): Void
   unshareDoc(request: UnshareDocRequest!): UnshareDocResponse!
   unshareTeamDocWithOtherTeam(request: UnshareTeamDocWithOtherTeamRequest!): Team!
+  unsilenceMultipleEmailAddresses(request: UnsilenceMultipleEmailAddressesRequest): Void
   unsubscribeFromGmailImport: Void
   unsubscribeNotification: Void
   updateDisplayName(request: UpdateDisplayNameRequest!): UpdateDisplayNameResponse!
   updateDisplayPicture(request: UpdateDisplayPictureRequest!): User!
   updateDocumentData(request: UpdateDocumentDataRequest!): UpdateDocumentDataResponse!
   updateEmailAliasActiveState(request: UpdateEmailAliasActiveStateRequest): UpdateEmailAliasActiveStateResponse
+  updateEmailAliasProfile(request: UpdateEmailAliasProfileRequest): Boolean!
+  updateEmailAliasSendReceiveEnabledState(request: UpdateEmailAliasEnabledStateRequest!): Void
   updateMailFilter(input: UpdateMailFilterInput!): Void
+  updateQuickAliasActiveState(request: UpdateQuickAliasActiveStateRequest): UpdateQuickAliasActiveStateResponse
+  updateQuickAliasInfo(request: UpdateQuickAliasInfoInput!): Void
   updateSrp(request: UpdateSrpRequest!): UpdateSrpResponse!
   updateUploadContactAvatarLink(request: UpdateUploadContactAvatarLinkRequest!): UpdateUploadContactAvatarLinkResponse!
   upgradeHierarchicalKeys(request: UpgradeHierarchicalKeysRequest!): UpgradeHierarchicalKeysResponse!
@@ -1594,6 +2002,14 @@ type Mutation {
   verifyCustomDomain(domainID: String!): Void
   verifyWalletAddressCreateAlias(request: VerifyWalletAddressCreateAliasRequest!): CreateEmailAliasResponse!
   verifyWebAuthnRegistration(request: VerifyWebAuthnRegistrationRequest!): VerifyWebAuthnRegistrationResponse!
+}
+
+input MuteNotificationForSenderRequest {
+  emailAddresses: [String!]!
+}
+
+type NativeDriveManifestResponse {
+  slimDocuments: [SlimDocument!]!
 }
 
 type NativeMailbox {
@@ -1666,6 +2082,40 @@ type Organization {
   teams: [Team!]!
 }
 
+type OutlookInboxOrganization {
+  categories: [ExternalEmailClientUserLabel!]!
+  folders: [ExternalEmailClientLabel!]!
+}
+
+input OutlookInboxOrganizationRequest {
+  importID: String!
+}
+
+type PGPInfo {
+  createdAt: Date!
+  emailAlias: String!
+  encryptedPrivateKey: EncryptedDataOutput!
+  encryptedSessionKey: EncryptedSessionKeyOutput!
+  encryptionFingerprint: String!
+  encryptionKeyID: String!
+  publicKey: String!
+  signingFingerprint: String!
+  signingKeyID: String!
+  status: PGPKeyStatus!
+}
+
+enum PGPKeyStatus {
+  DISABLED
+  ENABLED
+}
+
+enum PGPTrustLevel {
+  FULLY_TRUST
+  MARGINAL_TRUST
+  NO_TRUST
+  UNKNOWN
+}
+
 type PaidUpStatus {
   downgradeProgress: DowngradeProgress!
   paidUp: Boolean!
@@ -1700,6 +2150,11 @@ type PendingDocumentKeyUpgradesOutput {
 
 input PendingDocumentKeyUpgradesRequest {
   rootDocumentId: String!
+}
+
+type PendingStorageWarning {
+  allowanceMbAtWarningTrigger: Int!
+  usageMbAtWarningTrigger: Int!
 }
 
 type PendingUserInvite {
@@ -1814,15 +2269,20 @@ input PushCalendarEventInput2 {
 }
 
 type Query {
+  aliasDisplayInfo(emailAlias: String!): AliasDisplayInfo
   aliasValid(request: GetAliasValidRequest!): Boolean!
   allContacts: [Contact!]!
   allDrafts: [Draft!]!
   allFolderDocuments: [Document!]!
+  allowedUsers: [String!]!
   apiVersion: String
   attachments(ids: [String]): [Attachment]
   autoReply: AutoReplyOutput
   billingPortal(request: GetBillingPortalSessionRequest): CreateBillingPortalSessionOutput
+  blockedUsers: [String!]!
   browserPushNotificationsEnabled: Boolean!
+  bulkActionJobStatus(request: BulkActionJobStatusRequest!): BulkModifyLabelsJobStatusResponse!
+  bulkModifyLabelsJobStatus(jobID: String!): BulkModifyLabelsJobStatusResponse!
   calendar(calendarID: String!): Calendar!
   checkIfDomainsAvailable(domains: [String!]!): CheckIfDomainsAvailableResponse!
   checkoutPortal(request: GetCheckoutSessionRequest!): CheckoutSession!
@@ -1831,17 +2291,26 @@ type Query {
   currentUser: User
   currentUserAlterEgos: [UserAlterEgo!]!
   customDomainCheckoutPortal(request: GetCustomDomainCheckoutSessionRequest!): CheckoutSession!
-  customDomains: [String!]!
   decryptionServicePublicKey: PublicKey
   defaultProfilePicture(request: GetDefaultProfilePictureRequest!): DefaultDisplayPictureData
   document(request: GetDocumentRequest!): Document!
   documents(request: GetDocumentsRequest!): [Document!]!
   emailAutoForwardingSettings: EmailAutoForwardingSettings!
+
+  """
+  Resolves metadata related to importing a user's emails from an external email client.
+  """
+  emailImportMeta(request: EmailImportMetaRequest!): EmailImportMeta!
   emailsWithUnreadICS: [Email!]! @deprecated(reason: "Added pagination, use emailsWithUnreadICS2 instead")
   emailsWithUnreadICS2: EmailsWithUnreadICSResponse!
   events(request: EventsInput!): [CalendarEvent!]!
   eventsAroundDate(request: EventAroundDateInput!): [CalendarEvent!]!
+  filteredThreadIDs(request: FilteredThreadIDsRequest!): FilteredThreadIDs!
+  fullAliasInfo: [FullAliasInfo!]!
   getAliasesOnDomain(domainID: String!): AliasesOnDomainResponse!
+  getAppleSubscriptionPlans: GetAppleSubscriptionPlansResult!
+  getAppleTestNotificationStatus(request: GetAppleTestNotificationStatusInput!): CheckTestNotificationResponse!
+  getAvailableAnonymousDomains: [String!]!
   getBonfidaNames(solanaAddress: String!): [String!]!
   getCoinbaseCheckoutID(request: GetCoinbaseCheckoutIDRequest!): GetCoinbaseCheckoutIDResponse!
   getCurrentUserCustomDomains: GetCurrentUserCustomDomainsResponse!
@@ -1849,31 +2318,51 @@ type Query {
   getDomainSuggestions(domain: String!, limit: Int): GetDomainSuggestionsResponse!
   getENSName(ethereumAddress: String!): String
   getGmailAutoImportStatus: AutoImportStatus!
-  getGoogleAuthURL: String!
+  getGoogleAuthURL(action: AuthAction): String!
+  getGoogleSubscriptionPlans: GetGoogleSubscriptionPlansResult!
   getICNSName(cosmosAddress: String!): String
-  getOutlookAuthUrl: String!
+  getOrCreateStripeCustomer: GetOrCreateStripeCustomerResponse!
+  getOutlookAuthUrl(action: AuthAction): String!
+  getQuickAliasRootDomainsForUser: [String!]!
   getStargazeName(cosmosAddress: String!): String
+
+  """Info about how a user's Gmail inbox is organized"""
+  gmailInboxOrganization(request: GmailInboxOrganizationRequest!): GmailInboxOrganization!
+  importStatus: [ImportStatusType!]!
   isBlocked(senderAddress: String): Boolean!
   isCustomDomain(domains: [String!]!): Boolean!
   isHolderOfNFT(nftContractAddress: String!, userAddress: String!): Boolean!
   lastViewedReferralCredit: LastViewedReferralCreditResponse!
   mailFilters(request: GetMailFiltersInput): [MailFilter!]!
   mailbox(request: MailboxRequest!): Mailbox
+  nativeDriveManifest: NativeDriveManifestResponse!
   nativeMailbox(request: NativeMailboxRequest!): NativeMailbox
+  numMailboxThreads(label: String!): Int!
   orgMemberDefaultEmailAlias(userID: String!): String
   orgMemberEmailAliases(userID: String!): [String!]!
   organization(id: String!): Organization!
+
+  """Info about how a user's Outlook inbox is organized"""
+  outlookInboxOrganization(request: OutlookInboxOrganizationRequest!): OutlookInboxOrganization!
   pendingDocumentKeyUpgrades(request: PendingDocumentKeyUpgradesRequest!): PendingDocumentKeyUpgradesOutput!
+  pgpInfo(allKeys: Boolean, emailAlias: String): [PGPInfo]!
   recoveryPublicKeysAndData(request: GetRecoveryPublicKeysAndDataRequest!): RecoveryPublicKeysAndDataOutput
+  refreshToken: Void
+  requestAppStoreTestNotification: AppStoreTestNotificationResponse
   searchIndexProgress(request: GetSearchIndexProgressRequest!): SearchIndexProgress!
   searchIndexableDocuments: [IndexableDocument!]!
   sessionCache: SessionCacheOutput!
   sessionCacheChallenge(req: SessionCacheInput!): SessionCacheChallengeResponse!
   sessionCacheMobile(req: SessionCacheMobileRequest!): Void
+  silenceSenderSuggestions: BulkSilenceSuggestions!
+  silencedSenders: BulkSilenceSuggestions!
+  skemailerStatus(skemailerID: String!): SkemailerStatusResponse
+  spamUsers: [String!]!
   status: String
   team(id: String!): Team!
   templates(request: GetTemplatesRequest!): [Template!]!
   unread(label: String!): Int!
+  unreadAllLabels(labels: [String!]!): [LabelUnreadCount!]!
   user(request: GetUserRequest!): User
   userCalendar(calendarID: String!): UserCalendar!
   userLabels: [UserLabel!]!
@@ -1885,6 +2374,13 @@ type Query {
   usersFromEmailAlias(emailAliases: [String!]!): [User]!
   usersFromEmailAliasWithCatchall(emailAliases: [String!]!): [User]!
   validPaperShareHash(request: GetValidPaperShareHashRequest!): Boolean!
+  validateAnonymousSubdomain(request: CreateAnonymousSubdomainInput!): Boolean!
+  validateOriginalTransactionIdMatchesUser(request: ValidateOriginalTransactionIdMatchesUserInput!): Boolean!
+}
+
+type QuickAlias {
+  alias: String!
+  isSendingAndReceivingEnabled: Boolean!
 }
 
 type RecoveryPublicKeysAndDataOutput {
@@ -1958,6 +2454,11 @@ type RegenerateMfaBackupCodesResponse {
   status: RequestStatus!
 }
 
+input RenameWebAuthnDeviceRequest {
+  credentialID: String!
+  newName: String!
+}
+
 type RenewalDetails {
   price: Float
 }
@@ -1975,6 +2476,7 @@ input ReplyToEmailRequest {
   encryptedTextSnippet: EncryptedDataInput
   externalEncryptedSessionKey: EncryptedSessionKeyInput
   from: SendAddressRequest!
+  isPGP: Boolean
   rawSubject: String!
   replyID: String!
   scheduleSendAt: Date
@@ -2038,6 +2540,30 @@ type SaveMetadataResponse {
   document: Document!
 }
 
+input SaveThumbnailRequest {
+  docID: String!
+  thumbnail: String
+}
+
+type SaveThumbnailResponse {
+  document: Document!
+}
+
+input ScheduleSkemailerRequest {
+  fromEmail: String!
+  fromName: String!
+  htmlContentFileId: String!
+  scheduleAt: String!
+  subject: String!
+  targetAudience: TargetAudience!
+  textContentFileId: String!
+}
+
+type ScheduleSkemailerResponse {
+  skemailerID: String!
+  status: String!
+}
+
 type SearchIndexProgress {
   isIndexComplete: Boolean!
   numIndexableThreads: Int!
@@ -2052,6 +2578,25 @@ input SendAddressRequest {
   address: String!
   encryptedSessionKey: EncryptedSessionKeyInput
   name: String
+}
+
+type SendAttemptItem {
+  attemptDate: Date
+  sendAttemptResult: SendAttemptResult
+}
+
+enum SendAttemptResult {
+  CIRCULAR_REDIRECT
+  INVALID_RESPONSE
+  NO_RESPONSE
+  OTHER
+  PREMATURE_CLOSE
+  SOCKET_ISSUE
+  SUCCESS
+  TIMED_OUT
+  TLS_ISSUE
+  UNSUCCESSFUL_HTTP_RESPONSE_CODE
+  UNSUPPORTED_CHARSET
 }
 
 input SendDocumentEventRequest {
@@ -2074,6 +2619,7 @@ input SendEmailRequest {
   encryptedTextSnippet: EncryptedDataInput
   externalEncryptedSessionKey: EncryptedSessionKeyInput
   from: SendAddressRequest!
+  isPGP: Boolean
   rawSubject: String!
   scheduleSendAt: Date
   to: [SendAddressRequest!]!
@@ -2086,9 +2632,12 @@ type SendEmailResponse {
 
 input SendFeedbackRequest {
   feedback: String!
+  feedbackPlatformString: String
   isMobile: Boolean!
   isNative: Boolean!
+  isUrgent: Boolean
   origin: String!
+  requestType: FeedbackCategoryEnum
   zendeskUploadTokens: [String!]!
 }
 
@@ -2155,6 +2704,16 @@ input SetPDSubscribeFlagRequest {
   subscribed: Boolean!
 }
 
+input SetPGPKey {
+  disablePreviousKey: Boolean
+  emailAlias: String!
+  encryptedPrivateKey: EncryptedDataInput!
+  encryptionFingerprint: String!
+  publicKey: String!
+  sessionKey: EncryptedSessionKeyInput!
+  signingFingerprint: String!
+}
+
 input SetPushTokenRequest {
   deviceID: String!
   os: String!
@@ -2179,9 +2738,14 @@ type SetUseIPFSResponse {
 }
 
 input SetUserPreferencesRequest {
+  advanceToNext: Boolean
+  autoAdvance: Boolean
   blockRemoteContent: Boolean
   dateFormat: String
   defaultCalendarColor: String
+  defaultCalendarView: CalendarView
+  defaultCalendarViewMobile: CalendarView
+  fileTableFormat: FileTableDisplayFormat
   hideActivationChecklist: Boolean
   hourFormat: String
   leftSwipeGesture: SwipeSetting
@@ -2190,6 +2754,7 @@ input SetUserPreferencesRequest {
   showAliasInboxes: Boolean
   showPageIcon: Boolean
   startDayOfTheWeek: Int
+  tableOfContents: TableOfContentsSetting
   theme: String
   threadFormat: ThreadDisplayFormat
 }
@@ -2279,9 +2844,40 @@ enum SignatureContext {
   USER_PUBLIC_KEY
 }
 
+input SilenceMultipleEmailAddressesRequest {
+  emailAddressesToSilence: [String!]!
+}
+
+type SilenceSenderBulkSuggestion {
+  messageCount: Int!
+  sender: String!
+  totalBytes: Int
+}
+
+type SilencedDomainAggregation {
+  domain: String!
+  senders: [SilenceSenderBulkSuggestion!]!
+}
+
 type SingleRetrievedRecord {
   data: String!
   priority: String
+}
+
+type SkemailerStatusResponse {
+  checkpoint: String!
+  sendCount: Int!
+  skemailerID: String!
+  status: String!
+  updatedAt: String
+}
+
+type SlimDocument {
+  currentUserPermissionLevel: PermissionLevel!
+  docID: String!
+  parentID: String
+  trashedAt: String
+  updatedAt: String!
 }
 
 type SlimUserThread {
@@ -2310,7 +2906,9 @@ input SubscribeNotificationRequest {
 type SubscriptionInfo {
   billingInterval: SubscriptionInterval
   cancelAtPeriodEnd: Boolean!
+  isAppleSubscription: Boolean!
   isCryptoSubscription: Boolean!
+  isGoogleSubscription: Boolean!
   quantity: Int
   stripeStatus: String
   subscriptionPlan: String!
@@ -2327,6 +2925,12 @@ enum SubscriptionPlan {
   ESSENTIAL
   FREE
   PRO
+}
+
+type SubscriptionPlanWithSKU {
+  monthly: String
+  tierName: String!
+  yearly: String
 }
 
 enum SwipeSetting {
@@ -2363,11 +2967,23 @@ enum SystemLabels {
   DRAFTS
   IMPORTS
   INBOX
+  QUICK_ALIASES
   SCHEDULE_SEND
   SENT
   SPAM
   TRASH
   VIRUS
+}
+
+enum TableOfContentsSetting {
+  DISABLED
+  ENABLED
+  SHOW_ICON
+}
+
+enum TargetAudience {
+  EXTERNAL
+  INTERNAL
 }
 
 type Team {
@@ -2408,6 +3024,7 @@ type TemplateMetaData {
 }
 
 type ThreadAttributes {
+  clientsideFiltersApplied: Boolean
   read: Boolean!
   systemLabels: [String!]!
   userLabels: [UserLabel!]!
@@ -2430,6 +3047,10 @@ input TrashDocRequest {
 
 input UnblockEmailAddressRequest {
   emailAddressToUnblock: String
+}
+
+input UnmuteNotificationForSenderRequest {
+  emailAddresses: [String!]!
 }
 
 input UnsendEmailRequest {
@@ -2464,6 +3085,10 @@ input UnshareTeamDocWithOtherTeamRequest {
   targetTeamRootDocumentID: String!
 }
 
+input UnsilenceMultipleEmailAddressesRequest {
+  emailAddressesToUnsilence: [String!]!
+}
+
 input UpdateDisplayNameRequest {
   displayName: String!
 }
@@ -2494,13 +3119,27 @@ type UpdateDocumentDataResponse {
 }
 
 input UpdateEmailAliasActiveStateRequest {
-  captchaToken: String!
+  captchaToken: String
   emailAlias: String!
   isActive: Boolean!
 }
 
 type UpdateEmailAliasActiveStateResponse {
   status: RequestStatus!
+}
+
+input UpdateEmailAliasEnabledStateRequest {
+  emailAlias: String!
+  enabled: Boolean!
+}
+
+input UpdateEmailAliasProfileRequest {
+  displayName: String
+  displayPictureData: UpdateDisplayPictureSkemailRequest
+  emailAlias: String!
+  encryptedAliasData: EncryptedDataInput
+  encryptedSessionKey: EncryptedSessionKeyInput
+  notificationsEnabled: Boolean
 }
 
 input UpdateMailFilterInput {
@@ -2510,6 +3149,28 @@ input UpdateMailFilterInput {
   filter: MailFilterInput!
   mailFilterID: String!
   name: String
+}
+
+input UpdateQuickAliasActiveStateRequest {
+  captchaToken: String
+  emailAlias: String!
+  isActive: Boolean!
+  userDomainID: String!
+}
+
+type UpdateQuickAliasActiveStateResponse {
+  status: RequestStatus!
+}
+
+input UpdateQuickAliasInfoInput {
+  areNotificationsEnabled: Boolean
+  displayEmailAlias: String
+  displayName: String
+  displayPictureData: UpdateDisplayPictureSkemailRequest
+  emailAlias: String!
+  encryptedAliasData: String
+  encryptedByKey: String
+  encryptedSessionKey: String
 }
 
 input UpdateSrpRequest {
@@ -2534,6 +3195,12 @@ input UpdateUploadContactAvatarLinkRequest {
 
 type UpdateUploadContactAvatarLinkResponse {
   newProfileCustomURI: String!
+}
+
+enum UpdatedAtField {
+  EMAILS_UPDATED_AT
+  THREAD_CONTENT_UPDATED_AT
+  UPDATED_AT
 }
 
 type UpdatedThreadLabels {
@@ -2622,6 +3289,7 @@ input UploadSpamReportRequest {
 
 type User {
   accountTags: [String!]
+  anonymousSubdomains: [AnonymousSubdomain!]
   autoSyncContactsSetting: Boolean
   calendars: [UserCalendar!]
   canDirectlyUpdateSrp: Boolean
@@ -2637,14 +3305,17 @@ type User {
   jwt: String
   mfa: MFAFactors!
   mfaTypes: [String!]
+  numDeactivatedAnonymousSubdomains: Int
   onboardedWorkspaceMigration: Boolean!
   paidUpStatus: PaidUpStatus
   passwordDerivedSecret: String
+  pendingStorageWarning: PendingStorageWarning
   primaryCalendar: Calendar
   privateDocumentData: UserPrivateDocumentData
   privateUserData: PrivateUserData
   publicData: PublicData!
   publicKey: PublicKey!
+  quickAliases: [QuickAlias!]
   recoveryEmail: String
   recoveryServerShare: String
   recoverySigningPublicKey: PublicKey
@@ -2701,13 +3372,20 @@ type UserLabel {
 enum UserLabelVariant {
   ALIAS
   FOLDER
+  IMPORT
   PLAIN
+  QUICK_ALIAS
 }
 
 type UserPreferences {
+  advanceToNext: Boolean
+  autoAdvance: Boolean
   blockRemoteContent: Boolean
   dateFormat: String
   defaultCalendarColor: String
+  defaultCalendarView: CalendarView
+  defaultCalendarViewMobile: CalendarView
+  fileTableFormat: FileTableDisplayFormat
   hideActivationChecklist: Boolean
   hourFormat: String
   leftSwipeGesture: SwipeSetting
@@ -2716,6 +3394,7 @@ type UserPreferences {
   showAliasInboxes: Boolean
   showPageIcon: Boolean
   startDayOfTheWeek: Int
+  tableOfContents: TableOfContentsSetting
   theme: String
   threadFormat: ThreadDisplayFormat
 }
@@ -2742,7 +3421,11 @@ type UserThread {
   emails: [Email!]!
   emailsUpdatedAt: Date!
   permanentlyDeleted: Boolean!
+  senderToSilence: String
+  senderToSilenceMessageCounter: Int
+  senderToSilenceTotalBytes: Int
   sentLabelUpdatedAt: Date
+  threadContentUpdatedAt: Date!
   threadID: String!
   updatedAt: Date!
   userID: String!
@@ -2751,6 +3434,19 @@ type UserThread {
 type UserVerifiedKey {
   keys: JSON
   lastVerifiedDate: Date
+}
+
+input ValidateAppStoreSubscriptionRequest {
+  transactionId: String!
+}
+
+input ValidateOriginalTransactionIdMatchesUserInput {
+  originalTransactionId: String!
+}
+
+type ValueLabel {
+  label: String!
+  value: String!
 }
 
 input VerifyWalletAddressCreateAliasRequest {
@@ -2804,11 +3500,14 @@ enum WorkspaceEventType {
   ALIAS_INBOX_DISABLED
   ALIAS_INBOX_ENABLED
   ALIAS_NEXT
+  AUTO_FORWARDING_DISABLED
+  AUTO_FORWARDING_ENABLED
   BACKGROUND_TASK_DURATION
   BUY_CUSTOM_DOMAIN_CLICK
   BUY_CUSTOM_DOMAIN_WITH_TRIAL_CLICK
   CLOSE_BANNER
   CLOSE_DOWNLOAD_CALENDAR_MOBILE_BANNER
+  CLOSE_NOISE_CANCEL_FOOTER
   CLOSE_SKEMAIL_BANNER
   CREATE_MAIL_FILTER_CLICKED
   CRYPTO_CHECKOUT_STARTED
@@ -2838,11 +3537,18 @@ enum WorkspaceEventType {
   GET_STARTED_CHECKLIST_SKIP_ALL
   GET_STARTED_STEP_COMPLETE
   GET_STARTED_STEP_SKIP
+  IMPORT_STEP_CONTINUE
+  IMPORT_STEP_SKIP
+  IMPORT_UPGRADE_MODAL_SHOWN
   IPFS_TOGGLE
   JOYRIDE_SKIP
   LOGIN_PAGE
   LOGOUT
   MAIL_IMPORT_OPEN
+  MARK_NOT_NOISE
+  MARK_SILENCE
+  MARK_UNSILENCE
+  MARK_UNSUBSCRIBE
   MOBILE_MAIL_APP_ERROR
   MOBILE_THREAD_RECOVERED
   NATIVE_ADD_ACCOUNT
@@ -2863,12 +3569,20 @@ enum WorkspaceEventType {
   OPEN_INBOX_FIRST_TIME_FROM_ORG_SELECT
   OPEN_INBOX_FROM_BANNER
   OPEN_INBOX_FROM_JOYRIDE
+  OPEN_NOISE_CANCEL_FOOTER
   OPEN_SKEMAIL_ANDROID_APP_FROM_BANNER
   OPEN_SKEMAIL_IPHONE_APP_FROM_BANNER
   PERFORMED_BACKGROUND_TASK
   PLAN_CHANGE_STARTED
   PLAN_TABLE_SHOWN
+  PREMIUM_USERNAME_CLAIM_ATTEMPTED
+  PREMIUM_USERNAME_MODAL_OPENED
+  PUBLIC_SITE_PRICING_PAGE_ONBOARDING
   PW_NEXT_BTN
+  QUICK_ALIAS_SETTINGS_OPENED
+  QUICK_ALIAS_WARNING_BANNER_CLICK
+  QUICK_ALIAS_WARNING_BANNER_SHOWN
+  REQUESTED_PREMIUM_USERNAME
   SEARCH
   SELECT_THEME
   SIGNUP_CONNECT_WALLET_START
@@ -2897,6 +3611,7 @@ enum WorkspaceEventType {
   USER_PLATFORM
   USER_REACT_NATIVE
   USER_SKEMAIL_APP
+  USER_WINDOWS_DESKTOP
 }
 
 scalar join__FieldSet

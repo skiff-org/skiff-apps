@@ -1,34 +1,12 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "lib": ["dom", "esnext"],
-    "importHelpers": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "declarationDir": "dist",
-    "noImplicitAny": false,
-    "strict": true,
-    "pretty": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "resolveJsonModule": true,
-    "moduleResolution": "node",
-    "target": "es2021",
-    "esModuleInterop": true,
-    "baseUrl": ".",
-    "skipLibCheck": true,
-    "composite": true
-  },
-  "exclude": [
-    "**/.git",
-    "**/.git/objects/**",
-    "**/.git/subtree-cache/**",
-    "**/node_modules/**",
-    "**/tmp/**",
-    "**/bower_components/**",
-    "**/dist/**",
-    "**/.yarn/cache/**"
-  ]
+      "declarationDir": "dist/",
+      "tsBuildInfoFile": "dist/.tsbuildinfo",
+      "types": ["jest", "node"]
+    },
+    "references": [
+      { "path" : "../skiff-utils"},
+      { "path" : "../skiff-graphql"}
+    ]
 }

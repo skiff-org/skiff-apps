@@ -13,9 +13,12 @@ export function assert(condition: unknown, message = 'Assertion failed'): assert
   }
 }
 
-export const assertUnreachable = (_object: never, message = 'Did not expect to get here'): never => {
+export const assertUnreachable = (object: never, message = 'Did not expect to get here'): never => {
   throw new Error(message);
 };
+
+// get the type of a promise
+export type ValueType<T> = T extends Promise<infer U> ? U : T;
 
 /**
  * Type guard validate that a map has a key
@@ -29,7 +32,7 @@ export function filterExists<T>(object: T): object is NonNullable<T> {
 }
 
 // Same as filter exists but also removes all falsy values (Boolean(value) === true)
-export function filterFalsy<T>(object: T): object is NonFalsy<T> {
+export function filterTruthy<T>(object: T): object is NonFalsy<T> {
   return !!object;
 }
 

@@ -1,17 +1,43 @@
-import { Color, Icon, Icons, Size, Typography, TypographySize, isValidIcon } from '@skiff-org/skiff-ui';
-import React, { ReactNode } from 'react';
+import { Color, Icon, Icons, Size, Typography, TypographySize, isValidIcon } from 'nightwatch-ui';
+import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { DisplayPictureData } from 'skiff-graphql';
 import styled, { css } from 'styled-components';
 
 import { formatName } from '../../../utils';
+import Checkbox from '../../Checkbox/Checkbox';
 import { UserAvatar } from '../../UserAvatar';
 
-const ListItem = styled.div<{ $isLast: boolean; $hasOnClick: boolean }>`
+const ListItem = styled.div<{
+  $fullHeight?: boolean;
+  $isLast?: boolean;
+  $hasOnClick: boolean;
+  $active: boolean;
+  $hover: boolean;
+}>`
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 20px 0px;
+  ${(props) => (props.$fullHeight ? 'padding: 0px 16px; height: 100%;' : 'padding: 12px 16px;')}
+
+  border-bottom: ${(props) => (!props.$isLast ? '1px solid var(--border-tertiary)' : '')};
+
+  ${(props) =>
+    props.$hover &&
+    !props.$active &&
+    css`
+      background: var(--bg-overlay-quaternary);
+    `}
+
+  ${(props) =>
+    props.$active &&
+    css`
+      background: var(--bg-overlay-tertiary);
+      :hover {
+        background: var(--bg-overlay-tertiary);
+      }
+    `}
+
 
   ${isMobile &&
   css`
@@ -24,7 +50,6 @@ const ListItem = styled.div<{ $isLast: boolean; $hasOnClick: boolean }>`
   `}
 
   cursor: ${(props) => (props.$hasOnClick ? 'pointer' : '')};
-  border-bottom: ${(props) => (!props.$isLast ? '1px solid var(--border-tertiary)' : '')};
 `;
 
 const UsernameDisplayName = styled.span`
@@ -35,77 +60,100 @@ const UsernameDisplayName = styled.span`
   box-sizing: border-box;
 `;
 
-const AvatarName = styled.span`
+export const AvatarNameContainer = styled.span<{ $width?: string }>`
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 50%;
-  ${isMobile &&
-  css`
-    width: 100%;
-  `};
-  ${!isMobile &&
-  css`
-    width: 50%;
-  `}
+  width: ${({ $width }) => $width || '100%'};
+  height: 100%;
 `;
 
-const IconContainer = styled.div`
+export const UserIconContainer = styled.div<{
+  isBackground?: boolean;
+  isFullRowHeight?: boolean;
+  isPointerCursor?: boolean;
+}>`
   display: flex;
   align-items: center;
   flex-direction: column;
   justify-content: center;
-  background: var(--bg-overlay-secondary);
+  ${({ isPointerCursor }) => isPointerCursor && 'cursor: pointer;'}
+  ${({ isBackground }) => isBackground && 'background: var(--bg-overlay-secondary);'}
   width: 32px;
-  height: 32px;
+  height: ${({ isFullRowHeight }) => (isFullRowHeight ? '100%' : '32px')};
   border-radius: 8px;
 `;
 
 interface UserListRowProps {
+  active: boolean;
+  hover: boolean;
   displayName: string;
   isLast: boolean;
+  isSelected?: boolean;
   subtitle?: string;
   subtitleColor?: Color;
   avatarDisplayData?: DisplayPictureData | Icon;
   dataTest?: string;
   onClick?: () => void;
-  setIsHovering?: (isHovering: boolean) => void;
-  children?: ReactNode;
+  showCheckbox?: boolean;
+  fullHeight?: boolean;
+  width?: string;
+  toggleSelectedContact?: (isShiftKey: boolean) => void;
 }
 
 const UserListRow: React.FC<UserListRowProps> = ({
+  active,
+  hover,
   displayName,
   isLast,
+  isSelected,
   subtitle,
   subtitleColor,
   avatarDisplayData,
   dataTest,
   children,
+  showCheckbox,
+  fullHeight,
+  width,
   onClick,
-  setIsHovering
+  toggleSelectedContact
 }) => {
   const avatarIsIcon = typeof avatarDisplayData === 'string' && isValidIcon(avatarDisplayData);
 
   const formattedDisplayName = formatName(displayName);
 
+  const onClickSelectContact = (e: React.MouseEvent<Element, MouseEvent>) => {
+    e.stopPropagation();
+    if (toggleSelectedContact) {
+      toggleSelectedContact(e.shiftKey);
+    }
+  };
+
+  const AvatarIcon = avatarIsIcon ? (
+    <UserIconContainer isBackground>
+      <Icons color='secondary' icon={avatarDisplayData} size={Size.X_MEDIUM} />
+    </UserIconContainer>
+  ) : (
+    <UserAvatar color='orange' displayPictureData={avatarDisplayData} label={displayName} size={Size.X_MEDIUM} />
+  );
+
   return (
     <ListItem
+      $active={active}
+      $fullHeight={fullHeight}
       $hasOnClick={!!onClick}
+      $hover={hover}
       $isLast={isLast}
       data-test={dataTest}
       onClick={onClick}
-      onMouseOut={setIsHovering ? () => setIsHovering(false) : undefined}
-      onMouseOver={setIsHovering ? () => setIsHovering(true) : undefined}
     >
-      <AvatarName>
-        {avatarIsIcon && (
-          <IconContainer>
-            <Icons color='secondary' icon={avatarDisplayData} size={Size.X_MEDIUM} />
-          </IconContainer>
+      <AvatarNameContainer $width={width}>
+        {!isMobile && showCheckbox && (
+          <UserIconContainer isFullRowHeight isPointerCursor onClick={onClickSelectContact}>
+            <Checkbox checked={isSelected} onClick={onClickSelectContact} />
+          </UserIconContainer>
         )}
-        {!avatarIsIcon && (
-          <UserAvatar displayPictureData={avatarDisplayData} label={displayName} size={Size.X_MEDIUM} />
-        )}
+        {AvatarIcon}
         <UsernameDisplayName>
           <Typography>{formattedDisplayName}</Typography>
           {!!subtitle && (
@@ -114,7 +162,7 @@ const UserListRow: React.FC<UserListRowProps> = ({
             </Typography>
           )}
         </UsernameDisplayName>
-      </AvatarName>
+      </AvatarNameContainer>
       {children}
     </ListItem>
   );

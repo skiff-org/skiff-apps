@@ -1,10 +1,10 @@
-import { Button, Typography } from '@skiff-org/skiff-ui';
-import React, { useEffect } from 'react';
+import { Button, Typography } from 'nightwatch-ui';
+import React from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
 
 import { useCurrentUserIsOrgAdmin } from '../../hooks';
-import { isMobileApp } from '../../utils';
+import { isMobileApp, isReactNativeDesktopApp } from '../../utils';
 import { TitleActionSection } from '../Settings';
 
 import CreditPrompt, { CreditPromptProps } from './CreditPrompt';
@@ -13,7 +13,6 @@ interface CreditManagementProps {
   currentCreditCents: number;
   loading: boolean;
   openPlansTab: () => void;
-  refetchCredits: () => void;
 }
 
 const CreditContainer = styled.div`
@@ -26,16 +25,10 @@ const CreditManagement: React.FC<CreditManagementProps> = ({
   creditPrompts,
   currentCreditCents,
   loading,
-  openPlansTab,
-  refetchCredits
+  openPlansTab
 }) => {
   const isCurrentUserOrgAdmin = useCurrentUserIsOrgAdmin();
   const currentCreditsInDollars = currentCreditCents / 100;
-
-  // Refetch credits when component is mounted
-  useEffect(() => {
-    refetchCredits();
-  }, [refetchCredits]);
 
   const renderContents = () => {
     if (currentCreditCents <= 0) {
@@ -51,7 +44,7 @@ const CreditManagement: React.FC<CreditManagementProps> = ({
     return (
       <TitleActionSection
         actions={
-          isCurrentUserOrgAdmin
+          isCurrentUserOrgAdmin && !isReactNativeDesktopApp()
             ? [
                 {
                   content: shopForPlansButton,

@@ -1,4 +1,6 @@
-import { Icon, Icons, Size, Typography } from '@skiff-org/skiff-ui';
+import { Icon, Icons, Size, Typography } from 'nightwatch-ui';
+import React from 'react';
+import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
 
 const SubscriptionBlock = styled.div`
@@ -37,22 +39,35 @@ interface SubscriptionItemProps {
   title: string;
   subtitle: string;
   endAction: JSX.Element;
+  isAppleSubscription?: boolean;
 }
 
-const SubscriptionItem: React.FC<SubscriptionItemProps> = ({ icon, title, subtitle, endAction }) => {
+const SubscriptionItem: React.FC<SubscriptionItemProps> = ({
+  icon,
+  title,
+  subtitle,
+  endAction,
+  isAppleSubscription
+}) => {
+  const appleSubSuffix = isAppleSubscription ? ' • Visit the App Store to manage your subscription.' : '';
   return (
-    <SubscriptionBlock>
-      <SubscriptionIconInfo>
-        <IconContainer>
-          <Icons icon={icon} color='secondary' size={Size.X_MEDIUM} />
-        </IconContainer>
-        <SubscriptionInfo>
-          <Typography>{title}</Typography>
-          <Typography color='secondary'>{subtitle}</Typography>
-        </SubscriptionInfo>
-      </SubscriptionIconInfo>
-      {endAction}
-    </SubscriptionBlock>
+    <>
+      <SubscriptionBlock>
+        <SubscriptionIconInfo>
+          <IconContainer>
+            <Icons color='secondary' icon={icon} size={Size.X_MEDIUM} />
+          </IconContainer>
+          <SubscriptionInfo>
+            <Typography>{title}</Typography>
+            <Typography color='secondary' wrap>
+              {subtitle}
+              {!isMobile && `${appleSubSuffix}`}
+            </Typography>
+          </SubscriptionInfo>
+        </SubscriptionIconInfo>
+        {endAction}
+      </SubscriptionBlock>
+    </>
   );
 };
 

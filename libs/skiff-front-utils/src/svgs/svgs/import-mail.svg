@@ -1,0 +1,14 @@
+<svg width="470" height="147" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g clip-path="url(#a)">
+    <rect width="470" height="147" rx="12" fill="var(--bg-overlay-tertiary)" />
+    <circle cx="234.637" cy="73.637" r="72.438" stroke="var(--border-secondary)" stroke-dasharray="4 4" />
+    <circle cx="234.636" cy="73.637" r="129.745" stroke="var(--border-secondary)" stroke-dasharray="4 4" />
+    <circle cx="234.637" cy="73.637" r="189.137" stroke="var(--border-secondary)" stroke-dasharray="4 4" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M251.166 64.304c3.912 0 7.084-3.134 7.084-7 0-.818-.142-1.604-.403-2.333-.973-2.72-3.597-4.667-6.681-4.667s-5.708 1.948-6.68 4.667l-.031.088a6.925 6.925 0 0 0-.372 2.245c0 .818.142 1.603.403 2.333a7.015 7.015 0 0 0 2.72 3.471 7.107 7.107 0 0 0 3.96 1.196Zm-40.139-9.333h28.57a11.576 11.576 0 0 0-.236 2.333c0 .799.081 1.58.236 2.333h-21.952l16.993 11.196 8.114-5.346a11.835 11.835 0 0 0 4.32 2.763l-12.434 8.192-18.888-12.445v23.64h37.777v-18.9a11.82 11.82 0 0 0 4.723-2.099v21c0 2.577-2.115 4.666-4.723 4.666H215.75c-2.608 0-4.723-2.09-4.723-4.667V54.971Z" fill="var(--icon-disabled)" />
+  </g>
+  <defs>
+    <clipPath id="a">
+      <rect width="470" height="147" rx="12" fill="#fff" />
+    </clipPath>
+  </defs>
+</svg>

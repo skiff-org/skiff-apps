@@ -1,8 +1,9 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import { Divider, InputField, Skeleton } from '@skiff-org/skiff-ui';
+import { Divider, InputField, Skeleton } from 'nightwatch-ui';
 import React, { useState } from 'react';
-import { DocumentCollaborator, PermissionLevel } from 'skiff-graphql';
-import { assertExists } from 'skiff-utils';
+import { useSubscriptionPlan } from 'skiff-front-graphql';
+import { DocumentCollaborator, PermissionLevel, getTierNameFromSubscriptionPlan } from 'skiff-graphql';
+import { assertExists, getMaxUsersPerWorkspace } from 'skiff-utils';
 import styled from 'styled-components';
 
 import { useCurrentOrganization } from '../../../hooks';
@@ -10,6 +11,7 @@ import useShareDocument from '../../../hooks/useShareDocument';
 import { userMatchesSearchQuery } from '../../../utils/userUtils';
 import { currentUserIsWorkspaceAdmin } from '../../../utils/workspaceUtils';
 import { AddTeamMemberModal } from '../../modals/AddTeamMemberModal';
+import { ProvisionPaywallModal } from '../../modals/AddTeamMemberModal/ProvisionPaywallModal/ProvisionPaywallModal';
 import { SettingsPage } from '../Settings.types';
 import UserListTable, { UserListTableSection } from '../shared/UserListTable';
 
@@ -38,8 +40,12 @@ const OrganizationMemberListTable: React.FC<OrganizationMemberListTableProps> = 
   const [searchValue, setSearchValue] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [shareModalOpen, setShareModalOpen] = useState<boolean>(false);
+  const [paywallModalOpen, setPaywallModalOpen] = useState<boolean>(false);
 
   const { data: orgData, loading } = useCurrentOrganization();
+  const {
+    data: { activeSubscription }
+  } = useSubscriptionPlan();
   const organization = orgData?.organization;
   // every member of org is a collaborator on everyone team root doc
   const allOrgMembers = organization?.everyoneTeam?.rootDocument?.collaborators ?? [];
@@ -52,6 +58,10 @@ const OrganizationMemberListTable: React.FC<OrganizationMemberListTableProps> = 
   const filteredPendingMembers = !!searchValue
     ? pendingOrgMembers.filter((member) => member.email.toLowerCase().includes(searchValue.toLowerCase()))
     : pendingOrgMembers;
+
+  const currentTier = getTierNameFromSubscriptionPlan(activeSubscription);
+  const maxCollaborators = getMaxUsersPerWorkspace(currentTier);
+  const currentCollaborators = allOrgMembers.length;
 
   const { updateUserDocPermission } = useShareDocument(client, organization?.everyoneTeam.rootDocument?.docID ?? '');
 
@@ -81,12 +91,18 @@ const OrganizationMemberListTable: React.FC<OrganizationMemberListTableProps> = 
     return null;
   }
 
-  const openShare = () => setShareModalOpen(true);
+  const openShare = () => {
+    if (currentCollaborators >= maxCollaborators) {
+      setPaywallModalOpen(true);
+    } else {
+      setShareModalOpen(true);
+    }
+  };
 
   const inputField = (
     <InputField
       dataTest='settings-search-members'
-      errorMsg={errorMsg}
+      error={errorMsg}
       onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
         setErrorMsg('');
         setSearchValue(evt.target.value);
@@ -149,6 +165,20 @@ const OrganizationMemberListTable: React.FC<OrganizationMemberListTableProps> = 
   const tableSections: UserListTableSection[] = [pendingMembersSection, orgMembersSection].filter(
     Boolean
   ) as UserListTableSection[];
+
+  // if at collaborator limit, show paywall modal
+  if (paywallModalOpen) {
+    return (
+      <ProvisionPaywallModal
+        currentTier={currentTier}
+        maxCollaborators={maxCollaborators}
+        onClose={() => {
+          setPaywallModalOpen(false);
+        }}
+        openSettings={openSettings}
+      />
+    );
+  }
 
   return (
     <>

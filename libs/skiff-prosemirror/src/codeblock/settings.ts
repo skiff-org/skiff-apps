@@ -1,6 +1,6 @@
 import { oneDarkHighlightStyle } from '@codemirror/theme-one-dark';
 import { EditorView } from '@codemirror/view';
-import { ThemeMode } from '@skiff-org/skiff-ui';
+import { ThemeMode } from 'nightwatch-ui';
 import { redo, undo } from 'y-prosemirror';
 
 import { customCreateSelect, updateCustomSelect } from './customCreateSelect';
@@ -135,7 +135,13 @@ const codeblockSettings = (theme: ThemeMode, readOnly: boolean): CodeBlockSettin
     CodeBlockLanguages.json,
     CodeBlockLanguages.java,
     CodeBlockLanguages.lezer,
-    LegacyLanguages.solidity
+    LegacyLanguages.solidity,
+    LegacyLanguages.csharp,
+    LegacyLanguages.objectiveC,
+    LegacyLanguages.kotlin,
+    CodeBlockLanguages.typescript,
+    CodeBlockLanguages.tsx,
+    CodeBlockLanguages.jsx
   ],
   stopEvent: (e: Event) => {
     if (e instanceof DragEvent) return false;

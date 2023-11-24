@@ -69,6 +69,7 @@ fragment DocumentBasicInfo on Document {
       orgID
     }
   }
+  cloneDocID
 }
 
 fragment DocumentBase on Document {
@@ -196,6 +197,18 @@ fragment DocumentCollaborators on Document {
   }
 }
 
+fragment DocumentNativeInfo on Document {
+  ...DocumentBasicInfoWithoutTeamOrOrg
+  ...DocumentTeam
+  ...DocumentContents
+  ...DocumentDecryptedMetadata
+  team {
+    personal
+  }
+  updatedAt
+  thumbnail
+}
+
 fragment DocumentFullInfo on Document {
   ...DocumentBasicInfo
   ...DocumentDecryptedMetadata
@@ -208,6 +221,8 @@ fragment DocumentFullInfo on Document {
   ...DocumentCollaborators
   parentKeysClaim
   parentPublicHierarchicalKey
+  thumbnail
+  decryptedThumbnail @client
 }
 
 fragment TemplateData on Template {

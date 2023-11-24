@@ -1,9 +1,11 @@
 import { Dayjs } from 'dayjs';
 
+import { TwelveHourPeriod } from '../../types';
+
 export type TimeFormat = 'h' | 'H' | 'h A' | 'h:mm A' | 'H:mm' | 'HH:mm';
 
 export const getInitialDateObject = (withTimeDivider: boolean, initialHour?: Dayjs | null, timeFormat?: TimeFormat) => {
-  const initialDateObject = { hour: '00', minute: '00', timeDivider: withTimeDivider ? 'AM' : '' };
+  const initialDateObject = { hour: '00', minute: '00', timeDivider: withTimeDivider ? TwelveHourPeriod.AM : '' };
   if (initialHour && timeFormat) {
     const formatted = initialHour.format(timeFormat);
     const hour = formatted.split(':')[0];

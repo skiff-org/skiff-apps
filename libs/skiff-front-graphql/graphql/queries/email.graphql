@@ -31,12 +31,56 @@ query getMailFilters($request: GetMailFiltersInput) {
   }
 }
 
-query getAccountMailData($label: String!){
+query getAccountMailData($label: String!) {
   unread(label: $label)
   currentUser {
     ...UserProfileOrgData
+    ...UserOrgPersonalTeamData
+    ...UserOrgEveryoneTeamData
     userID
     defaultEmailAlias
     emailAliases
+    recoveryEmail
+    unverifiedRecoveryEmail
+  }
+}
+
+query getNumMailboxThreads($label: String!) {
+  numMailboxThreads(label: $label)
+}
+
+query getSilenceSenderSuggestions {
+  silenceSenderSuggestions {
+    silenceSenderDomains {
+      domain
+      senders {
+        sender
+        messageCount
+        totalBytes
+      }
+    }
+    silenceSenderIndividuals {
+      sender
+      messageCount
+      totalBytes
+    }
+  }
+}
+
+query getSilencedSenders {
+  silencedSenders {
+    silenceSenderDomains {
+      domain
+      senders {
+        sender
+        messageCount
+        totalBytes
+      }
+    }
+    silenceSenderIndividuals {
+      sender
+      messageCount
+      totalBytes
+    }
   }
 }

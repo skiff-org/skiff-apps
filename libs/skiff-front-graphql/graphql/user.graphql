@@ -16,15 +16,7 @@ query usersFromEmailAlias($emailAliases: [String!]!) {
 query usersFromEmailAliasWithCatchall($emailAliases: [String!]!) {
   usersFromEmailAliasWithCatchall(emailAliases: $emailAliases) {
     userID
-    username
     publicKey
-    publicData {
-      displayPictureData {
-        profileAccentColor
-        profileCustomURI
-        profileIcon
-      }
-    }
   }
 }
 
@@ -135,6 +127,8 @@ query getUserPaidUpStatus {
         userLabels
         userFolders
         userMailFilters
+        quickAliases
+        quickAliasSubdomains
       }
     }
   }
@@ -155,6 +149,13 @@ mutation createUploadAvatarLink {
 
 mutation createUploadContactAvatarLink($request: CreateUploadContactAvatarLinkRequest!) {
   createUploadContactAvatarLink(request: $request) {
+    writeUrl
+    profileCustomURI
+  }
+}
+
+mutation createUploadAliasAvatarLink($emailAlias: String!) {
+  createUploadAliasAvatarLink(emailAlias: $emailAlias) {
     writeUrl
     profileCustomURI
   }
@@ -228,12 +229,6 @@ mutation addExternalEmail($request: AddEmailRequest!) {
   }
 }
 
-mutation createUdAlias($request: CreateUdAliasRequest) {
-  createUdAlias(request: $request) {
-    emailAliases
-  }
-}
-
 mutation uploadRecoveryData($request: UploadRecoveryDataRequest!) {
   uploadRecoveryData(request: $request) {
     status
@@ -297,5 +292,43 @@ query getContactAutoSyncSettings {
   currentUser {
     userID
     autoSyncContactsSetting
+  }
+}
+
+query getUserQuickAliasDomains {
+  currentUser {
+    userID
+    anonymousSubdomains {
+      domain
+      domainID
+    }
+  }
+}
+
+query getNumUserDeactivatedQuickAliasDomains {
+  currentUser {
+    userID
+    numDeactivatedAnonymousSubdomains
+  }
+}
+
+query getUserQuickAliases {
+  currentUser {
+    userID
+    quickAliases {
+      alias
+      isSendingAndReceivingEnabled
+    }
+  }
+}
+
+query getCurrentUserAllOrgData {
+  currentUser {
+    userID
+    userID
+    username
+    rootOrganization {
+      ...OrganizationFullInfo
+    }
   }
 }

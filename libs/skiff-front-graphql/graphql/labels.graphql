@@ -13,6 +13,12 @@ mutation applyLabels($request: ModifyLabelsRequest) {
   }
 }
 
+mutation bulkApplyLabels($request: BulkModifyLabelsRequest) {
+  bulkApplyLabels(request: $request) {
+    jobID
+  }
+}
+
 mutation removeLabels($request: ModifyLabelsRequest) {
   removeLabels(request: $request) {
     updatedThreads {
@@ -28,12 +34,9 @@ mutation removeLabels($request: ModifyLabelsRequest) {
   }
 }
 
-query userLabels {
-  userLabels {
-    labelID
-    labelName
-    color
-    variant
+mutation bulkRemoveLabels($request: BulkModifyLabelsRequest) {
+  bulkRemoveLabels(request: $request) {
+    jobID
   }
 }
 
@@ -57,4 +60,20 @@ mutation editUserLabel($request: EditUserLabelRequest) {
 
 mutation deleteUserLabel($request: DeleteUserLabelRequest) {
   deleteUserLabel(request: $request)
+}
+
+query userLabels {
+  userLabels {
+    labelID
+    labelName
+    color
+    variant
+  }
+}
+
+query getBulkModifyLabelsJobStatus($jobID: String!) {
+  bulkModifyLabelsJobStatus(jobID: $jobID) {
+    jobStatus
+    completed
+  }
 }

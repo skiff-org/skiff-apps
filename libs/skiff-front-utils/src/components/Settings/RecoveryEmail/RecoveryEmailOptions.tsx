@@ -1,4 +1,4 @@
-import { Icon, InputField } from '@skiff-org/skiff-ui';
+import { Icon, InputField } from 'nightwatch-ui';
 import React from 'react';
 import styled from 'styled-components';
 

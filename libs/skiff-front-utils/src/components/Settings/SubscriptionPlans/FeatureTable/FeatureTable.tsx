@@ -1,4 +1,5 @@
 import { FloatingDelayGroup } from '@floating-ui/react-dom-interactions';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import {
   Divider,
   Icon,
@@ -12,25 +13,28 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from '@skiff-org/skiff-ui';
-import React, { useState } from 'react';
-import { SubscriptionInterval, SubscriptionPlan } from 'skiff-graphql';
+} from 'nightwatch-ui';
+import React, { useEffect, useState } from 'react';
+import { useStoreWorkspaceEventMutation } from 'skiff-front-graphql';
+import { SubscriptionInterval, SubscriptionPlan, WorkspaceEventType } from 'skiff-graphql';
+import { FreeCustomDomainFeatureFlag, OnboardingUpsellFeatureFlag } from 'skiff-utils';
 import styled from 'styled-components';
 
+import { DEFAULT_WORKSPACE_EVENT_VERSION } from '../../../../constants';
 import {
   FEATURE_TABLE_RESPONSIVE_BREAKPOINT,
   FeatureData,
   FeatureItem,
-  allFeatures,
-  narrowViewFeatures,
+  getAllFeatures,
+  getNarrowViewFeatures,
   subscriptionTiers
 } from '../../../../constants/plans.constants';
+import { useMediaQuery } from '../../../../hooks';
 import { useTheme } from '../../../../theme/AppThemeProvider';
 import { getPlanTableColumnWidths, getTierTitle, reduceFeatureDataToSupportedTiers } from '../../../../utils';
 import BillingCycleSwitch from '../BillingCycleSwitch/BillingCycleSwitch';
 import TierButton from '../TierButton/TierButton';
 
-import { useMediaQuery } from '../../../../hooks';
 import FeatureTableColumnEnd from './FeatureTableColumnEnd';
 import FeatureTableSectionHeader from './FeatureTableSectionHeader';
 
@@ -113,12 +117,12 @@ export function FeatureTableHeader({
             <TierButton
               activeSubscription={subscription}
               isUpdatingPlan={isUpdatingPlan}
+              openBillingPage={openBillingPage}
               setIsUpdatingPlan={setIsUpdatingPlan}
               spotlightPlan={spotlightPlan}
               startPolling={startPolling}
               subscriptionInterval={subscriptionInterval}
               subscriptionPlan={plan}
-              openBillingPage={openBillingPage}
             />
           </GridItem>
         ))}
@@ -158,6 +162,10 @@ function FeatureTableContent({
   openBillingPage
 }: FeatureTableContentProps) {
   const layoutBreakpoint = useMediaQuery(`(min-width:${FEATURE_TABLE_RESPONSIVE_BREAKPOINT}px)`);
+  const flags = useFlags();
+  const freeCustomDomainFlag = flags.freeCustomDomain as FreeCustomDomainFeatureFlag;
+  const allFeatures = getAllFeatures({ freeCustomDomainFlag });
+  const narrowViewFeatures = getNarrowViewFeatures({ freeCustomDomainFlag });
   // constructing the table (feature-based) rows
   if (layoutBreakpoint) {
     return (
@@ -240,12 +248,12 @@ function FeatureTableContent({
           <TierButton
             activeSubscription={subscription}
             isUpdatingPlan={isUpdatingPlan}
+            openBillingPage={openBillingPage}
             setIsUpdatingPlan={setIsUpdatingPlan}
             spotlightPlan={spotlightPlan}
             startPolling={startPolling}
             subscriptionInterval={subscriptionInterval}
             subscriptionPlan={tier}
-            openBillingPage={openBillingPage}
           />
           <NarrowViewFeatureList>
             {index > 0 && (
@@ -310,7 +318,20 @@ function FeatureTable({
   // if user has a paid plan with a billing interval, default to the view for that interval to ensure they can see their current plan
   const [subInterval, setSubInterval] = useState(activeSubscriptionBillingInterval || SubscriptionInterval.Yearly);
   const { theme } = useTheme();
-
+  const [storeWorkspaceEvent] = useStoreWorkspaceEventMutation();
+  const flags = useFlags();
+  const onboardingCohort = flags.onboardingUpsell as OnboardingUpsellFeatureFlag;
+  useEffect(() => {
+    void storeWorkspaceEvent({
+      variables: {
+        request: {
+          eventName: WorkspaceEventType.PlanTableShown,
+          data: JSON.stringify({ onboardingCohort }),
+          version: DEFAULT_WORKSPACE_EVENT_VERSION
+        }
+      }
+    });
+  }, [storeWorkspaceEvent, onboardingCohort]);
   const showEssential = true;
   const supportedTiers = showEssential
     ? [...subscriptionTiers.slice(0, 1), SubscriptionPlan.Essential, ...subscriptionTiers.slice(1)]
@@ -321,6 +342,7 @@ function FeatureTable({
     <TableContainer>
       <FeatureTableHeader
         isUpdatingPlan={isUpdatingPlan}
+        openBillingPage={openBillingPage}
         setIsUpdatingPlan={setIsUpdatingPlan}
         setSubscriptionInterval={setSubInterval}
         showEssential={showEssential}
@@ -330,10 +352,10 @@ function FeatureTable({
         subscriptionInterval={subInterval}
         supportedTiers={supportedTiers}
         theme={theme}
-        openBillingPage={openBillingPage}
       />
       <FeatureTableContent
         isUpdatingPlan={isUpdatingPlan}
+        openBillingPage={openBillingPage}
         setIsUpdatingPlan={setIsUpdatingPlan}
         showEssential={showEssential}
         spotlightPlan={spotlightPlan}
@@ -342,7 +364,6 @@ function FeatureTable({
         subscriptionInterval={subInterval}
         supportedTiers={supportedTiers}
         theme={theme}
-        openBillingPage={openBillingPage}
       />
     </TableContainer>
   );

@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import memoize from 'lodash/memoize';
-import { rawDecryptSymmetric } from '@skiff-org/skiff-crypto';
+import { rawDecryptSymmetric } from 'skiff-crypto';
 import { RawRichTextMediaCacheDatagram } from 'skiff-front-graphql';
 
 import { InlineCacheElemData } from '../types';

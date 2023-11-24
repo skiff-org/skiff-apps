@@ -1,4 +1,13 @@
-import { Divider, Icon, IconButton, ThemeMode, Type, Typography, useOnClickOutside } from '@skiff-org/skiff-ui';
+import {
+  Divider,
+  FilledVariant,
+  Icon,
+  IconButton,
+  ThemeMode,
+  Type,
+  Typography,
+  useOnClickOutside
+} from 'nightwatch-ui';
 import { Node } from 'prosemirror-model';
 import { EditorState, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
@@ -226,12 +235,6 @@ export const ThreadInput: FC<ThreadInputProps> = ({
 
   const hideBottomBar = !(isTyping || !emptyEditor(editorRef)) || isMobile;
 
-  const mentionsPopupCoords = positionBodyPopupAccordingToSelection(
-    editorRef.current,
-    MENTIONS_POP_SIZE,
-    POP_THRESHOLD,
-    POP_OFFSET
-  );
   const emojiPopupCoords = positionBodyPopupAccordingToSelection(
     editorRef.current,
     EMOJI_POP_SIZE,
@@ -325,6 +328,7 @@ export const ThreadInput: FC<ThreadInputProps> = ({
               }}
               icon={Icon.At}
               type={Type.SECONDARY}
+              variant={FilledVariant.UNFILLED}
             />
             <div ref={reactionButtonRef}>
               <IconButton
@@ -333,6 +337,7 @@ export const ThreadInput: FC<ThreadInputProps> = ({
                 }}
                 icon={Icon.SmilePlus}
                 type={Type.SECONDARY}
+                variant={FilledVariant.UNFILLED}
               />
             </div>
           </div>
@@ -344,7 +349,8 @@ export const ThreadInput: FC<ThreadInputProps> = ({
                     position: 'absolute',
                     right: 4,
                     top: 0,
-                    transform: 'translateY(-100%)'
+                    transform: 'translateY(-100%)',
+                    zIndex: 1000
                   }
                 : {}
             }
@@ -352,11 +358,12 @@ export const ThreadInput: FC<ThreadInputProps> = ({
             <IconButton
               onClick={(e) => {
                 e.stopPropagation();
-                if (!editorRef.current) return;
+                if (!editorRef.current) {
+                  return;
+                }
                 submitComment(editorRef.current.state, editorRef.current.dispatch);
               }}
               icon={Icon.Send}
-              filled
               disabled={emptyEditor(editorRef)}
             />
           </div>

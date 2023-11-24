@@ -24,7 +24,8 @@ export enum HourFormats {
   Short = 'h A',
   Medium = 'h:mm',
   MediumFull = 'H:mm', // 24 hour
-  Long = 'h:mm A'
+  Long = 'h:mm A',
+  Complete = 'h:mm A z' // time zone
 }
 
 export enum DayFormats {
@@ -37,6 +38,7 @@ export enum DayFormats {
 export enum DateFormats {
   Normal = 'MMM DD',
   Long = 'dddd, MMM D',
+  ShortWithYear = 'MMM D, YYYY',
   FullMonth = 'MMMM',
   FullYear = 'YYYY',
   AbbreviatedMonth = 'MMM'

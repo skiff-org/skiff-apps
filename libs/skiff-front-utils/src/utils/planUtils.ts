@@ -1,4 +1,4 @@
-import { Type, Color, TextColor } from '@skiff-org/skiff-ui';
+import { Type, Color, TextColor } from 'nightwatch-ui';
 import pluralize from 'pluralize';
 import {
   SubscriptionPlan,
@@ -7,9 +7,24 @@ import {
   isValidSubscriptionPlan,
   DowngradeProgress
 } from 'skiff-graphql';
-import { upperCaseFirstLetter, LIMITS_BY_TIER, TierName, MAXIMUM_STRIPE_PURCHASE_QUANTITY } from 'skiff-utils';
+import {
+  upperCaseFirstLetter,
+  TierName,
+  getStorageLimitInMb,
+  getMaxNumberNonWalletAliases,
+  getMaxCustomDomains,
+  getMaxUsersPerWorkspace,
+  getMaxNumberMailFilters,
+  getAllowedNumberShortAliases,
+  getMaxNumLabelsOrFolders,
+  GLOBAL_MAX_NUM_QUICK_ALIASES,
+  getMaxNumQuickAliases,
+  getMaxQuickAliasSubdomains,
+  insertIf
+} from 'skiff-utils';
 
 import { DowngradeTodoItemProps } from '../components/DowngradeTodoItem';
+import { TierLimitFlags } from '../constants';
 import { MONO_TYPE_TAG_STYLES_BY_PLAN, SPOTLIGHT_TEXT } from '../constants';
 import { MONTHLY_PRICES_BY_SUBSCRIPTION_PLAN, FeatureData, PLAN_TABLE_COLUMN_WIDTHS } from '../constants';
 import { EXPIRES_SOON_BUFFER_IN_MS } from '../constants';
@@ -128,6 +143,7 @@ interface DowngradeTodoItemWithKey extends DowngradeTodoItemProps {
 
 export const getDowngradeTodoItems = (
   tierToDowngradeTo: TierName,
+  { freeCustomDomainFlag }: TierLimitFlags,
   {
     currentStorageInMb,
     emailAliases,
@@ -136,21 +152,23 @@ export const getDowngradeTodoItems = (
     workspaceUsers,
     userLabels,
     userFolders,
-    userMailFilters
+    userMailFilters,
+    quickAliases,
+    quickAliasSubdomains
   }: DowngradeProgress
 ) => {
-  const {
-    maxStorageInMb,
-    maxNumNonWalletAliases,
-    maxCustomDomains,
-    allowedNumShortAliases,
-    maxUsersPerWorkspace,
-    maxNumLabelsOrFolders,
-    maxNumMailFilters
-  } = LIMITS_BY_TIER[tierToDowngradeTo];
+  const maxStorageInMb = getStorageLimitInMb(tierToDowngradeTo);
+  const maxNumNonWalletAliases = getMaxNumberNonWalletAliases(tierToDowngradeTo);
+  const maxCustomDomains = getMaxCustomDomains(tierToDowngradeTo, freeCustomDomainFlag);
+  const maxUsersPerWorkspace = getMaxUsersPerWorkspace(tierToDowngradeTo);
+  const maxNumMailFilters = getMaxNumberMailFilters(tierToDowngradeTo);
+  const allowedNumShortAliases = getAllowedNumberShortAliases(tierToDowngradeTo);
+  const maxNumLabelsOrFolders = getMaxNumLabelsOrFolders(tierToDowngradeTo);
+  const maxNumQuickAliases = getMaxNumQuickAliases(tierToDowngradeTo);
+  const maxNumQuickAliasSubdomains = getMaxQuickAliasSubdomains(tierToDowngradeTo);
 
   // paid features whose limits are at or above this number are effectively unlimited and user does not need to make any changes to achieve eligibility on this feature
-  const isTierToDowngradeToUnlimited = (quantity: number) => quantity >= MAXIMUM_STRIPE_PURCHASE_QUANTITY;
+  const isTierToDowngradeToUnlimited = (quantity: number) => quantity >= GLOBAL_MAX_NUM_QUICK_ALIASES;
   const sharedPrefix = "You're all set on ";
 
   const todoItemPropsList: Array<DowngradeTodoItemWithKey> = [
@@ -164,7 +182,7 @@ export const getDowngradeTodoItems = (
       key: 'downgrade-alias-limit',
       checked: emailAliases <= maxNumNonWalletAliases,
       description: `You have ${emailAliases} @skiff.com ${pluralize('alias', emailAliases)}.`,
-      title: `Delete email aliases until you have ${getFormattedQuantifier(maxNumNonWalletAliases)} left`
+      title: `Delete email addresses until you have ${getFormattedQuantifier(maxNumNonWalletAliases)} left`
     },
     {
       key: 'downgrade-custom-domains-limit',
@@ -179,7 +197,7 @@ export const getDowngradeTodoItems = (
         'alias',
         shortAliases
       )} with less than ${ALIAS_MINIMUM_LENGTH} characters.`,
-      title: `Delete short aliases until you have ${getFormattedQuantifier(allowedNumShortAliases)} left`
+      title: `Delete short addresses until you have ${getFormattedQuantifier(allowedNumShortAliases)} left`
     },
     {
       key: 'downgrade-workspace-users-limit',
@@ -189,30 +207,47 @@ export const getDowngradeTodoItems = (
         ? `${sharedPrefix}workspace membership`
         : `Remove users from your workspace until you have ${getFormattedQuantifier(maxUsersPerWorkspace)} left`
     },
-    {
+    // we insert the below features only if the user needs to take action to conserve space in the modal;
+    // the reason for including *some* of the already complete checklist items is to empahsize the value
+    // of paid plans
+    ...insertIf(quickAliases > maxNumQuickAliases, {
+      key: 'downgrade-user-quick-aliases-limit',
+      checked: quickAliases <= maxNumQuickAliases,
+      description: `You have ${quickAliases} Quick ${pluralize('Alias', quickAliases)}.`,
+      title: isTierToDowngradeToUnlimited(maxNumQuickAliases)
+        ? `${sharedPrefix}Quick Aliases`
+        : `Delete Quick Aliases until you have ${getFormattedQuantifier(maxNumQuickAliases)} left`
+    }),
+    ...insertIf(quickAliasSubdomains > maxNumQuickAliasSubdomains, {
+      key: 'downgrade-user-quick-alias-subdomains-limit',
+      checked: quickAliasSubdomains <= maxNumQuickAliasSubdomains,
+      description: `You have ${quickAliasSubdomains} Quick Alias ${pluralize('domain', quickAliasSubdomains)}.`,
+      title: `Delete Quick Alias domains until you have ${getFormattedQuantifier(maxNumQuickAliasSubdomains)} left`
+    }),
+    ...insertIf(userFolders > maxNumLabelsOrFolders, {
       key: 'downgrade-user-folders-limit',
       checked: userFolders <= maxNumLabelsOrFolders,
       description: `You have ${userFolders} ${pluralize('folder', userFolders)}.`,
       title: isTierToDowngradeToUnlimited(maxNumLabelsOrFolders)
         ? `${sharedPrefix}folders`
         : `Delete folders until you have ${getFormattedQuantifier(maxNumLabelsOrFolders)} left`
-    },
-    {
+    }),
+    ...insertIf(userLabels > maxNumLabelsOrFolders, {
       key: 'downgrade-user-labels-limit',
       checked: userLabels <= maxNumLabelsOrFolders,
       description: `You have ${userLabels} ${pluralize('label', userLabels)}.`,
       title: isTierToDowngradeToUnlimited(maxNumLabelsOrFolders)
         ? `${sharedPrefix}labels`
         : `Delete labels until you have ${getFormattedQuantifier(maxNumLabelsOrFolders)} left`
-    },
-    {
+    }),
+    ...insertIf(userMailFilters > maxNumMailFilters, {
       key: 'downgrade-user-mail-filters-limit',
       checked: userMailFilters <= maxNumMailFilters,
       description: `You have ${userMailFilters} mail ${pluralize('filter', userMailFilters)}.`,
       title: isTierToDowngradeToUnlimited(maxNumMailFilters)
         ? `${sharedPrefix}mail filters`
         : `Delete mail filters until you have ${getFormattedQuantifier(maxNumMailFilters)} left`
-    }
+    })
   ];
   return todoItemPropsList;
 };

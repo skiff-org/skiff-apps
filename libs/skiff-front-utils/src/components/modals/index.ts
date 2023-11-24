@@ -9,3 +9,4 @@ export { default as AddEmailModal } from './AddEmailModal';
 export { default as DowngradeModal } from './DowngradeModal';
 export { default as PlanDelinquencyModal } from './PlanDelinquencyModal';
 export { default as ConfirmDeleteAccountModal } from './ConfirmDeleteAccountModal';
+export { default as UpgradeModal, ExceededItem, SelectItemType } from './UpgradeModal';

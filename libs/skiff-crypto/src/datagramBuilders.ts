@@ -1,6 +1,6 @@
 import { gunzipSync, gzipSync } from 'fflate';
 import { Range } from 'semver';
-import { utf8BytesToString, utf8StringToBytes } from './utf8';
+import { utf8BytesToString, utf8StringToBytes } from 'skiff-utils';
 
 import { Datagram } from './aead/common';
 

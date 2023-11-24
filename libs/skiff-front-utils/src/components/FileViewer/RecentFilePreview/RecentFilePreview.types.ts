@@ -1,4 +1,4 @@
-import { Color, CircularProgressSize, Icon } from '@skiff-org/skiff-ui';
+import { CircularProgressSize, Color, Icon } from 'nightwatch-ui';
 import { FC } from 'react';
 import { NwContentType } from 'skiff-graphql';
 
@@ -16,7 +16,11 @@ export interface PreviewObject {
   fileSizeBytes?: number;
 }
 
-export type PreviewComponentProps = Pick<PreviewObject, 'data'> & { compact?: boolean; maxHeight?: string };
+export type PreviewComponentProps = Pick<PreviewObject, 'data' | 'mimeType'> & {
+  compact?: boolean;
+  maxHeight?: string;
+  className?: string;
+};
 
 export type PreviewComponent = FC<PreviewComponentProps>;
 
@@ -36,5 +40,9 @@ export type PreviewDisplayProps = {
   iconColor?: Color;
   size: PreviewSize;
   title?: string;
-  showEmptyIllustration?: boolean;
+  onClose?: () => void;
+  CustomUnknownPreviewComponent?: JSX.Element;
+  isEmbeddedInPage?: boolean;
+  width?: number;
+  reactPdf?: boolean;
 };

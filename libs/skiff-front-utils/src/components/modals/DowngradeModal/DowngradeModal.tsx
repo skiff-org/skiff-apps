@@ -1,7 +1,9 @@
-import { Button, Dialog, DialogTypes, Size, Type } from '@skiff-org/skiff-ui';
+import { useFlags } from 'launchdarkly-react-client-sdk';
+import { Button, Dialog, DialogType, Size, Type } from 'nightwatch-ui';
 import React from 'react';
 import { DowngradeProgress } from 'skiff-graphql';
 import { TierName } from 'skiff-utils';
+import { FreeCustomDomainFeatureFlag } from 'skiff-utils';
 
 import { getDowngradeTodoItems } from '../../../utils';
 import DowngradeTodoItem from '../../DowngradeTodoItem';
@@ -14,7 +16,9 @@ interface DowngradeModalProps {
 }
 
 const DowngradeModal: React.FC<DowngradeModalProps> = ({ open, onClose, tierToDowngradeTo, downgradeProgress }) => {
-  const todoItemPropsList = getDowngradeTodoItems(tierToDowngradeTo, downgradeProgress);
+  const flags = useFlags();
+  const freeCustomDomainFlag = flags.freeCustomDomain as FreeCustomDomainFeatureFlag;
+  const todoItemPropsList = getDowngradeTodoItems(tierToDowngradeTo, { freeCustomDomainFlag }, downgradeProgress);
   return (
     <Dialog
       customContent
@@ -22,7 +26,7 @@ const DowngradeModal: React.FC<DowngradeModalProps> = ({ open, onClose, tierToDo
       onClose={onClose}
       open={open}
       title='Are you sure you want to downgrade?'
-      type={DialogTypes.Default}
+      type={DialogType.DEFAULT}
     >
       {todoItemPropsList.map(({ key, ...props }) => (
         <DowngradeTodoItem {...props} key={key} />

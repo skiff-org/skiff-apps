@@ -12,6 +12,7 @@ type Document {
   decryptedSessionKey: String!
   decryptedPrivateHierarchicalKey: String
   currentlyEditingUsers: [CurrentlyEditingUser]! # Set when editing a document by looking at awarness updates from the websocket
+  decryptedThumbnail: String
 }
 
 type CurrentlyEditingUser {

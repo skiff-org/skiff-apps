@@ -48,6 +48,10 @@ export const signOutAllLocalStorageAccounts = () => {
   relevantKeys.forEach((key) => localStorage.removeItem(key));
 };
 
+export const signOutOfLocalStorageAccount = (userID: string) => {
+  localStorage.removeItem(`${getStorageKey(StorageTypes.SAVED_ACCOUNT)}:${userID}`);
+};
+
 export const getSessionCacheForLatestUser = () => {
   const latestUserID = getLatestUserID();
   // get default key if no userID, otherwise get from userID

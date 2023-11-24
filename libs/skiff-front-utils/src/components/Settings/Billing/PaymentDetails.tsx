@@ -1,13 +1,23 @@
-import { Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
+import { Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
 import { useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { useGetBillingPortalSessionUrlLazyQuery } from 'skiff-front-graphql';
+import { useGetBillingPortalSessionUrlLazyQuery, useSubscriptionPlan } from 'skiff-front-graphql';
 
 import TitleActionSection from '../TitleActionSection';
+
+const APPLE_STORE_SUBSCRIPTIONS = 'https://apps.apple.com/account/subscriptions';
+
+const openAppleSubscriptionPage = () => {
+  window.open(APPLE_STORE_SUBSCRIPTIONS, '_blank');
+};
 
 function PaymentDetails() {
   const [getBillingPortalSessionUrl] = useGetBillingPortalSessionUrlLazyQuery();
   const [loading, setLoading] = useState(false);
+
+  const {
+    data: { isAppleSubscription }
+  } = useSubscriptionPlan();
 
   const openStripe = async () => {
     // Open Stripe portal to set subscription to cancel at period end
@@ -32,7 +42,13 @@ function PaymentDetails() {
       <TitleActionSection
         actions={[
           {
-            onClick: () => void openStripe(),
+            onClick: () => {
+              if (isAppleSubscription) {
+                openAppleSubscriptionPage();
+              } else {
+                void openStripe();
+              }
+            },
             label: 'Manage',
             type: 'button',
             loading: loading

@@ -151,6 +151,12 @@
   background: var(--bg-l0-solid, #f0f1f3) !important;
 }
 
+.colHeader > .cellContent > p {
+  word-wrap: break-word;
+  text-overflow: initial;
+  white-space: pre-wrap;
+}
+
 .ProseMirror .tableWrapper .drag-handle-container {
   display: none;
 }

@@ -1,6 +1,6 @@
 // This file contains constants shared between editor front and back
 
-import { mbToBytes } from './fileSizeUtils';
+import { gbToBytes, mbToBytes } from './fileSizeUtils';
 
 // In the new file storage architecture, this limit doesn't really matter - we just set it to a high value for sanity.
 // The maximum file size we can store is MAX_CACHE_ELEMS_PER_DOC * FILE_SLICE_SIZE.
@@ -14,6 +14,8 @@ export const FILE_SLICE_SIZE = mbToBytes(5); // MB
 export const DOCUMENT_HISTORY_FREE_TIER_HOURS = 24;
 
 export const MAXIMUM_STRIPE_PURCHASE_QUANTITY = 999999;
+
+export const GLOBAL_MAX_NUM_QUICK_ALIASES = 10_000;
 
 /** Credits */
 
@@ -50,6 +52,13 @@ export const CREDIT_FOR_OUTLOOK_IMPORT = {
 export const CREDIT_FOR_GMAIL_IMPORT = {
   cents: 1000, // $10
   skemailStorageBytes: 0,
+  editorStorageBytes: 0
+};
+
+// 1GB - One-time credit
+export const CREDIT_FOR_ENS_NAME = {
+  cents: 0,
+  skemailStorageBytes: gbToBytes(1),
   editorStorageBytes: 0
 };
 
@@ -106,6 +115,8 @@ export enum CustomDomainPriceExperimentGroup {
 }
 
 export const SUPPORT_EMAIL = 'support@skiff.org';
+// email domains from which support comms may originate
+export const SKIFF_SUPPORT_DOMAINS = ['skiff.org', 'skiff.zendesk.com'];
 
 export enum EmailType {
   SHARE = 'SHARE',
@@ -124,7 +135,7 @@ export enum EmailType {
   SUGGEST_WORKSPACE = 'SUGGEST_WORKSPACE'
 }
 
-export const POLL_INTERVAL_IN_MS = 30000; // 30 seconds
+export const POLL_INTERVAL_IN_MS = 20000; // 20 seconds
 
 // Header name for auth link
 export const SKIFF_USERID_HEADER_NAME = 'x-skiff-userid';
@@ -132,14 +143,14 @@ export const SKIFF_USERID_HEADER_NAME = 'x-skiff-userid';
 // Header name for device id
 export const SKIFF_DEVICEID_HEADER_NAME = 'x-skiff-deviceid';
 
+// Header name for product
+export const SKIFF_PRODUCT_HEADER_NAME = 'x-skeader-product';
+
+// Admin API Token
+export const ADMIN_API_TOKEN_HEADER = 'x-skiff-admin-api-token';
+
 // Human-readable prefix for challenge to clarify to users what they're signing
 export const CHALLENGE_TOKEN_PREFIX = 'skiff_signup_';
-
-// required suffix for all UD aliases
-export const UNSTOPPABLE_ALIAS_SUFFIX = '-ud';
-
-// email custom domain associated with all UD addresses
-export const UNSTOPPABLE_CUSTOM_DOMAIN = 'ud.me';
 
 export enum CustomDomainStatus {
   PENDING = 'PENDING',
@@ -202,9 +213,12 @@ export interface PerIntervalPrice {
   yearly: number;
 }
 
-export const UNIT_PRICE_BY_SKIFF_CREDIT_ELIGIBLE_TIER: Record<SkiffCreditEligibleTier, PerIntervalPrice> = {
-  [SkiffCreditEligibleTier.Pro]: { monthly: PlanPrices.ProMonthly, yearly: PlanPrices.ProYearly },
-  [SkiffCreditEligibleTier.Business]: { monthly: PlanPrices.BusinessMonthly, yearly: PlanPrices.BusinessYearly }
+export type PaidTier = TierName.Essential | TierName.Pro | TierName.Business;
+
+export const UNIT_PRICE_BY_TIER_NAME: Record<PaidTier, PerIntervalPrice> = {
+  [TierName.Essential]: { monthly: PlanPrices.EssentialMonthly, yearly: PlanPrices.EssentialYearly },
+  [TierName.Pro]: { monthly: PlanPrices.ProMonthly, yearly: PlanPrices.ProYearly },
+  [TierName.Business]: { monthly: PlanPrices.BusinessMonthly, yearly: PlanPrices.BusinessYearly }
 };
 
 export const STRIPE_CHECKOUT_SESSION_LIFESPAN_SECONDS = 24 * 60 * 60;
@@ -247,82 +261,11 @@ export enum PaywallErrorCode {
   WorkspaceUserLimit = 'WORKSPACE_USER_LIMIT',
   SecuredBySkiffSig = 'SECURED_BY_SKIFF_SIG',
   AutoReply = 'AUTO_REPLY',
-  MailFilterLimit = 'MAIL_FILTER'
+  MailFilterLimit = 'MAIL_FILTER',
+  CatchallAlias = 'CATCHALL_ALIAS',
+  EditAliasDisplayInfo = 'EDIT_ALIAS_DISPLAY_INFO',
+  AnonymousSubdomain = 'ANONYMOUS_SUBDOMAIN'
 }
-
-interface TierLimits {
-  maxStorageInMb: number;
-  maxUploadLimitInMb: number;
-  maxNumNonWalletAliases: number;
-  maxCustomDomains: number;
-  allowedNumShortAliases: number;
-  maxNumLabelsOrFolders: number;
-  messagesPerDay: number;
-  maxUsersPerWorkspace: number;
-  autoReplyEnabled: boolean;
-  unlimitedVersionHistory: boolean;
-  maxNumMailFilters: number;
-  maxAliasesInactive: number;
-}
-
-export const LIMITS_BY_TIER: Record<TierName, TierLimits> = {
-  [TierName.Free]: {
-    maxStorageInMb: 10000,
-    maxUploadLimitInMb: 5000, // 5 GB
-    maxNumNonWalletAliases: 4,
-    maxCustomDomains: 0,
-    allowedNumShortAliases: 0,
-    messagesPerDay: 200,
-    maxNumLabelsOrFolders: 5,
-    maxUsersPerWorkspace: 6,
-    autoReplyEnabled: false,
-    unlimitedVersionHistory: false,
-    maxNumMailFilters: 2,
-    maxAliasesInactive: 2
-  },
-  [TierName.Essential]: {
-    maxStorageInMb: 15000,
-    maxUploadLimitInMb: 5000, // 5 GB
-    maxNumNonWalletAliases: 10,
-    maxCustomDomains: 1,
-    allowedNumShortAliases: 0,
-    messagesPerDay: 200,
-    maxNumLabelsOrFolders: Infinity,
-    maxUsersPerWorkspace: 6,
-    autoReplyEnabled: true,
-    unlimitedVersionHistory: false,
-    maxNumMailFilters: Infinity,
-    maxAliasesInactive: 6
-  },
-  [TierName.Pro]: {
-    maxStorageInMb: 100000,
-    maxUploadLimitInMb: 50000, // 50 GB
-    maxNumNonWalletAliases: 10,
-    maxCustomDomains: 2,
-    allowedNumShortAliases: 1,
-    messagesPerDay: Infinity,
-    maxNumLabelsOrFolders: Infinity,
-    maxUsersPerWorkspace: 6,
-    autoReplyEnabled: true,
-    unlimitedVersionHistory: true,
-    maxNumMailFilters: Infinity,
-    maxAliasesInactive: 10
-  },
-  [TierName.Business]: {
-    maxStorageInMb: 1000000,
-    maxUploadLimitInMb: 150000, // 150 GB
-    maxNumNonWalletAliases: 15,
-    maxCustomDomains: 15,
-    allowedNumShortAliases: 2,
-    messagesPerDay: Infinity,
-    maxNumLabelsOrFolders: Infinity,
-    maxUsersPerWorkspace: MAXIMUM_STRIPE_PURCHASE_QUANTITY,
-    autoReplyEnabled: true,
-    unlimitedVersionHistory: true,
-    maxNumMailFilters: Infinity,
-    maxAliasesInactive: 20
-  }
-};
 
 // the billing cycles supported by both Stripe and Skiff
 export enum StripeBillingInterval {
@@ -376,8 +319,9 @@ export enum CaptchaBehaviorTypes {
   PASSWORD_RESET = 'password_reset',
   SEND_MESSAGE = 'user_post',
   REPLY_MESSAGE = 'user_comment',
-  DELETE_ALIAS = 'account_update',
-  PROVISION_USER = 'account_update'
+  DELETE_ALIAS = 'delete_alias',
+  DELETE_QUICK_ALIAS = 'delete_quick_alias',
+  PROVISION_USER = 'provision_user'
 }
 
 export const SUPPORTED_ICNS_PREFIXES = ['cosmos', 'juno'];
@@ -417,3 +361,30 @@ export const ActiveGoodStandingStates = [SubscriptionStates.ACTIVE, Subscription
 
 // Size of content snippet to be displayed in the email list.
 export const CONTENT_SNIPPET_SIZE = 100; // chars
+
+export const ALERTS_EMAIL_ALIAS = 'alerts@notifications.skiff.org';
+export const SUPPORT_EMAIL_ALIAS = 'support@skiff.org';
+export const SUPPORT_COM_EMAIL_ALIAS = 'support@skiff.com';
+export const UPDATES_EMAIL_ALIAS = 'updates@marketing.skiff.org';
+export const WELCOME_EMAIL_ALIAS = 'hello@skiff.com';
+export const ONBOARDING_ALIAS = 'onboarding@marketing.skiff.org';
+export const SUBSCRIPTION_UPDATE_ALIAS = 'subscriptions-noreply@skiff.com';
+
+export const VERIFIED_SKIFF_EMAILS = [
+  ALERTS_EMAIL_ALIAS,
+  SUPPORT_EMAIL_ALIAS,
+  SUPPORT_COM_EMAIL_ALIAS,
+  ONBOARDING_ALIAS,
+  UPDATES_EMAIL_ALIAS,
+  WELCOME_EMAIL_ALIAS,
+  SUBSCRIPTION_UPDATE_ALIAS
+];
+
+// the distance away from the quick alias limit within which we warn the user on alias creation;
+// i.e. if limit is 10, we start warning at the creation of the (10 - BUFFER)th alias
+export const QUICK_ALIAS_LIMIT_WARNING_BUFFER = 2;
+
+// proportions of storage allowance usage at which we warn users
+export const STORAGE_WARNING_THRESHOLDS = [
+  0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.92, 0.95, 0.96, 0.97, 0.98, 0.99
+];

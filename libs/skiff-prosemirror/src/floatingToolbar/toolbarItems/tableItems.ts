@@ -1,26 +1,24 @@
-import { CellSelection, isInTable, selectedRect } from '@skiff-org/prosemirror-tables';
 import {
   addBottomRow,
-  addRightColumn,
-  changeCellsBackgroundColor,
+  addRightColumn, CellSelection, changeCellsBackgroundColor,
   deleteLastCol,
   deleteLastRow,
   getDeleteCommand,
-  isCellColorActive,
-  toggleTableHeaders
+  isCellColorActive, isInTable, selectedRect, toggleTableHeaders
 } from '@skiff-org/prosemirror-tables';
 import crelt from 'crelt';
-import { Icon } from '@skiff-org/skiff-ui';
+import { Icon } from 'nightwatch-ui';
 import { EditorState, Transaction } from 'prosemirror-state';
 import { findParentNodeOfType } from 'prosemirror-utils';
 import { EditorView } from 'prosemirror-view';
-import { HIGHLIGHT_COLORS } from 'skiff-front-utils';
+import { EditorHighlightColorIds, HIGHLIGHT_COLORS } from 'skiff-front-utils';
 
 import { getToolbarType } from '../utils';
 
 import AnimatedDropdown from './customMenu/AnimatedDropdown';
 import SkiffMenuItem from './customMenu/SkiffMenuItem';
 import { itemsMap, ToolbarItemsIds } from './itemsMap';
+import { getSpecialBackgrounds } from './textItems';
 import { addDeleteHoverClass, createElementWithClassAndIcon, removeDeleteHoverClass } from './utils';
 
 const removeCol = new SkiffMenuItem({
@@ -51,7 +49,7 @@ const colsCount = new SkiffMenuItem({
     if (!isInTable(state) || !dom.firstChild) return;
     (dom.firstChild as HTMLElement).innerText = `${selectedRect(state as any).table.firstChild?.childCount}` || '0';
   },
-  run: () => {},
+  run: () => { },
   id: ToolbarItemsIds.TABLE_COLUMNS
 });
 
@@ -97,7 +95,7 @@ const rowsCount = new SkiffMenuItem({
     if (!isInTable(state) || !dom.firstChild) return;
     (dom.firstChild as HTMLElement).innerText = `${selectedRect(state as any).table.childCount}` || '0';
   },
-  run: () => {},
+  run: () => { },
   id: ToolbarItemsIds.TABLE_ROWS
 });
 
@@ -116,9 +114,10 @@ const addRow = new SkiffMenuItem({
 export const rowsControlItems = [removeRow, rowsCount, addRow];
 
 const createCellColorIcon = (color: string, labelContent: string) => {
+  const isTransparent = EditorHighlightColorIds.TRANSPARENT === color;
   const icon = crelt('span', {
-    class: `cell-background-color-item-icon`,
-    style: `background: ${HIGHLIGHT_COLORS[color]}`
+    class: `cell-background-color-item-icon ${isTransparent ? 'transparent-toolbar-icon' : ''}`,
+    style: `background: ${getSpecialBackgrounds(HIGHLIGHT_COLORS[color] as string)}`
   });
   const container = crelt(
     'div',
@@ -150,7 +149,7 @@ export const getCellsBackgroundColorItems = () =>
   );
 
 export const cellsBackgroundColorsItemDropdown = new AnimatedDropdown(getCellsBackgroundColorItems(), {
-  label: '',
+  label: 'bg-cell-color-icon',
   class: 'cell-background-color-dropdown',
   dataTest: 'cell-background-color-dropdown'
 });

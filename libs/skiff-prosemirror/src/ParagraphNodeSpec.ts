@@ -1,4 +1,4 @@
-import { DOMOutputSpec, Node as PMNode, NodeSpec } from 'prosemirror-model';
+import { DOMOutputSpec, NodeSpec, Node as PMNode } from 'prosemirror-model';
 
 import convertToCSSPTValue from './convertToCSSPTValue';
 import clamp from './ui/clamp';
@@ -15,6 +15,9 @@ const ALIGN_PATTERN = /(left|right|center|justify)/;
 // as a `<p>` element.
 const ParagraphNodeSpec: NodeSpec = {
   attrs: {
+    dir: {
+      default: 'auto'
+    },
     align: {
       default: null
     },
@@ -80,10 +83,11 @@ export function getParagraphNodeAttrs(dom: Node | string) {
 }
 
 export function toParagraphDOM(node: PMNode): DOMOutputSpec {
-  const { align, indent, lineSpacing, paddingTop, paddingBottom, id, ychange } = node.attrs;
+  const { align, indent, lineSpacing, paddingTop, paddingBottom, id, ychange, dir } = node.attrs;
   const attrs: {
     id?: string;
     ychange_type?: string;
+    dir?: string;
     style?: string;
     class?: string;
   } = {};
@@ -108,6 +112,10 @@ export function toParagraphDOM(node: PMNode): DOMOutputSpec {
 
   if (paddingBottom && !EMPTY_CSS_VALUE.has(paddingBottom)) {
     style += `padding-bottom: ${paddingBottom};`;
+  }
+
+  if (dir) {
+    attrs.dir = dir as string;
   }
 
   if (style) attrs.style = style;

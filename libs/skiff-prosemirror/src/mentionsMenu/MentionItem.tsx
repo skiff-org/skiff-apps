@@ -1,4 +1,4 @@
-import { Size, ThemeMode, Typography } from '@skiff-org/skiff-ui';
+import { Size, ThemeMode, Typography } from 'nightwatch-ui';
 import { EditorView } from 'prosemirror-view';
 import React, { FunctionComponent, useMemo } from 'react';
 import { formatName } from 'skiff-front-utils';

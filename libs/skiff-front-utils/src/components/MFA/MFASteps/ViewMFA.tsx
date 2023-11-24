@@ -11,7 +11,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 import React, { useState } from 'react';
 import { MfaTypes } from 'skiff-graphql';
 import styled from 'styled-components';
@@ -89,9 +89,8 @@ function ViewQRCode({ closeDialog, qrUrl, setStep, totpSeed, userMfaTypes }: Vie
   const flags = useFlags();
   const { enqueueToast } = useToast();
   const hasTotp = userMfaTypes?.includes(MfaTypes.Totp);
-  const showHardwareKeyFlag = (flags.showHardwareKey as boolean) || window.location.hostname === 'localhost';
   // currently, RN is not set up properly to handle webauthn registration
-  const showHardwareKey = showHardwareKeyFlag && !window.ReactNativeWebView;
+  const showHardwareKey = !window.ReactNativeWebView;
 
   const copyToClipboard = () => {
     if (isCopyClicked) return;

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import React, { ForwardedRef } from 'react';
 import styled from 'styled-components';
 
+import { DISPLAY_SCROLLBAR_CSS } from 'nightwatch-ui';
 import ActionSidebarItem from './ActionSidebarItem';
 import { SidebarProps } from './Sidebar.types';
 import SidebarSection from './SidebarSection';
@@ -24,10 +25,15 @@ const SidebarContainer = styled.div<{ width?: number }>`
 
 const ItemList = styled.div<{ $hasFooter?: boolean }>`
   overflow: auto;
+  ::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+  :hover {
+    ${DISPLAY_SCROLLBAR_CSS}
+  }
   flex-direction: column;
   display: flex;
   gap: ${(props) => (props.$hasFooter ? 0 : 12)}px;
-  padding-bottom: 12px;
   height: ${(props) => (props.$hasFooter ? 'calc(100% - 212px)' : '100%')};
 `;
 
@@ -53,11 +59,11 @@ export const SidebarDataTest = {
 };
 
 const Sidebar = (
-  { AppSwitcher, primaryActions, sections, Footer, width, isCollapsed, onClick, id }: SidebarProps,
+  { AppSwitcher, className, primaryActions, sections, Footer, width, isCollapsed, onClick, id }: SidebarProps,
   ref: ForwardedRef<HTMLDivElement | null>
 ) => {
   return (
-    <SidebarContainer id={id} onClick={onClick} ref={ref} width={width}>
+    <SidebarContainer id={id} onClick={onClick} ref={ref} width={width} className={className}>
       {AppSwitcher}
       {!!primaryActions?.length && (
         <PrimaryActions>

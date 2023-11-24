@@ -9,15 +9,14 @@ import {
   Icons,
   ThemeMode,
   Type
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 import React, { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import Drawer from '../../Drawer';
 import {
   PendingUserInvite,
   UserProfileDataFragment,
   useDeleteInviteMutation,
-  useGetCollaboratorsQuery
+  useGetDocumentFullQuery
 } from 'skiff-front-graphql';
 import { PermissionLevel, RequestStatus } from 'skiff-graphql';
 import styled from 'styled-components';
@@ -31,6 +30,7 @@ import { getDisplayPictureDataFromUser } from '../../../utils/userUtils';
 import { currentUserIsWorkspaceAdmin } from '../../../utils/workspaceUtils';
 import AccessLevelSelect from '../../AccessLevelSelect';
 import { AccessUserType } from '../../AccessLevelSelect/AccessLevelSelect';
+import Drawer from '../../Drawer';
 import UserListRow from '../shared/UserListRow';
 
 const LoadingContainer = styled.span`
@@ -100,10 +100,9 @@ const OrganizationMemberListRow: React.FC<OrganizationMemberListRowProps> = ({
 
   const isWorkspaceAdmin = currentUserIsWorkspaceAdmin(activeOrgData?.organization);
 
-  const [isHovering, setIsHovering] = useState(false);
   const { userID } = useRequiredCurrentUserData();
 
-  const { refetch } = useGetCollaboratorsQuery({
+  const { refetch } = useGetDocumentFullQuery({
     variables: {
       request: {
         docID
@@ -112,8 +111,8 @@ const OrganizationMemberListRow: React.FC<OrganizationMemberListRowProps> = ({
     skip: !docID
   });
 
-  const handleSelectResend = async (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleSelectResend = async (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     const orgEveryoneTeamDocID = activeOrgData?.organization.everyoneTeam.rootDocument?.docID;
 
     try {
@@ -133,9 +132,7 @@ const OrganizationMemberListRow: React.FC<OrganizationMemberListRowProps> = ({
     await refetch();
   };
 
-  const handleSelectDelete = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-
+  const handleSelectDelete = async () => {
     try {
       const response = await deleteInvite({ variables: { request: { docID, email } } });
       if (response.data?.deleteInvite.status === RequestStatus.Success) {
@@ -160,14 +157,16 @@ const OrganizationMemberListRow: React.FC<OrganizationMemberListRowProps> = ({
 
   return (
     <UserListRow
+      active={false}
       avatarDisplayData={!!pendingInvite ? Icon.Clock : displayPictureData}
       dataTest={dataTest}
       displayName={displayName}
+      hover={false}
       isLast={isLast}
       onClick={onClick}
-      setIsHovering={setIsHovering}
       subtitle={getSubtitle()}
       subtitleColor={pendingInvite ? 'tertiary' : 'secondary'}
+      width='50%'
     >
       {loading && (
         <LoadingContainer>
@@ -266,7 +265,7 @@ const OrganizationMemberListRow: React.FC<OrganizationMemberListRowProps> = ({
       )}
       {!pendingInvite && isWorkspaceAdmin && (
         <ForwardIconContainer>
-          <Icons color={isHovering ? 'secondary' : 'disabled'} icon={Icon.Forward} onClick={() => {}} />
+          <Icons color='disabled' icon={Icon.Forward} onClick={() => {}} />
         </ForwardIconContainer>
       )}
     </UserListRow>

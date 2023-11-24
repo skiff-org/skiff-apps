@@ -1,4 +1,4 @@
-import { MonoTag, ThemeMode } from '@skiff-org/skiff-ui';
+import { MonoTag, ThemeMode } from 'nightwatch-ui';
 import { SubscriptionPlan } from 'skiff-graphql';
 
 import { MONO_TYPE_TAG_STYLES_BY_PLAN } from '../../constants';

@@ -4,7 +4,7 @@ import { Plugin, PluginKey } from 'prosemirror-state';
 import { NodeWithPos } from 'prosemirror-utils';
 
 import { EditorSchema, syncPluginKey } from '..';
-import { DOC_HEADER_HR, SUBPAGE } from '../NodeNames';
+import { DOC_TITLE, SUBPAGE } from '../NodeNames';
 import uuid from '../ui/uuid';
 
 export const stopPreventRemoveSubpage = 'prevent-remove-of-subpage';
@@ -106,7 +106,7 @@ export class SubpagePlugin extends Plugin<SubpagePluginAttrs> {
 
           let insertLocation = -1;
           newState.doc.descendants((node, pos) => {
-            if (node.type.name === DOC_HEADER_HR) insertLocation = pos + node.nodeSize;
+            if (node.type.name === DOC_TITLE) insertLocation = pos + node.nodeSize;
             return true;
           });
           // Only insert if the doc has HEADER_HR which means its a new doc type

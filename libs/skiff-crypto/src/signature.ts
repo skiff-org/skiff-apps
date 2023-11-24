@@ -1,5 +1,5 @@
 import { fromByteArray, toByteArray } from 'base64-js';
-import { utf8StringToBytes } from './utf8';
+import { utf8StringToBytes } from 'skiff-utils';
 import nacl from 'tweetnacl';
 
 // These following three enums are sourced from generated/graphql.ts

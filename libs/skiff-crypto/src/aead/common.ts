@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import { Range } from 'semver';
-import { utf8BytesToString, utf8StringToBytes } from '../utf8';
+import { utf8BytesToString, utf8StringToBytes } from 'skiff-utils';
 
 import { concatUint8Arrays, extractVarintPrefixed, varintPrefixed } from './typedArraysUtils';
 
@@ -28,12 +28,12 @@ interface EncryptDatagram<T> {
   encrypt(datagram: Datagram<T>, data: T, nonce: Uint8Array): TypedBytes;
 }
 
-interface DecryptDatagram<T> {
+interface decryptDatagramV2<T> {
   decrypt(datagram: Datagram<T>, bytes: TypedBytes): T;
 }
 
 // Envelope is the minimum set of functions needed to encrypt and decrypt a bytestream.
-export type Envelope<T> = EncryptDatagram<T> & DecryptDatagram<T>;
+export type Envelope<T> = EncryptDatagram<T> & decryptDatagramV2<T>;
 
 /**
  * AADMeta is a class that encapsulates the additional metadata included in these envelope implementations.
@@ -118,7 +118,7 @@ export class AADMeta {
  * If the content being provided doesn't have the associated header, nonsense may be returned.
  */
 export class TypedBytes extends Uint8Array {
-  inspect(): ReturnType<typeof AADMeta['deserialize']> {
+  inspect(): ReturnType<(typeof AADMeta)['deserialize']> {
     const parsed = AADMeta.deserialize(this);
 
     if (parsed == null || parsed.metadata == null) {

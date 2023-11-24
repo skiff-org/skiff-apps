@@ -1,33 +1,45 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
+import { createDetachedSignatureAsymmetric } from 'skiff-crypto';
 import {
+  DeleteAccountDocument,
+  DeleteAccountMutation,
+  DeleteAccountMutationVariables,
+  DeleteMailAccountDocument,
+  DeleteMailAccountMutation,
+  DeleteMailAccountMutationVariables,
+  DisplayPictureData,
   GetUserIdDocument,
   GetUserIdQuery,
   GetUserIdQueryVariables,
+  GetUsersProfileDataDocument,
+  GetUsersProfileDataQuery,
+  GetUsersProfileDataQueryVariables,
+  USER_NOT_FOUND,
+  UpdateDisplayNameDocument,
+  UserID,
   UsersFromEmailAliasDocument,
   UsersFromEmailAliasQuery,
   UsersFromEmailAliasQueryVariables,
-  USER_NOT_FOUND,
-  DisplayPictureData
+  models
 } from 'skiff-front-graphql';
-import { AddressObject, User } from 'skiff-graphql';
+import { AddressObject, LoginSrpRequest, RequestStatus, SignatureContext, User } from 'skiff-graphql';
 import {
+  filterExists,
+  getMailDomain,
   isBonfidaName,
   isENSName,
-  getMailDomain,
-  trimAndLowercase,
-  isWalletOrNameServiceAddress,
   isWalletAddress,
-  filterExists
+  isWalletOrNameServiceAddress,
+  trimAndLowercase
 } from 'skiff-utils';
 import isEmail from 'validator/lib/isEmail';
+import isEthereumAddress from 'validator/lib/isEthereumAddress';
+
+import { requireCurrentUserData, saveCurrentUserData } from '../apollo';
 
 import { MAIL_DOMAIN } from './getMailDomain';
-import {
-  abbreviateWalletAddress,
-  createAbbreviatedWalletEmail,
-  createEmail,
-  getEthAddrFromENSName
-} from './walletUtils';
+import { abbreviateWalletAddress, createAbbreviatedWalletEmail, createEmail } from './walletUtils';
+import { getENSNameFromEthAddr, getEthAddrFromENSName } from './walletUtils/metamaskUtils';
 
 // Returns an array with the alias and the domain
 // For example, if email were 'test@skiff.com', this would return { alias: 'test', domain: 'skiff.com' }
@@ -239,17 +251,186 @@ export async function formatUsernameAndCheckExists(
     return { formattedUsername: undefined, error: true };
   }
   try {
-    const checkWithoutEmail = await lookupAliasInfoFromEmail(client, lowerCaseUsername);
-    if (checkWithoutEmail) {
-      return { formattedUsername: checkWithoutEmail.username };
-    }
-    const checkWithEmail = await lookupAliasInfoFromEmail(client, lowerCaseUsername + '@' + MAIL_DOMAIN);
+    const mailDomainSuffix = !!window.location ? MAIL_DOMAIN : 'skiff.com';
+    const [checkWithEmail, checkWithoutEmail] = await Promise.all([
+      lookupAliasInfoFromEmail(client, lowerCaseUsername + '@' + mailDomainSuffix),
+      lookupAliasInfoFromEmail(client, lowerCaseUsername)
+    ]);
     if (checkWithEmail) {
       return { formattedUsername: checkWithEmail.username };
+    }
+    if (checkWithoutEmail) {
+      return { formattedUsername: checkWithoutEmail.username };
     }
     return { formattedUsername: undefined };
   } catch (error) {
     console.error(error);
     return { formattedUsername: undefined, error: true };
   }
+}
+
+/*
+ * Deletes a user account.
+ * If successful, Should log out user via socket update.
+ * @param {User} userData - User requesting deletion.
+ * @returns {Promise<boolean>} Delete account success/failure.
+ */
+export async function deleteAccount(
+  username: string,
+  signingPrivateKey: string,
+  loginSrpRequest: LoginSrpRequest,
+  client: ApolloClient<NormalizedCacheObject>
+): Promise<boolean> {
+  // Create signature
+  const signature = createDetachedSignatureAsymmetric(
+    username, // data to sign is user's own username
+    signingPrivateKey,
+    SignatureContext.DeleteAccount
+  );
+
+  const deleteMailAccountResponse = await client.mutate<DeleteMailAccountMutation, DeleteMailAccountMutationVariables>({
+    mutation: DeleteMailAccountDocument,
+    variables: {
+      request: {
+        signature
+      }
+    }
+  });
+
+  if (!deleteMailAccountResponse.data) {
+    console.error('Failed to delete mail account');
+    return false;
+  }
+
+  const deleteAccountResponse = await client.mutate<DeleteAccountMutation, DeleteAccountMutationVariables>({
+    mutation: DeleteAccountDocument,
+    variables: {
+      request: {
+        signature,
+        loginSrpRequest
+      }
+    }
+  });
+
+  if (!deleteAccountResponse.data) {
+    console.error('Failed to delete editor account');
+    return false;
+  }
+
+  const { status } = deleteAccountResponse.data.deleteAccount;
+  return status === RequestStatus.Success;
+}
+
+/**
+ * If the user does not have a display name set, update the display name so
+ * that it is in sync with the default email alias -- ie if the default email is a wallet address
+ * with a linked ens name, update the display name to be the ens name
+ * @param defaultEmail the email to base the display name off of
+ * @param user the user to update the display name for
+ */
+export const resolveAndSetENSDisplayName = async (
+  defaultEmail: string,
+  user: models.User,
+  client: ApolloClient<NormalizedCacheObject>
+) => {
+  const { publicData } = user;
+
+  // Update the display name so that it is in sync with the default email alias
+  // If there's no display name set, check if we can default to the linked ENS name
+  const ensName = await resolveENSName(defaultEmail, publicData?.displayName);
+  if (ensName) {
+    await setDisplayName(user.userID, ensName, client);
+  }
+};
+
+/**
+ * If there is no current display name, get the ENS name linked tot he default email (if applicable)
+ * @param defaultEmail the default email of the user
+ * @param currDisplayName the current display name
+ * @returns the resolved ENS name if there is one linked, otherwise undefined
+ */
+export const resolveENSName = async (defaultEmail: string, currDisplayName?: string | null) => {
+  if (!currDisplayName) {
+    const { alias } = splitEmailToAliasAndDomain(defaultEmail);
+    const isEthAddress = isEthereumAddress(alias);
+    if (isEthAddress) {
+      return getENSNameFromEthAddr(alias);
+    } else if (isENSName(alias)) {
+      return alias;
+    }
+  }
+  return undefined;
+};
+
+/**
+ * Fetches all public data about users by ID
+ * @param {Array<UserID>} userIDs array of target user IDs
+ * @param {any} dispatch - redux dispatch fn
+ * @returns {Promise<User[]>} array of objects containing usernames and publicData blobs for each user
+ */
+export async function fetchUserProfileDataFromIDs(userIDs: Array<string>, client: ApolloClient<NormalizedCacheObject>) {
+  const profileDataResponse = await client.query<GetUsersProfileDataQuery, GetUsersProfileDataQueryVariables>({
+    query: GetUsersProfileDataDocument,
+    variables: {
+      request: {
+        userIDs
+      }
+    }
+  });
+
+  const { users } = profileDataResponse.data;
+
+  if (!users) {
+    console.error('FetchUsersPublicData: Request failed.');
+    return null;
+  }
+
+  return users;
+}
+
+/**
+ * Update user displayName
+ * @param {UserID} userID - current user ID
+ * @param {String} displayName - new display name
+ * @param {any} dispatch - redux dispatch fn
+ * @returns {RequestStatus} - gql mutation status
+ */
+export async function setDisplayName(
+  userID: UserID,
+  displayName: string,
+  client: ApolloClient<NormalizedCacheObject>
+): Promise<RequestStatus> {
+  const updateResponse = await client.mutate({
+    mutation: UpdateDisplayNameDocument,
+    variables: {
+      request: {
+        displayName
+      }
+    },
+    // We use the GetUsersProfileDataDocument query to populate the user's display name for other components, so we want to
+    // refetch that data to make sure we capture the changes from the mutation. The next time a component that uses
+    // GetUsersProfileDataDocument loads, it will make a network call instead of using the cached result.
+    refetchQueries: [{ query: GetUsersProfileDataDocument, variables: { request: { userIDs: [userID] } } }]
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const { status } = updateResponse.data.updateDisplayName;
+  if (status !== RequestStatus.Success) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return status;
+  }
+
+  // trigger local state update
+  await fetchUserProfileDataFromIDs([userID], client);
+  const currentUserData = requireCurrentUserData();
+  saveCurrentUserData({
+    ...currentUserData,
+    publicData: {
+      ...(currentUserData.publicData ?? {}),
+      displayName
+    }
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return status;
 }

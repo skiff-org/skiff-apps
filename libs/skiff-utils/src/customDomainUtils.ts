@@ -21,7 +21,7 @@ export function sanitizeDomain(domain: string) {
 
 export const EXAMPLE_CUSTOM_DOMAIN = 'brandeis.com';
 
-const RESERVED_CUSTOM_DOMAINS = ['ethereum.email', 'solana.email', 'keplr.xyz', 'bitkeep.app', 'ud.me'];
+export const RESERVED_CUSTOM_DOMAINS = ['ethereum.email', 'solana.email', 'keplr.xyz', 'bitkeep.app', 'ud.me'];
 
 /**
  * Return whether the domain is included within our list of reserved

@@ -1,10 +1,11 @@
-import { DropdownItem, IconText, IconTextSize, Select, Size, ThemeMode, TypographyWeight } from '@skiff-org/skiff-ui';
+import { DropdownItem, IconText, IconTextSize, Size, ThemeMode, TypographyWeight } from 'nightwatch-ui';
 import React from 'react';
 import { useGetDocumentBaseQuery } from 'skiff-front-graphql';
 import { PermissionLevel } from 'skiff-graphql';
 import { upperCaseFirstLetter } from 'skiff-utils';
 
 import { canShareUsers } from '../../utils/sharingUtils';
+import SelectField from '../SelectField';
 
 export enum AccessUserType {
   EXISTING,
@@ -120,21 +121,11 @@ const AccessLevelSelect: React.FC<AccessLevelSelectProps> = ({
   ));
 
   if (onRemoveClick) {
-    permissionItems.push(
-      <DropdownItem
-        color='destructive'
-        dataTest='Remove'
-        label='Remove'
-        onClick={(e) => {
-          e.stopPropagation();
-          onRemoveClick();
-        }}
-      />
-    );
+    permissionItems.push(<DropdownItem color='destructive' dataTest='Remove' label='Remove' onClick={onRemoveClick} />);
   }
 
   return (
-    <Select
+    <SelectField
       dataTest={dataTest}
       disabled={disabled}
       forceTheme={theme}
@@ -145,7 +136,7 @@ const AccessLevelSelect: React.FC<AccessLevelSelectProps> = ({
       value={selectedPermission}
     >
       {permissionItems}
-    </Select>
+    </SelectField>
   );
 };
 

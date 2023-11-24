@@ -1,4 +1,4 @@
-import { Button, Size, Typography, TypographySize } from '@skiff-org/skiff-ui';
+import { Button, Size, Typography, TypographySize } from 'nightwatch-ui';
 import { useState } from 'react';
 import {
   useGetCheckoutSessionUrlOrStripeUpdateStatusLazyQuery,
@@ -82,6 +82,7 @@ const TierButton = ({
     loading,
     data: {
       isCryptoSubscription,
+      isAppleSubscription,
       cancelAtPeriodEnd,
       supposedEndDate,
       stripeStatus,
@@ -112,6 +113,7 @@ const TierButton = ({
 
   if (loading) return null;
 
+  const isNonStripeSubscription = isCryptoSubscription || isAppleSubscription;
   const isCurrentPlan = planRelation === PlanRelation.CURRENT;
   const activePlanIsFreeTier = activeSubscription === SubscriptionPlan.Free;
   const billWillNotProrate = activePlanIsFreeTier || isCurrentPlan || subscriptionPlan === SubscriptionPlan.Free;
@@ -208,12 +210,14 @@ const TierButton = ({
         </div>
         {/* prevent layout shift */}
         {isCryptoSubscription && !isCurrentPlan && <Spacer />}
-        {/* Don't show button if we paid with crypto and want to change. */}
-        {!(isCryptoSubscription && !isCurrentPlan) && (
+        {/* Show button only if is neither apple/crypto subscription, or it's current plan */}
+        {!(isNonStripeSubscription && !isCurrentPlan) && (
           <div>
             <Button
               disabled={
-                isCryptoSubscription || isUpdatingPlan || (isCurrentPlan && subscriptionPlan === SubscriptionPlan.Free)
+                isNonStripeSubscription ||
+                isUpdatingPlan ||
+                (isCurrentPlan && subscriptionPlan === SubscriptionPlan.Free)
               }
               loading={isButtonLoading}
               onClick={() => {
@@ -222,7 +226,7 @@ const TierButton = ({
                   // manage plan should take you to billing tab
                   if (
                     planRelation === PlanRelation.CURRENT &&
-                    !(activeSubscription === SubscriptionPlan.Free || isCryptoSubscription)
+                    !(activeSubscription === SubscriptionPlan.Free || isNonStripeSubscription)
                   ) {
                     openBillingPage();
                   } else {
@@ -236,7 +240,7 @@ const TierButton = ({
               size={Size.SMALL}
               type={getTierButtonType(planRelation)}
             >
-              {getTierLabel(planRelation, activeSubscription, isCryptoSubscription)}
+              {getTierLabel(planRelation, activeSubscription, isNonStripeSubscription)}
             </Button>
             {downgradeModalInfo && (
               <DowngradeModal

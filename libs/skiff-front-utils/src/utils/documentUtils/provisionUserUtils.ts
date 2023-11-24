@@ -1,6 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import srp from 'secure-remote-password/client';
-import { createKeyFromSecret, createSRPKey } from '@skiff-org/skiff-crypto';
+import { createKeyFromSecret, createSRPKey } from 'skiff-crypto';
 import {
   generateInitialUserObject,
   encryptPrivateUserData,
@@ -20,6 +20,8 @@ import isEmail from 'validator/lib/isEmail';
 import { requireCurrentUserData } from '../../apollo';
 
 import { encryptPrivateHierarchicalKeyForUser, signEncryptedPrivateHierarchicalKey } from './docCryptoUtils';
+import { upgradeDocKey } from './documentOperationUtils';
+import { downloadDocument } from './downloadDocument';
 
 export async function provisionNewUser(
   client: ApolloClient<NormalizedCacheObject>,
@@ -33,8 +35,17 @@ export async function provisionNewUser(
   const newUserID = v4();
   const curUserData = requireCurrentUserData();
 
-  assertExists(everyoneTeamRootDoc?.publicHierarchicalKey);
-  assertExists(everyoneTeamRootDoc?.decryptedPrivateHierarchicalKey);
+  assertExists(everyoneTeamRootDoc, 'Everyone team root doc does not exist');
+
+  if (!everyoneTeamRootDoc.decryptedPrivateHierarchicalKey) {
+    await upgradeDocKey(client, everyoneTeamRootDoc.docID);
+  }
+  const downloadedEveryoneTeamRoot = await downloadDocument(client, everyoneTeamRootDoc.docID);
+  assertExists(
+    downloadedEveryoneTeamRoot.decryptedPrivateHierarchicalKey,
+    'Everyone team root doc does not have decrypted key'
+  );
+  assertExists(downloadedEveryoneTeamRoot.publicHierarchicalKey, 'Everyone team root doc does not have public key');
   assertExists(isEmail(newUserAlias), 'Must be a valid email address');
 
   const salt = srp.generateSalt();
@@ -63,7 +74,7 @@ export async function provisionNewUser(
 
   // Create permission entries
   const encryptedPrivateHierarchicalKey = encryptPrivateHierarchicalKeyForUser(
-    everyoneTeamRootDoc.decryptedPrivateHierarchicalKey,
+    downloadedEveryoneTeamRoot.decryptedPrivateHierarchicalKey,
     publicKey, // new user public key
     curUserData.privateUserData.privateKey // current user
   );
@@ -85,7 +96,7 @@ export async function provisionNewUser(
     docID: everyoneTeamRootDoc.docID,
     signatures: [signature],
     newPermissionEntries: [fullEntry],
-    currentPublicHierarchicalKey: everyoneTeamRootDoc.publicHierarchicalKey
+    currentPublicHierarchicalKey: downloadedEveryoneTeamRoot.publicHierarchicalKey
   };
   let provisionEmailDetails: ProvisionEmailDetails | undefined = undefined;
   if (deliveryEmail) {
@@ -106,7 +117,8 @@ export async function provisionNewUser(
         provisionEmailDetails
       }
     },
-    refetchQueries: [{ query: GetOrganizationMembersDocument, variables: { id: orgIDForRefetch } }]
+    refetchQueries: [{ query: GetOrganizationMembersDocument, variables: { id: orgIDForRefetch } }],
+    errorPolicy: 'all'
   });
   return provisionResult;
 }

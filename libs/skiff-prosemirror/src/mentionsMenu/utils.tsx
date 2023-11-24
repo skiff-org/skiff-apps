@@ -1,6 +1,6 @@
 import '../ui/skiff-editor-menus.css';
 
-import { Icon as IconEnum, InputField, Size } from '@skiff-org/skiff-ui';
+import { Icon as IconEnum, InputField, Size } from 'nightwatch-ui';
 import { PluginKey, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import React from 'react';

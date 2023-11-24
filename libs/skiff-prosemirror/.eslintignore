@@ -1,0 +1,10 @@
+/package.json
+/bin
+/dist
+generated
+.eslintrc.js
+**/__mocks__/*
+configs
+internals
+devScripts
+build.js

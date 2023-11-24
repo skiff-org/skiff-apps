@@ -1,4 +1,4 @@
-import { Icon } from '@skiff-org/skiff-ui';
+import { Icon } from 'nightwatch-ui';
 
 export const COSMOS_CHAIN_ID = 'cosmoshub-4';
 

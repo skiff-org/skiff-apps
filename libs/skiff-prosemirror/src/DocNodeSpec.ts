@@ -1,5 +1,5 @@
 import convertToCSSPTValue from './convertToCSSPTValue';
-import { DOC_DESCRIPTION, DOC_HEADER_HR, DOC_ICON, DOC_TITLE } from './NodeNames';
+import { DOC_ICON, DOC_TITLE } from './NodeNames';
 
 export const LAYOUT = {
   DESKTOP_SCREEN_4_3: 'desktop_screen_4_3',
@@ -56,6 +56,6 @@ const DocNodeSpec = {
       default: null
     }
   },
-  content: `${DOC_ICON} ${DOC_TITLE} ${DOC_DESCRIPTION} ${DOC_HEADER_HR} block+`
+  content: `${DOC_ICON} ${DOC_TITLE} block+`
 };
 export default DocNodeSpec;
