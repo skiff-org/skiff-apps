@@ -1,0 +1,353 @@
+/* DISPLAY */
+/* Display Regular */
+@font-face {
+  font-family: 'Skiff Sans Display';
+  src: url('../../public/fonts/Skiff-Sans-Display-380.woff2') format('woff2');
+  font-weight: 380;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Display Regular italic */
+@font-face {
+  font-family: 'Skiff Sans Display';
+  src: url('../../public/fonts/Skiff-Sans-Display-380Italic.woff2') format('woff2');
+  font-weight: 380;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Display Medium */
+@font-face {
+  font-family: 'Skiff Sans Display';
+  src: url('../../public/fonts/Skiff-Sans-Display-470.woff2') format('woff2');
+  font-weight: 470;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Display Medium italic */
+@font-face {
+  font-family: 'Skiff Sans Display';
+  src: url('../../public/fonts/Skiff-Sans-Display-470Italic.woff2') format('woff2');
+  font-weight: 470;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Display Bold */
+@font-face {
+  font-family: 'Skiff Sans Display';
+  src: url('../../public/fonts/Skiff-Sans-Display-560.woff2') format('woff2');
+  font-weight: 560;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Display Bold italic */
+@font-face {
+  font-family: 'Skiff Sans Display';
+  src: url('../../public/fonts/Skiff-Sans-Display-560Italic.woff2') format('woff2');
+  font-weight: 560;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* TEXT */
+/* Text Regular */
+@font-face {
+  font-family: 'Skiff Sans Text';
+  src: url('../../public/fonts/Skiff-Sans-Text-380.woff2') format('woff2');
+  font-weight: 380;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Text Regular italic */
+@font-face {
+  font-family: 'Skiff Sans Text';
+  src: url('../../public/fonts/Skiff-Sans-Text-380Italic.woff2') format('woff2');
+  font-weight: 380;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Text Medium */
+@font-face {
+  font-family: 'Skiff Sans Text';
+  src: url('../../public/fonts/Skiff-Sans-Text-470.woff2') format('woff2');
+  font-weight: 470;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Text Medium italic */
+@font-face {
+  font-family: 'Skiff Sans Text';
+  src: url('../../public/fonts/Skiff-Sans-Text-470Italic.woff2') format('woff2');
+  font-weight: 470;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Text Bold */
+@font-face {
+  font-family: 'Skiff Sans Text';
+  src: url('../../public/fonts/Skiff-Sans-Text-560.woff2') format('woff2');
+  font-weight: 560;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Text Bold italic */
+@font-face {
+  font-family: 'Skiff Sans Text';
+  src: url('../../public/fonts/Skiff-Sans-Text-560Italic.woff2') format('woff2');
+  font-weight: 560;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* MONO */
+/* Mono Regular */
+@font-face {
+  font-family: 'Skiff Mono';
+  src: url('../../public/fonts/Skiff-Mono-Regular.woff2') format('woff2');
+  font-weight: 380;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Mono Regular italic */
+@font-face {
+  font-family: 'Skiff Mono';
+  src: url('../../public/fonts/Skiff-Mono-RegularItalic.woff2') format('woff2');
+  font-weight: 380;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Mono Medium */
+@font-face {
+  font-family: 'Skiff Mono';
+  src: url('../../public/fonts/Skiff-Mono-Medium.woff2') format('woff2');
+  font-weight: 470;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Mono Medium italic */
+@font-face {
+  font-family: 'Skiff Mono';
+  src: url('../../public/fonts/Skiff-Mono-MediumItalic.woff2') format('woff2');
+  font-weight: 470;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Mono Bold */
+@font-face {
+  font-family: 'Skiff Mono';
+  src: url('../../public/fonts/Skiff-Mono-Bold.woff2') format('woff2');
+  font-weight: 560;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Mono Bold italic */
+@font-face {
+  font-family: 'Skiff Mono';
+  src: url('../../public/fonts/Skiff-Mono-BoldItalic.woff2') format('woff2');
+  font-weight: 560;
+  font-style: italic;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+}
+/* Mobile Safe Area */
+body {
+  overflow: hidden; /* Fix scroll issues on mobile */
+  background: var(--bg-l2-solid);
+  margin: 0;
+}
+
+a {
+  color: var(--text-link);
+  text-decoration: none;
+}
+
+/* Remove blue box feedback when clicking */
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* https://benfrain.com/how-to-get-the-value-of-phone-notches-environment-variables-env-in-javascript-from-css/ */
+:root {
+  --sat: env(safe-area-inset-top);
+  --sar: env(safe-area-inset-right);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+}
+
+/* Toast z-index needs to be higher than Surface so that it is always on top*/
+.SnackbarContainer-root {
+  z-index: 100000000 !important;
+}
+
+/* This will change the scrollbar track */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+/* This is the scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);    /* color of the scroll thumb */
+  border-radius: 20px;                      /* roundness of the scroll thumb */
+  border: 3px solid transparent;            /* creates padding around scroll thumb */
+  background-clip: content-box;             /* ensures padding doesn't take on the background color */
+}
+
+/* Button at the top and bottom */
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* When you hover over the scrollbar */
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--cta-secondary-hover);    /* color of the scroll thumb when hovering */
+}
+
+.variable-size-list {
+  overflow: auto !important;
+}
+
+.variable-size-list::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+.variable-size-list:hover::-webkit-scrollbar {
+  width: 12px;
+}
+
+.variable-size-list:hover::-webkit-scrollbar-thumb {
+  background: var(--border-primary); /* color of the scroll thumb */
+  border-radius: 20px; /* roundness of the scroll thumb */
+  border: 3px solid transparent; /* creates padding around scroll thumb */
+  background-clip: content-box; /* ensures padding doesn't take on the background color */
+}
+
+.variable-size-list::-webkit-scrollbar-button {
+  display: none;
+}
+
+.variable-size-list:hover::-webkit-scrollbar-thumb {
+  background-color: var(--cta-secondary-hover); /* color of the scroll thumb when hovering */
+}
+
+.__prosemirror-dev-tools__ > div {
+  z-index: 99999999;
+}
+
+.ProseMirror .is-empty::before {
+  color: var(--text-disabled);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror img:hover {
+  cursor: pointer;
+}
+
+.ProseMirror img.ProseMirror-selectednode {
+  border-color: white;
+}
+
+.ProseMirror p {
+  padding: 0px;
+  margin: 0px;
+  font-weight: 380;
+  font-size: 15px;
+  line-height: 130%;
+  letter-spacing: 0em;
+}
+
+.ProseMirror strong {
+  font-weight: 520;
+}
+
+.ProseMirror blockquote {
+  padding: 0px;
+  margin: 0px;
+  border-left: 2px solid var(--icon-secondary);
+  padding-left: 12px;
+}
+
+.ProseMirror-focused {
+  border: none;
+  outline: none;
+}
+
+.ProseMirror ol,
+.ProseMirror ul {
+  padding-left: 30px;
+}
+
+.ProseMirror li::marker{
+  font-family: 'Skiff Sans Text', monospace;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 300;
+  font-size: 15px;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: var(--text-disabled);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.toolbar-dropdown > .optionMenu {
+  background: var(--bg-emphasis) !important;
+}
+
+.ProseMirror code {
+  color: var(--text-link);
+  font-family: 'Skiff Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+  padding: 0px 4px;
+  box-shadow: var(--inset-empty);
+  border-radius: 4px;
+  background: var(--bg-overlay-tertiary);
+}
+
+.ProseMirror ol ol ol ol ol,
+.ProseMirror ol ol ol ol ol ol ol ol,
+.ProseMirror ol ol {
+  list-style-type: lower-alpha;
+}
+
+.ProseMirror ol ol ol ol ol ol,
+.ProseMirror ol ol ol ol ol ol ol ol ol,
+.ProseMirror ol ol ol {
+  list-style-type: upper-roman;
+}
+
+.ProseMirror ol,
+.ProseMirror ol ol ol ol ol ol ol,
+.ProseMirror ol ol ol ol ol ol ol ol ol ol,
+.ProseMirror ol ol ol ol {
+  list-style-type: decimal;
+}
+
+.resize-handle {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  cursor: ew-resize;
+}
+
+.__floater {
+  filter: none !important;
+}

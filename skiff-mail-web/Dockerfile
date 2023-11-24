@@ -1,0 +1,76 @@
+FROM skiff-core:latest as skemail_base
+
+WORKDIR /usr/src/app
+# Install all libs
+COPY --from=skiff-libs:latest /usr/src/app/libs libs
+
+# Install skemail-web dependencies
+WORKDIR /usr/src/app/apps/skemail-web
+COPY . .
+CMD [ "yarn", "build"]
+
+FROM skemail_base AS skemail
+WORKDIR /usr/src/app/apps/skemail-web
+CMD [ "yarn", "build"]
+
+FROM skemail_base AS cdn_build
+ARG GIT_HASH
+ARG API_BASE_URL
+ARG HCAPTCHA_SITE_KEY
+ARG PASSIVE_HCAPTCHA_SITE_KEY
+ARG LD_CLIENT_SIDE_ID
+ARG DD_RUM_ENABLED="false"
+ARG DD_FORWARD_ERROR_MESSAGES=""
+ARG DD_RUM_SAMPLE_RATE=""
+ARG DD_RUM_PREMIUM_SAMPLE_RATE=""
+ARG DD_RUM_SERVICE_NAME=""
+ARG DD_RUM_ENV=""
+ARG DD_RUM_SITE=""
+ARG DD_RUM_APP_ID=""
+ARG DD_RUM_CLIENT_TOKEN=""
+ARG HCAPTCHA_SITE_KEY=""
+ARG PASSIVE_HCAPTCHA_SITE_KEY=""
+
+ENV GIT_HASH=$NEXT_PUBLIC_GIT_HASH
+ENV API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ENV HCAPTCHA_SITE_KEY=$NEXT_PUBLIC_HCAPTCHA_SITE_KEY
+ENV PASSIVE_HCAPTCHA_SITE_KEY=$NEXT_PUBLIC_PASSIVE_HCAPTCHA_SITE_KEY
+ENV LD_CLIENT_SIDE_ID=$NEXT_PUBLIC_LD_CLIENT_SIDE_ID
+
+WORKDIR /usr/src/app/apps/skemail-web
+RUN yarn export
+
+FROM scratch as artifact
+# Exports static bundle
+COPY --from=cdn_build /usr/src/app/apps/skemail-web/out dist/
+
+FROM skemail AS production_build
+WORKDIR /usr/src/app/apps/skemail-web
+
+ARG GIT_HASH
+ARG API_BASE_URL
+ARG HCAPTCHA_SITE_KEY
+ARG PASSIVE_HCAPTCHA_SITE_KEY
+ARG LD_CLIENT_SIDE_ID
+ARG DD_RUM_ENABLED="false"
+ARG DD_FORWARD_ERROR_MESSAGES=""
+ARG DD_RUM_SAMPLE_RATE=""
+ARG DD_RUM_PREMIUM_SAMPLE_RATE=""
+ARG DD_RUM_SERVICE_NAME=""
+ARG DD_RUM_ENV=""
+ARG DD_RUM_SITE=""
+ARG DD_RUM_APP_ID=""
+ARG DD_RUM_CLIENT_TOKEN=""
+ARG HCAPTCHA_SITE_KEY=""
+ARG PASSIVE_HCAPTCHA_SITE_KEY=""
+
+ENV GIT_HASH=$NEXT_PUBLIC_GIT_HASH
+ENV API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ENV HCAPTCHA_SITE_KEY=$NEXT_PUBLIC_HCAPTCHA_SITE_KEY
+ENV PASSIVE_HCAPTCHA_SITE_KEY=$NEXT_PUBLIC_PASSIVE_HCAPTCHA_SITE_KEY
+ENV LD_CLIENT_SIDE_ID=$NEXT_PUBLIC_LD_CLIENT_SIDE_ID
+# DD_... vars are only used on the static site, so we only need them during yarn build,
+# not yarn start -> no need to ENV them.
+
+RUN yarn build
+CMD ["yarn", "start", "--port=8080", "--hostname=0.0.0.0"]

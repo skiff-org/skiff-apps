@@ -1,0 +1,19 @@
+---
+services:
+  - name: skemail-web # change name of service and deploy
+    replicas: 1
+    description: Skemail Web
+    type: public
+    image: __ECR_REGISTRY__/skemail-web
+    # __git_sha__ is replaced by GitHub Workflow
+    tag: __git_sha__
+    resources:
+      requests:
+        cpu: 1
+        memory: 512Mi
+      limits:
+        cpu: 1
+        memory: 2G
+    environment_variables:
+      - name: GIT_HASH
+        value: "__git_sha__"
