@@ -1,13 +1,14 @@
-import { Icon, Icons, Typography, TypographySize, ThemeMode } from '@skiff-org/skiff-ui';
+import { Icon, Icons, ThemeMode, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
 import { useState } from 'react';
 
 import { UserAvatar } from '../UserAvatar';
 
 import {
   ActiveCheck,
+  UnreadBadge,
+  WorkspaceAvatar,
   WorkspaceItemContainer,
   WorkspaceLabels,
-  WorkspaceAvatar,
   WorkspaceOptionItem
 } from './OrganizationSelect.constants';
 
@@ -57,6 +58,15 @@ export const WorkspaceItem = (props: WorkspaceItemProps) => {
       {workspace?.active && (
         <ActiveCheck>
           <Icons color='white' icon={Icon.Check} />
+        </ActiveCheck>
+      )}
+      {!workspace?.active && (workspace?.numUnread || 0) > 0 && (
+        <ActiveCheck>
+          <UnreadBadge>
+            <Typography forceTheme={ThemeMode.DARK} weight={TypographyWeight.MEDIUM} size={TypographySize.CAPTION}>
+              {workspace?.numUnread}
+            </Typography>
+          </UnreadBadge>
         </ActiveCheck>
       )}
       {workspace?.warning && (

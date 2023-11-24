@@ -1,24 +1,21 @@
 /* eslint-disable */
-import _m0 from "protobufjs/minimal";
+import Long from 'long';
+import _m0 from 'protobufjs/minimal';
 
-export const protobufPackage = "com.skiff.skemail.filters";
+export const protobufPackage = 'com.skiff.skemail.filters';
 
-export interface MailFilterHeader {
-}
+export interface MailFilterHeader {}
 
 /** MailFilter is a filter that can be applied to a mail message. */
 export interface MailFilterBody {
   filterType: string;
-  filterField?:
-    | string
-    | undefined;
+  filterField?: string | undefined;
   /** any JSON */
   serializedData?: string | undefined;
   subFilter: MailFilterBody[];
 }
 
-export interface FilterActionHeader {
-}
+export interface FilterActionHeader {}
 
 export interface SingleFilterAction {
   actionType: string;
@@ -30,8 +27,7 @@ export interface FilterActionBody {
   actions: SingleFilterAction[];
 }
 
-export interface FilterSerializedDataHeader {
-}
+export interface FilterSerializedDataHeader {}
 
 export interface FilterSerializedDataBody {
   text: string;
@@ -47,17 +43,16 @@ export const MailFilterHeader = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MailFilterHeader {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMailFilterHeader();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
       }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -71,23 +66,19 @@ export const MailFilterHeader = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<MailFilterHeader>, I>>(base?: I): MailFilterHeader {
-    return MailFilterHeader.fromPartial(base ?? {});
-  },
-
   fromPartial<I extends Exact<DeepPartial<MailFilterHeader>, I>>(_: I): MailFilterHeader {
     const message = createBaseMailFilterHeader();
     return message;
-  },
+  }
 };
 
 function createBaseMailFilterBody(): MailFilterBody {
-  return { filterType: "", filterField: undefined, serializedData: undefined, subFilter: [] };
+  return { filterType: '', filterField: undefined, serializedData: undefined, subFilter: [] };
 }
 
 export const MailFilterBody = {
   encode(message: MailFilterBody, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.filterType !== "") {
+    if (message.filterType !== '') {
       writer.uint32(10).string(message.filterType);
     }
     if (message.filterField !== undefined) {
@@ -103,55 +94,38 @@ export const MailFilterBody = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MailFilterBody {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMailFilterBody();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
-            break;
-          }
-
           message.filterType = reader.string();
-          continue;
+          break;
         case 2:
-          if (tag !== 18) {
-            break;
-          }
-
           message.filterField = reader.string();
-          continue;
+          break;
         case 3:
-          if (tag !== 26) {
-            break;
-          }
-
           message.serializedData = reader.string();
-          continue;
+          break;
         case 4:
-          if (tag !== 34) {
-            break;
-          }
-
           message.subFilter.push(MailFilterBody.decode(reader, reader.uint32()));
-          continue;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
       }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): MailFilterBody {
     return {
-      filterType: isSet(object.filterType) ? String(object.filterType) : "",
+      filterType: isSet(object.filterType) ? String(object.filterType) : '',
       filterField: isSet(object.filterField) ? String(object.filterField) : undefined,
       serializedData: isSet(object.serializedData) ? String(object.serializedData) : undefined,
-      subFilter: Array.isArray(object?.subFilter) ? object.subFilter.map((e: any) => MailFilterBody.fromJSON(e)) : [],
+      subFilter: Array.isArray(object?.subFilter) ? object.subFilter.map((e: any) => MailFilterBody.fromJSON(e)) : []
     };
   },
 
@@ -161,25 +135,21 @@ export const MailFilterBody = {
     message.filterField !== undefined && (obj.filterField = message.filterField);
     message.serializedData !== undefined && (obj.serializedData = message.serializedData);
     if (message.subFilter) {
-      obj.subFilter = message.subFilter.map((e) => e ? MailFilterBody.toJSON(e) : undefined);
+      obj.subFilter = message.subFilter.map((e) => (e ? MailFilterBody.toJSON(e) : undefined));
     } else {
       obj.subFilter = [];
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<MailFilterBody>, I>>(base?: I): MailFilterBody {
-    return MailFilterBody.fromPartial(base ?? {});
-  },
-
   fromPartial<I extends Exact<DeepPartial<MailFilterBody>, I>>(object: I): MailFilterBody {
     const message = createBaseMailFilterBody();
-    message.filterType = object.filterType ?? "";
+    message.filterType = object.filterType ?? '';
     message.filterField = object.filterField ?? undefined;
     message.serializedData = object.serializedData ?? undefined;
     message.subFilter = object.subFilter?.map((e) => MailFilterBody.fromPartial(e)) || [];
     return message;
-  },
+  }
 };
 
 function createBaseFilterActionHeader(): FilterActionHeader {
@@ -192,17 +162,16 @@ export const FilterActionHeader = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): FilterActionHeader {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFilterActionHeader();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
       }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -216,23 +185,19 @@ export const FilterActionHeader = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<FilterActionHeader>, I>>(base?: I): FilterActionHeader {
-    return FilterActionHeader.fromPartial(base ?? {});
-  },
-
   fromPartial<I extends Exact<DeepPartial<FilterActionHeader>, I>>(_: I): FilterActionHeader {
     const message = createBaseFilterActionHeader();
     return message;
-  },
+  }
 };
 
 function createBaseSingleFilterAction(): SingleFilterAction {
-  return { actionType: "", serializedData: undefined };
+  return { actionType: '', serializedData: undefined };
 }
 
 export const SingleFilterAction = {
   encode(message: SingleFilterAction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.actionType !== "") {
+    if (message.actionType !== '') {
       writer.uint32(10).string(message.actionType);
     }
     if (message.serializedData !== undefined) {
@@ -242,39 +207,30 @@ export const SingleFilterAction = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): SingleFilterAction {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSingleFilterAction();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
-            break;
-          }
-
           message.actionType = reader.string();
-          continue;
+          break;
         case 2:
-          if (tag !== 18) {
-            break;
-          }
-
           message.serializedData = reader.string();
-          continue;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
       }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): SingleFilterAction {
     return {
-      actionType: isSet(object.actionType) ? String(object.actionType) : "",
-      serializedData: isSet(object.serializedData) ? String(object.serializedData) : undefined,
+      actionType: isSet(object.actionType) ? String(object.actionType) : '',
+      serializedData: isSet(object.serializedData) ? String(object.serializedData) : undefined
     };
   },
 
@@ -285,16 +241,12 @@ export const SingleFilterAction = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<SingleFilterAction>, I>>(base?: I): SingleFilterAction {
-    return SingleFilterAction.fromPartial(base ?? {});
-  },
-
   fromPartial<I extends Exact<DeepPartial<SingleFilterAction>, I>>(object: I): SingleFilterAction {
     const message = createBaseSingleFilterAction();
-    message.actionType = object.actionType ?? "";
+    message.actionType = object.actionType ?? '';
     message.serializedData = object.serializedData ?? undefined;
     return message;
-  },
+  }
 };
 
 function createBaseFilterActionBody(): FilterActionBody {
@@ -310,53 +262,44 @@ export const FilterActionBody = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): FilterActionBody {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFilterActionBody();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
-            break;
-          }
-
           message.actions.push(SingleFilterAction.decode(reader, reader.uint32()));
-          continue;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
       }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): FilterActionBody {
     return {
-      actions: Array.isArray(object?.actions) ? object.actions.map((e: any) => SingleFilterAction.fromJSON(e)) : [],
+      actions: Array.isArray(object?.actions) ? object.actions.map((e: any) => SingleFilterAction.fromJSON(e)) : []
     };
   },
 
   toJSON(message: FilterActionBody): unknown {
     const obj: any = {};
     if (message.actions) {
-      obj.actions = message.actions.map((e) => e ? SingleFilterAction.toJSON(e) : undefined);
+      obj.actions = message.actions.map((e) => (e ? SingleFilterAction.toJSON(e) : undefined));
     } else {
       obj.actions = [];
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<FilterActionBody>, I>>(base?: I): FilterActionBody {
-    return FilterActionBody.fromPartial(base ?? {});
-  },
-
   fromPartial<I extends Exact<DeepPartial<FilterActionBody>, I>>(object: I): FilterActionBody {
     const message = createBaseFilterActionBody();
     message.actions = object.actions?.map((e) => SingleFilterAction.fromPartial(e)) || [];
     return message;
-  },
+  }
 };
 
 function createBaseFilterSerializedDataHeader(): FilterSerializedDataHeader {
@@ -369,17 +312,16 @@ export const FilterSerializedDataHeader = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): FilterSerializedDataHeader {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFilterSerializedDataHeader();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
       }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -393,53 +335,46 @@ export const FilterSerializedDataHeader = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<FilterSerializedDataHeader>, I>>(base?: I): FilterSerializedDataHeader {
-    return FilterSerializedDataHeader.fromPartial(base ?? {});
-  },
-
   fromPartial<I extends Exact<DeepPartial<FilterSerializedDataHeader>, I>>(_: I): FilterSerializedDataHeader {
     const message = createBaseFilterSerializedDataHeader();
     return message;
-  },
+  }
 };
 
 function createBaseFilterSerializedDataBody(): FilterSerializedDataBody {
-  return { text: "" };
+  return { text: '' };
 }
 
 export const FilterSerializedDataBody = {
   encode(message: FilterSerializedDataBody, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.text !== "") {
+    if (message.text !== '') {
       writer.uint32(10).string(message.text);
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): FilterSerializedDataBody {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFilterSerializedDataBody();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
-            break;
-          }
-
           message.text = reader.string();
-          continue;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
       }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): FilterSerializedDataBody {
-    return { text: isSet(object.text) ? String(object.text) : "" };
+    return {
+      text: isSet(object.text) ? String(object.text) : ''
+    };
   },
 
   toJSON(message: FilterSerializedDataBody): unknown {
@@ -448,27 +383,34 @@ export const FilterSerializedDataBody = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<FilterSerializedDataBody>, I>>(base?: I): FilterSerializedDataBody {
-    return FilterSerializedDataBody.fromPartial(base ?? {});
-  },
-
   fromPartial<I extends Exact<DeepPartial<FilterSerializedDataBody>, I>>(object: I): FilterSerializedDataBody {
     const message = createBaseFilterSerializedDataBody();
-    message.text = object.text ?? "";
+    message.text = object.text ?? '';
     return message;
-  },
+  }
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = T extends Builtin
+  ? T
+  : T extends Array<infer U>
+  ? Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U>
+  ? ReadonlyArray<DeepPartial<U>>
+  : T extends {}
+  ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+export type Exact<P, I extends P> = P extends Builtin
+  ? P
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & Record<Exclude<keyof I, KeysOfUnion<P>>, never>;
+
+if (_m0.util.Long !== Long) {
+  _m0.util.Long = Long as any;
+  _m0.configure();
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

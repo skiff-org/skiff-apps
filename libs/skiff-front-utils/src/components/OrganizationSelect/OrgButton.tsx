@@ -1,4 +1,4 @@
-import { Size, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
+import { Size, ThemeMode, Typography, TypographySize } from 'nightwatch-ui';
 import { useUserProfile } from 'skiff-front-graphql';
 import { ProductApp } from 'skiff-graphql';
 

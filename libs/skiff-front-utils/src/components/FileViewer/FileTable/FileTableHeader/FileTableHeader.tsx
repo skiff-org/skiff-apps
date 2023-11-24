@@ -1,14 +1,14 @@
-import { Icon, IconText, Icons, Size, TypographyWeight } from '@skiff-org/skiff-ui';
+import { Icon, IconText, Icons, Size, TypographyWeight } from 'nightwatch-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
 
+import { useMediaQuery } from '../../../../hooks';
 import useFileSortOrder, { SortMode } from '../../../../hooks/useFileSortOrder';
 import Checkbox from '../../../Checkbox';
 
-import { useMediaQuery } from '../../../../hooks';
-import { FileTableAction } from './FileTable.types';
-import FileTableActions from './FileTableActions';
+import ActionIcons from './ActionIcons';
+import { ActionIcon } from './FileTable.types';
 import { FileTableFilter, FileTypeFilter } from './FileTableFilter';
 import { FILE_TABLE_BREAKPOINT_1, FILE_TABLE_BREAKPOINT_2, FILE_TABLE_BREAKPOINT_3 } from './FileTableHeader.constants';
 
@@ -22,12 +22,13 @@ export const MetadataContainer = styled.div`
   user-select: none;
 `;
 
-export const MetadataColumn = styled.div<{ $hide?: boolean }>`
-  width: 100px;
+export const MetadataColumn = styled.div<{ $hide?: boolean; $alignStart?: boolean }>`
   display: flex;
+  width: 100px;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: ${(props) => (props.$alignStart ? 'flex-start' : 'flex-end')};
+  justify-content: ${(props) => (props.$alignStart ? 'flex-start' : 'flex-end')};
+  padding-left: ${(props) => (props.$alignStart ? '10px' : '0px')};
   opacity: ${(props) => (props.$hide ? 0 : 1)};
 `;
 
@@ -67,13 +68,11 @@ const ToolbarContainer = styled.div<{ $actions: boolean }>`
 
 const CheckboxContainer = styled.div`
   width: 100%;
-  display: ${isMobile ? 'none' : 'inline-flex'};
+  display: ${isMobile ? 'none' : 'flex'};
   padding: 12px 20px;
+  align-items: center;
+  max-height: 40px;
   box-sizing: border-box;
-`;
-
-const Spacer = styled.div`
-  width: 14px;
 `;
 
 // State of selected items, affects checkbox
@@ -92,7 +91,7 @@ interface FileTableHeaderProps {
   activeFileTypeFilter: FileTypeFilter;
   metadataHeaders: FileTableHeaderLabel[];
   setFileTypeFilter: (filter: FileTypeFilter) => void;
-  actions?: FileTableAction[];
+  actions?: ActionIcon[];
   selectionState?: FileTableHeaderSelectionState;
   hideFilter?: boolean;
   clearSelectedItems?: () => void;
@@ -131,9 +130,9 @@ const FileTableHeader: React.FC<FileTableHeaderProps> = ({
     setSortOrderAsc(!sortOrderAsc);
   };
 
-  const sortButton = (label: string, mode?: SortMode, dataTest?: string) => {
+  const sortButton = (label: string, mode?: SortMode, dataTest?: string, alignStart?: boolean) => {
     return (
-      <MetadataColumn>
+      <MetadataColumn $alignStart={alignStart}>
         <MetadataColumnHeader>
           <IconText
             color='disabled'
@@ -150,7 +149,6 @@ const FileTableHeader: React.FC<FileTableHeaderProps> = ({
             size={Size.SMALL}
             weight={TypographyWeight.REGULAR}
           />
-          {sortMode !== mode && <Spacer />}
         </MetadataColumnHeader>
       </MetadataColumn>
     );
@@ -164,7 +162,8 @@ const FileTableHeader: React.FC<FileTableHeaderProps> = ({
             <Checkbox
               checked={selectionState !== FileTableHeaderSelectionState.None}
               indeterminate={selectionState === FileTableHeaderSelectionState.Partial}
-              onClick={() => {
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
                 if (selectionState !== FileTableHeaderSelectionState.None) {
                   clearSelectedItems();
                 } else {
@@ -174,10 +173,10 @@ const FileTableHeader: React.FC<FileTableHeaderProps> = ({
             />
           )}
           <NameContainer $actions={!!actions?.length}>
-            {sortButton('Name', SortMode.Name, 'sort-files-by-name')}
+            {sortButton('Name', SortMode.Name, 'sort-files-by-name', true)}
           </NameContainer>
         </NameAndCheckbox>
-        {!!actions?.length && <FileTableActions actions={actions} />}
+        {!!actions?.length && <ActionIcons actions={actions} />}
         {!hideFilter && <FileTableFilter activeFilter={activeFileTypeFilter} setFilter={setFileTypeFilter} />}
         <EndContainer>
           <MetadataContainer>

@@ -1,6 +1,6 @@
 import './skiff-link-tooltip.css';
 
-import { Icon, IconButton, ThemeMode, Type } from '@skiff-org/skiff-ui';
+import { FilledVariant, Icon, IconButton, ThemeMode, Type } from 'nightwatch-ui';
 import { EditorView } from 'prosemirror-view';
 import React from 'react';
 import scrollIntoView from 'smooth-scroll-into-view-if-needed';
@@ -79,6 +79,7 @@ class LinkTooltip extends React.PureComponent<
               onClick={() => onRemove(editorView)}
               tooltip='Unlink'
               forceTheme={ThemeMode.DARK}
+              variant={FilledVariant.UNFILLED}
             />
           </div>
         </div>

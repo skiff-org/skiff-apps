@@ -1,4 +1,4 @@
-import { Divider, useOnClickOutside } from '@skiff-org/skiff-ui';
+import { Divider, useOnClickOutside } from 'nightwatch-ui';
 import { EditorView } from 'prosemirror-view';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 

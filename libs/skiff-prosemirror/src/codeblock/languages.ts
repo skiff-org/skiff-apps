@@ -1,5 +1,8 @@
 export enum CodeBlockLanguages {
   javascript = 'JavaScript',
+  typescript = 'TypeScript',
+  jsx = 'JSX',
+  tsx = 'TSX',
   html = 'HTML',
   css = 'CSS',
   sql = 'SQL',
@@ -22,6 +25,9 @@ export enum LegacyLanguages {
   asterisk = 'asterisk',
   brainfuck = 'brainfuck',
   clike = 'clike',
+  objectiveC = 'Objective-C',
+  csharp = 'C#',
+  kotlin = 'Kotlin',
   clojure = 'Clojure',
   cmake = 'CMake',
   cobol = 'COBOL',

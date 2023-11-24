@@ -27,7 +27,54 @@ function replaceNOBR(matched: string): string {
   return matched;
 }
 
+const classToTagMap: { [key: string]: string } = {
+  p1: 'h1',
+  p2: 'h2'
+};
+
+function patchAppleNotesHeadings(doc: Document): void {
+  for (const className in classToTagMap) {
+    const pElements = Array.from(doc.querySelectorAll(`p.${className}`));
+    pElements.forEach((p) => {
+      const newTag = classToTagMap[className];
+      const replacement = doc.createElement(newTag);
+
+      while (p.firstChild) {
+        replacement.appendChild(p.firstChild);
+      }
+
+      p.parentNode?.replaceChild(replacement, p);
+    });
+  }
+}
+
+// This regex pattern matches <p class="p4"><br></p> that comes just before another tag (excluding another <p class="p4"><br></p>)
+const redundantNewlineBeforeContentPattern = /<p\s+class="p4">\s*<br>\s*<\/p>\s*(?!<p\s+class="p4">\s*<br>\s*<\/p>)/gi;
+
+function removeRedundantNewlines(html: string): string {
+  return html.replace(redundantNewlineBeforeContentPattern, '');
+}
+
+function patchBoldAndItalicTags(doc: Document): void {
+  ['b', 'i'].forEach((tag) => {
+    const elements = Array.from(doc.querySelectorAll(tag));
+    elements.forEach((el) => {
+      const replacement = doc.createElement(tag === 'b' ? 'strong' : 'em');
+      while (el.firstChild) {
+        replacement.appendChild(el.firstChild);
+      }
+      el.parentNode?.replaceChild(replacement, el);
+    });
+  });
+}
+
 export default function normalizeHTML(html: string): string {
+  try {
+    html = removeRedundantNewlines(html);
+  } catch (error) {
+    console.error('Failed to remove redundant newlines', error);
+  }
+
   let body: HTMLElement | null = null;
   const sourceIsPage = HTML_BODY_PATTERN.test(html);
   html = html.replace(LONG_UNDERLINE_PATTERN, replaceNOBR);
@@ -36,10 +83,13 @@ export default function normalizeHTML(html: string): string {
   const doc = toSafeHTMLDocument(html);
 
   if (doc) {
-    // styles.
+    // Apple notes
+    patchAppleNotesHeadings(doc);
+    patchBoldAndItalicTags(doc);
+    // styles
     patchStyleElements(doc);
     patchElementInlineStyles(doc);
-    // contents.
+    // contents
     patchAnchorElements(doc);
     patchBreakElements(doc);
     patchListElements(doc);

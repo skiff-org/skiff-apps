@@ -31,6 +31,26 @@ query getSessionCacheChallenge($req: SessionCacheInput!) {
   }
 }
 
+query getPgpInfo($emailAlias: String!, $allKeys: Boolean) {
+  pgpInfo(emailAlias: $emailAlias, allKeys: $allKeys) {
+    createdAt
+    emailAlias
+    encryptedPrivateKey {
+      encryptedData
+    }
+    encryptionFingerprint
+    encryptedSessionKey {
+      encryptedSessionKey
+      encryptedBy
+    }
+    encryptionKeyID
+    publicKey
+    signingFingerprint
+    signingKeyID
+    status
+  }
+}
+
 query getSessionCacheWithCalendars {
   sessionCache {
     cacheKey
@@ -73,6 +93,8 @@ query getCheckoutSessionUrlOrStripeUpdateStatus($request: GetCheckoutSessionRequ
       userLabels
       userFolders
       userMailFilters
+      quickAliases
+      quickAliasSubdomains
     }
   }
 }
@@ -85,11 +107,11 @@ query getSearchIndexableDocuments {
 }
 
 query getSearchIndexProgress($request: GetSearchIndexProgressRequest!) {
-   searchIndexProgress(request: $request) {
-     numIndexableThreads
-     numThreadsIndexed
-     isIndexComplete
-   }
+  searchIndexProgress(request: $request) {
+    numIndexableThreads
+    numThreadsIndexed
+    isIndexComplete
+  }
 }
 
 query getAllFolderDocuments {
@@ -134,4 +156,20 @@ query getBonfidaNames($solanaAddress: String!) {
 
 query getICNSName($cosmosAddress: String!) {
   getICNSName(cosmosAddress: $cosmosAddress)
+}
+
+query refreshToken {
+  refreshToken
+}
+
+query getNativeDriveManifest {
+  nativeDriveManifest {
+    slimDocuments {
+      docID
+      parentID
+      currentUserPermissionLevel
+      trashedAt
+      updatedAt
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { ButtonGroupItem, Dialog, DialogTypes, Type } from '@skiff-org/skiff-ui';
+import { ButtonGroupItem, Dialog, DialogType, Type } from 'nightwatch-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 
@@ -13,11 +13,10 @@ const LogoutModal = ({ onClose, onLogout, isOpen, description }: LogoutModalProp
   return (
     <Dialog
       description={description ? description : isMobile ? 'You will need to sign in again.' : ''}
-      isMobile={isMobile}
       onClose={onClose}
       open={isOpen}
       title='Logout?'
-      type={DialogTypes.Confirm}
+      type={DialogType.CONFIRM}
     >
       <ButtonGroupItem dataTest='confirm-logout' label='Logout' onClick={onLogout} type={Type.DESTRUCTIVE} />
       <ButtonGroupItem label='Cancel' onClick={onClose} />

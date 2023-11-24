@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   DisplayPictureData,
   useCreateOrgUploadAvatarLinkMutation,
@@ -110,9 +110,7 @@ const OrganizationName: React.FC = () => {
         createUploadLink={createUploadOrgPictureLink}
         displayName={organization?.name}
         displayPictureData={organization?.displayPictureData}
-        setDisplayName={(newOrgName) => void updateOrgName(newOrgName)}
         setDisplayPictureData={setDisplayPictureData}
-        type='inline'
       />
       <TitleActionSection
         actions={[

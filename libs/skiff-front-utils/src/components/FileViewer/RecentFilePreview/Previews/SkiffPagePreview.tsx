@@ -1,12 +1,4 @@
-import {
-  Color,
-  Icon,
-  Icons,
-  getAccentColorValues,
-  Typography,
-  isAccentColor,
-  TypographyWeight
-} from '@skiff-org/skiff-ui';
+import { Color, Icon, Icons, getAccentColorValues, Typography, isAccentColor, TypographyWeight } from 'nightwatch-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 

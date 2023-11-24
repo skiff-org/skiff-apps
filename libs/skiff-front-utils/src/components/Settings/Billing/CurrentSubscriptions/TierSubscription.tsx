@@ -1,15 +1,5 @@
 import dayjs from 'dayjs';
-import {
-  Button,
-  Dropdown,
-  DropdownItem,
-  FilledVariant,
-  Icon,
-  Icons,
-  IconButton,
-  MonoTag,
-  Type
-} from '@skiff-org/skiff-ui';
+import { Button, Dropdown, DropdownItem, FilledVariant, Icon, IconButton, Icons, MonoTag, Type } from 'nightwatch-ui';
 import { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useGetBillingPortalSessionUrlLazyQuery, useInvoiceHistory, useSubscriptionPlan } from 'skiff-front-graphql';
@@ -83,7 +73,15 @@ const TierSubscription: React.FC<TierSubscriptionProps> = ({ openPlansPage }) =>
   const [getBillingPortalSessionUrl] = useGetBillingPortalSessionUrlLazyQuery();
 
   const {
-    data: { supposedEndDate, cancelAtPeriodEnd, activeSubscription, billingInterval, stripeStatus, quantity },
+    data: {
+      supposedEndDate,
+      cancelAtPeriodEnd,
+      activeSubscription,
+      billingInterval,
+      stripeStatus,
+      quantity,
+      isAppleSubscription
+    },
     refetch: refetchSubscriptionPlan
   } = useSubscriptionPlan();
 
@@ -91,7 +89,7 @@ const TierSubscription: React.FC<TierSubscriptionProps> = ({ openPlansPage }) =>
 
   const [downgradeModalInfo, setDowngradeModalInfo] = useState<DowngradeModalInfo | null>(null);
 
-  const openStripePlan = async () => {
+  const openStripePlan = async (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     // Open Stripe portal to set subscription to cancel at period end
     // or un-cancel subscription previously set to cancel
     const { data } = await getBillingPortalSessionUrl({
@@ -132,59 +130,70 @@ const TierSubscription: React.FC<TierSubscriptionProps> = ({ openPlansPage }) =>
     );
   };
 
+  const getEndAction = () => {
+    if (isAppleSubscription) {
+      return <MonoTag color={'green'} label='ACTIVE' />;
+    }
+    if (cancelAtPeriodEnd) {
+      return (
+        <>
+          {!isMobile && (
+            <Button onClick={() => openStripePlan()} type={Type.SECONDARY}>
+              Renew plan
+            </Button>
+          )}
+        </>
+      );
+    } else {
+      return (
+        <>
+          <TagButton>
+            {!!stripeStatus && (
+              <MonoTag
+                bgColor={!statusColor ? 'var(--bg-overlay-tertiary)' : undefined}
+                color={statusColor}
+                label={formatStatusText(getStatusText(stripeStatus as SubscriptionStates))}
+              />
+            )}
+            {!isMobile && (
+              <IconButton
+                icon={<Icons color='secondary' icon={Icon.OverflowH} />}
+                onClick={() => setShowMoreDropdown(true)}
+                ref={moreButtonRef}
+                variant={FilledVariant.UNFILLED}
+              />
+            )}
+          </TagButton>
+          {!isMobile && (
+            <Dropdown
+              buttonRef={moreButtonRef}
+              portal
+              setShowDropdown={setShowMoreDropdown}
+              showDropdown={showMoreDropdown}
+            >
+              {renderDropdownItems()}
+            </Dropdown>
+          )}
+          {downgradeModalInfo && (
+            <DowngradeModal
+              downgradeProgress={downgradeModalInfo.downgradeProgress}
+              onClose={() => setDowngradeModalInfo(null)}
+              open
+              tierToDowngradeTo={downgradeModalInfo.tierToDowngradeTo}
+            />
+          )}
+        </>
+      );
+    }
+  };
+  const endAction = getEndAction();
+
   return (
     <>
       <SubscriptionItem
-        endAction={
-          cancelAtPeriodEnd ? (
-            <>
-              {!isMobile && (
-                <Button onClick={() => openStripePlan()} type={Type.SECONDARY}>
-                  Renew plan
-                </Button>
-              )}
-            </>
-          ) : (
-            <>
-              <TagButton>
-                {!!stripeStatus && (
-                  <MonoTag
-                    bgColor={!statusColor ? 'var(--bg-overlay-tertiary)' : undefined}
-                    color={statusColor}
-                    label={formatStatusText(getStatusText(stripeStatus as SubscriptionStates))}
-                  />
-                )}
-                {!isMobile && (
-                  <IconButton
-                    icon={<Icons color='secondary' icon={Icon.OverflowH} />}
-                    onClick={() => setShowMoreDropdown(true)}
-                    ref={moreButtonRef}
-                    variant={FilledVariant.UNFILLED}
-                  />
-                )}
-              </TagButton>
-              {!isMobile && (
-                <Dropdown
-                  buttonRef={moreButtonRef}
-                  portal
-                  setShowDropdown={setShowMoreDropdown}
-                  showDropdown={showMoreDropdown}
-                >
-                  {renderDropdownItems()}
-                </Dropdown>
-              )}
-              {downgradeModalInfo && (
-                <DowngradeModal
-                  downgradeProgress={downgradeModalInfo.downgradeProgress}
-                  onClose={() => setDowngradeModalInfo(null)}
-                  open
-                  tierToDowngradeTo={downgradeModalInfo.tierToDowngradeTo}
-                />
-              )}
-            </>
-          )
-        }
+        endAction={endAction}
         icon={Icon.Map}
+        isAppleSubscription={!!isAppleSubscription}
         subtitle={`${cancelAtPeriodEnd ? 'Expires' : 'Renews'} ${dayjs(supposedEndDate).format('MMM DD. YYYY')}`}
         title={`${
           billingInterval ? `${upperCaseFirstLetter(billingInterval)} ` : ''

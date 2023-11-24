@@ -82,6 +82,10 @@ mutation setPDSubscribeFlag($request: SetPDSubscribeFlagRequest!) {
   setPDSubscribeFlag(request: $request)
 }
 
+mutation setPGPKey($request: SetPGPKey!) {
+  setPGPKey(request: $request)
+}
+
 mutation grantCredits($request: GrantCreditsRequest!) {
   grantCredits(request: $request) {
     creditsGranted {
@@ -97,22 +101,26 @@ mutation grantCredits($request: GrantCreditsRequest!) {
   }
 }
 
+mutation sendAnonymousSubdomainTutorialEmail($email: String!) {
+  sendAnonymousSubdomainTutorialEmail(email: $email)
+}
+
+mutation createQuickAliasDomain($request: CreateAnonymousSubdomainInput!) {
+  createAnonymousSubdomain(request: $request)
+}
+
+mutation deleteQuickAliasDomain($userDomainID: String!) {
+  deleteAnonymousSubdomain(userDomainID: $userDomainID)
+}
+
 mutation createEmailAlias($request: CreateEmailAliasRequest) {
   createEmailAlias(request: $request) {
     emailAliases
   }
 }
 
-mutation createUdAlias($request: CreateUdAliasRequest) {
-  createUdAlias(request: $request) {
-    emailAliases
-  }
-}
-
-mutation updateEmailAliasActiveState($request: UpdateEmailAliasActiveStateRequest) {
-  updateEmailAliasActiveState(request: $request) {
-    status
-  }
+mutation updateQuickAliasInfo($request: UpdateQuickAliasInfoInput!) {
+  updateQuickAliasInfo(request: $request)
 }
 
 mutation setUserPublicKey($request: SetUserPublicKeyRequest) {
@@ -160,4 +168,8 @@ mutation verifyWebAuthnRegistration($request: VerifyWebAuthnRegistrationRequest!
   verifyWebAuthnRegistration(request: $request) {
     status
   }
+}
+
+mutation renameWebauthnDevice($request: RenameWebAuthnDeviceRequest!) {
+  renameWebAuthnDevice(request: $request)
 }

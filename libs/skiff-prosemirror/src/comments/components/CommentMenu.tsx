@@ -1,4 +1,13 @@
-import { Dropdown, DropdownItem, Icon, IconButton, ThemeMode, Typography, TypographySize } from '@skiff-org/skiff-ui';
+import {
+  Dropdown,
+  DropdownItem,
+  FilledVariant,
+  Icon,
+  IconButton,
+  ThemeMode,
+  Typography,
+  TypographySize
+} from 'nightwatch-ui';
 import React, { FC, useRef } from 'react';
 import { isMobile } from 'react-device-detect';
 
@@ -74,6 +83,7 @@ const CommentMenu: FC<CommentMenuProps> = ({
             }}
             icon={Icon.SmilePlus}
             tooltip='Add reaction'
+            variant={FilledVariant.UNFILLED}
           />
         </div>
       )}
@@ -110,6 +120,7 @@ const CommentMenu: FC<CommentMenuProps> = ({
           }}
           icon={Icon.CheckCircle}
           tooltip='Resolve thread'
+          variant={FilledVariant.UNFILLED}
         />
       )}
       {actions && (
@@ -121,6 +132,7 @@ const CommentMenu: FC<CommentMenuProps> = ({
             }}
             icon={Icon.OverflowH}
             tooltip='Options'
+            variant={FilledVariant.UNFILLED}
           />
         </div>
       )}

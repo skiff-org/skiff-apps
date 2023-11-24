@@ -1,11 +1,11 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import { Dialog } from '@skiff-org/skiff-ui';
-import Drawer from '../../Drawer';
+import { Dialog } from 'nightwatch-ui';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { PaywallErrorCode } from 'skiff-utils';
 
-import { TabPage, SettingsPage } from '../../Settings/Settings.types';
+import Drawer from '../../Drawer';
+import { SettingsPage, TabPage } from '../../Settings/Settings.types';
 import PaywallModal from '../PaywallModal';
 
 import InviteByEmail from './InviteByEmail';
@@ -76,7 +76,6 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
             onCancel={returnToSelect}
             onClose={onClose}
             onConfirm={() => setInviteStep(ModalStep.CONFIRM_PROVISION)}
-            setPaywallErrorCode={setPaywallErrorCode}
             showConfirmProvision={inviteStep === ModalStep.CONFIRM_PROVISION}
           />
         );

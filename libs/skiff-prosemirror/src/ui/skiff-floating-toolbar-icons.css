@@ -58,7 +58,6 @@
 .ProseMirror-menu-active.menu-item,
 .cell-background-color-item.ProseMirror-menu-active,
 .menu-item:hover:not(.check-box-icon) {
-  background: rgba(255, 255, 255, 0.06);
 }
 
 .ProseMirror-menu-active.menu-item * {
@@ -126,7 +125,7 @@
   border-radius: 20px;
   width: 20px;
   height: 20px;
-  border: 1px var(--border-secondary) solid;
+  border: 1px solid rgba(255, 255, 255, 0.28);
 }
 
 .ProseMirror-menu-dropdown.text-color-dropdown {
@@ -148,11 +147,9 @@
 }
 
 .ProseMirror-menu-dropdown.cell-background-color-dropdown {
-  filter: var(--filter-white-icon);
-  width: 20px;
-  height: 20px;
-  content: url(./svgs/palette.svg);
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .menu-item.columns-count,

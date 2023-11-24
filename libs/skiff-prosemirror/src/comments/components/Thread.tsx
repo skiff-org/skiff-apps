@@ -2,7 +2,7 @@ import '../../ui/comments.css';
 import '../../ui/emoji-mart-styles.css';
 
 import cx from 'classnames';
-import { Icon, Icons, Typography, useOnClickOutside } from '@skiff-org/skiff-ui';
+import { Icon, Icons, Typography, useOnClickOutside } from 'nightwatch-ui';
 import { MarkType } from 'prosemirror-model';
 import { EditorView } from 'prosemirror-view';
 import React, { FC, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -146,7 +146,7 @@ const Thread: FC<ThreadProps> = ({
     }
   }, [commentsToDisplay.length, editing]);
 
-  const { triggerToast, useDocumentCollabDisplayNames, docID, isPublicDocument } = getCustomState(view.state);
+  const { triggerToast, useDocumentCollabDisplayNames, docID } = getCustomState(view.state);
   const { collabsDisplayName } = useDocumentCollabDisplayNames(docID!);
 
   useEffect(() => {
@@ -310,8 +310,12 @@ const Thread: FC<ThreadProps> = ({
       {active && !editing && view.editable && !comments?.resolved && (
         <ThreadInput
           onChange={(content) => {
-            if (content === null) return clearDraft();
-            if (comments?.id) updateDraft({ content, threadId: comments.id });
+            if (content === null) {
+              return clearDraft();
+            }
+            if (comments?.id) {
+              updateDraft({ content, threadId: comments.id });
+            }
           }}
           onAddComment={onAddComment}
           active={active}

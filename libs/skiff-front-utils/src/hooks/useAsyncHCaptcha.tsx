@@ -3,13 +3,10 @@ import React, { useCallback, useMemo, useRef } from 'react';
 
 import { getEnvironment } from '../utils/envUtils';
 
-// Create account captcha key - in skemail-web, the environment variables are `NEXT_PUBLIC_HCAPTCHA_SITE_KEY` and `NEXT_PUBLIC_PASSIVE_HCAPTCHA_SITE_KEY`
-export const HCAPTCHA_SITE_KEY =
-  process.env.HCAPTCHA_SITE_KEY || process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || 'ffffffff-ffff-ffff-ffff-ffffffffffff';
+// Create account captcha key
+export const HCAPTCHA_SITE_KEY = process.env.HCAPTCHA_SITE_KEY || 'ffffffff-ffff-ffff-ffff-ffffffffffff';
 export const PASSIVE_HCAPTCHA_SITE_KEY =
-  process.env.PASSIVE_HCAPTCHA_SITE_KEY ||
-  process.env.NEXT_PUBLIC_PASSIVE_HCAPTCHA_SITE_KEY ||
-  'ffffffff-ffff-ffff-ffff-ffffffffffff';
+  process.env.PASSIVE_HCAPTCHA_SITE_KEY || 'ffffffff-ffff-ffff-ffff-ffffffffffff';
 export const HCAPTCHA_TEST_SITE_KEY = '20000000-ffff-ffff-ffff-000000000002';
 export const HCAPTCHA_TEST_SAFE_RESPONSE = '20000000-aaaa-bbbb-cccc-000000000002';
 

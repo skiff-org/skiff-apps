@@ -1,9 +1,11 @@
-import { Button, Dialog, DialogTypes, Size } from '@skiff-org/skiff-ui';
+import { useFlags } from 'launchdarkly-react-client-sdk';
+import { Button, Dialog, DialogType, Size } from 'nightwatch-ui';
 import React, { useEffect } from 'react';
 import { useStoreWorkspaceEventMutation } from 'skiff-front-graphql';
 import { DowngradeProgress } from 'skiff-graphql';
 import { WorkspaceEventType } from 'skiff-graphql';
 import { getMaxNumberNonWalletAliases, TierName } from 'skiff-utils';
+import { FreeCustomDomainFeatureFlag } from 'skiff-utils';
 
 import { DEFAULT_WORKSPACE_EVENT_VERSION } from '../../../constants';
 import { useCurrentUserIsOrgAdmin } from '../../../hooks';
@@ -40,6 +42,8 @@ const PlanDelinquencyModal: React.FC<PlanDelinquencyModalProps> = ({
   const isCurrentUserOrgAdmin = useCurrentUserIsOrgAdmin(); // non-admins can't upgrade
   const [storeWorkspaceEvent] = useStoreWorkspaceEventMutation();
   const showModal = !!downgradeProgress;
+  const flags = useFlags();
+  const freeCustomDomainFlag = flags.freeCustomDomain as FreeCustomDomainFeatureFlag;
 
   useEffect(() => {
     if (!showModal) return;
@@ -58,27 +62,25 @@ const PlanDelinquencyModal: React.FC<PlanDelinquencyModalProps> = ({
 
   if (!showModal) return null;
 
-  const todoItemPropsList = getDowngradeTodoItems(currentTier, downgradeProgress);
+  const todoItemPropsList = getDowngradeTodoItems(currentTier, { freeCustomDomainFlag }, downgradeProgress);
   const maxNumGenericSkiffAliases = getMaxNumberNonWalletAliases(currentTier);
   // if user has too many generic aliases, sending from any of them is blocked; other types of alias delinquency
   // allow users to send from non-delinquent aliases (e.g. a short alias is delinquent but not a long one)
   const isOverTotalAliasAllowance = downgradeProgress.emailAliases > maxNumGenericSkiffAliases;
 
   const getDescriptionCopy = () =>
-    `Your ${currentTier} plan ${
-      delinquentAlias
-        ? `doesn't include sending from ${delinquentAlias}. You can still receive mail at this address${
-            isOverTotalAliasAllowance ? '' : ' and send from other aliases'
-          }`
-        : "doesn't include this feature"
-    }. `;
+    delinquentAlias
+      ? `Action is needed to unlock sending from ${delinquentAlias} (you can still receive mail at this address${
+          isOverTotalAliasAllowance ? '' : ' and send from other addresses). '
+        }`
+      : `Your ${currentTier} plan doesn't include this feature. `;
 
   const getCTACopy = () => {
     if (!isCurrentUserOrgAdmin) {
       return 'Contact your org admin to upgrade';
     }
     if (!isMobileApp()) {
-      return 'Upgrade to regain access to paid features';
+      return `Upgrade to regain access to ${isFeatureAgnostic ? 'paid features' : 'this feature'}`;
     }
     return 'Review your plan at app.skiff.com'; // intentionally not linking in mobile app, due to Apple rules
   };
@@ -97,7 +99,7 @@ const PlanDelinquencyModal: React.FC<PlanDelinquencyModalProps> = ({
           ? `You're over the limit on your ${currentTier} plan`
           : 'You no longer have access to this feature'
       }
-      type={DialogTypes.Default}
+      type={DialogType.DEFAULT}
     >
       {todoItemPropsList.map(({ key, ...props }) => (
         <DowngradeTodoItem {...props} key={key} />

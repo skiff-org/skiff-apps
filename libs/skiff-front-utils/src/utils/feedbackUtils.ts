@@ -1,3 +1,7 @@
+import { browserName, browserVersion, isAndroid, isIOS, osName } from 'react-device-detect';
+
+import { isReactNativeDesktopApp, isWindowsDesktopApp } from './mobileUtils';
+
 // get tokens for Zendesk upload
 export async function getFeedbackTokens(supportingFiles: File[]) {
   const zendeskUploadTokens: Array<string> = [];
@@ -22,3 +26,26 @@ export async function getFeedbackTokens(supportingFiles: File[]) {
   });
   return zendeskUploadTokens;
 }
+
+export const getFeedbackPlatformString = () => {
+  let description = '';
+  // Check for desktop apps first.
+  if (isWindowsDesktopApp()) {
+    description = 'Windows desktop app';
+  } else if (isReactNativeDesktopApp()) {
+    description = 'Mac desktop app';
+  } else {
+    // iOS specifics
+    if (isIOS) {
+      description = `iOS mobile web browser - ${browserName} v${browserVersion}`;
+    }
+    // Android specifics
+    else if (isAndroid) {
+      description = `Android mobile web browser - ${browserName} v${browserVersion}`;
+    } else {
+      description = `Operating System: ${osName}; Browser: ${browserName} v${browserVersion}`;
+    }
+  }
+
+  return description;
+};

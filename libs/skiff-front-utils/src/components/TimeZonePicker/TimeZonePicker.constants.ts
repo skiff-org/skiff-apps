@@ -1,0 +1,2 @@
+export const TIME_ZONE_PICKER_WIDTH = 380;
+export const TIME_ZONE_PICKER_MAX_HEIGHT = 250;

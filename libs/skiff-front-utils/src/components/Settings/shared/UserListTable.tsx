@@ -6,7 +6,7 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import styled, { css } from 'styled-components';
@@ -64,7 +64,10 @@ const Container = styled.div`
 `;
 
 const LoadingContainer = styled.div`
-  padding: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
 `;
 
 const ButtonContainer = styled.div`
@@ -146,7 +149,7 @@ const UserListTable: React.FC<UserListTableProps> = ({
           )}
           {loading && (
             <LoadingContainer>
-              <CircularProgress />
+              <CircularProgress spinner />
             </LoadingContainer>
           )}
         </div>

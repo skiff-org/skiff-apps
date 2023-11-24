@@ -2,6 +2,10 @@ import * as ProsemirrorTables from '@skiff-org/prosemirror-tables';
 
 import BlockquoteInsertNewLineCommand from './BlockquoteInsertNewLineCommand';
 import CodeBlockCommand from './CodeBlockCommand';
+import AddCommentCommand from './comments/AddCommentCommand';
+import createCommand from './createCommand';
+import EmDash from './emDash';
+import EnDash from './enDash';
 import HeadingCommand from './HeadingCommand';
 import HorizontalRuleCommand from './HorizontalRuleCommand';
 import ImageInsertCommand from './ImageInsertCommand';
@@ -12,11 +16,13 @@ import ListItemMergeCommand from './ListItemMergeCommand';
 import ListSplitCommand from './ListSplitCommand';
 import ListToggleCommand from './ListToggleCommand';
 import * as MarkNames from './MarkNames';
-import MarkToggleCommand from './MarkToggleCommand';
 import MarksClearCommand from './MarksClearCommand';
+import MarkToggleCommand from './MarkToggleCommand';
 import MathInsertCommand from './MathInsertCommand';
 import { BULLET_LIST, ORDERED_LIST, TODO_LIST, TOGGLE_LIST } from './NodeNames';
 import PrintCommand from './PrintCommand';
+import AddSubpageCommand from './subpages/AddSubpageCommand';
+import JumpOverSubpageCommand from './subpages/JumpOverSubpageCommand';
 import TableBackgroundColorCommand from './TableBackgroundColorCommand';
 import TableInsertCommand from './TableInsertCommand';
 import TableMergeCellsCommand from './TableMergeCellsCommand';
@@ -24,22 +30,11 @@ import TextAlignCommand from './TextAlignCommand';
 import TextColorCommand from './TextColorCommand';
 import TextHighlightCommand from './TextHighlightCommand';
 import { TextInsertTabSpaceCommand, TextRemoveTabSpaceCommand } from './TextInsertTabSpaceCommand';
-import AddCommentCommand from './comments/AddCommentCommand';
-import createCommand from './createCommand';
-import EmDash from './emDash';
-import EnDash from './enDash';
-import AddSubpageCommand from './subpages/AddSubpageCommand';
-import JumpOverSubpageCommand from './subpages/JumpOverSubpageCommand';
 import ToggleItemLiftCommand, { IndentToggleItem } from './toggleList/keymap';
 
 const { deleteColumn, deleteTable, goToNextCell, splitCell } = ProsemirrorTables;
 const { MARK_STRONG, MARK_EM, MARK_STRIKE, MARK_SUPER, MARK_UNDERLINE } = MarkNames;
-// Note that Firefox will, by default, add various kinds of controls to
-// editable tables, even though those don't work in ProseMirror. The only way
-// to turn these off is globally, which you might want to do with the
-// following code:
-document.execCommand('enableObjectResizing', false, 'false');
-document.execCommand('enableInlineTableEditing', false, 'false');
+
 export const BLOCKQUOTE_INSERT_NEW_LINE = new BlockquoteInsertNewLineCommand();
 export const CLEAR_FORMAT = new MarksClearCommand();
 export const CODE = new CodeBlockCommand();

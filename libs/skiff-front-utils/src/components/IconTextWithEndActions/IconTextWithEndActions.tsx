@@ -1,5 +1,5 @@
 import uniqueId from 'lodash/uniqueId';
-import { Icon, IconComponent, IconText, IconTextProps } from '@skiff-org/skiff-ui';
+import { Icon, IconComponent, IconText, IconTextProps } from 'nightwatch-ui';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -14,6 +14,13 @@ const Wrapper = styled.div`
 `;
 
 const IconTextContainer = styled.div`
+  min-width: 0px;
+`;
+
+const StartActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
   min-width: 0px;
 `;
 
@@ -34,19 +41,24 @@ export interface IconTextEndAction {
 export interface IconTextWithEndActionsProps extends IconTextProps {
   endActions: IconTextEndAction[];
   showEndActions?: boolean;
+  startComponent?: JSX.Element;
 }
 
 const IconTextWithEndActions: React.FC<IconTextWithEndActionsProps> = ({
   endActions,
   forceTheme,
   showEndActions = true,
+  startComponent,
   ...iconTextProps
 }: IconTextWithEndActionsProps) => {
   return (
     <Wrapper>
-      <IconTextContainer>
-        <IconText {...iconTextProps} />
-      </IconTextContainer>
+      <StartActions>
+        {startComponent}
+        <IconTextContainer>
+          <IconText {...iconTextProps} />
+        </IconTextContainer>
+      </StartActions>
       {showEndActions && (
         <EndActions>
           {endActions.map((endAction) => {

@@ -13,34 +13,78 @@ export function getSlices(doc: GenericDocument) {
   return doc.cacheSlices || [doc.documentData];
 }
 
-// Generator that downloads slices of the file
-export const downloadSlices = async function* (slices: string[], updateProgress?: (progress: number) => void) {
+export const downloadSlices = async function* (
+  slices: string[],
+  updateProgress?: (progress: number) => void,
+  concurrency = 5
+) {
   let offset = 0;
-  for (let i = 0; i < slices.length; i += 1) {
-    const sliceData = slices[i];
-    const slice = await getCacheElementArray(sliceData, (progress) => {
-      if (updateProgress) {
-        // In decimal form.
-        const progressBeforeChunk = i / slices.length;
-        // "progress" is provided in percent form, so we divide by 100.
-        const progressCurrentChunk = (1 / slices.length) * (progress / 100);
-        // Overall progress is the sum of the progress before the current chunk and the progress of the current chunk.
-        const overallProgress = progressBeforeChunk + progressCurrentChunk;
-        updateProgress(overallProgress * 100);
-      }
+  const sliceProgress = new Array<number>(slices.length).fill(0);
+
+  const updateOverallProgress = (): void => {
+    if (updateProgress) {
+      const totalProgress = sliceProgress.reduce((acc, progress) => acc + progress, 0);
+      updateProgress((totalProgress / slices.length) * 100);
+    }
+  };
+
+  const downloadSlice = async (sliceData: string, index: number): Promise<ArrayBuffer> => {
+    // Check if the slice is already cached
+    if (getCacheElementArray.cache.has(sliceData)) {
+      const progressCurrentChunk = 1 / slices.length;
+      sliceProgress[index] = progressCurrentChunk;
+      updateOverallProgress();
+      return getCacheElementArray.cache.get(sliceData) as Uint8Array;
+    }
+
+    const slice = await getCacheElementArray(sliceData, (progress: number) => {
+      sliceProgress[index] = progress / 100;
+      updateOverallProgress();
     });
-    yield { slice, offset };
-    offset += slice.length;
+    return slice;
+  };
+
+  for (let i = 0; i < slices.length; i += concurrency) {
+    const sliceChunk = slices.slice(i, i + concurrency);
+    const sliceChunkIndexes = Array.from({ length: sliceChunk.length }, (_, k) => i + k);
+
+    const downloadedSlices = await Promise.all(
+      sliceChunk.map((slice, index) => downloadSlice(slice, sliceChunkIndexes[index]))
+    );
+
+    for (const slice of downloadedSlices) {
+      yield { slice, offset };
+      offset += slice.byteLength;
+    }
   }
 };
+
 /**
  * Read a whole file into memory. Eventually, this should be unused, but it's a stop gap to support legacy code for now.
  */
-export async function getFullFile(document: GenericDocument, updateProgress?: (progress: number) => void) {
+export async function getFullFile(
+  document: GenericDocument,
+  mimeType: string | null | undefined,
+  updateProgress?: (progress: number) => void
+) {
   const documentData = getSlices(document);
-  let file: number[] = [];
+  const slices: ArrayBuffer[] = [];
   for await (const { slice } of downloadSlices(documentData, updateProgress)) {
-    file = file.concat(Array.from(slice));
+    slices.push(slice);
   }
-  return new Blob([new Uint8Array(file)]);
+
+  // Combine all ArrayBuffers into one Uint8Array
+  const combinedLength = slices.reduce((acc, val) => acc + val.byteLength, 0);
+  const file = new Uint8Array(combinedLength);
+  let offset = 0;
+  for (const slice of slices) {
+    file.set(new Uint8Array(slice), offset);
+    offset += slice.byteLength;
+  }
+
+  // Create and return a Blob
+  if (mimeType) {
+    return new Blob([file], { type: mimeType });
+  }
+  return new Blob([file]);
 }

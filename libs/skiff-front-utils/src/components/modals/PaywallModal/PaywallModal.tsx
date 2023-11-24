@@ -1,4 +1,4 @@
-import { ButtonGroupItem, Dialog, DialogTypes } from '@skiff-org/skiff-ui';
+import { ButtonGroupItem, Dialog, DialogType } from 'nightwatch-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { useSubscriptionPlan } from 'skiff-front-graphql';
@@ -28,7 +28,7 @@ function PaywallModal(props: PaywallModalProps) {
       onClose={onClose}
       open={!activeSubscriptionLoading && open}
       title={title}
-      type={DialogTypes.Promotional}
+      type={DialogType.PROMOTIONAL}
     >
       <ButtonGroupItem
         key='upgrade'

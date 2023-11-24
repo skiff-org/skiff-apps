@@ -1,4 +1,4 @@
-import { ButtonGroup, ButtonGroupItem, InputField } from '@skiff-org/skiff-ui';
+import { ButtonGroup, ButtonGroupItem, InputField } from 'nightwatch-ui';
 import React, { useCallback, useState } from 'react';
 import { RequestStatus, WorkspaceEventType } from 'skiff-graphql';
 
@@ -103,7 +103,7 @@ function EnterMFA({
     <>
       <InputField
         autoFocus
-        errorMsg={error}
+        error={error}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           setToken(e.target.value);
           setError('');
@@ -111,7 +111,7 @@ function EnterMFA({
         onKeyDown={(e: React.KeyboardEvent) => {
           // Remove focus from field when Enter is pressed
           if (e.key === 'Enter') {
-            onSubmit();
+            void onSubmit();
           }
         }}
         placeholder={`Enter ${codeLength}-digit code`}

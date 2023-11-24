@@ -11,6 +11,8 @@ query getCheckoutSessionUrlOrStripeUpdateStatus($request: GetCheckoutSessionRequ
       userLabels
       userFolders
       userMailFilters
+      quickAliases
+      quickAliasSubdomains
     }
   }
 }
@@ -40,9 +42,60 @@ query getBillingPortalSessionUrl($request: GetBillingPortalSessionRequest!) {
   }
 }
 
+query getOrCreateStripeCustomer {
+  getOrCreateStripeCustomer {
+    stripeCustomerID
+  }
+}
+
 mutation adjustBusinessPlan($request: AdjustBusinessPlanRequest!) {
   adjustBusinessPlan(request: $request) {
     status
     seats
+  }
+}
+
+query requestAppStoreTestNotification {
+  requestAppStoreTestNotification {
+    testNotificationToken
+  }
+}
+
+query getTestNotificationStatus($request: GetAppleTestNotificationStatusInput!) {
+  getAppleTestNotificationStatus(request: $request) {
+    signedPayload
+    sendAttempts {
+      attemptDate
+      sendAttemptResult
+    }
+  }
+}
+
+query validateOriginalTransactionIdMatchesUser($request: ValidateOriginalTransactionIdMatchesUserInput!) {
+  validateOriginalTransactionIdMatchesUser(request: $request)
+}
+
+mutation ValidateAppStoreSubscriptionRequest($request: ValidateAppStoreSubscriptionRequest!) {
+  ValidateAppStoreSubscriptionRequest(request: $request)
+}
+
+query getAppleSubscriptionPlans {
+  getAppleSubscriptionPlans {
+    plans {
+      tierName
+      monthly
+      yearly
+    }
+  }
+}
+
+query getGoogleSubscriptionPlans {
+  getGoogleSubscriptionPlans {
+    plans {
+      tierName
+      skuName
+      skuMonthlyOfferId
+      skuAnnualOfferId
+    }
   }
 }

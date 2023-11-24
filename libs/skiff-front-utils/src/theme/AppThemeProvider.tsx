@@ -1,9 +1,9 @@
 import noop from 'lodash/noop';
-import { LocalStorageThemeMode, StorageOnlyThemeMode, ThemeMode, themeNames } from '@skiff-org/skiff-ui';
-import React, { ReactNode, createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { LocalStorageThemeMode, StorageOnlyThemeMode, ThemeMode, themeNames } from 'nightwatch-ui';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 
-import { sendRNWebviewMsg } from '../utils/mobileUtils';
+import { isWindowsDesktopApp, sendRNWebviewMsg } from '../utils/mobileUtils';
 
 export const THEME_SELECT_VERSION = '0.1.0';
 
@@ -38,7 +38,7 @@ const GlobalStyles = createGlobalStyle`
     font-smoothing: antialiased;
   }
 `;
-export const AppThemeProvider: React.FC<{ children?: ReactNode }> = ({ children }) => {
+export const AppThemeProvider: React.FC = ({ children }) => {
   const [themeName, setThemeName] = useState<ThemeMode>(ThemeMode.DARK);
   const [storedThemeState, setStoredThemeState] = useState<LocalStorageThemeMode>(StorageOnlyThemeMode.SYSTEM);
 
@@ -53,6 +53,21 @@ export const AppThemeProvider: React.FC<{ children?: ReactNode }> = ({ children 
       document.body.style.setProperty(key, themeColor[key]);
     });
     sendRNWebviewMsg('theme', { theme });
+    if (isWindowsDesktopApp()) {
+      try {
+        const message = {
+          type: 'theme',
+          data: { theme }
+        };
+        // Windows WebView2 injects a global `window.chrome` object
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        chrome.webview.postMessage(JSON.stringify(message));
+      } catch (error) {
+        console.error('Failed to send theme to Windows app', error);
+      }
+    }
   };
 
   const updateThemeName = useCallback(

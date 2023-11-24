@@ -1,7 +1,7 @@
 import { fromByteArray, toByteArray } from 'base64-js';
 import memoize from 'lodash/memoize';
+import { utf8BytesToString, utf8StringToBytes } from 'skiff-utils';
 import nacl from 'tweetnacl';
-import { utf8BytesToString, utf8StringToBytes } from './utf8';
 
 /**
  * Generate a nonce for tweetnacl-js.

@@ -2,16 +2,18 @@ import isArray from 'lodash/isArray';
 import {
   ButtonComponent,
   ButtonGroup,
-  ButtonGroupProps,
+  ButtonGroupItemComponent,
   Color,
+  Icons,
   Icon,
   IconText,
   InputField,
+  InputFieldVariant,
   Size,
   Typography,
   TypographySize
-} from '@skiff-org/skiff-ui';
-import React, { ReactNode } from 'react';
+} from 'nightwatch-ui';
+import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { CreateUploadAvatarLinkResponse, DisplayPictureData } from 'skiff-graphql';
 import styled, { css } from 'styled-components';
@@ -24,7 +26,7 @@ const ROW_VERTICAL_PADDING = 12;
 const HeaderButtons = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: ${isMobile ? 'end' : 'space-between'};
 `;
 
 const SelectContainer = styled.div`
@@ -34,7 +36,7 @@ const SelectContainer = styled.div`
 
 const SelectAbsolute = styled.div`
   position: absolute;
-  top: -40px;
+  top: -14px;
   right: 0;
 `;
 
@@ -57,10 +59,10 @@ const InfoTableRow = styled.div`
   box-sizing: border-box;
 `;
 
-const ColumnValue = styled.div<{ $canSetEditing: boolean }>`
+const ColumnValue = styled.div<{ $canSetEditing: boolean; $fullWidth?: boolean }>`
   display: flex;
   align-items: center;
-
+  width: ${({ $fullWidth }) => ($fullWidth ? '100%' : '')};
   min-width: 30%;
   box-sizing: border-box;
   min-height: ${ROW_MIN_HEIGHT - ROW_VERTICAL_PADDING * 2}px;
@@ -93,6 +95,15 @@ const Footer = styled.div`
   margin-top: auto;
 `;
 
+const StyledInputField = styled(InputField)`
+  width: 100%;
+`;
+
+const LeftBackButton = styled.div`
+  position: absolute;
+  top: 24px;
+`;
+
 export interface UserProfileInfoColumn {
   value: string;
   key: string;
@@ -121,11 +132,10 @@ interface UserProfileViewProps {
   selectElement?: React.ReactElement;
   hideEditProfileSection?: boolean;
   hideDisplayName?: boolean;
-  headerButtons?: ButtonComponent | ButtonGroupProps['children'];
-  footerButtons?: ButtonComponent | ButtonGroupProps['children'];
+  headerButtons?: ButtonComponent | ButtonGroupItemComponent[];
+  footerButtons?: ButtonComponent | ButtonGroupItemComponent[];
   editModeProps?: { isEditing: boolean; setIsEditing: (isEditing: boolean) => void };
   setDisplayPictureData?: (displayPictureData: DisplayPictureData) => Promise<void> | void;
-  children?: ReactNode;
 }
 
 const UserProfileView: React.FC<UserProfileViewProps> = ({
@@ -149,8 +159,13 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
 
   return (
     <>
+      {isMobile && (
+        <LeftBackButton>
+          <Icons icon={Icon.Backward} onClick={onBackClick} size={Size.X_MEDIUM} />
+        </LeftBackButton>
+      )}
       <HeaderButtons>
-        <IconText label='Back' onClick={onBackClick} size={Size.MEDIUM} startIcon={Icon.ChevronLeft} />
+        {!isMobile && <IconText label='Back' onClick={onBackClick} size={Size.MEDIUM} startIcon={Icon.ChevronLeft} />}
         {headerButtons && (
           <>
             {isArray(headerButtons) && <ButtonGroup>{headerButtons}</ButtonGroup>}
@@ -160,14 +175,12 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
       </HeaderButtons>
       {!hideEditProfileSection && (
         <EditProfile
-          compact
           createUploadLink={createUploadLink}
           displayName={displayName}
           displayPictureData={displayPictureData}
           hideDisplayName={hideDisplayName}
           setDisplayPictureData={setDisplayPictureData}
           sublabel={isMobile ? undefined : subtitle}
-          type='inline'
         />
       )}
       {selectElement && (
@@ -192,18 +205,18 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
           return (
             <ListItem $isLast={index === userProfileInfoRows.length - 1} key={`${rowKey}-user-profile-row`}>
               <InfoTableRow>
-                {columns.map(({ value, key: colKey, color, autoFocus, setValue, onEnter }) => (
+                {columns.map(({ value, key: colKey, color, autoFocus, setValue, onEnter }, index) => (
                   // Note: DO NOT REMOVE THE KEY ATTRIBUTE (or use a non-unique key), it will break input focus
                   <ColumnValue
                     $canSetEditing={!!setIsEditing}
+                    $fullWidth={index === 1}
                     key={`${colKey}-user-profile-column`}
                     onClick={!!setIsEditing ? () => setIsEditing(true) : undefined}
                   >
                     {(!isEditing || !setValue) && <Typography color={color}>{value}</Typography>}
                     {isEditing && setValue && (
-                      <InputField
+                      <StyledInputField
                         autoFocus={autoFocus}
-                        ghost
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           setValue(e.target.value);
                         }}
@@ -214,6 +227,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
                         }}
                         placeholder='Empty'
                         value={value}
+                        variant={InputFieldVariant.GHOST}
                       />
                     )}
                   </ColumnValue>

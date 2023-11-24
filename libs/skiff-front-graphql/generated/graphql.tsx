@@ -7,14 +7,19 @@ const defaultOptions = {} as const;
 export type GetAllCurrentUserContactsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type GetAllCurrentUserContactsQuery = { __typename?: 'Query', allContacts: Array<{ __typename?: 'Contact', emailAddress: string, firstName?: string | null, lastName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureDataSkemail', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null }> };
+export type GetAllCurrentUserContactsQuery = { __typename?: 'Query', allContacts: Array<{ __typename?: 'Contact', contactID: string, emailAddress?: string | null, firstName?: string | null, lastName?: string | null, encryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedContactData?: string | null, decryptedSessionKey?: string | null, displayPictureData?: { __typename?: 'DisplayPictureDataSkemail', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null, decryptedData?: { __typename?: 'DecryptedContactData', decryptedNotes?: string | null, decryptedBirthday?: string | null, decryptedCompany?: string | null, decryptedJobTitle?: string | null, decryptedNickname?: string | null, decryptedURL?: string | null, decryptedPhoneNumbers?: Array<{ __typename?: 'ValueLabel', value: string, label: string }> | null, decryptedAddresses?: Array<{ __typename?: 'ValueLabel', value: string, label: string }> | null } | null }> };
+
+export type GetAllCurrentUserContactsNativeQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetAllCurrentUserContactsNativeQuery = { __typename?: 'Query', allContacts: Array<{ __typename?: 'Contact', contactID: string, emailAddress?: string | null, firstName?: string | null, lastName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureDataSkemail', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null }> };
 
 export type GetContactsQueryVariables = Types.Exact<{
   request: Types.GetContactsRequest;
 }>;
 
 
-export type GetContactsQuery = { __typename?: 'Query', contacts: Array<{ __typename?: 'Contact', emailAddress: string, firstName?: string | null, lastName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureDataSkemail', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null }> };
+export type GetContactsQuery = { __typename?: 'Query', contacts: Array<{ __typename?: 'Contact', contactID: string, emailAddress?: string | null, firstName?: string | null, lastName?: string | null, encryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedContactData?: string | null, decryptedSessionKey?: string | null, displayPictureData?: { __typename?: 'DisplayPictureDataSkemail', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null, decryptedData?: { __typename?: 'DecryptedContactData', decryptedNotes?: string | null, decryptedBirthday?: string | null, decryptedCompany?: string | null, decryptedJobTitle?: string | null, decryptedNickname?: string | null, decryptedURL?: string | null, decryptedPhoneNumbers?: Array<{ __typename?: 'ValueLabel', value: string, label: string }> | null, decryptedAddresses?: Array<{ __typename?: 'ValueLabel', value: string, label: string }> | null } | null }> };
 
 export type GetDefaultProfilePictureQueryVariables = Types.Exact<{
   request: Types.GetDefaultProfilePictureRequest;
@@ -36,6 +41,13 @@ export type DeleteContactMutationVariables = Types.Exact<{
 
 
 export type DeleteContactMutation = { __typename?: 'Mutation', deleteContact?: any | null };
+
+export type DeleteContactsMutationVariables = Types.Exact<{
+  request: Types.DeleteContactsRequest;
+}>;
+
+
+export type DeleteContactsMutation = { __typename?: 'Mutation', deleteContacts?: any | null };
 
 export type GetCreditsQueryVariables = Types.Exact<{
   request: Types.GetCreditsRequest;
@@ -148,33 +160,40 @@ export type CreateOrUpdateDraftMutation = { __typename?: 'Mutation', createOrUpd
 
 export type AddressFragment = { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null };
 
-export type EmailWithoutContentFragment = { __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null };
+export type EmailWithoutContentFragment = { __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null };
 
-export type ThreadWithoutContentFragment = { __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> };
+export type ThreadWithoutContentFragment = { __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, deletedAt?: Date | null, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> };
 
-export type EmailFragment = { __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null };
+export type EmailFragment = { __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null };
 
-export type ThreadFragment = { __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> };
+export type ThreadFragment = { __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, deletedAt?: Date | null, senderToSilence?: string | null, senderToSilenceMessageCounter?: number | null, senderToSilenceTotalBytes?: number | null, threadContentUpdatedAt: Date, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> };
 
-export type MobileThreadFragment = { __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> };
+export type MobileThreadFragment = { __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, deletedAt?: Date | null, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, clientsideFiltersApplied?: boolean | null, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> };
 
-export type SlimThreadFragment = { __typename?: 'SlimUserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> } };
+export type SlimThreadFragment = { __typename?: 'SlimUserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, deletedAt?: Date | null, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> } };
 
-export type SlimThreadWithoutLabelsFragment = { __typename?: 'SlimUserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string }> } };
+export type SlimThreadWithoutLabelsFragment = { __typename?: 'SlimUserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, deletedAt?: Date | null, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string }> } };
 
 export type MailboxWithContentQueryVariables = Types.Exact<{
   request: Types.MailboxRequest;
 }>;
 
 
-export type MailboxWithContentQuery = { __typename?: 'Query', mailbox?: { __typename?: 'Mailbox', threads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }>, pageInfo: { __typename?: 'MailboxPageInfo', hasNextPage: boolean, cursor?: { __typename?: 'MailboxCursorResponse', threadID: string, date: Date } | null } } | null };
+export type MailboxWithContentQuery = { __typename?: 'Query', mailbox?: { __typename?: 'Mailbox', threads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, deletedAt?: Date | null, senderToSilence?: string | null, senderToSilenceMessageCounter?: number | null, senderToSilenceTotalBytes?: number | null, threadContentUpdatedAt: Date, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }>, pageInfo: { __typename?: 'MailboxPageInfo', hasNextPage: boolean, cursor?: { __typename?: 'MailboxCursorResponse', threadID: string, date: Date } | null } } | null };
 
 export type MailboxQueryVariables = Types.Exact<{
   request: Types.MailboxRequest;
 }>;
 
 
-export type MailboxQuery = { __typename?: 'Query', mailbox?: { __typename?: 'Mailbox', threads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }>, pageInfo: { __typename?: 'MailboxPageInfo', hasNextPage: boolean, cursor?: { __typename?: 'MailboxCursorResponse', threadID: string, date: Date } | null } } | null };
+export type MailboxQuery = { __typename?: 'Query', mailbox?: { __typename?: 'Mailbox', threads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, deletedAt?: Date | null, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }>, pageInfo: { __typename?: 'MailboxPageInfo', hasNextPage: boolean, cursor?: { __typename?: 'MailboxCursorResponse', threadID: string, date: Date } | null } } | null };
+
+export type FilteredThreadIDsQueryVariables = Types.Exact<{
+  request: Types.FilteredThreadIDsRequest;
+}>;
+
+
+export type FilteredThreadIDsQuery = { __typename?: 'Query', filteredThreadIDs: { __typename?: 'FilteredThreadIDs', threadIDs: Array<string>, numThreadIDsRemoved: number } };
 
 export type MobileMailboxQueryVariables = Types.Exact<{
   mailboxRequest: Types.NativeMailboxRequest;
@@ -182,7 +201,7 @@ export type MobileMailboxQueryVariables = Types.Exact<{
 }>;
 
 
-export type MobileMailboxQuery = { __typename?: 'Query', nativeMailbox?: { __typename?: 'NativeMailbox', threads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }>, slimThreads: Array<{ __typename?: 'SlimUserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> } }>, pageInfo: { __typename?: 'MailboxPageInfo', hasNextPage: boolean, cursor?: { __typename?: 'MailboxCursorResponse', threadID: string, date: Date } | null } } | null, userThreads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }> };
+export type MobileMailboxQuery = { __typename?: 'Query', nativeMailbox?: { __typename?: 'NativeMailbox', threads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, deletedAt?: Date | null, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, clientsideFiltersApplied?: boolean | null, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }>, slimThreads: Array<{ __typename?: 'SlimUserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, deletedAt?: Date | null, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> } }>, pageInfo: { __typename?: 'MailboxPageInfo', hasNextPage: boolean, cursor?: { __typename?: 'MailboxCursorResponse', threadID: string, date: Date } | null } } | null, userThreads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, deletedAt?: Date | null, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, clientsideFiltersApplied?: boolean | null, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }> };
 
 export type MobileMailboxLabelsSyncQueryVariables = Types.Exact<{
   mailboxRequest: Types.NativeMailboxRequest;
@@ -190,7 +209,7 @@ export type MobileMailboxLabelsSyncQueryVariables = Types.Exact<{
 }>;
 
 
-export type MobileMailboxLabelsSyncQuery = { __typename?: 'Query', nativeMailbox?: { __typename?: 'NativeMailbox', threads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }>, slimThreads: Array<{ __typename?: 'SlimUserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string }> } }>, pageInfo: { __typename?: 'MailboxPageInfo', hasNextPage: boolean, cursor?: { __typename?: 'MailboxCursorResponse', threadID: string, date: Date } | null } } | null, userThreads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> };
+export type MobileMailboxLabelsSyncQuery = { __typename?: 'Query', nativeMailbox?: { __typename?: 'NativeMailbox', threads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, deletedAt?: Date | null, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, clientsideFiltersApplied?: boolean | null, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }>, slimThreads: Array<{ __typename?: 'SlimUserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, deletedAt?: Date | null, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string }> } }>, pageInfo: { __typename?: 'MailboxPageInfo', hasNextPage: boolean, cursor?: { __typename?: 'MailboxCursorResponse', threadID: string, date: Date } | null } } | null, userThreads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, deletedAt?: Date | null, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, clientsideFiltersApplied?: boolean | null, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> };
 
 export type GetMobileThreadsFromIdQueryVariables = Types.Exact<{
   threadIDs: Array<Types.Scalars['String']> | Types.Scalars['String'];
@@ -198,21 +217,21 @@ export type GetMobileThreadsFromIdQueryVariables = Types.Exact<{
 }>;
 
 
-export type GetMobileThreadsFromIdQuery = { __typename?: 'Query', userThreads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }> };
+export type GetMobileThreadsFromIdQuery = { __typename?: 'Query', userThreads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, updatedAt: Date, deletedAt?: Date | null, permanentlyDeleted: boolean, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, clientsideFiltersApplied?: boolean | null, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }> };
 
 export type GetThreadFromIdQueryVariables = Types.Exact<{
   threadID: Types.Scalars['String'];
 }>;
 
 
-export type GetThreadFromIdQuery = { __typename?: 'Query', userThread?: { __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> } | null };
+export type GetThreadFromIdQuery = { __typename?: 'Query', userThread?: { __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, deletedAt?: Date | null, senderToSilence?: string | null, senderToSilenceMessageCounter?: number | null, senderToSilenceTotalBytes?: number | null, threadContentUpdatedAt: Date, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> } | null };
 
 export type GetThreadsFromIDsQueryVariables = Types.Exact<{
   threadIDs: Array<Types.Scalars['String']> | Types.Scalars['String'];
 }>;
 
 
-export type GetThreadsFromIDsQuery = { __typename?: 'Query', userThreads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }> };
+export type GetThreadsFromIDsQuery = { __typename?: 'Query', userThreads: Array<{ __typename?: 'UserThread', threadID: string, emailsUpdatedAt: Date, sentLabelUpdatedAt?: Date | null, deletedAt?: Date | null, senderToSilence?: string | null, senderToSilenceMessageCounter?: number | null, senderToSilenceTotalBytes?: number | null, threadContentUpdatedAt: Date, attributes: { __typename?: 'ThreadAttributes', read: boolean, systemLabels: Array<string>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, color: string, labelName: string, variant: Types.UserLabelVariant }> }, emails: Array<{ __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null }> }> };
 
 export type GetFromAddressListForEmailsOnThreadQueryVariables = Types.Exact<{
   threadID: Types.Scalars['String'];
@@ -235,6 +254,20 @@ export type ValidateMailAliasQueryVariables = Types.Exact<{
 
 export type ValidateMailAliasQuery = { __typename?: 'Query', aliasValid: boolean };
 
+export type UpdateQuickAliasActiveStateMutationVariables = Types.Exact<{
+  request?: Types.InputMaybe<Types.UpdateQuickAliasActiveStateRequest>;
+}>;
+
+
+export type UpdateQuickAliasActiveStateMutation = { __typename?: 'Mutation', updateQuickAliasActiveState?: { __typename?: 'UpdateQuickAliasActiveStateResponse', status: Types.RequestStatus } | null };
+
+export type UpdateEmailAliasSendReceiveEnabledStateMutationVariables = Types.Exact<{
+  request: Types.UpdateEmailAliasEnabledStateRequest;
+}>;
+
+
+export type UpdateEmailAliasSendReceiveEnabledStateMutation = { __typename?: 'Mutation', updateEmailAliasSendReceiveEnabledState?: any | null };
+
 export type CreateEmailAliasMutationVariables = Types.Exact<{
   request?: Types.InputMaybe<Types.CreateEmailAliasRequest>;
 }>;
@@ -255,6 +288,13 @@ export type UpdateEmailAliasActiveStateMutationVariables = Types.Exact<{
 
 
 export type UpdateEmailAliasActiveStateMutation = { __typename?: 'Mutation', updateEmailAliasActiveState?: { __typename?: 'UpdateEmailAliasActiveStateResponse', status: Types.RequestStatus } | null };
+
+export type UpdateEmailAliasProfileMutationVariables = Types.Exact<{
+  request: Types.UpdateEmailAliasProfileRequest;
+}>;
+
+
+export type UpdateEmailAliasProfileMutation = { __typename?: 'Mutation', updateEmailAliasProfile: boolean };
 
 export type SetAllThreadsReadStatusMutationVariables = Types.Exact<{
   request: Types.SetAllThreadsReadStatusRequest;
@@ -289,7 +329,7 @@ export type UnsendMessageMutationVariables = Types.Exact<{
 }>;
 
 
-export type UnsendMessageMutation = { __typename?: 'Mutation', unsendMessage?: { __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null } | null };
+export type UnsendMessageMutation = { __typename?: 'Mutation', unsendMessage?: { __typename?: 'Email', id: string, createdAt: Date, scheduleSendAt?: Date | null, encryptedRawMimeUrl?: string | null, decryptedSessionKey?: string | null, decryptedSubject?: string | null, decryptedText?: string | null, decryptedHtml?: string | null, decryptedTextAsHtml?: string | null, decryptedTextSnippet?: string | null, notificationsTurnedOffForSender: boolean, attachmentMetadata: Array<{ __typename?: 'EncryptedAttachmentMetadata', attachmentID: string, encryptedData: { __typename?: 'EncryptedDataOutput', encryptedData: string } }>, from: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }, to: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, cc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, bcc: Array<{ __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null }>, replyTo?: { __typename?: 'AddressObject', name?: string | null, address: string, blocked?: boolean | null } | null, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } }, encryptedSubject: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedText: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextAsHtml: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedTextSnippet?: { __typename?: 'EncryptedDataOutput', encryptedData: string } | null, decryptedAttachmentMetadata?: Array<{ __typename?: 'DecryptedAttachment', attachmentID: string, decryptedMetadata?: { __typename?: 'AttachmentMetadata', contentType: string, contentDisposition: string, filename: string, checksum: string, size: number, contentId: string } | null }> | null } | null };
 
 export type SendReplyMessageMutationVariables = Types.Exact<{
   request: Types.ReplyToEmailRequest;
@@ -325,6 +365,13 @@ export type GetNumUnreadQueryVariables = Types.Exact<{
 
 
 export type GetNumUnreadQuery = { __typename?: 'Query', unread: number };
+
+export type GetNumUnreadAllLabelsQueryVariables = Types.Exact<{
+  labels: Array<Types.Scalars['String']> | Types.Scalars['String'];
+}>;
+
+
+export type GetNumUnreadAllLabelsQuery = { __typename?: 'Query', unreadAllLabels: Array<{ __typename?: 'LabelUnreadCount', label: string, count: number }> };
 
 export type BlockEmailAddressMutationVariables = Types.Exact<{
   request: Types.BlockEmailAddressRequest;
@@ -367,6 +414,18 @@ export type DeleteThreadMutationVariables = Types.Exact<{
 
 
 export type DeleteThreadMutation = { __typename?: 'Mutation', deleteThread?: any | null };
+
+export type BulkDeleteTrashedThreadsMutationVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type BulkDeleteTrashedThreadsMutation = { __typename?: 'Mutation', bulkDeleteTrashedThreads?: { __typename?: 'BulkDeleteTrashedThreadsResponse', jobID: string } | null };
+
+export type GetBulkActionJobStatusQueryVariables = Types.Exact<{
+  request: Types.BulkActionJobStatusRequest;
+}>;
+
+
+export type GetBulkActionJobStatusQuery = { __typename?: 'Query', bulkActionJobStatus: { __typename?: 'BulkModifyLabelsJobStatusResponse', jobStatus: Types.BullMqJobStatus, completed: boolean } };
 
 export type SetPushTokenMutationVariables = Types.Exact<{
   request: Types.SetPushTokenRequest;
@@ -438,6 +497,55 @@ export type MarkThreadsAsClientsideFilteredMutationVariables = Types.Exact<{
 
 export type MarkThreadsAsClientsideFilteredMutation = { __typename?: 'Mutation', markThreadsAsClientsideFiltered?: any | null };
 
+export type SilenceMultipleEmailAddressesMutationVariables = Types.Exact<{
+  request: Types.SilenceMultipleEmailAddressesRequest;
+}>;
+
+
+export type SilenceMultipleEmailAddressesMutation = { __typename?: 'Mutation', silenceMultipleEmailAddresses?: any | null };
+
+export type MarkSpamMultipleEmailAddressesMutationVariables = Types.Exact<{
+  request: Types.MarkSpamMultipleEmailAddressesRequest;
+}>;
+
+
+export type MarkSpamMultipleEmailAddressesMutation = { __typename?: 'Mutation', markSpamMultipleEmailAddresses?: any | null };
+
+export type MarkNotSpamMultipleEmailAddressesMutationVariables = Types.Exact<{
+  request: Types.MarkNotSpamMultipleEmailAddressesRequest;
+}>;
+
+
+export type MarkNotSpamMultipleEmailAddressesMutation = { __typename?: 'Mutation', markNotSpamMultipleEmailAddresses?: any | null };
+
+export type BulkTrashMutationVariables = Types.Exact<{
+  request: Types.BulkTrashRequest;
+}>;
+
+
+export type BulkTrashMutation = { __typename?: 'Mutation', bulkTrash?: { __typename?: 'BulkTrashResponse', jobID: string } | null };
+
+export type MarkThreadAsOpenedMutationVariables = Types.Exact<{
+  request: Types.MarkThreadAsOpenedInput;
+}>;
+
+
+export type MarkThreadAsOpenedMutation = { __typename?: 'Mutation', markThreadAsOpened?: any | null };
+
+export type MuteNotificationForSenderMutationVariables = Types.Exact<{
+  request: Types.MuteNotificationForSenderRequest;
+}>;
+
+
+export type MuteNotificationForSenderMutation = { __typename?: 'Mutation', muteNotificationForSender?: any | null };
+
+export type UnmuteNotificationForSenderMutationVariables = Types.Exact<{
+  request: Types.UnmuteNotificationForSenderRequest;
+}>;
+
+
+export type UnmuteNotificationForSenderMutation = { __typename?: 'Mutation', unmuteNotificationForSender?: any | null };
+
 export type DocumentPermissionInfoFragment = { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null };
 
 export type DocumentCollaboratorInfoFragment = { __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } };
@@ -448,9 +556,9 @@ export type DocumentHierarchicalPermissionChainInfoFragment = { __typename?: 'Hi
 
 export type DocumentBasicInfoWithoutTeamOrOrgFragment = { __typename?: 'Document', docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> };
 
-export type DocumentBasicInfoFragment = { __typename?: 'Document', docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> };
+export type DocumentBasicInfoFragment = { __typename?: 'Document', cloneDocID?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> };
 
-export type DocumentBaseFragment = { __typename?: 'Document', updatedAt?: Date | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> };
+export type DocumentBaseFragment = { __typename?: 'Document', updatedAt?: Date | null, cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> };
 
 export type DocumentDecryptedMetadataFragment = { __typename?: 'Document', createdAt?: Date | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null } };
 
@@ -466,13 +574,15 @@ export type DocumentTeamFragment = { __typename?: 'Document', team?: { __typenam
 
 export type DocumentPermissionProxiesFragment = { __typename?: 'Document', permissionProxies: Array<{ __typename?: 'DocumentPermissionProxy', sourceDocID: string, sourceTeam: { __typename?: 'Team', teamID: string, name: string, icon: string } }> };
 
-export type DocumentParentsFullBreadcrumbFragment = { __typename?: 'Document', parentsBreadcrumb: Array<{ __typename?: 'Document', createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> }> };
+export type DocumentParentsFullBreadcrumbFragment = { __typename?: 'Document', parentsBreadcrumb: Array<{ __typename?: 'Document', cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> }> };
 
 export type DocumentParentsBreadcrumbFragment = { __typename?: 'Document', parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }> };
 
 export type DocumentCollaboratorsFragment = { __typename?: 'Document', collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }> };
 
-export type DocumentFullInfoFragment = { __typename?: 'Document', parentKeysClaim?: string | null, parentPublicHierarchicalKey?: string | null, createdAt?: Date | null, updatedAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, currentlyEditingUsers: Array<{ __typename?: 'CurrentlyEditingUser', name: string, userID: string, color: string, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } | null>, link?: { __typename?: 'LinkOutput', encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, salt: string, decryptedLinkKey: string } | null, invites: Array<{ __typename?: 'PendingUserInvite', docID: string, email: string, permissionLevel: Types.PermissionLevel }>, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> };
+export type DocumentNativeInfoFragment = { __typename?: 'Document', updatedAt?: Date | null, thumbnail?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, createdAt?: Date | null, team?: { __typename?: 'Team', personal: boolean, teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }>, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null } };
+
+export type DocumentFullInfoFragment = { __typename?: 'Document', parentKeysClaim?: string | null, parentPublicHierarchicalKey?: string | null, thumbnail?: string | null, decryptedThumbnail?: string | null, cloneDocID?: string | null, createdAt?: Date | null, updatedAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, currentlyEditingUsers: Array<{ __typename?: 'CurrentlyEditingUser', name: string, userID: string, color: string, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } | null>, link?: { __typename?: 'LinkOutput', encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, salt: string, decryptedLinkKey: string } | null, invites: Array<{ __typename?: 'PendingUserInvite', docID: string, email: string, permissionLevel: Types.PermissionLevel }>, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> };
 
 export type TemplateDataFragment = { __typename?: 'Template', templateID: string, group: string, parentID?: string | null, contents: { __typename?: 'TemplateContent', pmDoc: any }, metadata: { __typename?: 'TemplateMetaData', title: string, icon?: string | null, color?: string | null, description?: string | null } };
 
@@ -482,17 +592,21 @@ export type UserProfileDataFragment = { __typename?: 'User', userID: string, use
 
 export type UserProfileOrgDataFragment = { __typename?: 'User', userID: string, username: string, publicKey: { key: string, signature?: string }, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null }, rootOrganization: { __typename?: 'Organization', orgID: string, name: string, displayPictureData: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } } };
 
+export type UserOrgPersonalTeamDataFragment = { __typename?: 'User', userID: string, rootOrganization: { __typename?: 'Organization', orgID: string, rootDocID: string, personalTeam: { __typename?: 'Team', teamID: string, rootDocument?: { __typename?: 'Document', docID: string } | null } } };
+
+export type UserOrgEveryoneTeamDataFragment = { __typename?: 'User', userID: string, rootOrganization: { __typename?: 'Organization', orgID: string, rootDocID: string, everyoneTeam: { __typename?: 'Team', teamID: string, rootDocument?: { __typename?: 'Document', createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }>, invites: Array<{ __typename?: 'PendingUserInvite', docID: string, email: string, permissionLevel: Types.PermissionLevel }>, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }> } | null } } };
+
 export type UserProfileDataWithKeysFragment = { __typename?: 'User', publicKey: { key: string, signature?: string }, signingPublicKey: string, userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } };
 
 export type UserWithEmailAliasesFragment = { __typename?: 'User', userID: string, emailAliases?: Array<string> | null };
 
 export type UserWithMailStorageUsedFragment = { __typename?: 'User', userID: string, skemailStorageUsage?: { __typename?: 'StorageUsage', attachmentUsageBytes: string, messageUsageBytes: string } | null };
 
-export type ContactDataFragment = { __typename?: 'Contact', emailAddress: string, firstName?: string | null, lastName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureDataSkemail', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null };
+export type ContactDataFragment = { __typename?: 'Contact', contactID: string, emailAddress?: string | null, firstName?: string | null, lastName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureDataSkemail', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null };
 
-export type UserPreferencesDataFragment = { __typename?: 'UserPreferences', theme?: string | null, dateFormat?: string | null, hourFormat?: string | null, showPageIcon?: boolean | null, defaultCalendarColor?: string | null, startDayOfTheWeek?: number | null, leftSwipeGesture?: Types.SwipeSetting | null, rightSwipeGesture?: Types.SwipeSetting | null, blockRemoteContent?: boolean | null, securedBySkiffSigDisabled?: boolean | null, showAliasInboxes?: boolean | null, threadFormat?: Types.ThreadDisplayFormat | null, hideActivationChecklist?: boolean | null };
+export type UserPreferencesDataFragment = { __typename?: 'UserPreferences', autoAdvance?: boolean | null, advanceToNext?: boolean | null, theme?: string | null, dateFormat?: string | null, hourFormat?: string | null, showPageIcon?: boolean | null, defaultCalendarColor?: string | null, defaultCalendarView?: Types.CalendarView | null, defaultCalendarViewMobile?: Types.CalendarView | null, startDayOfTheWeek?: number | null, leftSwipeGesture?: Types.SwipeSetting | null, rightSwipeGesture?: Types.SwipeSetting | null, blockRemoteContent?: boolean | null, securedBySkiffSigDisabled?: boolean | null, showAliasInboxes?: boolean | null, fileTableFormat?: Types.FileTableDisplayFormat | null, threadFormat?: Types.ThreadDisplayFormat | null, hideActivationChecklist?: boolean | null, tableOfContents?: Types.TableOfContentsSetting | null };
 
-export type UserPreferencesFragmentFragment = { __typename?: 'User', userID: string, userPreferences?: { __typename?: 'UserPreferences', theme?: string | null, dateFormat?: string | null, hourFormat?: string | null, showPageIcon?: boolean | null, defaultCalendarColor?: string | null, startDayOfTheWeek?: number | null, leftSwipeGesture?: Types.SwipeSetting | null, rightSwipeGesture?: Types.SwipeSetting | null, blockRemoteContent?: boolean | null, securedBySkiffSigDisabled?: boolean | null, showAliasInboxes?: boolean | null, threadFormat?: Types.ThreadDisplayFormat | null, hideActivationChecklist?: boolean | null } | null };
+export type UserPreferencesFragmentFragment = { __typename?: 'User', userID: string, userPreferences?: { __typename?: 'UserPreferences', autoAdvance?: boolean | null, advanceToNext?: boolean | null, theme?: string | null, dateFormat?: string | null, hourFormat?: string | null, showPageIcon?: boolean | null, defaultCalendarColor?: string | null, defaultCalendarView?: Types.CalendarView | null, defaultCalendarViewMobile?: Types.CalendarView | null, startDayOfTheWeek?: number | null, leftSwipeGesture?: Types.SwipeSetting | null, rightSwipeGesture?: Types.SwipeSetting | null, blockRemoteContent?: boolean | null, securedBySkiffSigDisabled?: boolean | null, showAliasInboxes?: boolean | null, fileTableFormat?: Types.FileTableDisplayFormat | null, threadFormat?: Types.ThreadDisplayFormat | null, hideActivationChecklist?: boolean | null, tableOfContents?: Types.TableOfContentsSetting | null } | null };
 
 export type ImportEmlEmailMutationVariables = Types.Exact<{
   importRequest: Types.ImportEmlEmailRequest;
@@ -507,6 +621,13 @@ export type ImportMboxEmailsMutationVariables = Types.Exact<{
 
 
 export type ImportMboxEmailsMutation = { __typename?: 'Mutation', importMboxEmails?: any | null };
+
+export type GetMboxImportUrlMutationVariables = Types.Exact<{
+  getImportUrlRequest: Types.GetMboxImportUrlRequest;
+}>;
+
+
+export type GetMboxImportUrlMutation = { __typename?: 'Mutation', getMboxImportUrl?: { __typename?: 'GetMboxImportUrlResponse', fileID: string, uploadData: string } | null };
 
 export type ImportGmailEmailsMutationVariables = Types.Exact<{
   request: Types.ImportGmailRequest;
@@ -527,20 +648,97 @@ export type GetGmailAutoImportStatusQuery = { __typename?: 'Query', getGmailAuto
 
 export type ImportOutlookEmailsMutationVariables = Types.Exact<{
   code: Types.Scalars['String'];
+  state: Types.Scalars['String'];
 }>;
 
 
 export type ImportOutlookEmailsMutation = { __typename?: 'Mutation', importOutlookEmails?: any | null };
 
-export type GetGoogleAuthUrlQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type GetGoogleAuthUrlQueryVariables = Types.Exact<{
+  action?: Types.InputMaybe<Types.AuthAction>;
+}>;
 
 
 export type GetGoogleAuthUrlQuery = { __typename?: 'Query', getGoogleAuthURL: string };
 
-export type GetOutlookAuthUrlQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type GetOutlookAuthUrlQueryVariables = Types.Exact<{
+  action?: Types.InputMaybe<Types.AuthAction>;
+}>;
 
 
 export type GetOutlookAuthUrlQuery = { __typename?: 'Query', getOutlookAuthUrl: string };
+
+export type GetEmailAutoForwardingSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetEmailAutoForwardingSettingsQuery = { __typename?: 'Query', emailAutoForwardingSettings: { __typename?: 'EmailAutoForwardingSettings', gmail: { __typename?: 'EmailAutoForwardingClientSettings', enabled: boolean }, outlook: { __typename?: 'EmailAutoForwardingClientSettings', enabled: boolean } } };
+
+export type EnableEmailAutoForwardingMutationVariables = Types.Exact<{
+  request: Types.EnableEmailAutoForwardingRequest;
+}>;
+
+
+export type EnableEmailAutoForwardingMutation = { __typename?: 'Mutation', enableEmailAutoForwarding?: any | null };
+
+export type DisableEmailAutoForwardingMutationVariables = Types.Exact<{
+  request: Types.DisableEmailAutoForwardingRequest;
+}>;
+
+
+export type DisableEmailAutoForwardingMutation = { __typename?: 'Mutation', disableEmailAutoForwarding?: any | null };
+
+export type GetEmailImportMetaQueryVariables = Types.Exact<{
+  request: Types.EmailImportMetaRequest;
+}>;
+
+
+export type GetEmailImportMetaQuery = { __typename?: 'Query', emailImportMeta: { __typename?: 'EmailImportMeta', estimatedEmailCount: number } };
+
+type ExternalEmailClientLabel_ExternalEmailClientSystemLabel_Fragment = { __typename?: 'ExternalEmailClientSystemLabel', skiffSystemLabel?: Types.SystemLabels | null, labelID: string, labelName: string };
+
+type ExternalEmailClientLabel_ExternalEmailClientUserLabel_Fragment = { __typename?: 'ExternalEmailClientUserLabel', labelID: string, labelName: string, skiffUserLabel?: { __typename?: 'UserLabel', labelID: string, labelName: string, color: string, variant: Types.UserLabelVariant } | null };
+
+export type ExternalEmailClientLabelFragment = ExternalEmailClientLabel_ExternalEmailClientSystemLabel_Fragment | ExternalEmailClientLabel_ExternalEmailClientUserLabel_Fragment;
+
+export type GetGmailLabelsQueryVariables = Types.Exact<{
+  request: Types.GmailInboxOrganizationRequest;
+}>;
+
+
+export type GetGmailLabelsQuery = { __typename?: 'Query', gmailInboxOrganization: { __typename?: 'GmailInboxOrganization', labels: Array<{ __typename?: 'ExternalEmailClientSystemLabel', skiffSystemLabel?: Types.SystemLabels | null, labelID: string, labelName: string } | { __typename?: 'ExternalEmailClientUserLabel', labelID: string, labelName: string, skiffUserLabel?: { __typename?: 'UserLabel', labelID: string, labelName: string, color: string, variant: Types.UserLabelVariant } | null }> } };
+
+export type GetOutlookCategoriesAndFoldersQueryVariables = Types.Exact<{
+  request: Types.OutlookInboxOrganizationRequest;
+}>;
+
+
+export type GetOutlookCategoriesAndFoldersQuery = { __typename?: 'Query', outlookInboxOrganization: { __typename?: 'OutlookInboxOrganization', categories: Array<{ __typename?: 'ExternalEmailClientUserLabel', labelID: string, labelName: string, skiffUserLabel?: { __typename?: 'UserLabel', labelID: string, labelName: string, color: string, variant: Types.UserLabelVariant } | null }>, folders: Array<{ __typename?: 'ExternalEmailClientSystemLabel', skiffSystemLabel?: Types.SystemLabels | null, labelID: string, labelName: string } | { __typename?: 'ExternalEmailClientUserLabel', labelID: string, labelName: string, skiffUserLabel?: { __typename?: 'UserLabel', labelID: string, labelName: string, color: string, variant: Types.UserLabelVariant } | null }> } };
+
+export type EnableGmailImportMutationVariables = Types.Exact<{
+  request: Types.EnableGmailImportRequest;
+}>;
+
+
+export type EnableGmailImportMutation = { __typename?: 'Mutation', enableGmailImport?: any | null };
+
+export type EnableOutlookImportMutationVariables = Types.Exact<{
+  request: Types.EnableOutlookImportRequest;
+}>;
+
+
+export type EnableOutlookImportMutation = { __typename?: 'Mutation', enableOutlookImport?: any | null };
+
+export type CreateImportSessionMutationVariables = Types.Exact<{
+  request: Types.CreateImportSessionRequest;
+}>;
+
+
+export type CreateImportSessionMutation = { __typename?: 'Mutation', createImportSession: { __typename?: 'ImportSession', importID: string } };
+
+export type GetImportStatusQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetImportStatusQuery = { __typename?: 'Query', importStatus: Array<{ __typename?: 'ImportStatusType', importID: string, importedEmailCount?: number | null, status: Types.ImportStatus }> };
 
 export type ApplyLabelsMutationVariables = Types.Exact<{
   request?: Types.InputMaybe<Types.ModifyLabelsRequest>;
@@ -549,6 +747,13 @@ export type ApplyLabelsMutationVariables = Types.Exact<{
 
 export type ApplyLabelsMutation = { __typename?: 'Mutation', applyLabels?: { __typename?: 'ModifyLabelsResponse', updatedThreads: Array<{ __typename?: 'UpdatedThreadLabels', threadID: string, systemLabels: Array<Types.SystemLabels>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, labelName: string, color: string, variant: Types.UserLabelVariant }> }> } | null };
 
+export type BulkApplyLabelsMutationVariables = Types.Exact<{
+  request?: Types.InputMaybe<Types.BulkModifyLabelsRequest>;
+}>;
+
+
+export type BulkApplyLabelsMutation = { __typename?: 'Mutation', bulkApplyLabels?: { __typename?: 'BulkModifyLabelsResponse', jobID: string } | null };
+
 export type RemoveLabelsMutationVariables = Types.Exact<{
   request?: Types.InputMaybe<Types.ModifyLabelsRequest>;
 }>;
@@ -556,10 +761,12 @@ export type RemoveLabelsMutationVariables = Types.Exact<{
 
 export type RemoveLabelsMutation = { __typename?: 'Mutation', removeLabels?: { __typename?: 'ModifyLabelsResponse', updatedThreads: Array<{ __typename?: 'UpdatedThreadLabels', threadID: string, systemLabels: Array<Types.SystemLabels>, userLabels: Array<{ __typename?: 'UserLabel', labelID: string, labelName: string, color: string, variant: Types.UserLabelVariant }> }> } | null };
 
-export type UserLabelsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type BulkRemoveLabelsMutationVariables = Types.Exact<{
+  request?: Types.InputMaybe<Types.BulkModifyLabelsRequest>;
+}>;
 
 
-export type UserLabelsQuery = { __typename?: 'Query', userLabels: Array<{ __typename?: 'UserLabel', labelID: string, labelName: string, color: string, variant: Types.UserLabelVariant }> };
+export type BulkRemoveLabelsMutation = { __typename?: 'Mutation', bulkRemoveLabels?: { __typename?: 'BulkModifyLabelsResponse', jobID: string } | null };
 
 export type CreateUserLabelMutationVariables = Types.Exact<{
   request?: Types.InputMaybe<Types.CreateUserLabelRequest>;
@@ -581,6 +788,18 @@ export type DeleteUserLabelMutationVariables = Types.Exact<{
 
 
 export type DeleteUserLabelMutation = { __typename?: 'Mutation', deleteUserLabel?: any | null };
+
+export type UserLabelsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type UserLabelsQuery = { __typename?: 'Query', userLabels: Array<{ __typename?: 'UserLabel', labelID: string, labelName: string, color: string, variant: Types.UserLabelVariant }> };
+
+export type GetBulkModifyLabelsJobStatusQueryVariables = Types.Exact<{
+  jobID: Types.Scalars['String'];
+}>;
+
+
+export type GetBulkModifyLabelsJobStatusQuery = { __typename?: 'Query', bulkModifyLabelsJobStatus: { __typename?: 'BulkModifyLabelsJobStatusResponse', jobStatus: Types.BullMqJobStatus, completed: boolean } };
 
 export type CreateSrpResponseDataFragment = { __typename?: 'CreateSrpResponse', userID?: string | null, status: Types.LoginMutationStatus, jwt?: string | null, cacheKey?: string | null, recoveryEmail?: string | null, walletAddress?: string | null, rootOrgID?: string | null, createdMailAccount?: boolean | null };
 
@@ -687,42 +906,63 @@ export type SaveMetadataMutationVariables = Types.Exact<{
 }>;
 
 
-export type SaveMetadataMutation = { __typename?: 'Mutation', saveMetadata: { __typename?: 'SaveMetadataResponse', document: { __typename?: 'Document', createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
+export type SaveMetadataMutation = { __typename?: 'Mutation', saveMetadata: { __typename?: 'SaveMetadataResponse', document: { __typename?: 'Document', cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
+
+export type SaveMetadataNativeMutationVariables = Types.Exact<{
+  request: Types.SaveMetadataRequest;
+}>;
+
+
+export type SaveMetadataNativeMutation = { __typename?: 'Mutation', saveMetadata: { __typename?: 'SaveMetadataResponse', document: { __typename?: 'Document', updatedAt?: Date | null, thumbnail?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, createdAt?: Date | null, team?: { __typename?: 'Team', personal: boolean, teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }>, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null } } } };
+
+export type SaveThumbnailMutationVariables = Types.Exact<{
+  request: Types.SaveThumbnailRequest;
+}>;
+
+
+export type SaveThumbnailMutation = { __typename?: 'Mutation', saveThumbnail: { __typename?: 'SaveThumbnailResponse', document: { __typename?: 'Document', cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
+
+export type SaveThumbnailNativeMutationVariables = Types.Exact<{
+  request: Types.SaveThumbnailRequest;
+}>;
+
+
+export type SaveThumbnailNativeMutation = { __typename?: 'Mutation', saveThumbnail: { __typename?: 'SaveThumbnailResponse', document: { __typename?: 'Document', updatedAt?: Date | null, thumbnail?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, createdAt?: Date | null, team?: { __typename?: 'Team', personal: boolean, teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }>, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null } } } };
 
 export type NewMultipleDocsMutationVariables = Types.Exact<{
   request: Array<Types.NewDocRequest> | Types.NewDocRequest;
 }>;
 
 
-export type NewMultipleDocsMutation = { __typename?: 'Mutation', newMultipleDocs: Array<{ __typename?: 'NewDocResponse', docID: string, document?: { __typename?: 'Document', parentKeysClaim?: string | null, parentPublicHierarchicalKey?: string | null, createdAt?: Date | null, updatedAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, currentlyEditingUsers: Array<{ __typename?: 'CurrentlyEditingUser', name: string, userID: string, color: string, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } | null>, link?: { __typename?: 'LinkOutput', encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, salt: string, decryptedLinkKey: string } | null, invites: Array<{ __typename?: 'PendingUserInvite', docID: string, email: string, permissionLevel: Types.PermissionLevel }>, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } | null, error?: { __typename?: 'BatchError', message: string, code: string, extensions?: any | null } | null }> };
+export type NewMultipleDocsMutation = { __typename?: 'Mutation', newMultipleDocs: Array<{ __typename?: 'NewDocResponse', docID: string, document?: { __typename?: 'Document', parentKeysClaim?: string | null, parentPublicHierarchicalKey?: string | null, thumbnail?: string | null, decryptedThumbnail?: string | null, cloneDocID?: string | null, createdAt?: Date | null, updatedAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, currentlyEditingUsers: Array<{ __typename?: 'CurrentlyEditingUser', name: string, userID: string, color: string, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } | null>, link?: { __typename?: 'LinkOutput', encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, salt: string, decryptedLinkKey: string } | null, invites: Array<{ __typename?: 'PendingUserInvite', docID: string, email: string, permissionLevel: Types.PermissionLevel }>, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } | null, error?: { __typename?: 'BatchError', message: string, code: string, extensions?: any | null } | null }> };
 
 export type ShareDocMutationVariables = Types.Exact<{
   request: Types.ShareDocRequest;
 }>;
 
 
-export type ShareDocMutation = { __typename?: 'Mutation', shareDoc: { __typename?: 'ShareDocResponse', document: { __typename?: 'Document', docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
+export type ShareDocMutation = { __typename?: 'Mutation', shareDoc: { __typename?: 'ShareDocResponse', document: { __typename?: 'Document', cloneDocID?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
 
 export type UpgradeKeyMutationVariables = Types.Exact<{
   request: Types.UpgradeKeyRequest;
 }>;
 
 
-export type UpgradeKeyMutation = { __typename?: 'Mutation', upgradeKey: { __typename?: 'UpgradeKeyResponse', document: { __typename?: 'Document', createdAt?: Date | null, updatedAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, link?: { __typename?: 'LinkOutput', encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, salt: string, decryptedLinkKey: string } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
+export type UpgradeKeyMutation = { __typename?: 'Mutation', upgradeKey: { __typename?: 'UpgradeKeyResponse', document: { __typename?: 'Document', cloneDocID?: string | null, createdAt?: Date | null, updatedAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, link?: { __typename?: 'LinkOutput', encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, salt: string, decryptedLinkKey: string } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
 
 export type UpgradeHierarchicalKeysMutationVariables = Types.Exact<{
   request: Types.UpgradeHierarchicalKeysRequest;
 }>;
 
 
-export type UpgradeHierarchicalKeysMutation = { __typename?: 'Mutation', upgradeHierarchicalKeys: { __typename?: 'UpgradeHierarchicalKeysResponse', documents: Array<{ __typename?: 'Document', docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> }> } };
+export type UpgradeHierarchicalKeysMutation = { __typename?: 'Mutation', upgradeHierarchicalKeys: { __typename?: 'UpgradeHierarchicalKeysResponse', documents: Array<{ __typename?: 'Document', cloneDocID?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> }> } };
 
 export type UnshareDocMutationVariables = Types.Exact<{
   request: Types.UnshareDocRequest;
 }>;
 
 
-export type UnshareDocMutation = { __typename?: 'Mutation', unshareDoc: { __typename?: 'UnshareDocResponse', document: { __typename?: 'Document', docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
+export type UnshareDocMutation = { __typename?: 'Mutation', unshareDoc: { __typename?: 'UnshareDocResponse', document: { __typename?: 'Document', cloneDocID?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
 
 export type DeleteDocMutationVariables = Types.Exact<{
   request: Types.DeleteDocRequest;
@@ -743,7 +983,7 @@ export type SetupLinkMutationVariables = Types.Exact<{
 }>;
 
 
-export type SetupLinkMutation = { __typename?: 'Mutation', setupLink: { __typename?: 'SetupLinkResponse', document: { __typename?: 'Document', docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, link?: { __typename?: 'LinkOutput', salt: string, encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, decryptedLinkKey: string } | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
+export type SetupLinkMutation = { __typename?: 'Mutation', setupLink: { __typename?: 'SetupLinkResponse', document: { __typename?: 'Document', cloneDocID?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, link?: { __typename?: 'LinkOutput', salt: string, encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, decryptedLinkKey: string } | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
 
 export type DeleteLinkMutationVariables = Types.Exact<{
   request: Types.DeleteLinkRequest;
@@ -757,14 +997,21 @@ export type MoveDocMutationVariables = Types.Exact<{
 }>;
 
 
-export type MoveDocMutation = { __typename?: 'Mutation', moveDoc: { __typename?: 'MoveDocResponse', document: { __typename?: 'Document', updatedAt?: Date | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
+export type MoveDocMutation = { __typename?: 'Mutation', moveDoc: { __typename?: 'MoveDocResponse', document: { __typename?: 'Document', updatedAt?: Date | null, cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
 
 export type MoveMultipleDocMutationVariables = Types.Exact<{
   request: Array<Types.MoveDocRequest> | Types.MoveDocRequest;
 }>;
 
 
-export type MoveMultipleDocMutation = { __typename?: 'Mutation', moveMultipleDoc: Array<{ __typename?: 'MoveDocResponse', document: { __typename?: 'Document', updatedAt?: Date | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } }> };
+export type MoveMultipleDocMutation = { __typename?: 'Mutation', moveMultipleDoc: Array<{ __typename?: 'MoveDocResponse', document: { __typename?: 'Document', updatedAt?: Date | null, cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } }> };
+
+export type MoveMultipleDocNativeMutationVariables = Types.Exact<{
+  request: Array<Types.MoveDocRequest> | Types.MoveDocRequest;
+}>;
+
+
+export type MoveMultipleDocNativeMutation = { __typename?: 'Mutation', moveMultipleDoc: Array<{ __typename?: 'MoveDocResponse', document: { __typename?: 'Document', updatedAt?: Date | null, thumbnail?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, createdAt?: Date | null, team?: { __typename?: 'Team', personal: boolean, teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }>, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null } } }> };
 
 export type CreateCacheElementMutationVariables = Types.Exact<{
   request: Types.CreateCacheElementRequest;
@@ -792,21 +1039,42 @@ export type ChangeLinkPermissionMutationVariables = Types.Exact<{
 }>;
 
 
-export type ChangeLinkPermissionMutation = { __typename?: 'Mutation', changeLinkPermission: { __typename?: 'ChangeLinkPermissionResponse', document: { __typename?: 'Document', docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, link?: { __typename?: 'LinkOutput', salt: string, encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, decryptedLinkKey: string } | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
+export type ChangeLinkPermissionMutation = { __typename?: 'Mutation', changeLinkPermission: { __typename?: 'ChangeLinkPermissionResponse', document: { __typename?: 'Document', cloneDocID?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, link?: { __typename?: 'LinkOutput', salt: string, encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, decryptedLinkKey: string } | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
 
 export type TrashDocsMutationVariables = Types.Exact<{
   request: Array<Types.TrashDocRequest> | Types.TrashDocRequest;
 }>;
 
 
-export type TrashDocsMutation = { __typename?: 'Mutation', trashDocs: Array<{ __typename?: 'MoveDocResponse', document: { __typename?: 'Document', updatedAt?: Date | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } }> };
+export type TrashDocsMutation = { __typename?: 'Mutation', trashDocs: Array<{ __typename?: 'MoveDocResponse', document: { __typename?: 'Document', updatedAt?: Date | null, cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } }> };
+
+export type TrashDocsNativeMutationVariables = Types.Exact<{
+  request: Array<Types.TrashDocRequest> | Types.TrashDocRequest;
+}>;
+
+
+export type TrashDocsNativeMutation = { __typename?: 'Mutation', trashDocs: Array<{ __typename?: 'MoveDocResponse', document: { __typename?: 'Document', updatedAt?: Date | null, thumbnail?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, createdAt?: Date | null, team?: { __typename?: 'Team', personal: boolean, teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }>, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null } } }> };
 
 export type RestoreTrashDocMutationVariables = Types.Exact<{
   request: Types.TrashDocRequest;
 }>;
 
 
-export type RestoreTrashDocMutation = { __typename?: 'Mutation', restoreTrashDoc: { __typename?: 'MoveDocResponse', document: { __typename?: 'Document', updatedAt?: Date | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
+export type RestoreTrashDocMutation = { __typename?: 'Mutation', restoreTrashDoc: { __typename?: 'MoveDocResponse', document: { __typename?: 'Document', updatedAt?: Date | null, cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } } };
+
+export type RestoreTrashDocNativeMutationVariables = Types.Exact<{
+  request: Types.TrashDocRequest;
+}>;
+
+
+export type RestoreTrashDocNativeMutation = { __typename?: 'Mutation', restoreTrashDoc: { __typename?: 'MoveDocResponse', document: { __typename?: 'Document', updatedAt?: Date | null, thumbnail?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, createdAt?: Date | null, team?: { __typename?: 'Team', personal: boolean, teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }>, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null } } } };
+
+export type DuplicateDocDeepMutationVariables = Types.Exact<{
+  request: Types.DuplicateDocDeepRequest;
+}>;
+
+
+export type DuplicateDocDeepMutation = { __typename?: 'Mutation', duplicateDocDeep: { __typename?: 'DuplicateDocDeepResponse', docID: string } };
 
 export type StoreWorkspaceEventMutationVariables = Types.Exact<{
   request: Types.WorkspaceEventRequest;
@@ -850,6 +1118,13 @@ export type UploadSpamReportMutationVariables = Types.Exact<{
 
 export type UploadSpamReportMutation = { __typename?: 'Mutation', uploadSpamReport?: any | null };
 
+export type UnsilenceMultipleEmailAddressesMutationVariables = Types.Exact<{
+  request: Types.UnsilenceMultipleEmailAddressesRequest;
+}>;
+
+
+export type UnsilenceMultipleEmailAddressesMutation = { __typename?: 'Mutation', unsilenceMultipleEmailAddresses?: any | null };
+
 export type NotificationClickedMutationVariables = Types.Exact<{
   request: Types.NotificationClickedRequest;
 }>;
@@ -862,21 +1137,21 @@ export type CreateTeamMutationVariables = Types.Exact<{
 }>;
 
 
-export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'Team', teamID: string, name: string, icon: string, rootDocument?: { __typename?: 'Document', createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } | null, organization: { __typename?: 'Organization', orgID: string, teams: Array<{ __typename?: 'Team', teamID: string, name: string }> } } };
+export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'Team', teamID: string, name: string, icon: string, rootDocument?: { __typename?: 'Document', cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } | null, organization: { __typename?: 'Organization', orgID: string, teams: Array<{ __typename?: 'Team', teamID: string, name: string }> } } };
 
 export type ShareTeamDocWithOtherTeamMutationVariables = Types.Exact<{
   request: Types.ShareTeamDocWithOtherTeamRequest;
 }>;
 
 
-export type ShareTeamDocWithOtherTeamMutation = { __typename?: 'Mutation', shareTeamDocWithOtherTeam: { __typename?: 'Team', teamID: string, name: string, icon: string, rootDocument?: { __typename?: 'Document', createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } | null } };
+export type ShareTeamDocWithOtherTeamMutation = { __typename?: 'Mutation', shareTeamDocWithOtherTeam: { __typename?: 'Team', teamID: string, name: string, icon: string, rootDocument?: { __typename?: 'Document', cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } | null } };
 
 export type UnshareTeamDocWithOtherTeamMutationVariables = Types.Exact<{
   request: Types.UnshareTeamDocWithOtherTeamRequest;
 }>;
 
 
-export type UnshareTeamDocWithOtherTeamMutation = { __typename?: 'Mutation', unshareTeamDocWithOtherTeam: { __typename?: 'Team', teamID: string, name: string, icon: string, rootDocument?: { __typename?: 'Document', createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } | null } };
+export type UnshareTeamDocWithOtherTeamMutation = { __typename?: 'Mutation', unshareTeamDocWithOtherTeam: { __typename?: 'Team', teamID: string, name: string, icon: string, rootDocument?: { __typename?: 'Document', cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } | null } };
 
 export type DeleteTeamMutationVariables = Types.Exact<{
   request: Types.DeleteTeamRequest;
@@ -1016,12 +1291,40 @@ export type SetPdSubscribeFlagMutationVariables = Types.Exact<{
 
 export type SetPdSubscribeFlagMutation = { __typename?: 'Mutation', setPDSubscribeFlag?: any | null };
 
-export type CreateUdAliasMutationVariables = Types.Exact<{
-  request?: Types.InputMaybe<Types.CreateUdAliasRequest>;
+export type SetPgpKeyMutationVariables = Types.Exact<{
+  request: Types.SetPgpKey;
 }>;
 
 
-export type CreateUdAliasMutation = { __typename?: 'Mutation', createUdAlias?: { __typename?: 'CreateEmailAliasResponse', emailAliases: Array<string> } | null };
+export type SetPgpKeyMutation = { __typename?: 'Mutation', setPGPKey?: any | null };
+
+export type SendAnonymousSubdomainTutorialEmailMutationVariables = Types.Exact<{
+  email: Types.Scalars['String'];
+}>;
+
+
+export type SendAnonymousSubdomainTutorialEmailMutation = { __typename?: 'Mutation', sendAnonymousSubdomainTutorialEmail?: any | null };
+
+export type CreateQuickAliasDomainMutationVariables = Types.Exact<{
+  request: Types.CreateAnonymousSubdomainInput;
+}>;
+
+
+export type CreateQuickAliasDomainMutation = { __typename?: 'Mutation', createAnonymousSubdomain?: any | null };
+
+export type DeleteQuickAliasDomainMutationVariables = Types.Exact<{
+  userDomainID: Types.Scalars['String'];
+}>;
+
+
+export type DeleteQuickAliasDomainMutation = { __typename?: 'Mutation', deleteAnonymousSubdomain?: any | null };
+
+export type UpdateQuickAliasInfoMutationVariables = Types.Exact<{
+  request: Types.UpdateQuickAliasInfoInput;
+}>;
+
+
+export type UpdateQuickAliasInfoMutation = { __typename?: 'Mutation', updateQuickAliasInfo?: any | null };
 
 export type CreateUploadAvatarLinkMutationVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -1071,12 +1374,19 @@ export type VerifyWebAuthnRegistrationMutationVariables = Types.Exact<{
 
 export type VerifyWebAuthnRegistrationMutation = { __typename?: 'Mutation', verifyWebAuthnRegistration: { __typename?: 'VerifyWebAuthnRegistrationResponse', status: Types.RequestStatus } };
 
+export type RenameWebauthnDeviceMutationVariables = Types.Exact<{
+  request: Types.RenameWebAuthnDeviceRequest;
+}>;
+
+
+export type RenameWebauthnDeviceMutation = { __typename?: 'Mutation', renameWebAuthnDevice?: any | null };
+
 export type GetCheckoutSessionUrlOrStripeUpdateStatusQueryVariables = Types.Exact<{
   request: Types.GetCheckoutSessionRequest;
 }>;
 
 
-export type GetCheckoutSessionUrlOrStripeUpdateStatusQuery = { __typename?: 'Query', checkoutPortal: { __typename?: 'CheckoutSession', url?: string | null, status: Types.RequestStatus, downgradeProgress?: { __typename?: 'DowngradeProgress', currentStorageInMb: number, customDomains: number, emailAliases: number, shortAliases: number, workspaceUsers: number, userLabels: number, userFolders: number, userMailFilters: number } | null } };
+export type GetCheckoutSessionUrlOrStripeUpdateStatusQuery = { __typename?: 'Query', checkoutPortal: { __typename?: 'CheckoutSession', url?: string | null, status: Types.RequestStatus, downgradeProgress?: { __typename?: 'DowngradeProgress', currentStorageInMb: number, customDomains: number, emailAliases: number, shortAliases: number, workspaceUsers: number, userLabels: number, userFolders: number, userMailFilters: number, quickAliases: number, quickAliasSubdomains: number } | null } };
 
 export type GetCustomDomainCheckoutPortalQueryVariables = Types.Exact<{
   request: Types.GetCustomDomainCheckoutSessionRequest;
@@ -1099,6 +1409,11 @@ export type GetBillingPortalSessionUrlQueryVariables = Types.Exact<{
 
 export type GetBillingPortalSessionUrlQuery = { __typename?: 'Query', billingPortal?: { __typename?: 'CreateBillingPortalSessionOutput', url?: string | null } | null };
 
+export type GetOrCreateStripeCustomerQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetOrCreateStripeCustomerQuery = { __typename?: 'Query', getOrCreateStripeCustomer: { __typename?: 'GetOrCreateStripeCustomerResponse', stripeCustomerID: string } };
+
 export type AdjustBusinessPlanMutationVariables = Types.Exact<{
   request: Types.AdjustBusinessPlanRequest;
 }>;
@@ -1106,61 +1421,97 @@ export type AdjustBusinessPlanMutationVariables = Types.Exact<{
 
 export type AdjustBusinessPlanMutation = { __typename?: 'Mutation', adjustBusinessPlan: { __typename?: 'AdjustBusinessPlanResponse', status: Types.RequestStatus, seats?: number | null } };
 
-export type GetCollaboratorsQueryVariables = Types.Exact<{
-  request: Types.GetDocumentRequest;
+export type RequestAppStoreTestNotificationQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type RequestAppStoreTestNotificationQuery = { __typename?: 'Query', requestAppStoreTestNotification?: { __typename?: 'AppStoreTestNotificationResponse', testNotificationToken?: string | null } | null };
+
+export type GetTestNotificationStatusQueryVariables = Types.Exact<{
+  request: Types.GetAppleTestNotificationStatusInput;
 }>;
 
 
-export type GetCollaboratorsQuery = { __typename?: 'Query', document: { __typename?: 'Document', createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, invites: Array<{ __typename?: 'PendingUserInvite', docID: string, email: string, permissionLevel: Types.PermissionLevel }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } };
+export type GetTestNotificationStatusQuery = { __typename?: 'Query', getAppleTestNotificationStatus: { __typename?: 'CheckTestNotificationResponse', signedPayload?: string | null, sendAttempts?: Array<{ __typename?: 'SendAttemptItem', attemptDate?: Date | null, sendAttemptResult?: Types.SendAttemptResult | null } | null> | null } };
+
+export type ValidateOriginalTransactionIdMatchesUserQueryVariables = Types.Exact<{
+  request: Types.ValidateOriginalTransactionIdMatchesUserInput;
+}>;
+
+
+export type ValidateOriginalTransactionIdMatchesUserQuery = { __typename?: 'Query', validateOriginalTransactionIdMatchesUser: boolean };
+
+export type ValidateAppStoreSubscriptionRequestMutationVariables = Types.Exact<{
+  request: Types.ValidateAppStoreSubscriptionRequest;
+}>;
+
+
+export type ValidateAppStoreSubscriptionRequestMutation = { __typename?: 'Mutation', ValidateAppStoreSubscriptionRequest: boolean };
+
+export type GetAppleSubscriptionPlansQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetAppleSubscriptionPlansQuery = { __typename?: 'Query', getAppleSubscriptionPlans: { __typename?: 'GetAppleSubscriptionPlansResult', plans: Array<{ __typename?: 'SubscriptionPlanWithSKU', tierName: string, monthly?: string | null, yearly?: string | null }> } };
+
+export type GetGoogleSubscriptionPlansQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetGoogleSubscriptionPlansQuery = { __typename?: 'Query', getGoogleSubscriptionPlans: { __typename?: 'GetGoogleSubscriptionPlansResult', plans: Array<{ __typename?: 'GoogleSubscriptionPlanWithSKU', tierName: string, skuName: string, skuMonthlyOfferId: string, skuAnnualOfferId: string }> } };
 
 export type GetActiveUsersQueryVariables = Types.Exact<{
   request: Types.GetDocumentRequest;
 }>;
 
 
-export type GetActiveUsersQuery = { __typename?: 'Query', document: { __typename?: 'Document', docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, currentlyEditingUsers: Array<{ __typename?: 'CurrentlyEditingUser', name: string, userID: string, color: string, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } | null>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } };
+export type GetActiveUsersQuery = { __typename?: 'Query', document: { __typename?: 'Document', cloneDocID?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, currentlyEditingUsers: Array<{ __typename?: 'CurrentlyEditingUser', name: string, userID: string, color: string, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } | null>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } };
 
 export type GetLinkQueryVariables = Types.Exact<{
   request: Types.GetDocumentRequest;
 }>;
 
 
-export type GetLinkQuery = { __typename?: 'Query', document: { __typename?: 'Document', docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, link?: { __typename?: 'LinkOutput', encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, salt: string, decryptedLinkKey: string } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } };
+export type GetLinkQuery = { __typename?: 'Query', document: { __typename?: 'Document', cloneDocID?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, link?: { __typename?: 'LinkOutput', encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, salt: string, decryptedLinkKey: string } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } };
 
 export type GetDocumentsBaseQueryVariables = Types.Exact<{
   request: Types.GetDocumentsRequest;
 }>;
 
 
-export type GetDocumentsBaseQuery = { __typename?: 'Query', documents: Array<{ __typename?: 'Document', updatedAt?: Date | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> }> };
+export type GetDocumentsBaseQuery = { __typename?: 'Query', documents: Array<{ __typename?: 'Document', updatedAt?: Date | null, cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> }> };
 
 export type GetDocumentsBaseForTrashQueryVariables = Types.Exact<{
   request: Types.GetDocumentsRequest;
 }>;
 
 
-export type GetDocumentsBaseForTrashQuery = { __typename?: 'Query', documents: Array<{ __typename?: 'Document', updatedAt?: Date | null, previousParentID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> }> };
+export type GetDocumentsBaseForTrashQuery = { __typename?: 'Query', documents: Array<{ __typename?: 'Document', updatedAt?: Date | null, previousParentID?: string | null, cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> }> };
 
 export type GetDocumentBreadcrumbQueryVariables = Types.Exact<{
   request: Types.GetDocumentRequest;
 }>;
 
 
-export type GetDocumentBreadcrumbQuery = { __typename?: 'Query', document: { __typename?: 'Document', docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, parentsBreadcrumb: Array<{ __typename?: 'Document', createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } };
+export type GetDocumentBreadcrumbQuery = { __typename?: 'Query', document: { __typename?: 'Document', cloneDocID?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, parentsBreadcrumb: Array<{ __typename?: 'Document', cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } };
 
 export type GetDocumentBaseQueryVariables = Types.Exact<{
   request: Types.GetDocumentRequest;
 }>;
 
 
-export type GetDocumentBaseQuery = { __typename?: 'Query', document: { __typename?: 'Document', updatedAt?: Date | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } };
+export type GetDocumentBaseQuery = { __typename?: 'Query', document: { __typename?: 'Document', updatedAt?: Date | null, cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } };
 
 export type GetDocumentFullQueryVariables = Types.Exact<{
   request: Types.GetDocumentRequest;
 }>;
 
 
-export type GetDocumentFullQuery = { __typename?: 'Query', document: { __typename?: 'Document', parentKeysClaim?: string | null, parentPublicHierarchicalKey?: string | null, createdAt?: Date | null, updatedAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, currentlyEditingUsers: Array<{ __typename?: 'CurrentlyEditingUser', name: string, userID: string, color: string, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } | null>, link?: { __typename?: 'LinkOutput', encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, salt: string, decryptedLinkKey: string } | null, invites: Array<{ __typename?: 'PendingUserInvite', docID: string, email: string, permissionLevel: Types.PermissionLevel }>, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } };
+export type GetDocumentFullQuery = { __typename?: 'Query', document: { __typename?: 'Document', parentKeysClaim?: string | null, parentPublicHierarchicalKey?: string | null, thumbnail?: string | null, decryptedThumbnail?: string | null, cloneDocID?: string | null, createdAt?: Date | null, updatedAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, currentlyEditingUsers: Array<{ __typename?: 'CurrentlyEditingUser', name: string, userID: string, color: string, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } | null>, link?: { __typename?: 'LinkOutput', encryptedLinkKey: string, permissionLevel: Types.PermissionLevel, salt: string, decryptedLinkKey: string } | null, invites: Array<{ __typename?: 'PendingUserInvite', docID: string, email: string, permissionLevel: Types.PermissionLevel }>, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string }>, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }>, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> } };
+
+export type GetNativeDocumentsQueryVariables = Types.Exact<{
+  request: Types.GetDocumentsRequest;
+}>;
+
+
+export type GetNativeDocumentsQuery = { __typename?: 'Query', documents: Array<{ __typename?: 'Document', updatedAt?: Date | null, thumbnail?: string | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, createdAt?: Date | null, team?: { __typename?: 'Team', personal: boolean, teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }>, contents: { __typename?: 'EncryptedContentsOutput', contentsArr: Array<{ __typename?: 'EncryptedChunkOutput', content: string, signedBy: string, signature: string, chunkNumber: number }> }, decryptedContents: { __typename?: 'DocumentDecryptedContents', contentsArr: Array<{ __typename?: 'DocumentDecryptedContentsChunk', chunkNumber: number, chunkData: any }> }, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null } }> };
 
 export type GetDocumentPublicOrgDataQueryVariables = Types.Exact<{
   request: Types.GetDocumentRequest;
@@ -1195,7 +1546,24 @@ export type GetAccountMailDataQueryVariables = Types.Exact<{
 }>;
 
 
-export type GetAccountMailDataQuery = { __typename?: 'Query', unread: number, currentUser?: { __typename?: 'User', userID: string, defaultEmailAlias?: string | null, emailAliases?: Array<string> | null, username: string, publicKey: { key: string, signature?: string }, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null }, rootOrganization: { __typename?: 'Organization', orgID: string, name: string, displayPictureData: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } } } | null };
+export type GetAccountMailDataQuery = { __typename?: 'Query', unread: number, currentUser?: { __typename?: 'User', userID: string, defaultEmailAlias?: string | null, emailAliases?: Array<string> | null, recoveryEmail?: string | null, unverifiedRecoveryEmail?: string | null, username: string, publicKey: { key: string, signature?: string }, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null }, rootOrganization: { __typename?: 'Organization', orgID: string, name: string, rootDocID: string, displayPictureData: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null }, personalTeam: { __typename?: 'Team', teamID: string, rootDocument?: { __typename?: 'Document', docID: string } | null }, everyoneTeam: { __typename?: 'Team', teamID: string, rootDocument?: { __typename?: 'Document', createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }>, invites: Array<{ __typename?: 'PendingUserInvite', docID: string, email: string, permissionLevel: Types.PermissionLevel }>, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }> } | null } } } | null };
+
+export type GetNumMailboxThreadsQueryVariables = Types.Exact<{
+  label: Types.Scalars['String'];
+}>;
+
+
+export type GetNumMailboxThreadsQuery = { __typename?: 'Query', numMailboxThreads: number };
+
+export type GetSilenceSenderSuggestionsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetSilenceSenderSuggestionsQuery = { __typename?: 'Query', silenceSenderSuggestions: { __typename?: 'BulkSilenceSuggestions', silenceSenderDomains: Array<{ __typename?: 'SilencedDomainAggregation', domain: string, senders: Array<{ __typename?: 'SilenceSenderBulkSuggestion', sender: string, messageCount: number, totalBytes?: number | null }> }>, silenceSenderIndividuals: Array<{ __typename?: 'SilenceSenderBulkSuggestion', sender: string, messageCount: number, totalBytes?: number | null }> } };
+
+export type GetSilencedSendersQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetSilencedSendersQuery = { __typename?: 'Query', silencedSenders: { __typename?: 'BulkSilenceSuggestions', silenceSenderDomains: Array<{ __typename?: 'SilencedDomainAggregation', domain: string, senders: Array<{ __typename?: 'SilenceSenderBulkSuggestion', sender: string, messageCount: number, totalBytes?: number | null }> }>, silenceSenderIndividuals: Array<{ __typename?: 'SilenceSenderBulkSuggestion', sender: string, messageCount: number, totalBytes?: number | null }> } };
 
 export type GetSessionCacheQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -1215,6 +1583,14 @@ export type GetSessionCacheChallengeQueryVariables = Types.Exact<{
 
 
 export type GetSessionCacheChallengeQuery = { __typename?: 'Query', sessionCacheChallenge: { __typename?: 'SessionCacheChallengeResponse', serverPublicKey: string, encryptedChallenge: string } };
+
+export type GetPgpInfoQueryVariables = Types.Exact<{
+  emailAlias: Types.Scalars['String'];
+  allKeys?: Types.InputMaybe<Types.Scalars['Boolean']>;
+}>;
+
+
+export type GetPgpInfoQuery = { __typename?: 'Query', pgpInfo: Array<{ __typename?: 'PGPInfo', createdAt: Date, emailAlias: string, encryptionFingerprint: string, encryptionKeyID: string, publicKey: string, signingFingerprint: string, signingKeyID: string, status: Types.PgpKeyStatus, encryptedPrivateKey: { __typename?: 'EncryptedDataOutput', encryptedData: string }, encryptedSessionKey: { __typename?: 'EncryptedSessionKeyOutput', encryptedSessionKey: string, encryptedBy: { key: string, signature?: string } } } | null> };
 
 export type GetSessionCacheWithCalendarsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -1236,7 +1612,7 @@ export type GetSearchIndexProgressQuery = { __typename?: 'Query', searchIndexPro
 export type GetAllFolderDocumentsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type GetAllFolderDocumentsQuery = { __typename?: 'Query', allFolderDocuments: Array<{ __typename?: 'Document', updatedAt?: Date | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string, createdAt?: Date | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null } }>, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> }> };
+export type GetAllFolderDocumentsQuery = { __typename?: 'Query', allFolderDocuments: Array<{ __typename?: 'Document', updatedAt?: Date | null, cloneDocID?: string | null, createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, parentsBreadcrumb: Array<{ __typename?: 'Document', docID: string, createdAt?: Date | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null } }>, team?: { __typename?: 'Team', teamID: string, name: string, icon: string, accessLevel?: Types.TeamAccess | null, rootDocument?: { __typename?: 'Document', docID: string } | null, organization: { __typename?: 'Organization', orgID: string } } | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }> }> };
 
 export type ApiVersionQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -1249,6 +1625,16 @@ export type GetIcnsNameQueryVariables = Types.Exact<{
 
 
 export type GetIcnsNameQuery = { __typename?: 'Query', getICNSName?: string | null };
+
+export type RefreshTokenQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type RefreshTokenQuery = { __typename?: 'Query', refreshToken?: any | null };
+
+export type GetNativeDriveManifestQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetNativeDriveManifestQuery = { __typename?: 'Query', nativeDriveManifest: { __typename?: 'NativeDriveManifestResponse', slimDocuments: Array<{ __typename?: 'SlimDocument', docID: string, parentID?: string | null, currentUserPermissionLevel: Types.PermissionLevel, trashedAt?: string | null, updatedAt: string }> } };
 
 export type GetOrganizationQueryVariables = Types.Exact<{
   id: Types.Scalars['String'];
@@ -1349,7 +1735,7 @@ export type GetUserTagsQuery = { __typename?: 'Query', user?: { __typename?: 'Us
 export type GetSubscriptionInfoQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type GetSubscriptionInfoQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', userID: string, subscriptionInfo: { __typename?: 'SubscriptionInfo', subscriptionPlan: string, isCryptoSubscription: boolean, cancelAtPeriodEnd: boolean, supposedEndDate?: Date | null, stripeStatus?: string | null, billingInterval?: Types.SubscriptionInterval | null, quantity?: number | null } } | null };
+export type GetSubscriptionInfoQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', userID: string, subscriptionInfo: { __typename?: 'SubscriptionInfo', subscriptionPlan: string, isCryptoSubscription: boolean, isAppleSubscription: boolean, isGoogleSubscription: boolean, cancelAtPeriodEnd: boolean, supposedEndDate?: Date | null, stripeStatus?: string | null, billingInterval?: Types.SubscriptionInterval | null, quantity?: number | null } } | null };
 
 export type GetInvoiceHistoryQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -1372,6 +1758,23 @@ export type CurrentUserEmailAliasesQueryVariables = Types.Exact<{ [key: string]:
 
 
 export type CurrentUserEmailAliasesQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', userID: string, emailAliases?: Array<string> | null } | null };
+
+export type GetFullAliasInfoQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetFullAliasInfoQuery = { __typename?: 'Query', fullAliasInfo: Array<{ __typename?: 'FullAliasInfo', emailAlias: string, displayName?: string | null, encryptedAliasData?: string | null, encryptedByKey?: string | null, encryptedSessionKey?: string | null, areNotificationsEnabled?: boolean | null, createdAt: Date, decryptedSessionKey?: string | null, displayPictureData?: { __typename?: 'DisplayPictureDataSkemail', profileIcon?: string | null, profileAccentColor?: string | null, profileCustomURI?: string | null } | null, decryptedData?: { __typename?: 'DecryptedAliasData', note?: string | null } | null }> };
+
+export type AliasDisplayInfoQueryVariables = Types.Exact<{
+  emailAlias: Types.Scalars['String'];
+}>;
+
+
+export type AliasDisplayInfoQuery = { __typename?: 'Query', aliasDisplayInfo?: { __typename?: 'AliasDisplayInfo', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureDataSkemail', profileIcon?: string | null, profileAccentColor?: string | null, profileCustomURI?: string | null } | null } | null };
+
+export type GetQuickAliasRootDomainsForUserQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetQuickAliasRootDomainsForUserQuery = { __typename?: 'Query', getQuickAliasRootDomainsForUser: Array<string> };
 
 export type GetRecoveryPublicKeysAndDataQueryVariables = Types.Exact<{
   request: Types.GetRecoveryPublicKeysAndDataRequest;
@@ -1409,7 +1812,7 @@ export type OrgMemberDefaultEmailAliasQuery = { __typename?: 'Query', orgMemberD
 export type GetUserPreferencesQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type GetUserPreferencesQuery = { __typename?: 'Query', userPreferences?: { __typename?: 'UserPreferences', theme?: string | null, dateFormat?: string | null, hourFormat?: string | null, showPageIcon?: boolean | null, defaultCalendarColor?: string | null, startDayOfTheWeek?: number | null, leftSwipeGesture?: Types.SwipeSetting | null, rightSwipeGesture?: Types.SwipeSetting | null, blockRemoteContent?: boolean | null, securedBySkiffSigDisabled?: boolean | null, showAliasInboxes?: boolean | null, threadFormat?: Types.ThreadDisplayFormat | null, hideActivationChecklist?: boolean | null } | null };
+export type GetUserPreferencesQuery = { __typename?: 'Query', userPreferences?: { __typename?: 'UserPreferences', autoAdvance?: boolean | null, advanceToNext?: boolean | null, theme?: string | null, dateFormat?: string | null, hourFormat?: string | null, showPageIcon?: boolean | null, defaultCalendarColor?: string | null, defaultCalendarView?: Types.CalendarView | null, defaultCalendarViewMobile?: Types.CalendarView | null, startDayOfTheWeek?: number | null, leftSwipeGesture?: Types.SwipeSetting | null, rightSwipeGesture?: Types.SwipeSetting | null, blockRemoteContent?: boolean | null, securedBySkiffSigDisabled?: boolean | null, showAliasInboxes?: boolean | null, fileTableFormat?: Types.FileTableDisplayFormat | null, threadFormat?: Types.ThreadDisplayFormat | null, hideActivationChecklist?: boolean | null, tableOfContents?: Types.TableOfContentsSetting | null } | null };
 
 export type CanDirectlyUpdateSrpQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -1420,6 +1823,11 @@ export type BrowserPushNotificationsEnabledQueryVariables = Types.Exact<{ [key: 
 
 
 export type BrowserPushNotificationsEnabledQuery = { __typename?: 'Query', browserPushNotificationsEnabled: boolean };
+
+export type SpamListsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type SpamListsQuery = { __typename?: 'Query', blockedUsers: Array<string>, spamUsers: Array<string>, allowedUsers: Array<string> };
 
 export type CurrentUserSubscribedToPdQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -1438,7 +1846,7 @@ export type UsersFromEmailAliasWithCatchallQueryVariables = Types.Exact<{
 }>;
 
 
-export type UsersFromEmailAliasWithCatchallQuery = { __typename?: 'Query', usersFromEmailAliasWithCatchall: Array<{ __typename?: 'User', userID: string, username: string, publicKey: { key: string, signature?: string }, publicData: { __typename?: 'PublicData', displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } | null> };
+export type UsersFromEmailAliasWithCatchallQuery = { __typename?: 'Query', usersFromEmailAliasWithCatchall: Array<{ __typename?: 'User', userID: string, publicKey: { key: string, signature?: string } } | null> };
 
 export type GetUserProfileOrgDataQueryVariables = Types.Exact<{
   request: Types.GetUserRequest;
@@ -1486,7 +1894,7 @@ export type GetUserCustomDomainSubscriptionsInfoQuery = { __typename?: 'Query', 
 export type GetUserPaidUpStatusQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type GetUserPaidUpStatusQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', userID: string, paidUpStatus?: { __typename?: 'PaidUpStatus', paidUp: boolean, downgradeProgress: { __typename?: 'DowngradeProgress', currentStorageInMb: number, customDomains: number, emailAliases: number, shortAliases: number, workspaceUsers: number, userLabels: number, userFolders: number, userMailFilters: number } } | null } | null };
+export type GetUserPaidUpStatusQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', userID: string, paidUpStatus?: { __typename?: 'PaidUpStatus', paidUp: boolean, downgradeProgress: { __typename?: 'DowngradeProgress', currentStorageInMb: number, customDomains: number, emailAliases: number, shortAliases: number, workspaceUsers: number, userLabels: number, userFolders: number, userMailFilters: number, quickAliases: number, quickAliasSubdomains: number } } | null } | null };
 
 export type CreateUploadContactAvatarLinkMutationVariables = Types.Exact<{
   request: Types.CreateUploadContactAvatarLinkRequest;
@@ -1494,6 +1902,13 @@ export type CreateUploadContactAvatarLinkMutationVariables = Types.Exact<{
 
 
 export type CreateUploadContactAvatarLinkMutation = { __typename?: 'Mutation', createUploadContactAvatarLink: { __typename?: 'CreateUploadAvatarLinkResponse', writeUrl: string, profileCustomURI: string } };
+
+export type CreateUploadAliasAvatarLinkMutationVariables = Types.Exact<{
+  emailAlias: Types.Scalars['String'];
+}>;
+
+
+export type CreateUploadAliasAvatarLinkMutation = { __typename?: 'Mutation', createUploadAliasAvatarLink: { __typename?: 'CreateUploadAvatarLinkResponse', writeUrl: string, profileCustomURI: string } };
 
 export type UpdateUploadContactAvatarLinkMutationVariables = Types.Exact<{
   request: Types.UpdateUploadContactAvatarLinkRequest;
@@ -1548,7 +1963,7 @@ export type SetUserPreferencesMutationVariables = Types.Exact<{
 }>;
 
 
-export type SetUserPreferencesMutation = { __typename?: 'Mutation', setUserPreferences?: { __typename?: 'UserPreferences', theme?: string | null, dateFormat?: string | null, hourFormat?: string | null, showPageIcon?: boolean | null, defaultCalendarColor?: string | null, startDayOfTheWeek?: number | null, leftSwipeGesture?: Types.SwipeSetting | null, rightSwipeGesture?: Types.SwipeSetting | null, blockRemoteContent?: boolean | null, securedBySkiffSigDisabled?: boolean | null, showAliasInboxes?: boolean | null, threadFormat?: Types.ThreadDisplayFormat | null, hideActivationChecklist?: boolean | null } | null };
+export type SetUserPreferencesMutation = { __typename?: 'Mutation', setUserPreferences?: { __typename?: 'UserPreferences', autoAdvance?: boolean | null, advanceToNext?: boolean | null, theme?: string | null, dateFormat?: string | null, hourFormat?: string | null, showPageIcon?: boolean | null, defaultCalendarColor?: string | null, defaultCalendarView?: Types.CalendarView | null, defaultCalendarViewMobile?: Types.CalendarView | null, startDayOfTheWeek?: number | null, leftSwipeGesture?: Types.SwipeSetting | null, rightSwipeGesture?: Types.SwipeSetting | null, blockRemoteContent?: boolean | null, securedBySkiffSigDisabled?: boolean | null, showAliasInboxes?: boolean | null, fileTableFormat?: Types.FileTableDisplayFormat | null, threadFormat?: Types.ThreadDisplayFormat | null, hideActivationChecklist?: boolean | null, tableOfContents?: Types.TableOfContentsSetting | null } | null };
 
 export type SetContactAutosyncSettingMutationVariables = Types.Exact<{
   request: Types.Scalars['Boolean'];
@@ -1561,6 +1976,26 @@ export type GetContactAutoSyncSettingsQueryVariables = Types.Exact<{ [key: strin
 
 
 export type GetContactAutoSyncSettingsQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', userID: string, autoSyncContactsSetting?: boolean | null } | null };
+
+export type GetUserQuickAliasDomainsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetUserQuickAliasDomainsQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', userID: string, anonymousSubdomains?: Array<{ __typename?: 'AnonymousSubdomain', domain: string, domainID: string }> | null } | null };
+
+export type GetNumUserDeactivatedQuickAliasDomainsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetNumUserDeactivatedQuickAliasDomainsQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', userID: string, numDeactivatedAnonymousSubdomains?: number | null } | null };
+
+export type GetUserQuickAliasesQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetUserQuickAliasesQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', userID: string, quickAliases?: Array<{ __typename?: 'QuickAlias', alias: string, isSendingAndReceivingEnabled: boolean }> | null } | null };
+
+export type GetCurrentUserAllOrgDataQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type GetCurrentUserAllOrgDataQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', userID: string, username: string, rootOrganization: { __typename?: 'Organization', orgID: string, name: string, rootDocID: string, hasCustomized: boolean, teams: Array<{ __typename?: 'Team', accessLevel?: Types.TeamAccess | null, teamID: string, name: string, icon: string, rootDocument?: { __typename?: 'Document', createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }>, permissionProxies: Array<{ __typename?: 'DocumentPermissionProxy', sourceDocID: string, sourceTeam: { __typename?: 'Team', teamID: string, name: string, icon: string } }> } | null }>, everyoneTeam: { __typename?: 'Team', teamID: string, rootDocument?: { __typename?: 'Document', createdAt?: Date | null, docID: string, documentType: Types.NwContentType, publicHierarchicalKey?: string | null, decryptedSessionKey: string, decryptedPrivateHierarchicalKey?: string | null, currentUserPermissionLevel: Types.PermissionLevel, parentID?: string | null, hasChildren: boolean, trashedAt?: string | null, previousParentID?: string | null, metadata: { __typename?: 'EncryptedMetadataOutput', signedBy: string, encryptedMetadata: string, signature: string }, decryptedMetadata: { __typename?: 'DocumentDecryptedMetadata', title: string, icon?: string | null, color?: string | null, description?: string | null, timeLastModified?: Date | null, fileSizeBytes?: number | null, mimeType?: string | null }, hierarchicalPermissionChain: Array<{ __typename?: 'HierarchicalPermissionChainLink', docID: string, previousLinkDocID?: string | null, keysClaim?: string | null, keysClaimEncryptedByKey?: string | null, encryptedSessionKey?: string | null, encryptedSessionKeyEncryptedByKey?: string | null, permission?: { __typename?: 'PermissionEntry', userID: string, expiryDate?: Date | null, encryptedBy: { key: string, signature?: string }, encryptedKey?: string | null, encryptedPrivateHierarchicalKey?: string | null } | null }>, invites: Array<{ __typename?: 'PendingUserInvite', docID: string, email: string, permissionLevel: Types.PermissionLevel }>, collaborators: Array<{ __typename?: 'DocumentCollaborator', permissionLevel: Types.PermissionLevel, expiryDate?: Date | null, sourceDocID: string, user: { __typename?: 'User', userID: string, username: string, publicData: { __typename?: 'PublicData', displayName?: string | null, displayPictureData?: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } | null } } }> } | null }, personalTeam: { __typename?: 'Team', teamID: string, rootDocument?: { __typename?: 'Document', docID: string } | null }, displayPictureData: { __typename?: 'DisplayPictureData', profileAccentColor?: string | null, profileCustomURI?: string | null, profileIcon?: string | null } } } | null };
 
 export const DnsRecordDataFragmentDoc = /*#__PURE__*/ gql`
     fragment DNSRecordData on DNSRecord {
@@ -1639,6 +2074,7 @@ export const EmailWithoutContentFragmentDoc = /*#__PURE__*/ gql`
       contentId
     }
   }
+  notificationsTurnedOffForSender
 }
     ${AddressFragmentDoc}`;
 export const ThreadWithoutContentFragmentDoc = /*#__PURE__*/ gql`
@@ -1659,6 +2095,7 @@ export const ThreadWithoutContentFragmentDoc = /*#__PURE__*/ gql`
   }
   emailsUpdatedAt
   sentLabelUpdatedAt
+  deletedAt
 }
     ${EmailWithoutContentFragmentDoc}`;
 export const EmailFragmentDoc = /*#__PURE__*/ gql`
@@ -1727,6 +2164,7 @@ export const EmailFragmentDoc = /*#__PURE__*/ gql`
       contentId
     }
   }
+  notificationsTurnedOffForSender
 }
     ${AddressFragmentDoc}`;
 export const ThreadFragmentDoc = /*#__PURE__*/ gql`
@@ -1747,6 +2185,11 @@ export const ThreadFragmentDoc = /*#__PURE__*/ gql`
   }
   emailsUpdatedAt
   sentLabelUpdatedAt
+  deletedAt
+  senderToSilence
+  senderToSilenceMessageCounter
+  senderToSilenceTotalBytes
+  threadContentUpdatedAt
 }
     ${EmailFragmentDoc}`;
 export const MobileThreadFragmentDoc = /*#__PURE__*/ gql`
@@ -1761,6 +2204,7 @@ export const MobileThreadFragmentDoc = /*#__PURE__*/ gql`
       labelName
       variant
     }
+    clientsideFiltersApplied
   }
   emails {
     ...Email
@@ -1768,6 +2212,7 @@ export const MobileThreadFragmentDoc = /*#__PURE__*/ gql`
   emailsUpdatedAt
   sentLabelUpdatedAt
   updatedAt
+  deletedAt
   permanentlyDeleted
 }
     ${EmailFragmentDoc}`;
@@ -1787,6 +2232,7 @@ export const SlimThreadFragmentDoc = /*#__PURE__*/ gql`
   emailsUpdatedAt
   sentLabelUpdatedAt
   updatedAt
+  deletedAt
   permanentlyDeleted
 }
     `;
@@ -1803,6 +2249,7 @@ export const SlimThreadWithoutLabelsFragmentDoc = /*#__PURE__*/ gql`
   emailsUpdatedAt
   sentLabelUpdatedAt
   updatedAt
+  deletedAt
   permanentlyDeleted
 }
     `;
@@ -1884,6 +2331,7 @@ export const DocumentBasicInfoFragmentDoc = /*#__PURE__*/ gql`
       orgID
     }
   }
+  cloneDocID
 }
     ${DocumentBasicInfoWithoutTeamOrOrgFragmentDoc}`;
 export const DocumentDecryptedMetadataFragmentDoc = /*#__PURE__*/ gql`
@@ -1931,6 +2379,22 @@ export const DocumentParentsFullBreadcrumbFragmentDoc = /*#__PURE__*/ gql`
 }
     ${DocumentBasicInfoFragmentDoc}
 ${DocumentDecryptedMetadataFragmentDoc}`;
+export const DocumentTeamFragmentDoc = /*#__PURE__*/ gql`
+    fragment DocumentTeam on Document {
+  team {
+    teamID
+    name
+    icon
+    accessLevel
+    rootDocument {
+      docID
+    }
+    organization {
+      orgID
+    }
+  }
+}
+    `;
 export const DocumentContentsFragmentDoc = /*#__PURE__*/ gql`
     fragment DocumentContents on Document {
   updatedAt
@@ -1950,6 +2414,22 @@ export const DocumentContentsFragmentDoc = /*#__PURE__*/ gql`
   }
 }
     `;
+export const DocumentNativeInfoFragmentDoc = /*#__PURE__*/ gql`
+    fragment DocumentNativeInfo on Document {
+  ...DocumentBasicInfoWithoutTeamOrOrg
+  ...DocumentTeam
+  ...DocumentContents
+  ...DocumentDecryptedMetadata
+  team {
+    personal
+  }
+  updatedAt
+  thumbnail
+}
+    ${DocumentBasicInfoWithoutTeamOrOrgFragmentDoc}
+${DocumentTeamFragmentDoc}
+${DocumentContentsFragmentDoc}
+${DocumentDecryptedMetadataFragmentDoc}`;
 export const DocumentCurrentlyEditingUsersFragmentDoc = /*#__PURE__*/ gql`
     fragment DocumentCurrentlyEditingUsers on Document {
   docID
@@ -1981,22 +2461,6 @@ export const DocumentInvitesFragmentDoc = /*#__PURE__*/ gql`
     docID
     email
     permissionLevel
-  }
-}
-    `;
-export const DocumentTeamFragmentDoc = /*#__PURE__*/ gql`
-    fragment DocumentTeam on Document {
-  team {
-    teamID
-    name
-    icon
-    accessLevel
-    rootDocument {
-      docID
-    }
-    organization {
-      orgID
-    }
   }
 }
     `;
@@ -2044,6 +2508,8 @@ export const DocumentFullInfoFragmentDoc = /*#__PURE__*/ gql`
   ...DocumentCollaborators
   parentKeysClaim
   parentPublicHierarchicalKey
+  thumbnail
+  decryptedThumbnail @client
 }
     ${DocumentBasicInfoFragmentDoc}
 ${DocumentDecryptedMetadataFragmentDoc}
@@ -2149,6 +2615,42 @@ export const UserProfileOrgDataFragmentDoc = /*#__PURE__*/ gql`
   }
 }
     `;
+export const UserOrgPersonalTeamDataFragmentDoc = /*#__PURE__*/ gql`
+    fragment UserOrgPersonalTeamData on User {
+  userID
+  rootOrganization {
+    orgID
+    rootDocID
+    personalTeam {
+      teamID
+      rootDocument {
+        docID
+      }
+    }
+  }
+}
+    `;
+export const UserOrgEveryoneTeamDataFragmentDoc = /*#__PURE__*/ gql`
+    fragment UserOrgEveryoneTeamData on User {
+  userID
+  rootOrganization {
+    orgID
+    rootDocID
+    everyoneTeam {
+      teamID
+      rootDocument {
+        ...DocumentDecryptedMetadata
+        ...DocumentBasicInfoWithoutTeamOrOrg
+        ...DocumentInvites
+        ...DocumentCollaborators
+      }
+    }
+  }
+}
+    ${DocumentDecryptedMetadataFragmentDoc}
+${DocumentBasicInfoWithoutTeamOrOrgFragmentDoc}
+${DocumentInvitesFragmentDoc}
+${DocumentCollaboratorsFragmentDoc}`;
 export const UserProfileDataWithKeysFragmentDoc = /*#__PURE__*/ gql`
     fragment UserProfileDataWithKeys on User {
   ...UserProfileData
@@ -2173,6 +2675,7 @@ export const UserWithMailStorageUsedFragmentDoc = /*#__PURE__*/ gql`
     `;
 export const ContactDataFragmentDoc = /*#__PURE__*/ gql`
     fragment ContactData on Contact {
+  contactID
   emailAddress
   firstName
   lastName
@@ -2185,19 +2688,25 @@ export const ContactDataFragmentDoc = /*#__PURE__*/ gql`
     `;
 export const UserPreferencesDataFragmentDoc = /*#__PURE__*/ gql`
     fragment UserPreferencesData on UserPreferences {
+  autoAdvance
+  advanceToNext
   theme
   dateFormat
   hourFormat
   showPageIcon
   defaultCalendarColor
+  defaultCalendarView
+  defaultCalendarViewMobile
   startDayOfTheWeek
   leftSwipeGesture
   rightSwipeGesture
   blockRemoteContent
   securedBySkiffSigDisabled
   showAliasInboxes
+  fileTableFormat
   threadFormat
   hideActivationChecklist
+  tableOfContents
 }
     `;
 export const UserPreferencesFragmentFragmentDoc = /*#__PURE__*/ gql`
@@ -2208,6 +2717,23 @@ export const UserPreferencesFragmentFragmentDoc = /*#__PURE__*/ gql`
   }
 }
     ${UserPreferencesDataFragmentDoc}`;
+export const ExternalEmailClientLabelFragmentDoc = /*#__PURE__*/ gql`
+    fragment ExternalEmailClientLabel on ExternalEmailClientLabel {
+  labelID
+  labelName
+  ... on ExternalEmailClientSystemLabel {
+    skiffSystemLabel
+  }
+  ... on ExternalEmailClientUserLabel {
+    skiffUserLabel {
+      labelID
+      labelName
+      color
+      variant
+    }
+  }
+}
+    `;
 export const CreateSrpResponseDataFragmentDoc = /*#__PURE__*/ gql`
     fragment CreateSrpResponseData on CreateSrpResponse {
   userID
@@ -2248,6 +2774,7 @@ export const LoginSrpResponseDataFragmentDoc = /*#__PURE__*/ gql`
 export const GetAllCurrentUserContactsDocument = /*#__PURE__*/ gql`
     query getAllCurrentUserContacts {
   allContacts {
+    contactID
     emailAddress
     firstName
     lastName
@@ -2255,6 +2782,26 @@ export const GetAllCurrentUserContactsDocument = /*#__PURE__*/ gql`
       profileAccentColor
       profileCustomURI
       profileIcon
+    }
+    encryptedByKey
+    encryptedSessionKey
+    encryptedContactData
+    decryptedSessionKey @client
+    decryptedData @client {
+      decryptedPhoneNumbers {
+        value
+        label
+      }
+      decryptedNotes
+      decryptedBirthday
+      decryptedCompany
+      decryptedJobTitle
+      decryptedAddresses {
+        value
+        label
+      }
+      decryptedNickname
+      decryptedURL
     }
   }
 }
@@ -2286,9 +2833,10 @@ export function useGetAllCurrentUserContactsLazyQuery(baseOptions?: Apollo.LazyQ
 export type GetAllCurrentUserContactsQueryHookResult = ReturnType<typeof useGetAllCurrentUserContactsQuery>;
 export type GetAllCurrentUserContactsLazyQueryHookResult = ReturnType<typeof useGetAllCurrentUserContactsLazyQuery>;
 export type GetAllCurrentUserContactsQueryResult = Apollo.QueryResult<GetAllCurrentUserContactsQuery, GetAllCurrentUserContactsQueryVariables>;
-export const GetContactsDocument = /*#__PURE__*/ gql`
-    query getContacts($request: GetContactsRequest!) {
-  contacts(request: $request) {
+export const GetAllCurrentUserContactsNativeDocument = /*#__PURE__*/ gql`
+    query getAllCurrentUserContactsNative {
+  allContacts {
+    contactID
     emailAddress
     firstName
     lastName
@@ -2296,6 +2844,68 @@ export const GetContactsDocument = /*#__PURE__*/ gql`
       profileAccentColor
       profileCustomURI
       profileIcon
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAllCurrentUserContactsNativeQuery__
+ *
+ * To run a query within a React component, call `useGetAllCurrentUserContactsNativeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllCurrentUserContactsNativeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllCurrentUserContactsNativeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAllCurrentUserContactsNativeQuery(baseOptions?: Apollo.QueryHookOptions<GetAllCurrentUserContactsNativeQuery, GetAllCurrentUserContactsNativeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllCurrentUserContactsNativeQuery, GetAllCurrentUserContactsNativeQueryVariables>(GetAllCurrentUserContactsNativeDocument, options);
+      }
+export function useGetAllCurrentUserContactsNativeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllCurrentUserContactsNativeQuery, GetAllCurrentUserContactsNativeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllCurrentUserContactsNativeQuery, GetAllCurrentUserContactsNativeQueryVariables>(GetAllCurrentUserContactsNativeDocument, options);
+        }
+export type GetAllCurrentUserContactsNativeQueryHookResult = ReturnType<typeof useGetAllCurrentUserContactsNativeQuery>;
+export type GetAllCurrentUserContactsNativeLazyQueryHookResult = ReturnType<typeof useGetAllCurrentUserContactsNativeLazyQuery>;
+export type GetAllCurrentUserContactsNativeQueryResult = Apollo.QueryResult<GetAllCurrentUserContactsNativeQuery, GetAllCurrentUserContactsNativeQueryVariables>;
+export const GetContactsDocument = /*#__PURE__*/ gql`
+    query getContacts($request: GetContactsRequest!) {
+  contacts(request: $request) {
+    contactID
+    emailAddress
+    firstName
+    lastName
+    displayPictureData {
+      profileAccentColor
+      profileCustomURI
+      profileIcon
+    }
+    encryptedByKey
+    encryptedSessionKey
+    encryptedContactData
+    decryptedSessionKey @client
+    decryptedData @client {
+      decryptedPhoneNumbers {
+        value
+        label
+      }
+      decryptedNotes
+      decryptedBirthday
+      decryptedCompany
+      decryptedJobTitle
+      decryptedAddresses {
+        value
+        label
+      }
+      decryptedNickname
+      decryptedURL
     }
   }
 }
@@ -2425,6 +3035,37 @@ export function useDeleteContactMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteContactMutationHookResult = ReturnType<typeof useDeleteContactMutation>;
 export type DeleteContactMutationResult = Apollo.MutationResult<DeleteContactMutation>;
 export type DeleteContactMutationOptions = Apollo.BaseMutationOptions<DeleteContactMutation, DeleteContactMutationVariables>;
+export const DeleteContactsDocument = /*#__PURE__*/ gql`
+    mutation deleteContacts($request: DeleteContactsRequest!) {
+  deleteContacts(request: $request)
+}
+    `;
+export type DeleteContactsMutationFn = Apollo.MutationFunction<DeleteContactsMutation, DeleteContactsMutationVariables>;
+
+/**
+ * __useDeleteContactsMutation__
+ *
+ * To run a mutation, you first call `useDeleteContactsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteContactsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteContactsMutation, { data, loading, error }] = useDeleteContactsMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useDeleteContactsMutation(baseOptions?: Apollo.MutationHookOptions<DeleteContactsMutation, DeleteContactsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteContactsMutation, DeleteContactsMutationVariables>(DeleteContactsDocument, options);
+      }
+export type DeleteContactsMutationHookResult = ReturnType<typeof useDeleteContactsMutation>;
+export type DeleteContactsMutationResult = Apollo.MutationResult<DeleteContactsMutation>;
+export type DeleteContactsMutationOptions = Apollo.BaseMutationOptions<DeleteContactsMutation, DeleteContactsMutationVariables>;
 export const GetCreditsDocument = /*#__PURE__*/ gql`
     query getCredits($request: GetCreditsRequest!) {
   credits(request: $request) {
@@ -3097,6 +3738,42 @@ export function useMailboxLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ma
 export type MailboxQueryHookResult = ReturnType<typeof useMailboxQuery>;
 export type MailboxLazyQueryHookResult = ReturnType<typeof useMailboxLazyQuery>;
 export type MailboxQueryResult = Apollo.QueryResult<MailboxQuery, MailboxQueryVariables>;
+export const FilteredThreadIDsDocument = /*#__PURE__*/ gql`
+    query filteredThreadIDs($request: FilteredThreadIDsRequest!) {
+  filteredThreadIDs(request: $request) {
+    threadIDs
+    numThreadIDsRemoved
+  }
+}
+    `;
+
+/**
+ * __useFilteredThreadIDsQuery__
+ *
+ * To run a query within a React component, call `useFilteredThreadIDsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFilteredThreadIDsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFilteredThreadIDsQuery({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useFilteredThreadIDsQuery(baseOptions: Apollo.QueryHookOptions<FilteredThreadIDsQuery, FilteredThreadIDsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FilteredThreadIDsQuery, FilteredThreadIDsQueryVariables>(FilteredThreadIDsDocument, options);
+      }
+export function useFilteredThreadIDsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FilteredThreadIDsQuery, FilteredThreadIDsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FilteredThreadIDsQuery, FilteredThreadIDsQueryVariables>(FilteredThreadIDsDocument, options);
+        }
+export type FilteredThreadIDsQueryHookResult = ReturnType<typeof useFilteredThreadIDsQuery>;
+export type FilteredThreadIDsLazyQueryHookResult = ReturnType<typeof useFilteredThreadIDsLazyQuery>;
+export type FilteredThreadIDsQueryResult = Apollo.QueryResult<FilteredThreadIDsQuery, FilteredThreadIDsQueryVariables>;
 export const MobileMailboxDocument = /*#__PURE__*/ gql`
     query mobileMailbox($mailboxRequest: NativeMailboxRequest!, $threadIDs: [String!]!) {
   nativeMailbox(request: $mailboxRequest) {
@@ -3432,6 +4109,70 @@ export function useValidateMailAliasLazyQuery(baseOptions?: Apollo.LazyQueryHook
 export type ValidateMailAliasQueryHookResult = ReturnType<typeof useValidateMailAliasQuery>;
 export type ValidateMailAliasLazyQueryHookResult = ReturnType<typeof useValidateMailAliasLazyQuery>;
 export type ValidateMailAliasQueryResult = Apollo.QueryResult<ValidateMailAliasQuery, ValidateMailAliasQueryVariables>;
+export const UpdateQuickAliasActiveStateDocument = /*#__PURE__*/ gql`
+    mutation updateQuickAliasActiveState($request: UpdateQuickAliasActiveStateRequest) {
+  updateQuickAliasActiveState(request: $request) {
+    status
+  }
+}
+    `;
+export type UpdateQuickAliasActiveStateMutationFn = Apollo.MutationFunction<UpdateQuickAliasActiveStateMutation, UpdateQuickAliasActiveStateMutationVariables>;
+
+/**
+ * __useUpdateQuickAliasActiveStateMutation__
+ *
+ * To run a mutation, you first call `useUpdateQuickAliasActiveStateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateQuickAliasActiveStateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateQuickAliasActiveStateMutation, { data, loading, error }] = useUpdateQuickAliasActiveStateMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useUpdateQuickAliasActiveStateMutation(baseOptions?: Apollo.MutationHookOptions<UpdateQuickAliasActiveStateMutation, UpdateQuickAliasActiveStateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateQuickAliasActiveStateMutation, UpdateQuickAliasActiveStateMutationVariables>(UpdateQuickAliasActiveStateDocument, options);
+      }
+export type UpdateQuickAliasActiveStateMutationHookResult = ReturnType<typeof useUpdateQuickAliasActiveStateMutation>;
+export type UpdateQuickAliasActiveStateMutationResult = Apollo.MutationResult<UpdateQuickAliasActiveStateMutation>;
+export type UpdateQuickAliasActiveStateMutationOptions = Apollo.BaseMutationOptions<UpdateQuickAliasActiveStateMutation, UpdateQuickAliasActiveStateMutationVariables>;
+export const UpdateEmailAliasSendReceiveEnabledStateDocument = /*#__PURE__*/ gql`
+    mutation updateEmailAliasSendReceiveEnabledState($request: UpdateEmailAliasEnabledStateRequest!) {
+  updateEmailAliasSendReceiveEnabledState(request: $request)
+}
+    `;
+export type UpdateEmailAliasSendReceiveEnabledStateMutationFn = Apollo.MutationFunction<UpdateEmailAliasSendReceiveEnabledStateMutation, UpdateEmailAliasSendReceiveEnabledStateMutationVariables>;
+
+/**
+ * __useUpdateEmailAliasSendReceiveEnabledStateMutation__
+ *
+ * To run a mutation, you first call `useUpdateEmailAliasSendReceiveEnabledStateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateEmailAliasSendReceiveEnabledStateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateEmailAliasSendReceiveEnabledStateMutation, { data, loading, error }] = useUpdateEmailAliasSendReceiveEnabledStateMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useUpdateEmailAliasSendReceiveEnabledStateMutation(baseOptions?: Apollo.MutationHookOptions<UpdateEmailAliasSendReceiveEnabledStateMutation, UpdateEmailAliasSendReceiveEnabledStateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateEmailAliasSendReceiveEnabledStateMutation, UpdateEmailAliasSendReceiveEnabledStateMutationVariables>(UpdateEmailAliasSendReceiveEnabledStateDocument, options);
+      }
+export type UpdateEmailAliasSendReceiveEnabledStateMutationHookResult = ReturnType<typeof useUpdateEmailAliasSendReceiveEnabledStateMutation>;
+export type UpdateEmailAliasSendReceiveEnabledStateMutationResult = Apollo.MutationResult<UpdateEmailAliasSendReceiveEnabledStateMutation>;
+export type UpdateEmailAliasSendReceiveEnabledStateMutationOptions = Apollo.BaseMutationOptions<UpdateEmailAliasSendReceiveEnabledStateMutation, UpdateEmailAliasSendReceiveEnabledStateMutationVariables>;
 export const CreateEmailAliasDocument = /*#__PURE__*/ gql`
     mutation createEmailAlias($request: CreateEmailAliasRequest) {
   createEmailAlias(request: $request) {
@@ -3531,6 +4272,37 @@ export function useUpdateEmailAliasActiveStateMutation(baseOptions?: Apollo.Muta
 export type UpdateEmailAliasActiveStateMutationHookResult = ReturnType<typeof useUpdateEmailAliasActiveStateMutation>;
 export type UpdateEmailAliasActiveStateMutationResult = Apollo.MutationResult<UpdateEmailAliasActiveStateMutation>;
 export type UpdateEmailAliasActiveStateMutationOptions = Apollo.BaseMutationOptions<UpdateEmailAliasActiveStateMutation, UpdateEmailAliasActiveStateMutationVariables>;
+export const UpdateEmailAliasProfileDocument = /*#__PURE__*/ gql`
+    mutation updateEmailAliasProfile($request: UpdateEmailAliasProfileRequest!) {
+  updateEmailAliasProfile(request: $request)
+}
+    `;
+export type UpdateEmailAliasProfileMutationFn = Apollo.MutationFunction<UpdateEmailAliasProfileMutation, UpdateEmailAliasProfileMutationVariables>;
+
+/**
+ * __useUpdateEmailAliasProfileMutation__
+ *
+ * To run a mutation, you first call `useUpdateEmailAliasProfileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateEmailAliasProfileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateEmailAliasProfileMutation, { data, loading, error }] = useUpdateEmailAliasProfileMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useUpdateEmailAliasProfileMutation(baseOptions?: Apollo.MutationHookOptions<UpdateEmailAliasProfileMutation, UpdateEmailAliasProfileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateEmailAliasProfileMutation, UpdateEmailAliasProfileMutationVariables>(UpdateEmailAliasProfileDocument, options);
+      }
+export type UpdateEmailAliasProfileMutationHookResult = ReturnType<typeof useUpdateEmailAliasProfileMutation>;
+export type UpdateEmailAliasProfileMutationResult = Apollo.MutationResult<UpdateEmailAliasProfileMutation>;
+export type UpdateEmailAliasProfileMutationOptions = Apollo.BaseMutationOptions<UpdateEmailAliasProfileMutation, UpdateEmailAliasProfileMutationVariables>;
 export const SetAllThreadsReadStatusDocument = /*#__PURE__*/ gql`
     mutation setAllThreadsReadStatus($request: SetAllThreadsReadStatusRequest!) {
   setAllThreadsReadStatus(request: $request)
@@ -3858,6 +4630,42 @@ export function useGetNumUnreadLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type GetNumUnreadQueryHookResult = ReturnType<typeof useGetNumUnreadQuery>;
 export type GetNumUnreadLazyQueryHookResult = ReturnType<typeof useGetNumUnreadLazyQuery>;
 export type GetNumUnreadQueryResult = Apollo.QueryResult<GetNumUnreadQuery, GetNumUnreadQueryVariables>;
+export const GetNumUnreadAllLabelsDocument = /*#__PURE__*/ gql`
+    query getNumUnreadAllLabels($labels: [String!]!) {
+  unreadAllLabels(labels: $labels) {
+    label
+    count
+  }
+}
+    `;
+
+/**
+ * __useGetNumUnreadAllLabelsQuery__
+ *
+ * To run a query within a React component, call `useGetNumUnreadAllLabelsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetNumUnreadAllLabelsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetNumUnreadAllLabelsQuery({
+ *   variables: {
+ *      labels: // value for 'labels'
+ *   },
+ * });
+ */
+export function useGetNumUnreadAllLabelsQuery(baseOptions: Apollo.QueryHookOptions<GetNumUnreadAllLabelsQuery, GetNumUnreadAllLabelsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetNumUnreadAllLabelsQuery, GetNumUnreadAllLabelsQueryVariables>(GetNumUnreadAllLabelsDocument, options);
+      }
+export function useGetNumUnreadAllLabelsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetNumUnreadAllLabelsQuery, GetNumUnreadAllLabelsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetNumUnreadAllLabelsQuery, GetNumUnreadAllLabelsQueryVariables>(GetNumUnreadAllLabelsDocument, options);
+        }
+export type GetNumUnreadAllLabelsQueryHookResult = ReturnType<typeof useGetNumUnreadAllLabelsQuery>;
+export type GetNumUnreadAllLabelsLazyQueryHookResult = ReturnType<typeof useGetNumUnreadAllLabelsLazyQuery>;
+export type GetNumUnreadAllLabelsQueryResult = Apollo.QueryResult<GetNumUnreadAllLabelsQuery, GetNumUnreadAllLabelsQueryVariables>;
 export const BlockEmailAddressDocument = /*#__PURE__*/ gql`
     mutation blockEmailAddress($request: BlockEmailAddressRequest!) {
   blockEmailAddress(request: $request)
@@ -4050,6 +4858,74 @@ export function useDeleteThreadMutation(baseOptions?: Apollo.MutationHookOptions
 export type DeleteThreadMutationHookResult = ReturnType<typeof useDeleteThreadMutation>;
 export type DeleteThreadMutationResult = Apollo.MutationResult<DeleteThreadMutation>;
 export type DeleteThreadMutationOptions = Apollo.BaseMutationOptions<DeleteThreadMutation, DeleteThreadMutationVariables>;
+export const BulkDeleteTrashedThreadsDocument = /*#__PURE__*/ gql`
+    mutation bulkDeleteTrashedThreads {
+  bulkDeleteTrashedThreads {
+    jobID
+  }
+}
+    `;
+export type BulkDeleteTrashedThreadsMutationFn = Apollo.MutationFunction<BulkDeleteTrashedThreadsMutation, BulkDeleteTrashedThreadsMutationVariables>;
+
+/**
+ * __useBulkDeleteTrashedThreadsMutation__
+ *
+ * To run a mutation, you first call `useBulkDeleteTrashedThreadsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBulkDeleteTrashedThreadsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [bulkDeleteTrashedThreadsMutation, { data, loading, error }] = useBulkDeleteTrashedThreadsMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useBulkDeleteTrashedThreadsMutation(baseOptions?: Apollo.MutationHookOptions<BulkDeleteTrashedThreadsMutation, BulkDeleteTrashedThreadsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<BulkDeleteTrashedThreadsMutation, BulkDeleteTrashedThreadsMutationVariables>(BulkDeleteTrashedThreadsDocument, options);
+      }
+export type BulkDeleteTrashedThreadsMutationHookResult = ReturnType<typeof useBulkDeleteTrashedThreadsMutation>;
+export type BulkDeleteTrashedThreadsMutationResult = Apollo.MutationResult<BulkDeleteTrashedThreadsMutation>;
+export type BulkDeleteTrashedThreadsMutationOptions = Apollo.BaseMutationOptions<BulkDeleteTrashedThreadsMutation, BulkDeleteTrashedThreadsMutationVariables>;
+export const GetBulkActionJobStatusDocument = /*#__PURE__*/ gql`
+    query getBulkActionJobStatus($request: BulkActionJobStatusRequest!) {
+  bulkActionJobStatus(request: $request) {
+    jobStatus
+    completed
+  }
+}
+    `;
+
+/**
+ * __useGetBulkActionJobStatusQuery__
+ *
+ * To run a query within a React component, call `useGetBulkActionJobStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBulkActionJobStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBulkActionJobStatusQuery({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useGetBulkActionJobStatusQuery(baseOptions: Apollo.QueryHookOptions<GetBulkActionJobStatusQuery, GetBulkActionJobStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBulkActionJobStatusQuery, GetBulkActionJobStatusQueryVariables>(GetBulkActionJobStatusDocument, options);
+      }
+export function useGetBulkActionJobStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBulkActionJobStatusQuery, GetBulkActionJobStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBulkActionJobStatusQuery, GetBulkActionJobStatusQueryVariables>(GetBulkActionJobStatusDocument, options);
+        }
+export type GetBulkActionJobStatusQueryHookResult = ReturnType<typeof useGetBulkActionJobStatusQuery>;
+export type GetBulkActionJobStatusLazyQueryHookResult = ReturnType<typeof useGetBulkActionJobStatusLazyQuery>;
+export type GetBulkActionJobStatusQueryResult = Apollo.QueryResult<GetBulkActionJobStatusQuery, GetBulkActionJobStatusQueryVariables>;
 export const SetPushTokenDocument = /*#__PURE__*/ gql`
     mutation setPushToken($request: SetPushTokenRequest!) {
   setPushToken(request: $request)
@@ -4372,6 +5248,225 @@ export function useMarkThreadsAsClientsideFilteredMutation(baseOptions?: Apollo.
 export type MarkThreadsAsClientsideFilteredMutationHookResult = ReturnType<typeof useMarkThreadsAsClientsideFilteredMutation>;
 export type MarkThreadsAsClientsideFilteredMutationResult = Apollo.MutationResult<MarkThreadsAsClientsideFilteredMutation>;
 export type MarkThreadsAsClientsideFilteredMutationOptions = Apollo.BaseMutationOptions<MarkThreadsAsClientsideFilteredMutation, MarkThreadsAsClientsideFilteredMutationVariables>;
+export const SilenceMultipleEmailAddressesDocument = /*#__PURE__*/ gql`
+    mutation silenceMultipleEmailAddresses($request: SilenceMultipleEmailAddressesRequest!) {
+  silenceMultipleEmailAddresses(request: $request)
+}
+    `;
+export type SilenceMultipleEmailAddressesMutationFn = Apollo.MutationFunction<SilenceMultipleEmailAddressesMutation, SilenceMultipleEmailAddressesMutationVariables>;
+
+/**
+ * __useSilenceMultipleEmailAddressesMutation__
+ *
+ * To run a mutation, you first call `useSilenceMultipleEmailAddressesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSilenceMultipleEmailAddressesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [silenceMultipleEmailAddressesMutation, { data, loading, error }] = useSilenceMultipleEmailAddressesMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useSilenceMultipleEmailAddressesMutation(baseOptions?: Apollo.MutationHookOptions<SilenceMultipleEmailAddressesMutation, SilenceMultipleEmailAddressesMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SilenceMultipleEmailAddressesMutation, SilenceMultipleEmailAddressesMutationVariables>(SilenceMultipleEmailAddressesDocument, options);
+      }
+export type SilenceMultipleEmailAddressesMutationHookResult = ReturnType<typeof useSilenceMultipleEmailAddressesMutation>;
+export type SilenceMultipleEmailAddressesMutationResult = Apollo.MutationResult<SilenceMultipleEmailAddressesMutation>;
+export type SilenceMultipleEmailAddressesMutationOptions = Apollo.BaseMutationOptions<SilenceMultipleEmailAddressesMutation, SilenceMultipleEmailAddressesMutationVariables>;
+export const MarkSpamMultipleEmailAddressesDocument = /*#__PURE__*/ gql`
+    mutation markSpamMultipleEmailAddresses($request: MarkSpamMultipleEmailAddressesRequest!) {
+  markSpamMultipleEmailAddresses(request: $request)
+}
+    `;
+export type MarkSpamMultipleEmailAddressesMutationFn = Apollo.MutationFunction<MarkSpamMultipleEmailAddressesMutation, MarkSpamMultipleEmailAddressesMutationVariables>;
+
+/**
+ * __useMarkSpamMultipleEmailAddressesMutation__
+ *
+ * To run a mutation, you first call `useMarkSpamMultipleEmailAddressesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkSpamMultipleEmailAddressesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markSpamMultipleEmailAddressesMutation, { data, loading, error }] = useMarkSpamMultipleEmailAddressesMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useMarkSpamMultipleEmailAddressesMutation(baseOptions?: Apollo.MutationHookOptions<MarkSpamMultipleEmailAddressesMutation, MarkSpamMultipleEmailAddressesMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MarkSpamMultipleEmailAddressesMutation, MarkSpamMultipleEmailAddressesMutationVariables>(MarkSpamMultipleEmailAddressesDocument, options);
+      }
+export type MarkSpamMultipleEmailAddressesMutationHookResult = ReturnType<typeof useMarkSpamMultipleEmailAddressesMutation>;
+export type MarkSpamMultipleEmailAddressesMutationResult = Apollo.MutationResult<MarkSpamMultipleEmailAddressesMutation>;
+export type MarkSpamMultipleEmailAddressesMutationOptions = Apollo.BaseMutationOptions<MarkSpamMultipleEmailAddressesMutation, MarkSpamMultipleEmailAddressesMutationVariables>;
+export const MarkNotSpamMultipleEmailAddressesDocument = /*#__PURE__*/ gql`
+    mutation markNotSpamMultipleEmailAddresses($request: MarkNotSpamMultipleEmailAddressesRequest!) {
+  markNotSpamMultipleEmailAddresses(request: $request)
+}
+    `;
+export type MarkNotSpamMultipleEmailAddressesMutationFn = Apollo.MutationFunction<MarkNotSpamMultipleEmailAddressesMutation, MarkNotSpamMultipleEmailAddressesMutationVariables>;
+
+/**
+ * __useMarkNotSpamMultipleEmailAddressesMutation__
+ *
+ * To run a mutation, you first call `useMarkNotSpamMultipleEmailAddressesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkNotSpamMultipleEmailAddressesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markNotSpamMultipleEmailAddressesMutation, { data, loading, error }] = useMarkNotSpamMultipleEmailAddressesMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useMarkNotSpamMultipleEmailAddressesMutation(baseOptions?: Apollo.MutationHookOptions<MarkNotSpamMultipleEmailAddressesMutation, MarkNotSpamMultipleEmailAddressesMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MarkNotSpamMultipleEmailAddressesMutation, MarkNotSpamMultipleEmailAddressesMutationVariables>(MarkNotSpamMultipleEmailAddressesDocument, options);
+      }
+export type MarkNotSpamMultipleEmailAddressesMutationHookResult = ReturnType<typeof useMarkNotSpamMultipleEmailAddressesMutation>;
+export type MarkNotSpamMultipleEmailAddressesMutationResult = Apollo.MutationResult<MarkNotSpamMultipleEmailAddressesMutation>;
+export type MarkNotSpamMultipleEmailAddressesMutationOptions = Apollo.BaseMutationOptions<MarkNotSpamMultipleEmailAddressesMutation, MarkNotSpamMultipleEmailAddressesMutationVariables>;
+export const BulkTrashDocument = /*#__PURE__*/ gql`
+    mutation bulkTrash($request: BulkTrashRequest!) {
+  bulkTrash(request: $request) {
+    jobID
+  }
+}
+    `;
+export type BulkTrashMutationFn = Apollo.MutationFunction<BulkTrashMutation, BulkTrashMutationVariables>;
+
+/**
+ * __useBulkTrashMutation__
+ *
+ * To run a mutation, you first call `useBulkTrashMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBulkTrashMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [bulkTrashMutation, { data, loading, error }] = useBulkTrashMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useBulkTrashMutation(baseOptions?: Apollo.MutationHookOptions<BulkTrashMutation, BulkTrashMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<BulkTrashMutation, BulkTrashMutationVariables>(BulkTrashDocument, options);
+      }
+export type BulkTrashMutationHookResult = ReturnType<typeof useBulkTrashMutation>;
+export type BulkTrashMutationResult = Apollo.MutationResult<BulkTrashMutation>;
+export type BulkTrashMutationOptions = Apollo.BaseMutationOptions<BulkTrashMutation, BulkTrashMutationVariables>;
+export const MarkThreadAsOpenedDocument = /*#__PURE__*/ gql`
+    mutation markThreadAsOpened($request: MarkThreadAsOpenedInput!) {
+  markThreadAsOpened(request: $request)
+}
+    `;
+export type MarkThreadAsOpenedMutationFn = Apollo.MutationFunction<MarkThreadAsOpenedMutation, MarkThreadAsOpenedMutationVariables>;
+
+/**
+ * __useMarkThreadAsOpenedMutation__
+ *
+ * To run a mutation, you first call `useMarkThreadAsOpenedMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkThreadAsOpenedMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markThreadAsOpenedMutation, { data, loading, error }] = useMarkThreadAsOpenedMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useMarkThreadAsOpenedMutation(baseOptions?: Apollo.MutationHookOptions<MarkThreadAsOpenedMutation, MarkThreadAsOpenedMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MarkThreadAsOpenedMutation, MarkThreadAsOpenedMutationVariables>(MarkThreadAsOpenedDocument, options);
+      }
+export type MarkThreadAsOpenedMutationHookResult = ReturnType<typeof useMarkThreadAsOpenedMutation>;
+export type MarkThreadAsOpenedMutationResult = Apollo.MutationResult<MarkThreadAsOpenedMutation>;
+export type MarkThreadAsOpenedMutationOptions = Apollo.BaseMutationOptions<MarkThreadAsOpenedMutation, MarkThreadAsOpenedMutationVariables>;
+export const MuteNotificationForSenderDocument = /*#__PURE__*/ gql`
+    mutation muteNotificationForSender($request: MuteNotificationForSenderRequest!) {
+  muteNotificationForSender(request: $request)
+}
+    `;
+export type MuteNotificationForSenderMutationFn = Apollo.MutationFunction<MuteNotificationForSenderMutation, MuteNotificationForSenderMutationVariables>;
+
+/**
+ * __useMuteNotificationForSenderMutation__
+ *
+ * To run a mutation, you first call `useMuteNotificationForSenderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMuteNotificationForSenderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [muteNotificationForSenderMutation, { data, loading, error }] = useMuteNotificationForSenderMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useMuteNotificationForSenderMutation(baseOptions?: Apollo.MutationHookOptions<MuteNotificationForSenderMutation, MuteNotificationForSenderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MuteNotificationForSenderMutation, MuteNotificationForSenderMutationVariables>(MuteNotificationForSenderDocument, options);
+      }
+export type MuteNotificationForSenderMutationHookResult = ReturnType<typeof useMuteNotificationForSenderMutation>;
+export type MuteNotificationForSenderMutationResult = Apollo.MutationResult<MuteNotificationForSenderMutation>;
+export type MuteNotificationForSenderMutationOptions = Apollo.BaseMutationOptions<MuteNotificationForSenderMutation, MuteNotificationForSenderMutationVariables>;
+export const UnmuteNotificationForSenderDocument = /*#__PURE__*/ gql`
+    mutation unmuteNotificationForSender($request: UnmuteNotificationForSenderRequest!) {
+  unmuteNotificationForSender(request: $request)
+}
+    `;
+export type UnmuteNotificationForSenderMutationFn = Apollo.MutationFunction<UnmuteNotificationForSenderMutation, UnmuteNotificationForSenderMutationVariables>;
+
+/**
+ * __useUnmuteNotificationForSenderMutation__
+ *
+ * To run a mutation, you first call `useUnmuteNotificationForSenderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUnmuteNotificationForSenderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [unmuteNotificationForSenderMutation, { data, loading, error }] = useUnmuteNotificationForSenderMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useUnmuteNotificationForSenderMutation(baseOptions?: Apollo.MutationHookOptions<UnmuteNotificationForSenderMutation, UnmuteNotificationForSenderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UnmuteNotificationForSenderMutation, UnmuteNotificationForSenderMutationVariables>(UnmuteNotificationForSenderDocument, options);
+      }
+export type UnmuteNotificationForSenderMutationHookResult = ReturnType<typeof useUnmuteNotificationForSenderMutation>;
+export type UnmuteNotificationForSenderMutationResult = Apollo.MutationResult<UnmuteNotificationForSenderMutation>;
+export type UnmuteNotificationForSenderMutationOptions = Apollo.BaseMutationOptions<UnmuteNotificationForSenderMutation, UnmuteNotificationForSenderMutationVariables>;
 export const ImportEmlEmailDocument = /*#__PURE__*/ gql`
     mutation importEmlEmail($importRequest: ImportEmlEmailRequest!) {
   importEmlEmail(importRequest: $importRequest)
@@ -4434,6 +5529,40 @@ export function useImportMboxEmailsMutation(baseOptions?: Apollo.MutationHookOpt
 export type ImportMboxEmailsMutationHookResult = ReturnType<typeof useImportMboxEmailsMutation>;
 export type ImportMboxEmailsMutationResult = Apollo.MutationResult<ImportMboxEmailsMutation>;
 export type ImportMboxEmailsMutationOptions = Apollo.BaseMutationOptions<ImportMboxEmailsMutation, ImportMboxEmailsMutationVariables>;
+export const GetMboxImportUrlDocument = /*#__PURE__*/ gql`
+    mutation getMboxImportUrl($getImportUrlRequest: GetMboxImportUrlRequest!) {
+  getMboxImportUrl(getImportUrlRequest: $getImportUrlRequest) {
+    fileID
+    uploadData
+  }
+}
+    `;
+export type GetMboxImportUrlMutationFn = Apollo.MutationFunction<GetMboxImportUrlMutation, GetMboxImportUrlMutationVariables>;
+
+/**
+ * __useGetMboxImportUrlMutation__
+ *
+ * To run a mutation, you first call `useGetMboxImportUrlMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGetMboxImportUrlMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [getMboxImportUrlMutation, { data, loading, error }] = useGetMboxImportUrlMutation({
+ *   variables: {
+ *      getImportUrlRequest: // value for 'getImportUrlRequest'
+ *   },
+ * });
+ */
+export function useGetMboxImportUrlMutation(baseOptions?: Apollo.MutationHookOptions<GetMboxImportUrlMutation, GetMboxImportUrlMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<GetMboxImportUrlMutation, GetMboxImportUrlMutationVariables>(GetMboxImportUrlDocument, options);
+      }
+export type GetMboxImportUrlMutationHookResult = ReturnType<typeof useGetMboxImportUrlMutation>;
+export type GetMboxImportUrlMutationResult = Apollo.MutationResult<GetMboxImportUrlMutation>;
+export type GetMboxImportUrlMutationOptions = Apollo.BaseMutationOptions<GetMboxImportUrlMutation, GetMboxImportUrlMutationVariables>;
 export const ImportGmailEmailsDocument = /*#__PURE__*/ gql`
     mutation importGmailEmails($request: ImportGmailRequest!) {
   importGmailEmails(request: $request)
@@ -4530,8 +5659,8 @@ export type GetGmailAutoImportStatusQueryHookResult = ReturnType<typeof useGetGm
 export type GetGmailAutoImportStatusLazyQueryHookResult = ReturnType<typeof useGetGmailAutoImportStatusLazyQuery>;
 export type GetGmailAutoImportStatusQueryResult = Apollo.QueryResult<GetGmailAutoImportStatusQuery, GetGmailAutoImportStatusQueryVariables>;
 export const ImportOutlookEmailsDocument = /*#__PURE__*/ gql`
-    mutation importOutlookEmails($code: String!) {
-  importOutlookEmails(code: $code)
+    mutation importOutlookEmails($code: String!, $state: String!) {
+  importOutlookEmails(code: $code, state: $state)
 }
     `;
 export type ImportOutlookEmailsMutationFn = Apollo.MutationFunction<ImportOutlookEmailsMutation, ImportOutlookEmailsMutationVariables>;
@@ -4550,6 +5679,7 @@ export type ImportOutlookEmailsMutationFn = Apollo.MutationFunction<ImportOutloo
  * const [importOutlookEmailsMutation, { data, loading, error }] = useImportOutlookEmailsMutation({
  *   variables: {
  *      code: // value for 'code'
+ *      state: // value for 'state'
  *   },
  * });
  */
@@ -4561,8 +5691,8 @@ export type ImportOutlookEmailsMutationHookResult = ReturnType<typeof useImportO
 export type ImportOutlookEmailsMutationResult = Apollo.MutationResult<ImportOutlookEmailsMutation>;
 export type ImportOutlookEmailsMutationOptions = Apollo.BaseMutationOptions<ImportOutlookEmailsMutation, ImportOutlookEmailsMutationVariables>;
 export const GetGoogleAuthUrlDocument = /*#__PURE__*/ gql`
-    query getGoogleAuthURL {
-  getGoogleAuthURL
+    query getGoogleAuthURL($action: AuthAction) {
+  getGoogleAuthURL(action: $action)
 }
     `;
 
@@ -4578,6 +5708,7 @@ export const GetGoogleAuthUrlDocument = /*#__PURE__*/ gql`
  * @example
  * const { data, loading, error } = useGetGoogleAuthUrlQuery({
  *   variables: {
+ *      action: // value for 'action'
  *   },
  * });
  */
@@ -4593,8 +5724,8 @@ export type GetGoogleAuthUrlQueryHookResult = ReturnType<typeof useGetGoogleAuth
 export type GetGoogleAuthUrlLazyQueryHookResult = ReturnType<typeof useGetGoogleAuthUrlLazyQuery>;
 export type GetGoogleAuthUrlQueryResult = Apollo.QueryResult<GetGoogleAuthUrlQuery, GetGoogleAuthUrlQueryVariables>;
 export const GetOutlookAuthUrlDocument = /*#__PURE__*/ gql`
-    query getOutlookAuthUrl {
-  getOutlookAuthUrl
+    query getOutlookAuthUrl($action: AuthAction) {
+  getOutlookAuthUrl(action: $action)
 }
     `;
 
@@ -4610,6 +5741,7 @@ export const GetOutlookAuthUrlDocument = /*#__PURE__*/ gql`
  * @example
  * const { data, loading, error } = useGetOutlookAuthUrlQuery({
  *   variables: {
+ *      action: // value for 'action'
  *   },
  * });
  */
@@ -4624,6 +5756,357 @@ export function useGetOutlookAuthUrlLazyQuery(baseOptions?: Apollo.LazyQueryHook
 export type GetOutlookAuthUrlQueryHookResult = ReturnType<typeof useGetOutlookAuthUrlQuery>;
 export type GetOutlookAuthUrlLazyQueryHookResult = ReturnType<typeof useGetOutlookAuthUrlLazyQuery>;
 export type GetOutlookAuthUrlQueryResult = Apollo.QueryResult<GetOutlookAuthUrlQuery, GetOutlookAuthUrlQueryVariables>;
+export const GetEmailAutoForwardingSettingsDocument = /*#__PURE__*/ gql`
+    query getEmailAutoForwardingSettings {
+  emailAutoForwardingSettings {
+    gmail {
+      enabled
+    }
+    outlook {
+      enabled
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetEmailAutoForwardingSettingsQuery__
+ *
+ * To run a query within a React component, call `useGetEmailAutoForwardingSettingsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetEmailAutoForwardingSettingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetEmailAutoForwardingSettingsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetEmailAutoForwardingSettingsQuery(baseOptions?: Apollo.QueryHookOptions<GetEmailAutoForwardingSettingsQuery, GetEmailAutoForwardingSettingsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetEmailAutoForwardingSettingsQuery, GetEmailAutoForwardingSettingsQueryVariables>(GetEmailAutoForwardingSettingsDocument, options);
+      }
+export function useGetEmailAutoForwardingSettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetEmailAutoForwardingSettingsQuery, GetEmailAutoForwardingSettingsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetEmailAutoForwardingSettingsQuery, GetEmailAutoForwardingSettingsQueryVariables>(GetEmailAutoForwardingSettingsDocument, options);
+        }
+export type GetEmailAutoForwardingSettingsQueryHookResult = ReturnType<typeof useGetEmailAutoForwardingSettingsQuery>;
+export type GetEmailAutoForwardingSettingsLazyQueryHookResult = ReturnType<typeof useGetEmailAutoForwardingSettingsLazyQuery>;
+export type GetEmailAutoForwardingSettingsQueryResult = Apollo.QueryResult<GetEmailAutoForwardingSettingsQuery, GetEmailAutoForwardingSettingsQueryVariables>;
+export const EnableEmailAutoForwardingDocument = /*#__PURE__*/ gql`
+    mutation enableEmailAutoForwarding($request: EnableEmailAutoForwardingRequest!) {
+  enableEmailAutoForwarding(request: $request)
+}
+    `;
+export type EnableEmailAutoForwardingMutationFn = Apollo.MutationFunction<EnableEmailAutoForwardingMutation, EnableEmailAutoForwardingMutationVariables>;
+
+/**
+ * __useEnableEmailAutoForwardingMutation__
+ *
+ * To run a mutation, you first call `useEnableEmailAutoForwardingMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEnableEmailAutoForwardingMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [enableEmailAutoForwardingMutation, { data, loading, error }] = useEnableEmailAutoForwardingMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useEnableEmailAutoForwardingMutation(baseOptions?: Apollo.MutationHookOptions<EnableEmailAutoForwardingMutation, EnableEmailAutoForwardingMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EnableEmailAutoForwardingMutation, EnableEmailAutoForwardingMutationVariables>(EnableEmailAutoForwardingDocument, options);
+      }
+export type EnableEmailAutoForwardingMutationHookResult = ReturnType<typeof useEnableEmailAutoForwardingMutation>;
+export type EnableEmailAutoForwardingMutationResult = Apollo.MutationResult<EnableEmailAutoForwardingMutation>;
+export type EnableEmailAutoForwardingMutationOptions = Apollo.BaseMutationOptions<EnableEmailAutoForwardingMutation, EnableEmailAutoForwardingMutationVariables>;
+export const DisableEmailAutoForwardingDocument = /*#__PURE__*/ gql`
+    mutation disableEmailAutoForwarding($request: DisableEmailAutoForwardingRequest!) {
+  disableEmailAutoForwarding(request: $request)
+}
+    `;
+export type DisableEmailAutoForwardingMutationFn = Apollo.MutationFunction<DisableEmailAutoForwardingMutation, DisableEmailAutoForwardingMutationVariables>;
+
+/**
+ * __useDisableEmailAutoForwardingMutation__
+ *
+ * To run a mutation, you first call `useDisableEmailAutoForwardingMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDisableEmailAutoForwardingMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [disableEmailAutoForwardingMutation, { data, loading, error }] = useDisableEmailAutoForwardingMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useDisableEmailAutoForwardingMutation(baseOptions?: Apollo.MutationHookOptions<DisableEmailAutoForwardingMutation, DisableEmailAutoForwardingMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DisableEmailAutoForwardingMutation, DisableEmailAutoForwardingMutationVariables>(DisableEmailAutoForwardingDocument, options);
+      }
+export type DisableEmailAutoForwardingMutationHookResult = ReturnType<typeof useDisableEmailAutoForwardingMutation>;
+export type DisableEmailAutoForwardingMutationResult = Apollo.MutationResult<DisableEmailAutoForwardingMutation>;
+export type DisableEmailAutoForwardingMutationOptions = Apollo.BaseMutationOptions<DisableEmailAutoForwardingMutation, DisableEmailAutoForwardingMutationVariables>;
+export const GetEmailImportMetaDocument = /*#__PURE__*/ gql`
+    query getEmailImportMeta($request: EmailImportMetaRequest!) {
+  emailImportMeta(request: $request) {
+    estimatedEmailCount
+  }
+}
+    `;
+
+/**
+ * __useGetEmailImportMetaQuery__
+ *
+ * To run a query within a React component, call `useGetEmailImportMetaQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetEmailImportMetaQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetEmailImportMetaQuery({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useGetEmailImportMetaQuery(baseOptions: Apollo.QueryHookOptions<GetEmailImportMetaQuery, GetEmailImportMetaQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetEmailImportMetaQuery, GetEmailImportMetaQueryVariables>(GetEmailImportMetaDocument, options);
+      }
+export function useGetEmailImportMetaLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetEmailImportMetaQuery, GetEmailImportMetaQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetEmailImportMetaQuery, GetEmailImportMetaQueryVariables>(GetEmailImportMetaDocument, options);
+        }
+export type GetEmailImportMetaQueryHookResult = ReturnType<typeof useGetEmailImportMetaQuery>;
+export type GetEmailImportMetaLazyQueryHookResult = ReturnType<typeof useGetEmailImportMetaLazyQuery>;
+export type GetEmailImportMetaQueryResult = Apollo.QueryResult<GetEmailImportMetaQuery, GetEmailImportMetaQueryVariables>;
+export const GetGmailLabelsDocument = /*#__PURE__*/ gql`
+    query getGmailLabels($request: GmailInboxOrganizationRequest!) {
+  gmailInboxOrganization(request: $request) {
+    labels {
+      ...ExternalEmailClientLabel
+    }
+  }
+}
+    ${ExternalEmailClientLabelFragmentDoc}`;
+
+/**
+ * __useGetGmailLabelsQuery__
+ *
+ * To run a query within a React component, call `useGetGmailLabelsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetGmailLabelsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetGmailLabelsQuery({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useGetGmailLabelsQuery(baseOptions: Apollo.QueryHookOptions<GetGmailLabelsQuery, GetGmailLabelsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetGmailLabelsQuery, GetGmailLabelsQueryVariables>(GetGmailLabelsDocument, options);
+      }
+export function useGetGmailLabelsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetGmailLabelsQuery, GetGmailLabelsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetGmailLabelsQuery, GetGmailLabelsQueryVariables>(GetGmailLabelsDocument, options);
+        }
+export type GetGmailLabelsQueryHookResult = ReturnType<typeof useGetGmailLabelsQuery>;
+export type GetGmailLabelsLazyQueryHookResult = ReturnType<typeof useGetGmailLabelsLazyQuery>;
+export type GetGmailLabelsQueryResult = Apollo.QueryResult<GetGmailLabelsQuery, GetGmailLabelsQueryVariables>;
+export const GetOutlookCategoriesAndFoldersDocument = /*#__PURE__*/ gql`
+    query getOutlookCategoriesAndFolders($request: OutlookInboxOrganizationRequest!) {
+  outlookInboxOrganization(request: $request) {
+    categories {
+      labelID
+      labelName
+      skiffUserLabel {
+        labelID
+        labelName
+        color
+        variant
+      }
+    }
+    folders {
+      ...ExternalEmailClientLabel
+    }
+  }
+}
+    ${ExternalEmailClientLabelFragmentDoc}`;
+
+/**
+ * __useGetOutlookCategoriesAndFoldersQuery__
+ *
+ * To run a query within a React component, call `useGetOutlookCategoriesAndFoldersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOutlookCategoriesAndFoldersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOutlookCategoriesAndFoldersQuery({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useGetOutlookCategoriesAndFoldersQuery(baseOptions: Apollo.QueryHookOptions<GetOutlookCategoriesAndFoldersQuery, GetOutlookCategoriesAndFoldersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetOutlookCategoriesAndFoldersQuery, GetOutlookCategoriesAndFoldersQueryVariables>(GetOutlookCategoriesAndFoldersDocument, options);
+      }
+export function useGetOutlookCategoriesAndFoldersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetOutlookCategoriesAndFoldersQuery, GetOutlookCategoriesAndFoldersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetOutlookCategoriesAndFoldersQuery, GetOutlookCategoriesAndFoldersQueryVariables>(GetOutlookCategoriesAndFoldersDocument, options);
+        }
+export type GetOutlookCategoriesAndFoldersQueryHookResult = ReturnType<typeof useGetOutlookCategoriesAndFoldersQuery>;
+export type GetOutlookCategoriesAndFoldersLazyQueryHookResult = ReturnType<typeof useGetOutlookCategoriesAndFoldersLazyQuery>;
+export type GetOutlookCategoriesAndFoldersQueryResult = Apollo.QueryResult<GetOutlookCategoriesAndFoldersQuery, GetOutlookCategoriesAndFoldersQueryVariables>;
+export const EnableGmailImportDocument = /*#__PURE__*/ gql`
+    mutation enableGmailImport($request: EnableGmailImportRequest!) {
+  enableGmailImport(request: $request)
+}
+    `;
+export type EnableGmailImportMutationFn = Apollo.MutationFunction<EnableGmailImportMutation, EnableGmailImportMutationVariables>;
+
+/**
+ * __useEnableGmailImportMutation__
+ *
+ * To run a mutation, you first call `useEnableGmailImportMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEnableGmailImportMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [enableGmailImportMutation, { data, loading, error }] = useEnableGmailImportMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useEnableGmailImportMutation(baseOptions?: Apollo.MutationHookOptions<EnableGmailImportMutation, EnableGmailImportMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EnableGmailImportMutation, EnableGmailImportMutationVariables>(EnableGmailImportDocument, options);
+      }
+export type EnableGmailImportMutationHookResult = ReturnType<typeof useEnableGmailImportMutation>;
+export type EnableGmailImportMutationResult = Apollo.MutationResult<EnableGmailImportMutation>;
+export type EnableGmailImportMutationOptions = Apollo.BaseMutationOptions<EnableGmailImportMutation, EnableGmailImportMutationVariables>;
+export const EnableOutlookImportDocument = /*#__PURE__*/ gql`
+    mutation enableOutlookImport($request: EnableOutlookImportRequest!) {
+  enableOutlookImport(request: $request)
+}
+    `;
+export type EnableOutlookImportMutationFn = Apollo.MutationFunction<EnableOutlookImportMutation, EnableOutlookImportMutationVariables>;
+
+/**
+ * __useEnableOutlookImportMutation__
+ *
+ * To run a mutation, you first call `useEnableOutlookImportMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEnableOutlookImportMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [enableOutlookImportMutation, { data, loading, error }] = useEnableOutlookImportMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useEnableOutlookImportMutation(baseOptions?: Apollo.MutationHookOptions<EnableOutlookImportMutation, EnableOutlookImportMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EnableOutlookImportMutation, EnableOutlookImportMutationVariables>(EnableOutlookImportDocument, options);
+      }
+export type EnableOutlookImportMutationHookResult = ReturnType<typeof useEnableOutlookImportMutation>;
+export type EnableOutlookImportMutationResult = Apollo.MutationResult<EnableOutlookImportMutation>;
+export type EnableOutlookImportMutationOptions = Apollo.BaseMutationOptions<EnableOutlookImportMutation, EnableOutlookImportMutationVariables>;
+export const CreateImportSessionDocument = /*#__PURE__*/ gql`
+    mutation createImportSession($request: CreateImportSessionRequest!) {
+  createImportSession(request: $request) {
+    importID
+  }
+}
+    `;
+export type CreateImportSessionMutationFn = Apollo.MutationFunction<CreateImportSessionMutation, CreateImportSessionMutationVariables>;
+
+/**
+ * __useCreateImportSessionMutation__
+ *
+ * To run a mutation, you first call `useCreateImportSessionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateImportSessionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createImportSessionMutation, { data, loading, error }] = useCreateImportSessionMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useCreateImportSessionMutation(baseOptions?: Apollo.MutationHookOptions<CreateImportSessionMutation, CreateImportSessionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateImportSessionMutation, CreateImportSessionMutationVariables>(CreateImportSessionDocument, options);
+      }
+export type CreateImportSessionMutationHookResult = ReturnType<typeof useCreateImportSessionMutation>;
+export type CreateImportSessionMutationResult = Apollo.MutationResult<CreateImportSessionMutation>;
+export type CreateImportSessionMutationOptions = Apollo.BaseMutationOptions<CreateImportSessionMutation, CreateImportSessionMutationVariables>;
+export const GetImportStatusDocument = /*#__PURE__*/ gql`
+    query getImportStatus {
+  importStatus {
+    importID
+    importedEmailCount
+    status
+  }
+}
+    `;
+
+/**
+ * __useGetImportStatusQuery__
+ *
+ * To run a query within a React component, call `useGetImportStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetImportStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetImportStatusQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetImportStatusQuery(baseOptions?: Apollo.QueryHookOptions<GetImportStatusQuery, GetImportStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetImportStatusQuery, GetImportStatusQueryVariables>(GetImportStatusDocument, options);
+      }
+export function useGetImportStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetImportStatusQuery, GetImportStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetImportStatusQuery, GetImportStatusQueryVariables>(GetImportStatusDocument, options);
+        }
+export type GetImportStatusQueryHookResult = ReturnType<typeof useGetImportStatusQuery>;
+export type GetImportStatusLazyQueryHookResult = ReturnType<typeof useGetImportStatusLazyQuery>;
+export type GetImportStatusQueryResult = Apollo.QueryResult<GetImportStatusQuery, GetImportStatusQueryVariables>;
 export const ApplyLabelsDocument = /*#__PURE__*/ gql`
     mutation applyLabels($request: ModifyLabelsRequest) {
   applyLabels(request: $request) {
@@ -4666,6 +6149,39 @@ export function useApplyLabelsMutation(baseOptions?: Apollo.MutationHookOptions<
 export type ApplyLabelsMutationHookResult = ReturnType<typeof useApplyLabelsMutation>;
 export type ApplyLabelsMutationResult = Apollo.MutationResult<ApplyLabelsMutation>;
 export type ApplyLabelsMutationOptions = Apollo.BaseMutationOptions<ApplyLabelsMutation, ApplyLabelsMutationVariables>;
+export const BulkApplyLabelsDocument = /*#__PURE__*/ gql`
+    mutation bulkApplyLabels($request: BulkModifyLabelsRequest) {
+  bulkApplyLabels(request: $request) {
+    jobID
+  }
+}
+    `;
+export type BulkApplyLabelsMutationFn = Apollo.MutationFunction<BulkApplyLabelsMutation, BulkApplyLabelsMutationVariables>;
+
+/**
+ * __useBulkApplyLabelsMutation__
+ *
+ * To run a mutation, you first call `useBulkApplyLabelsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBulkApplyLabelsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [bulkApplyLabelsMutation, { data, loading, error }] = useBulkApplyLabelsMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useBulkApplyLabelsMutation(baseOptions?: Apollo.MutationHookOptions<BulkApplyLabelsMutation, BulkApplyLabelsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<BulkApplyLabelsMutation, BulkApplyLabelsMutationVariables>(BulkApplyLabelsDocument, options);
+      }
+export type BulkApplyLabelsMutationHookResult = ReturnType<typeof useBulkApplyLabelsMutation>;
+export type BulkApplyLabelsMutationResult = Apollo.MutationResult<BulkApplyLabelsMutation>;
+export type BulkApplyLabelsMutationOptions = Apollo.BaseMutationOptions<BulkApplyLabelsMutation, BulkApplyLabelsMutationVariables>;
 export const RemoveLabelsDocument = /*#__PURE__*/ gql`
     mutation removeLabels($request: ModifyLabelsRequest) {
   removeLabels(request: $request) {
@@ -4708,43 +6224,39 @@ export function useRemoveLabelsMutation(baseOptions?: Apollo.MutationHookOptions
 export type RemoveLabelsMutationHookResult = ReturnType<typeof useRemoveLabelsMutation>;
 export type RemoveLabelsMutationResult = Apollo.MutationResult<RemoveLabelsMutation>;
 export type RemoveLabelsMutationOptions = Apollo.BaseMutationOptions<RemoveLabelsMutation, RemoveLabelsMutationVariables>;
-export const UserLabelsDocument = /*#__PURE__*/ gql`
-    query userLabels {
-  userLabels {
-    labelID
-    labelName
-    color
-    variant
+export const BulkRemoveLabelsDocument = /*#__PURE__*/ gql`
+    mutation bulkRemoveLabels($request: BulkModifyLabelsRequest) {
+  bulkRemoveLabels(request: $request) {
+    jobID
   }
 }
     `;
+export type BulkRemoveLabelsMutationFn = Apollo.MutationFunction<BulkRemoveLabelsMutation, BulkRemoveLabelsMutationVariables>;
 
 /**
- * __useUserLabelsQuery__
+ * __useBulkRemoveLabelsMutation__
  *
- * To run a query within a React component, call `useUserLabelsQuery` and pass it any options that fit your needs.
- * When your component renders, `useUserLabelsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
+ * To run a mutation, you first call `useBulkRemoveLabelsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBulkRemoveLabelsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
  *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const { data, loading, error } = useUserLabelsQuery({
+ * const [bulkRemoveLabelsMutation, { data, loading, error }] = useBulkRemoveLabelsMutation({
  *   variables: {
+ *      request: // value for 'request'
  *   },
  * });
  */
-export function useUserLabelsQuery(baseOptions?: Apollo.QueryHookOptions<UserLabelsQuery, UserLabelsQueryVariables>) {
+export function useBulkRemoveLabelsMutation(baseOptions?: Apollo.MutationHookOptions<BulkRemoveLabelsMutation, BulkRemoveLabelsMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<UserLabelsQuery, UserLabelsQueryVariables>(UserLabelsDocument, options);
+        return Apollo.useMutation<BulkRemoveLabelsMutation, BulkRemoveLabelsMutationVariables>(BulkRemoveLabelsDocument, options);
       }
-export function useUserLabelsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserLabelsQuery, UserLabelsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<UserLabelsQuery, UserLabelsQueryVariables>(UserLabelsDocument, options);
-        }
-export type UserLabelsQueryHookResult = ReturnType<typeof useUserLabelsQuery>;
-export type UserLabelsLazyQueryHookResult = ReturnType<typeof useUserLabelsLazyQuery>;
-export type UserLabelsQueryResult = Apollo.QueryResult<UserLabelsQuery, UserLabelsQueryVariables>;
+export type BulkRemoveLabelsMutationHookResult = ReturnType<typeof useBulkRemoveLabelsMutation>;
+export type BulkRemoveLabelsMutationResult = Apollo.MutationResult<BulkRemoveLabelsMutation>;
+export type BulkRemoveLabelsMutationOptions = Apollo.BaseMutationOptions<BulkRemoveLabelsMutation, BulkRemoveLabelsMutationVariables>;
 export const CreateUserLabelDocument = /*#__PURE__*/ gql`
     mutation createUserLabel($request: CreateUserLabelRequest) {
   createUserLabel(request: $request) {
@@ -4848,6 +6360,79 @@ export function useDeleteUserLabelMutation(baseOptions?: Apollo.MutationHookOpti
 export type DeleteUserLabelMutationHookResult = ReturnType<typeof useDeleteUserLabelMutation>;
 export type DeleteUserLabelMutationResult = Apollo.MutationResult<DeleteUserLabelMutation>;
 export type DeleteUserLabelMutationOptions = Apollo.BaseMutationOptions<DeleteUserLabelMutation, DeleteUserLabelMutationVariables>;
+export const UserLabelsDocument = /*#__PURE__*/ gql`
+    query userLabels {
+  userLabels {
+    labelID
+    labelName
+    color
+    variant
+  }
+}
+    `;
+
+/**
+ * __useUserLabelsQuery__
+ *
+ * To run a query within a React component, call `useUserLabelsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserLabelsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserLabelsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUserLabelsQuery(baseOptions?: Apollo.QueryHookOptions<UserLabelsQuery, UserLabelsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserLabelsQuery, UserLabelsQueryVariables>(UserLabelsDocument, options);
+      }
+export function useUserLabelsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserLabelsQuery, UserLabelsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserLabelsQuery, UserLabelsQueryVariables>(UserLabelsDocument, options);
+        }
+export type UserLabelsQueryHookResult = ReturnType<typeof useUserLabelsQuery>;
+export type UserLabelsLazyQueryHookResult = ReturnType<typeof useUserLabelsLazyQuery>;
+export type UserLabelsQueryResult = Apollo.QueryResult<UserLabelsQuery, UserLabelsQueryVariables>;
+export const GetBulkModifyLabelsJobStatusDocument = /*#__PURE__*/ gql`
+    query getBulkModifyLabelsJobStatus($jobID: String!) {
+  bulkModifyLabelsJobStatus(jobID: $jobID) {
+    jobStatus
+    completed
+  }
+}
+    `;
+
+/**
+ * __useGetBulkModifyLabelsJobStatusQuery__
+ *
+ * To run a query within a React component, call `useGetBulkModifyLabelsJobStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBulkModifyLabelsJobStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBulkModifyLabelsJobStatusQuery({
+ *   variables: {
+ *      jobID: // value for 'jobID'
+ *   },
+ * });
+ */
+export function useGetBulkModifyLabelsJobStatusQuery(baseOptions: Apollo.QueryHookOptions<GetBulkModifyLabelsJobStatusQuery, GetBulkModifyLabelsJobStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBulkModifyLabelsJobStatusQuery, GetBulkModifyLabelsJobStatusQueryVariables>(GetBulkModifyLabelsJobStatusDocument, options);
+      }
+export function useGetBulkModifyLabelsJobStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBulkModifyLabelsJobStatusQuery, GetBulkModifyLabelsJobStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBulkModifyLabelsJobStatusQuery, GetBulkModifyLabelsJobStatusQueryVariables>(GetBulkModifyLabelsJobStatusDocument, options);
+        }
+export type GetBulkModifyLabelsJobStatusQueryHookResult = ReturnType<typeof useGetBulkModifyLabelsJobStatusQuery>;
+export type GetBulkModifyLabelsJobStatusLazyQueryHookResult = ReturnType<typeof useGetBulkModifyLabelsJobStatusLazyQuery>;
+export type GetBulkModifyLabelsJobStatusQueryResult = Apollo.QueryResult<GetBulkModifyLabelsJobStatusQuery, GetBulkModifyLabelsJobStatusQueryVariables>;
 export const CreateSrpDocument = /*#__PURE__*/ gql`
     mutation createSrp($request: CreateSrpRequest!) {
   createSrp(request: $request) {
@@ -5349,6 +6934,113 @@ export function useSaveMetadataMutation(baseOptions?: Apollo.MutationHookOptions
 export type SaveMetadataMutationHookResult = ReturnType<typeof useSaveMetadataMutation>;
 export type SaveMetadataMutationResult = Apollo.MutationResult<SaveMetadataMutation>;
 export type SaveMetadataMutationOptions = Apollo.BaseMutationOptions<SaveMetadataMutation, SaveMetadataMutationVariables>;
+export const SaveMetadataNativeDocument = /*#__PURE__*/ gql`
+    mutation saveMetadataNative($request: SaveMetadataRequest!) {
+  saveMetadata(request: $request) {
+    document {
+      ...DocumentNativeInfo
+    }
+  }
+}
+    ${DocumentNativeInfoFragmentDoc}`;
+export type SaveMetadataNativeMutationFn = Apollo.MutationFunction<SaveMetadataNativeMutation, SaveMetadataNativeMutationVariables>;
+
+/**
+ * __useSaveMetadataNativeMutation__
+ *
+ * To run a mutation, you first call `useSaveMetadataNativeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveMetadataNativeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveMetadataNativeMutation, { data, loading, error }] = useSaveMetadataNativeMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useSaveMetadataNativeMutation(baseOptions?: Apollo.MutationHookOptions<SaveMetadataNativeMutation, SaveMetadataNativeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SaveMetadataNativeMutation, SaveMetadataNativeMutationVariables>(SaveMetadataNativeDocument, options);
+      }
+export type SaveMetadataNativeMutationHookResult = ReturnType<typeof useSaveMetadataNativeMutation>;
+export type SaveMetadataNativeMutationResult = Apollo.MutationResult<SaveMetadataNativeMutation>;
+export type SaveMetadataNativeMutationOptions = Apollo.BaseMutationOptions<SaveMetadataNativeMutation, SaveMetadataNativeMutationVariables>;
+export const SaveThumbnailDocument = /*#__PURE__*/ gql`
+    mutation saveThumbnail($request: SaveThumbnailRequest!) {
+  saveThumbnail(request: $request) {
+    document {
+      ...DocumentBasicInfo
+      ...DocumentDecryptedMetadata
+    }
+  }
+}
+    ${DocumentBasicInfoFragmentDoc}
+${DocumentDecryptedMetadataFragmentDoc}`;
+export type SaveThumbnailMutationFn = Apollo.MutationFunction<SaveThumbnailMutation, SaveThumbnailMutationVariables>;
+
+/**
+ * __useSaveThumbnailMutation__
+ *
+ * To run a mutation, you first call `useSaveThumbnailMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveThumbnailMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveThumbnailMutation, { data, loading, error }] = useSaveThumbnailMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useSaveThumbnailMutation(baseOptions?: Apollo.MutationHookOptions<SaveThumbnailMutation, SaveThumbnailMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SaveThumbnailMutation, SaveThumbnailMutationVariables>(SaveThumbnailDocument, options);
+      }
+export type SaveThumbnailMutationHookResult = ReturnType<typeof useSaveThumbnailMutation>;
+export type SaveThumbnailMutationResult = Apollo.MutationResult<SaveThumbnailMutation>;
+export type SaveThumbnailMutationOptions = Apollo.BaseMutationOptions<SaveThumbnailMutation, SaveThumbnailMutationVariables>;
+export const SaveThumbnailNativeDocument = /*#__PURE__*/ gql`
+    mutation saveThumbnailNative($request: SaveThumbnailRequest!) {
+  saveThumbnail(request: $request) {
+    document {
+      ...DocumentNativeInfo
+    }
+  }
+}
+    ${DocumentNativeInfoFragmentDoc}`;
+export type SaveThumbnailNativeMutationFn = Apollo.MutationFunction<SaveThumbnailNativeMutation, SaveThumbnailNativeMutationVariables>;
+
+/**
+ * __useSaveThumbnailNativeMutation__
+ *
+ * To run a mutation, you first call `useSaveThumbnailNativeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveThumbnailNativeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveThumbnailNativeMutation, { data, loading, error }] = useSaveThumbnailNativeMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useSaveThumbnailNativeMutation(baseOptions?: Apollo.MutationHookOptions<SaveThumbnailNativeMutation, SaveThumbnailNativeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SaveThumbnailNativeMutation, SaveThumbnailNativeMutationVariables>(SaveThumbnailNativeDocument, options);
+      }
+export type SaveThumbnailNativeMutationHookResult = ReturnType<typeof useSaveThumbnailNativeMutation>;
+export type SaveThumbnailNativeMutationResult = Apollo.MutationResult<SaveThumbnailNativeMutation>;
+export type SaveThumbnailNativeMutationOptions = Apollo.BaseMutationOptions<SaveThumbnailNativeMutation, SaveThumbnailNativeMutationVariables>;
 export const NewMultipleDocsDocument = /*#__PURE__*/ gql`
     mutation newMultipleDocs($request: [NewDocRequest!]!) {
   newMultipleDocs(request: $request) {
@@ -5757,6 +7449,41 @@ export function useMoveMultipleDocMutation(baseOptions?: Apollo.MutationHookOpti
 export type MoveMultipleDocMutationHookResult = ReturnType<typeof useMoveMultipleDocMutation>;
 export type MoveMultipleDocMutationResult = Apollo.MutationResult<MoveMultipleDocMutation>;
 export type MoveMultipleDocMutationOptions = Apollo.BaseMutationOptions<MoveMultipleDocMutation, MoveMultipleDocMutationVariables>;
+export const MoveMultipleDocNativeDocument = /*#__PURE__*/ gql`
+    mutation moveMultipleDocNative($request: [MoveDocRequest!]!) {
+  moveMultipleDoc(request: $request) {
+    document {
+      ...DocumentNativeInfo
+    }
+  }
+}
+    ${DocumentNativeInfoFragmentDoc}`;
+export type MoveMultipleDocNativeMutationFn = Apollo.MutationFunction<MoveMultipleDocNativeMutation, MoveMultipleDocNativeMutationVariables>;
+
+/**
+ * __useMoveMultipleDocNativeMutation__
+ *
+ * To run a mutation, you first call `useMoveMultipleDocNativeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMoveMultipleDocNativeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [moveMultipleDocNativeMutation, { data, loading, error }] = useMoveMultipleDocNativeMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useMoveMultipleDocNativeMutation(baseOptions?: Apollo.MutationHookOptions<MoveMultipleDocNativeMutation, MoveMultipleDocNativeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MoveMultipleDocNativeMutation, MoveMultipleDocNativeMutationVariables>(MoveMultipleDocNativeDocument, options);
+      }
+export type MoveMultipleDocNativeMutationHookResult = ReturnType<typeof useMoveMultipleDocNativeMutation>;
+export type MoveMultipleDocNativeMutationResult = Apollo.MutationResult<MoveMultipleDocNativeMutation>;
+export type MoveMultipleDocNativeMutationOptions = Apollo.BaseMutationOptions<MoveMultipleDocNativeMutation, MoveMultipleDocNativeMutationVariables>;
 export const CreateCacheElementDocument = /*#__PURE__*/ gql`
     mutation createCacheElement($request: CreateCacheElementRequest!) {
   createCacheElement(request: $request) {
@@ -5934,6 +7661,41 @@ export function useTrashDocsMutation(baseOptions?: Apollo.MutationHookOptions<Tr
 export type TrashDocsMutationHookResult = ReturnType<typeof useTrashDocsMutation>;
 export type TrashDocsMutationResult = Apollo.MutationResult<TrashDocsMutation>;
 export type TrashDocsMutationOptions = Apollo.BaseMutationOptions<TrashDocsMutation, TrashDocsMutationVariables>;
+export const TrashDocsNativeDocument = /*#__PURE__*/ gql`
+    mutation trashDocsNative($request: [TrashDocRequest!]!) {
+  trashDocs(request: $request) {
+    document {
+      ...DocumentNativeInfo
+    }
+  }
+}
+    ${DocumentNativeInfoFragmentDoc}`;
+export type TrashDocsNativeMutationFn = Apollo.MutationFunction<TrashDocsNativeMutation, TrashDocsNativeMutationVariables>;
+
+/**
+ * __useTrashDocsNativeMutation__
+ *
+ * To run a mutation, you first call `useTrashDocsNativeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTrashDocsNativeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [trashDocsNativeMutation, { data, loading, error }] = useTrashDocsNativeMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useTrashDocsNativeMutation(baseOptions?: Apollo.MutationHookOptions<TrashDocsNativeMutation, TrashDocsNativeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<TrashDocsNativeMutation, TrashDocsNativeMutationVariables>(TrashDocsNativeDocument, options);
+      }
+export type TrashDocsNativeMutationHookResult = ReturnType<typeof useTrashDocsNativeMutation>;
+export type TrashDocsNativeMutationResult = Apollo.MutationResult<TrashDocsNativeMutation>;
+export type TrashDocsNativeMutationOptions = Apollo.BaseMutationOptions<TrashDocsNativeMutation, TrashDocsNativeMutationVariables>;
 export const RestoreTrashDocDocument = /*#__PURE__*/ gql`
     mutation restoreTrashDoc($request: TrashDocRequest!) {
   restoreTrashDoc(request: $request) {
@@ -5971,6 +7733,74 @@ export function useRestoreTrashDocMutation(baseOptions?: Apollo.MutationHookOpti
 export type RestoreTrashDocMutationHookResult = ReturnType<typeof useRestoreTrashDocMutation>;
 export type RestoreTrashDocMutationResult = Apollo.MutationResult<RestoreTrashDocMutation>;
 export type RestoreTrashDocMutationOptions = Apollo.BaseMutationOptions<RestoreTrashDocMutation, RestoreTrashDocMutationVariables>;
+export const RestoreTrashDocNativeDocument = /*#__PURE__*/ gql`
+    mutation restoreTrashDocNative($request: TrashDocRequest!) {
+  restoreTrashDoc(request: $request) {
+    document {
+      ...DocumentNativeInfo
+    }
+  }
+}
+    ${DocumentNativeInfoFragmentDoc}`;
+export type RestoreTrashDocNativeMutationFn = Apollo.MutationFunction<RestoreTrashDocNativeMutation, RestoreTrashDocNativeMutationVariables>;
+
+/**
+ * __useRestoreTrashDocNativeMutation__
+ *
+ * To run a mutation, you first call `useRestoreTrashDocNativeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRestoreTrashDocNativeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [restoreTrashDocNativeMutation, { data, loading, error }] = useRestoreTrashDocNativeMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useRestoreTrashDocNativeMutation(baseOptions?: Apollo.MutationHookOptions<RestoreTrashDocNativeMutation, RestoreTrashDocNativeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RestoreTrashDocNativeMutation, RestoreTrashDocNativeMutationVariables>(RestoreTrashDocNativeDocument, options);
+      }
+export type RestoreTrashDocNativeMutationHookResult = ReturnType<typeof useRestoreTrashDocNativeMutation>;
+export type RestoreTrashDocNativeMutationResult = Apollo.MutationResult<RestoreTrashDocNativeMutation>;
+export type RestoreTrashDocNativeMutationOptions = Apollo.BaseMutationOptions<RestoreTrashDocNativeMutation, RestoreTrashDocNativeMutationVariables>;
+export const DuplicateDocDeepDocument = /*#__PURE__*/ gql`
+    mutation duplicateDocDeep($request: DuplicateDocDeepRequest!) {
+  duplicateDocDeep(request: $request) {
+    docID
+  }
+}
+    `;
+export type DuplicateDocDeepMutationFn = Apollo.MutationFunction<DuplicateDocDeepMutation, DuplicateDocDeepMutationVariables>;
+
+/**
+ * __useDuplicateDocDeepMutation__
+ *
+ * To run a mutation, you first call `useDuplicateDocDeepMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDuplicateDocDeepMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [duplicateDocDeepMutation, { data, loading, error }] = useDuplicateDocDeepMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useDuplicateDocDeepMutation(baseOptions?: Apollo.MutationHookOptions<DuplicateDocDeepMutation, DuplicateDocDeepMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DuplicateDocDeepMutation, DuplicateDocDeepMutationVariables>(DuplicateDocDeepDocument, options);
+      }
+export type DuplicateDocDeepMutationHookResult = ReturnType<typeof useDuplicateDocDeepMutation>;
+export type DuplicateDocDeepMutationResult = Apollo.MutationResult<DuplicateDocDeepMutation>;
+export type DuplicateDocDeepMutationOptions = Apollo.BaseMutationOptions<DuplicateDocDeepMutation, DuplicateDocDeepMutationVariables>;
 export const StoreWorkspaceEventDocument = /*#__PURE__*/ gql`
     mutation storeWorkspaceEvent($request: WorkspaceEventRequest!) {
   storeWorkspaceEvent(request: $request)
@@ -6168,6 +7998,37 @@ export function useUploadSpamReportMutation(baseOptions?: Apollo.MutationHookOpt
 export type UploadSpamReportMutationHookResult = ReturnType<typeof useUploadSpamReportMutation>;
 export type UploadSpamReportMutationResult = Apollo.MutationResult<UploadSpamReportMutation>;
 export type UploadSpamReportMutationOptions = Apollo.BaseMutationOptions<UploadSpamReportMutation, UploadSpamReportMutationVariables>;
+export const UnsilenceMultipleEmailAddressesDocument = /*#__PURE__*/ gql`
+    mutation unsilenceMultipleEmailAddresses($request: UnsilenceMultipleEmailAddressesRequest!) {
+  unsilenceMultipleEmailAddresses(request: $request)
+}
+    `;
+export type UnsilenceMultipleEmailAddressesMutationFn = Apollo.MutationFunction<UnsilenceMultipleEmailAddressesMutation, UnsilenceMultipleEmailAddressesMutationVariables>;
+
+/**
+ * __useUnsilenceMultipleEmailAddressesMutation__
+ *
+ * To run a mutation, you first call `useUnsilenceMultipleEmailAddressesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUnsilenceMultipleEmailAddressesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [unsilenceMultipleEmailAddressesMutation, { data, loading, error }] = useUnsilenceMultipleEmailAddressesMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useUnsilenceMultipleEmailAddressesMutation(baseOptions?: Apollo.MutationHookOptions<UnsilenceMultipleEmailAddressesMutation, UnsilenceMultipleEmailAddressesMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UnsilenceMultipleEmailAddressesMutation, UnsilenceMultipleEmailAddressesMutationVariables>(UnsilenceMultipleEmailAddressesDocument, options);
+      }
+export type UnsilenceMultipleEmailAddressesMutationHookResult = ReturnType<typeof useUnsilenceMultipleEmailAddressesMutation>;
+export type UnsilenceMultipleEmailAddressesMutationResult = Apollo.MutationResult<UnsilenceMultipleEmailAddressesMutation>;
+export type UnsilenceMultipleEmailAddressesMutationOptions = Apollo.BaseMutationOptions<UnsilenceMultipleEmailAddressesMutation, UnsilenceMultipleEmailAddressesMutationVariables>;
 export const NotificationClickedDocument = /*#__PURE__*/ gql`
     mutation notificationClicked($request: NotificationClickedRequest!) {
   notificationClicked(request: $request)
@@ -6981,39 +8842,161 @@ export function useSetPdSubscribeFlagMutation(baseOptions?: Apollo.MutationHookO
 export type SetPdSubscribeFlagMutationHookResult = ReturnType<typeof useSetPdSubscribeFlagMutation>;
 export type SetPdSubscribeFlagMutationResult = Apollo.MutationResult<SetPdSubscribeFlagMutation>;
 export type SetPdSubscribeFlagMutationOptions = Apollo.BaseMutationOptions<SetPdSubscribeFlagMutation, SetPdSubscribeFlagMutationVariables>;
-export const CreateUdAliasDocument = /*#__PURE__*/ gql`
-    mutation createUdAlias($request: CreateUdAliasRequest) {
-  createUdAlias(request: $request) {
-    emailAliases
-  }
+export const SetPgpKeyDocument = /*#__PURE__*/ gql`
+    mutation setPGPKey($request: SetPGPKey!) {
+  setPGPKey(request: $request)
 }
     `;
-export type CreateUdAliasMutationFn = Apollo.MutationFunction<CreateUdAliasMutation, CreateUdAliasMutationVariables>;
+export type SetPgpKeyMutationFn = Apollo.MutationFunction<SetPgpKeyMutation, SetPgpKeyMutationVariables>;
 
 /**
- * __useCreateUdAliasMutation__
+ * __useSetPgpKeyMutation__
  *
- * To run a mutation, you first call `useCreateUdAliasMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateUdAliasMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useSetPgpKeyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetPgpKeyMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createUdAliasMutation, { data, loading, error }] = useCreateUdAliasMutation({
+ * const [setPgpKeyMutation, { data, loading, error }] = useSetPgpKeyMutation({
  *   variables: {
  *      request: // value for 'request'
  *   },
  * });
  */
-export function useCreateUdAliasMutation(baseOptions?: Apollo.MutationHookOptions<CreateUdAliasMutation, CreateUdAliasMutationVariables>) {
+export function useSetPgpKeyMutation(baseOptions?: Apollo.MutationHookOptions<SetPgpKeyMutation, SetPgpKeyMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateUdAliasMutation, CreateUdAliasMutationVariables>(CreateUdAliasDocument, options);
+        return Apollo.useMutation<SetPgpKeyMutation, SetPgpKeyMutationVariables>(SetPgpKeyDocument, options);
       }
-export type CreateUdAliasMutationHookResult = ReturnType<typeof useCreateUdAliasMutation>;
-export type CreateUdAliasMutationResult = Apollo.MutationResult<CreateUdAliasMutation>;
-export type CreateUdAliasMutationOptions = Apollo.BaseMutationOptions<CreateUdAliasMutation, CreateUdAliasMutationVariables>;
+export type SetPgpKeyMutationHookResult = ReturnType<typeof useSetPgpKeyMutation>;
+export type SetPgpKeyMutationResult = Apollo.MutationResult<SetPgpKeyMutation>;
+export type SetPgpKeyMutationOptions = Apollo.BaseMutationOptions<SetPgpKeyMutation, SetPgpKeyMutationVariables>;
+export const SendAnonymousSubdomainTutorialEmailDocument = /*#__PURE__*/ gql`
+    mutation sendAnonymousSubdomainTutorialEmail($email: String!) {
+  sendAnonymousSubdomainTutorialEmail(email: $email)
+}
+    `;
+export type SendAnonymousSubdomainTutorialEmailMutationFn = Apollo.MutationFunction<SendAnonymousSubdomainTutorialEmailMutation, SendAnonymousSubdomainTutorialEmailMutationVariables>;
+
+/**
+ * __useSendAnonymousSubdomainTutorialEmailMutation__
+ *
+ * To run a mutation, you first call `useSendAnonymousSubdomainTutorialEmailMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendAnonymousSubdomainTutorialEmailMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendAnonymousSubdomainTutorialEmailMutation, { data, loading, error }] = useSendAnonymousSubdomainTutorialEmailMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useSendAnonymousSubdomainTutorialEmailMutation(baseOptions?: Apollo.MutationHookOptions<SendAnonymousSubdomainTutorialEmailMutation, SendAnonymousSubdomainTutorialEmailMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SendAnonymousSubdomainTutorialEmailMutation, SendAnonymousSubdomainTutorialEmailMutationVariables>(SendAnonymousSubdomainTutorialEmailDocument, options);
+      }
+export type SendAnonymousSubdomainTutorialEmailMutationHookResult = ReturnType<typeof useSendAnonymousSubdomainTutorialEmailMutation>;
+export type SendAnonymousSubdomainTutorialEmailMutationResult = Apollo.MutationResult<SendAnonymousSubdomainTutorialEmailMutation>;
+export type SendAnonymousSubdomainTutorialEmailMutationOptions = Apollo.BaseMutationOptions<SendAnonymousSubdomainTutorialEmailMutation, SendAnonymousSubdomainTutorialEmailMutationVariables>;
+export const CreateQuickAliasDomainDocument = /*#__PURE__*/ gql`
+    mutation createQuickAliasDomain($request: CreateAnonymousSubdomainInput!) {
+  createAnonymousSubdomain(request: $request)
+}
+    `;
+export type CreateQuickAliasDomainMutationFn = Apollo.MutationFunction<CreateQuickAliasDomainMutation, CreateQuickAliasDomainMutationVariables>;
+
+/**
+ * __useCreateQuickAliasDomainMutation__
+ *
+ * To run a mutation, you first call `useCreateQuickAliasDomainMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateQuickAliasDomainMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createQuickAliasDomainMutation, { data, loading, error }] = useCreateQuickAliasDomainMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useCreateQuickAliasDomainMutation(baseOptions?: Apollo.MutationHookOptions<CreateQuickAliasDomainMutation, CreateQuickAliasDomainMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateQuickAliasDomainMutation, CreateQuickAliasDomainMutationVariables>(CreateQuickAliasDomainDocument, options);
+      }
+export type CreateQuickAliasDomainMutationHookResult = ReturnType<typeof useCreateQuickAliasDomainMutation>;
+export type CreateQuickAliasDomainMutationResult = Apollo.MutationResult<CreateQuickAliasDomainMutation>;
+export type CreateQuickAliasDomainMutationOptions = Apollo.BaseMutationOptions<CreateQuickAliasDomainMutation, CreateQuickAliasDomainMutationVariables>;
+export const DeleteQuickAliasDomainDocument = /*#__PURE__*/ gql`
+    mutation deleteQuickAliasDomain($userDomainID: String!) {
+  deleteAnonymousSubdomain(userDomainID: $userDomainID)
+}
+    `;
+export type DeleteQuickAliasDomainMutationFn = Apollo.MutationFunction<DeleteQuickAliasDomainMutation, DeleteQuickAliasDomainMutationVariables>;
+
+/**
+ * __useDeleteQuickAliasDomainMutation__
+ *
+ * To run a mutation, you first call `useDeleteQuickAliasDomainMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteQuickAliasDomainMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteQuickAliasDomainMutation, { data, loading, error }] = useDeleteQuickAliasDomainMutation({
+ *   variables: {
+ *      userDomainID: // value for 'userDomainID'
+ *   },
+ * });
+ */
+export function useDeleteQuickAliasDomainMutation(baseOptions?: Apollo.MutationHookOptions<DeleteQuickAliasDomainMutation, DeleteQuickAliasDomainMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteQuickAliasDomainMutation, DeleteQuickAliasDomainMutationVariables>(DeleteQuickAliasDomainDocument, options);
+      }
+export type DeleteQuickAliasDomainMutationHookResult = ReturnType<typeof useDeleteQuickAliasDomainMutation>;
+export type DeleteQuickAliasDomainMutationResult = Apollo.MutationResult<DeleteQuickAliasDomainMutation>;
+export type DeleteQuickAliasDomainMutationOptions = Apollo.BaseMutationOptions<DeleteQuickAliasDomainMutation, DeleteQuickAliasDomainMutationVariables>;
+export const UpdateQuickAliasInfoDocument = /*#__PURE__*/ gql`
+    mutation updateQuickAliasInfo($request: UpdateQuickAliasInfoInput!) {
+  updateQuickAliasInfo(request: $request)
+}
+    `;
+export type UpdateQuickAliasInfoMutationFn = Apollo.MutationFunction<UpdateQuickAliasInfoMutation, UpdateQuickAliasInfoMutationVariables>;
+
+/**
+ * __useUpdateQuickAliasInfoMutation__
+ *
+ * To run a mutation, you first call `useUpdateQuickAliasInfoMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateQuickAliasInfoMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateQuickAliasInfoMutation, { data, loading, error }] = useUpdateQuickAliasInfoMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useUpdateQuickAliasInfoMutation(baseOptions?: Apollo.MutationHookOptions<UpdateQuickAliasInfoMutation, UpdateQuickAliasInfoMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateQuickAliasInfoMutation, UpdateQuickAliasInfoMutationVariables>(UpdateQuickAliasInfoDocument, options);
+      }
+export type UpdateQuickAliasInfoMutationHookResult = ReturnType<typeof useUpdateQuickAliasInfoMutation>;
+export type UpdateQuickAliasInfoMutationResult = Apollo.MutationResult<UpdateQuickAliasInfoMutation>;
+export type UpdateQuickAliasInfoMutationOptions = Apollo.BaseMutationOptions<UpdateQuickAliasInfoMutation, UpdateQuickAliasInfoMutationVariables>;
 export const CreateUploadAvatarLinkDocument = /*#__PURE__*/ gql`
     mutation createUploadAvatarLink {
   createUploadAvatarLink {
@@ -7269,6 +9252,37 @@ export function useVerifyWebAuthnRegistrationMutation(baseOptions?: Apollo.Mutat
 export type VerifyWebAuthnRegistrationMutationHookResult = ReturnType<typeof useVerifyWebAuthnRegistrationMutation>;
 export type VerifyWebAuthnRegistrationMutationResult = Apollo.MutationResult<VerifyWebAuthnRegistrationMutation>;
 export type VerifyWebAuthnRegistrationMutationOptions = Apollo.BaseMutationOptions<VerifyWebAuthnRegistrationMutation, VerifyWebAuthnRegistrationMutationVariables>;
+export const RenameWebauthnDeviceDocument = /*#__PURE__*/ gql`
+    mutation renameWebauthnDevice($request: RenameWebAuthnDeviceRequest!) {
+  renameWebAuthnDevice(request: $request)
+}
+    `;
+export type RenameWebauthnDeviceMutationFn = Apollo.MutationFunction<RenameWebauthnDeviceMutation, RenameWebauthnDeviceMutationVariables>;
+
+/**
+ * __useRenameWebauthnDeviceMutation__
+ *
+ * To run a mutation, you first call `useRenameWebauthnDeviceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRenameWebauthnDeviceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [renameWebauthnDeviceMutation, { data, loading, error }] = useRenameWebauthnDeviceMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useRenameWebauthnDeviceMutation(baseOptions?: Apollo.MutationHookOptions<RenameWebauthnDeviceMutation, RenameWebauthnDeviceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RenameWebauthnDeviceMutation, RenameWebauthnDeviceMutationVariables>(RenameWebauthnDeviceDocument, options);
+      }
+export type RenameWebauthnDeviceMutationHookResult = ReturnType<typeof useRenameWebauthnDeviceMutation>;
+export type RenameWebauthnDeviceMutationResult = Apollo.MutationResult<RenameWebauthnDeviceMutation>;
+export type RenameWebauthnDeviceMutationOptions = Apollo.BaseMutationOptions<RenameWebauthnDeviceMutation, RenameWebauthnDeviceMutationVariables>;
 export const GetCheckoutSessionUrlOrStripeUpdateStatusDocument = /*#__PURE__*/ gql`
     query getCheckoutSessionUrlOrStripeUpdateStatus($request: GetCheckoutSessionRequest!) {
   checkoutPortal(request: $request) {
@@ -7283,6 +9297,8 @@ export const GetCheckoutSessionUrlOrStripeUpdateStatusDocument = /*#__PURE__*/ g
       userLabels
       userFolders
       userMailFilters
+      quickAliases
+      quickAliasSubdomains
     }
   }
 }
@@ -7421,6 +9437,40 @@ export function useGetBillingPortalSessionUrlLazyQuery(baseOptions?: Apollo.Lazy
 export type GetBillingPortalSessionUrlQueryHookResult = ReturnType<typeof useGetBillingPortalSessionUrlQuery>;
 export type GetBillingPortalSessionUrlLazyQueryHookResult = ReturnType<typeof useGetBillingPortalSessionUrlLazyQuery>;
 export type GetBillingPortalSessionUrlQueryResult = Apollo.QueryResult<GetBillingPortalSessionUrlQuery, GetBillingPortalSessionUrlQueryVariables>;
+export const GetOrCreateStripeCustomerDocument = /*#__PURE__*/ gql`
+    query getOrCreateStripeCustomer {
+  getOrCreateStripeCustomer {
+    stripeCustomerID
+  }
+}
+    `;
+
+/**
+ * __useGetOrCreateStripeCustomerQuery__
+ *
+ * To run a query within a React component, call `useGetOrCreateStripeCustomerQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOrCreateStripeCustomerQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOrCreateStripeCustomerQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetOrCreateStripeCustomerQuery(baseOptions?: Apollo.QueryHookOptions<GetOrCreateStripeCustomerQuery, GetOrCreateStripeCustomerQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetOrCreateStripeCustomerQuery, GetOrCreateStripeCustomerQueryVariables>(GetOrCreateStripeCustomerDocument, options);
+      }
+export function useGetOrCreateStripeCustomerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetOrCreateStripeCustomerQuery, GetOrCreateStripeCustomerQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetOrCreateStripeCustomerQuery, GetOrCreateStripeCustomerQueryVariables>(GetOrCreateStripeCustomerDocument, options);
+        }
+export type GetOrCreateStripeCustomerQueryHookResult = ReturnType<typeof useGetOrCreateStripeCustomerQuery>;
+export type GetOrCreateStripeCustomerLazyQueryHookResult = ReturnType<typeof useGetOrCreateStripeCustomerLazyQuery>;
+export type GetOrCreateStripeCustomerQueryResult = Apollo.QueryResult<GetOrCreateStripeCustomerQuery, GetOrCreateStripeCustomerQueryVariables>;
 export const AdjustBusinessPlanDocument = /*#__PURE__*/ gql`
     mutation adjustBusinessPlan($request: AdjustBusinessPlanRequest!) {
   adjustBusinessPlan(request: $request) {
@@ -7455,49 +9505,220 @@ export function useAdjustBusinessPlanMutation(baseOptions?: Apollo.MutationHookO
 export type AdjustBusinessPlanMutationHookResult = ReturnType<typeof useAdjustBusinessPlanMutation>;
 export type AdjustBusinessPlanMutationResult = Apollo.MutationResult<AdjustBusinessPlanMutation>;
 export type AdjustBusinessPlanMutationOptions = Apollo.BaseMutationOptions<AdjustBusinessPlanMutation, AdjustBusinessPlanMutationVariables>;
-export const GetCollaboratorsDocument = /*#__PURE__*/ gql`
-    query getCollaborators($request: GetDocumentRequest!) {
-  document(request: $request) {
-    ...DocumentBasicInfo
-    ...DocumentDecryptedMetadata
-    ...DocumentCollaborators
-    ...DocumentTeam
-    ...DocumentInvites
+export const RequestAppStoreTestNotificationDocument = /*#__PURE__*/ gql`
+    query requestAppStoreTestNotification {
+  requestAppStoreTestNotification {
+    testNotificationToken
   }
 }
-    ${DocumentBasicInfoFragmentDoc}
-${DocumentDecryptedMetadataFragmentDoc}
-${DocumentCollaboratorsFragmentDoc}
-${DocumentTeamFragmentDoc}
-${DocumentInvitesFragmentDoc}`;
+    `;
 
 /**
- * __useGetCollaboratorsQuery__
+ * __useRequestAppStoreTestNotificationQuery__
  *
- * To run a query within a React component, call `useGetCollaboratorsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetCollaboratorsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useRequestAppStoreTestNotificationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRequestAppStoreTestNotificationQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetCollaboratorsQuery({
+ * const { data, loading, error } = useRequestAppStoreTestNotificationQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRequestAppStoreTestNotificationQuery(baseOptions?: Apollo.QueryHookOptions<RequestAppStoreTestNotificationQuery, RequestAppStoreTestNotificationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<RequestAppStoreTestNotificationQuery, RequestAppStoreTestNotificationQueryVariables>(RequestAppStoreTestNotificationDocument, options);
+      }
+export function useRequestAppStoreTestNotificationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<RequestAppStoreTestNotificationQuery, RequestAppStoreTestNotificationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<RequestAppStoreTestNotificationQuery, RequestAppStoreTestNotificationQueryVariables>(RequestAppStoreTestNotificationDocument, options);
+        }
+export type RequestAppStoreTestNotificationQueryHookResult = ReturnType<typeof useRequestAppStoreTestNotificationQuery>;
+export type RequestAppStoreTestNotificationLazyQueryHookResult = ReturnType<typeof useRequestAppStoreTestNotificationLazyQuery>;
+export type RequestAppStoreTestNotificationQueryResult = Apollo.QueryResult<RequestAppStoreTestNotificationQuery, RequestAppStoreTestNotificationQueryVariables>;
+export const GetTestNotificationStatusDocument = /*#__PURE__*/ gql`
+    query getTestNotificationStatus($request: GetAppleTestNotificationStatusInput!) {
+  getAppleTestNotificationStatus(request: $request) {
+    signedPayload
+    sendAttempts {
+      attemptDate
+      sendAttemptResult
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetTestNotificationStatusQuery__
+ *
+ * To run a query within a React component, call `useGetTestNotificationStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTestNotificationStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTestNotificationStatusQuery({
  *   variables: {
  *      request: // value for 'request'
  *   },
  * });
  */
-export function useGetCollaboratorsQuery(baseOptions: Apollo.QueryHookOptions<GetCollaboratorsQuery, GetCollaboratorsQueryVariables>) {
+export function useGetTestNotificationStatusQuery(baseOptions: Apollo.QueryHookOptions<GetTestNotificationStatusQuery, GetTestNotificationStatusQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetCollaboratorsQuery, GetCollaboratorsQueryVariables>(GetCollaboratorsDocument, options);
+        return Apollo.useQuery<GetTestNotificationStatusQuery, GetTestNotificationStatusQueryVariables>(GetTestNotificationStatusDocument, options);
       }
-export function useGetCollaboratorsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCollaboratorsQuery, GetCollaboratorsQueryVariables>) {
+export function useGetTestNotificationStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTestNotificationStatusQuery, GetTestNotificationStatusQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetCollaboratorsQuery, GetCollaboratorsQueryVariables>(GetCollaboratorsDocument, options);
+          return Apollo.useLazyQuery<GetTestNotificationStatusQuery, GetTestNotificationStatusQueryVariables>(GetTestNotificationStatusDocument, options);
         }
-export type GetCollaboratorsQueryHookResult = ReturnType<typeof useGetCollaboratorsQuery>;
-export type GetCollaboratorsLazyQueryHookResult = ReturnType<typeof useGetCollaboratorsLazyQuery>;
-export type GetCollaboratorsQueryResult = Apollo.QueryResult<GetCollaboratorsQuery, GetCollaboratorsQueryVariables>;
+export type GetTestNotificationStatusQueryHookResult = ReturnType<typeof useGetTestNotificationStatusQuery>;
+export type GetTestNotificationStatusLazyQueryHookResult = ReturnType<typeof useGetTestNotificationStatusLazyQuery>;
+export type GetTestNotificationStatusQueryResult = Apollo.QueryResult<GetTestNotificationStatusQuery, GetTestNotificationStatusQueryVariables>;
+export const ValidateOriginalTransactionIdMatchesUserDocument = /*#__PURE__*/ gql`
+    query validateOriginalTransactionIdMatchesUser($request: ValidateOriginalTransactionIdMatchesUserInput!) {
+  validateOriginalTransactionIdMatchesUser(request: $request)
+}
+    `;
+
+/**
+ * __useValidateOriginalTransactionIdMatchesUserQuery__
+ *
+ * To run a query within a React component, call `useValidateOriginalTransactionIdMatchesUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useValidateOriginalTransactionIdMatchesUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useValidateOriginalTransactionIdMatchesUserQuery({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useValidateOriginalTransactionIdMatchesUserQuery(baseOptions: Apollo.QueryHookOptions<ValidateOriginalTransactionIdMatchesUserQuery, ValidateOriginalTransactionIdMatchesUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ValidateOriginalTransactionIdMatchesUserQuery, ValidateOriginalTransactionIdMatchesUserQueryVariables>(ValidateOriginalTransactionIdMatchesUserDocument, options);
+      }
+export function useValidateOriginalTransactionIdMatchesUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ValidateOriginalTransactionIdMatchesUserQuery, ValidateOriginalTransactionIdMatchesUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ValidateOriginalTransactionIdMatchesUserQuery, ValidateOriginalTransactionIdMatchesUserQueryVariables>(ValidateOriginalTransactionIdMatchesUserDocument, options);
+        }
+export type ValidateOriginalTransactionIdMatchesUserQueryHookResult = ReturnType<typeof useValidateOriginalTransactionIdMatchesUserQuery>;
+export type ValidateOriginalTransactionIdMatchesUserLazyQueryHookResult = ReturnType<typeof useValidateOriginalTransactionIdMatchesUserLazyQuery>;
+export type ValidateOriginalTransactionIdMatchesUserQueryResult = Apollo.QueryResult<ValidateOriginalTransactionIdMatchesUserQuery, ValidateOriginalTransactionIdMatchesUserQueryVariables>;
+export const ValidateAppStoreSubscriptionRequestDocument = /*#__PURE__*/ gql`
+    mutation ValidateAppStoreSubscriptionRequest($request: ValidateAppStoreSubscriptionRequest!) {
+  ValidateAppStoreSubscriptionRequest(request: $request)
+}
+    `;
+export type ValidateAppStoreSubscriptionRequestMutationFn = Apollo.MutationFunction<ValidateAppStoreSubscriptionRequestMutation, ValidateAppStoreSubscriptionRequestMutationVariables>;
+
+/**
+ * __useValidateAppStoreSubscriptionRequestMutation__
+ *
+ * To run a mutation, you first call `useValidateAppStoreSubscriptionRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useValidateAppStoreSubscriptionRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [validateAppStoreSubscriptionRequestMutation, { data, loading, error }] = useValidateAppStoreSubscriptionRequestMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useValidateAppStoreSubscriptionRequestMutation(baseOptions?: Apollo.MutationHookOptions<ValidateAppStoreSubscriptionRequestMutation, ValidateAppStoreSubscriptionRequestMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ValidateAppStoreSubscriptionRequestMutation, ValidateAppStoreSubscriptionRequestMutationVariables>(ValidateAppStoreSubscriptionRequestDocument, options);
+      }
+export type ValidateAppStoreSubscriptionRequestMutationHookResult = ReturnType<typeof useValidateAppStoreSubscriptionRequestMutation>;
+export type ValidateAppStoreSubscriptionRequestMutationResult = Apollo.MutationResult<ValidateAppStoreSubscriptionRequestMutation>;
+export type ValidateAppStoreSubscriptionRequestMutationOptions = Apollo.BaseMutationOptions<ValidateAppStoreSubscriptionRequestMutation, ValidateAppStoreSubscriptionRequestMutationVariables>;
+export const GetAppleSubscriptionPlansDocument = /*#__PURE__*/ gql`
+    query getAppleSubscriptionPlans {
+  getAppleSubscriptionPlans {
+    plans {
+      tierName
+      monthly
+      yearly
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAppleSubscriptionPlansQuery__
+ *
+ * To run a query within a React component, call `useGetAppleSubscriptionPlansQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAppleSubscriptionPlansQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAppleSubscriptionPlansQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAppleSubscriptionPlansQuery(baseOptions?: Apollo.QueryHookOptions<GetAppleSubscriptionPlansQuery, GetAppleSubscriptionPlansQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAppleSubscriptionPlansQuery, GetAppleSubscriptionPlansQueryVariables>(GetAppleSubscriptionPlansDocument, options);
+      }
+export function useGetAppleSubscriptionPlansLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAppleSubscriptionPlansQuery, GetAppleSubscriptionPlansQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAppleSubscriptionPlansQuery, GetAppleSubscriptionPlansQueryVariables>(GetAppleSubscriptionPlansDocument, options);
+        }
+export type GetAppleSubscriptionPlansQueryHookResult = ReturnType<typeof useGetAppleSubscriptionPlansQuery>;
+export type GetAppleSubscriptionPlansLazyQueryHookResult = ReturnType<typeof useGetAppleSubscriptionPlansLazyQuery>;
+export type GetAppleSubscriptionPlansQueryResult = Apollo.QueryResult<GetAppleSubscriptionPlansQuery, GetAppleSubscriptionPlansQueryVariables>;
+export const GetGoogleSubscriptionPlansDocument = /*#__PURE__*/ gql`
+    query getGoogleSubscriptionPlans {
+  getGoogleSubscriptionPlans {
+    plans {
+      tierName
+      skuName
+      skuMonthlyOfferId
+      skuAnnualOfferId
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetGoogleSubscriptionPlansQuery__
+ *
+ * To run a query within a React component, call `useGetGoogleSubscriptionPlansQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetGoogleSubscriptionPlansQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetGoogleSubscriptionPlansQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetGoogleSubscriptionPlansQuery(baseOptions?: Apollo.QueryHookOptions<GetGoogleSubscriptionPlansQuery, GetGoogleSubscriptionPlansQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetGoogleSubscriptionPlansQuery, GetGoogleSubscriptionPlansQueryVariables>(GetGoogleSubscriptionPlansDocument, options);
+      }
+export function useGetGoogleSubscriptionPlansLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetGoogleSubscriptionPlansQuery, GetGoogleSubscriptionPlansQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetGoogleSubscriptionPlansQuery, GetGoogleSubscriptionPlansQueryVariables>(GetGoogleSubscriptionPlansDocument, options);
+        }
+export type GetGoogleSubscriptionPlansQueryHookResult = ReturnType<typeof useGetGoogleSubscriptionPlansQuery>;
+export type GetGoogleSubscriptionPlansLazyQueryHookResult = ReturnType<typeof useGetGoogleSubscriptionPlansLazyQuery>;
+export type GetGoogleSubscriptionPlansQueryResult = Apollo.QueryResult<GetGoogleSubscriptionPlansQuery, GetGoogleSubscriptionPlansQueryVariables>;
 export const GetActiveUsersDocument = /*#__PURE__*/ gql`
     query getActiveUsers($request: GetDocumentRequest!) {
   document(request: $request) {
@@ -7754,6 +9975,41 @@ export function useGetDocumentFullLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
 export type GetDocumentFullQueryHookResult = ReturnType<typeof useGetDocumentFullQuery>;
 export type GetDocumentFullLazyQueryHookResult = ReturnType<typeof useGetDocumentFullLazyQuery>;
 export type GetDocumentFullQueryResult = Apollo.QueryResult<GetDocumentFullQuery, GetDocumentFullQueryVariables>;
+export const GetNativeDocumentsDocument = /*#__PURE__*/ gql`
+    query getNativeDocuments($request: GetDocumentsRequest!) {
+  documents(request: $request) {
+    ...DocumentNativeInfo
+  }
+}
+    ${DocumentNativeInfoFragmentDoc}`;
+
+/**
+ * __useGetNativeDocumentsQuery__
+ *
+ * To run a query within a React component, call `useGetNativeDocumentsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetNativeDocumentsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetNativeDocumentsQuery({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useGetNativeDocumentsQuery(baseOptions: Apollo.QueryHookOptions<GetNativeDocumentsQuery, GetNativeDocumentsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetNativeDocumentsQuery, GetNativeDocumentsQueryVariables>(GetNativeDocumentsDocument, options);
+      }
+export function useGetNativeDocumentsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetNativeDocumentsQuery, GetNativeDocumentsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetNativeDocumentsQuery, GetNativeDocumentsQueryVariables>(GetNativeDocumentsDocument, options);
+        }
+export type GetNativeDocumentsQueryHookResult = ReturnType<typeof useGetNativeDocumentsQuery>;
+export type GetNativeDocumentsLazyQueryHookResult = ReturnType<typeof useGetNativeDocumentsLazyQuery>;
+export type GetNativeDocumentsQueryResult = Apollo.QueryResult<GetNativeDocumentsQuery, GetNativeDocumentsQueryVariables>;
 export const GetDocumentPublicOrgDataDocument = /*#__PURE__*/ gql`
     query getDocumentPublicOrgData($request: GetDocumentRequest!) {
   document(request: $request) {
@@ -7954,12 +10210,18 @@ export const GetAccountMailDataDocument = /*#__PURE__*/ gql`
   unread(label: $label)
   currentUser {
     ...UserProfileOrgData
+    ...UserOrgPersonalTeamData
+    ...UserOrgEveryoneTeamData
     userID
     defaultEmailAlias
     emailAliases
+    recoveryEmail
+    unverifiedRecoveryEmail
   }
 }
-    ${UserProfileOrgDataFragmentDoc}`;
+    ${UserProfileOrgDataFragmentDoc}
+${UserOrgPersonalTeamDataFragmentDoc}
+${UserOrgEveryoneTeamDataFragmentDoc}`;
 
 /**
  * __useGetAccountMailDataQuery__
@@ -7988,6 +10250,131 @@ export function useGetAccountMailDataLazyQuery(baseOptions?: Apollo.LazyQueryHoo
 export type GetAccountMailDataQueryHookResult = ReturnType<typeof useGetAccountMailDataQuery>;
 export type GetAccountMailDataLazyQueryHookResult = ReturnType<typeof useGetAccountMailDataLazyQuery>;
 export type GetAccountMailDataQueryResult = Apollo.QueryResult<GetAccountMailDataQuery, GetAccountMailDataQueryVariables>;
+export const GetNumMailboxThreadsDocument = /*#__PURE__*/ gql`
+    query getNumMailboxThreads($label: String!) {
+  numMailboxThreads(label: $label)
+}
+    `;
+
+/**
+ * __useGetNumMailboxThreadsQuery__
+ *
+ * To run a query within a React component, call `useGetNumMailboxThreadsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetNumMailboxThreadsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetNumMailboxThreadsQuery({
+ *   variables: {
+ *      label: // value for 'label'
+ *   },
+ * });
+ */
+export function useGetNumMailboxThreadsQuery(baseOptions: Apollo.QueryHookOptions<GetNumMailboxThreadsQuery, GetNumMailboxThreadsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetNumMailboxThreadsQuery, GetNumMailboxThreadsQueryVariables>(GetNumMailboxThreadsDocument, options);
+      }
+export function useGetNumMailboxThreadsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetNumMailboxThreadsQuery, GetNumMailboxThreadsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetNumMailboxThreadsQuery, GetNumMailboxThreadsQueryVariables>(GetNumMailboxThreadsDocument, options);
+        }
+export type GetNumMailboxThreadsQueryHookResult = ReturnType<typeof useGetNumMailboxThreadsQuery>;
+export type GetNumMailboxThreadsLazyQueryHookResult = ReturnType<typeof useGetNumMailboxThreadsLazyQuery>;
+export type GetNumMailboxThreadsQueryResult = Apollo.QueryResult<GetNumMailboxThreadsQuery, GetNumMailboxThreadsQueryVariables>;
+export const GetSilenceSenderSuggestionsDocument = /*#__PURE__*/ gql`
+    query getSilenceSenderSuggestions {
+  silenceSenderSuggestions {
+    silenceSenderDomains {
+      domain
+      senders {
+        sender
+        messageCount
+        totalBytes
+      }
+    }
+    silenceSenderIndividuals {
+      sender
+      messageCount
+      totalBytes
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetSilenceSenderSuggestionsQuery__
+ *
+ * To run a query within a React component, call `useGetSilenceSenderSuggestionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSilenceSenderSuggestionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSilenceSenderSuggestionsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetSilenceSenderSuggestionsQuery(baseOptions?: Apollo.QueryHookOptions<GetSilenceSenderSuggestionsQuery, GetSilenceSenderSuggestionsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetSilenceSenderSuggestionsQuery, GetSilenceSenderSuggestionsQueryVariables>(GetSilenceSenderSuggestionsDocument, options);
+      }
+export function useGetSilenceSenderSuggestionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSilenceSenderSuggestionsQuery, GetSilenceSenderSuggestionsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetSilenceSenderSuggestionsQuery, GetSilenceSenderSuggestionsQueryVariables>(GetSilenceSenderSuggestionsDocument, options);
+        }
+export type GetSilenceSenderSuggestionsQueryHookResult = ReturnType<typeof useGetSilenceSenderSuggestionsQuery>;
+export type GetSilenceSenderSuggestionsLazyQueryHookResult = ReturnType<typeof useGetSilenceSenderSuggestionsLazyQuery>;
+export type GetSilenceSenderSuggestionsQueryResult = Apollo.QueryResult<GetSilenceSenderSuggestionsQuery, GetSilenceSenderSuggestionsQueryVariables>;
+export const GetSilencedSendersDocument = /*#__PURE__*/ gql`
+    query getSilencedSenders {
+  silencedSenders {
+    silenceSenderDomains {
+      domain
+      senders {
+        sender
+        messageCount
+        totalBytes
+      }
+    }
+    silenceSenderIndividuals {
+      sender
+      messageCount
+      totalBytes
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetSilencedSendersQuery__
+ *
+ * To run a query within a React component, call `useGetSilencedSendersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSilencedSendersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSilencedSendersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetSilencedSendersQuery(baseOptions?: Apollo.QueryHookOptions<GetSilencedSendersQuery, GetSilencedSendersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetSilencedSendersQuery, GetSilencedSendersQueryVariables>(GetSilencedSendersDocument, options);
+      }
+export function useGetSilencedSendersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSilencedSendersQuery, GetSilencedSendersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetSilencedSendersQuery, GetSilencedSendersQueryVariables>(GetSilencedSendersDocument, options);
+        }
+export type GetSilencedSendersQueryHookResult = ReturnType<typeof useGetSilencedSendersQuery>;
+export type GetSilencedSendersLazyQueryHookResult = ReturnType<typeof useGetSilencedSendersLazyQuery>;
+export type GetSilencedSendersQueryResult = Apollo.QueryResult<GetSilencedSendersQuery, GetSilencedSendersQueryVariables>;
 export const GetSessionCacheDocument = /*#__PURE__*/ gql`
     query getSessionCache {
   sessionCache {
@@ -8107,6 +10494,56 @@ export function useGetSessionCacheChallengeLazyQuery(baseOptions?: Apollo.LazyQu
 export type GetSessionCacheChallengeQueryHookResult = ReturnType<typeof useGetSessionCacheChallengeQuery>;
 export type GetSessionCacheChallengeLazyQueryHookResult = ReturnType<typeof useGetSessionCacheChallengeLazyQuery>;
 export type GetSessionCacheChallengeQueryResult = Apollo.QueryResult<GetSessionCacheChallengeQuery, GetSessionCacheChallengeQueryVariables>;
+export const GetPgpInfoDocument = /*#__PURE__*/ gql`
+    query getPgpInfo($emailAlias: String!, $allKeys: Boolean) {
+  pgpInfo(emailAlias: $emailAlias, allKeys: $allKeys) {
+    createdAt
+    emailAlias
+    encryptedPrivateKey {
+      encryptedData
+    }
+    encryptionFingerprint
+    encryptedSessionKey {
+      encryptedSessionKey
+      encryptedBy
+    }
+    encryptionKeyID
+    publicKey
+    signingFingerprint
+    signingKeyID
+    status
+  }
+}
+    `;
+
+/**
+ * __useGetPgpInfoQuery__
+ *
+ * To run a query within a React component, call `useGetPgpInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPgpInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPgpInfoQuery({
+ *   variables: {
+ *      emailAlias: // value for 'emailAlias'
+ *      allKeys: // value for 'allKeys'
+ *   },
+ * });
+ */
+export function useGetPgpInfoQuery(baseOptions: Apollo.QueryHookOptions<GetPgpInfoQuery, GetPgpInfoQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPgpInfoQuery, GetPgpInfoQueryVariables>(GetPgpInfoDocument, options);
+      }
+export function useGetPgpInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPgpInfoQuery, GetPgpInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPgpInfoQuery, GetPgpInfoQueryVariables>(GetPgpInfoDocument, options);
+        }
+export type GetPgpInfoQueryHookResult = ReturnType<typeof useGetPgpInfoQuery>;
+export type GetPgpInfoLazyQueryHookResult = ReturnType<typeof useGetPgpInfoLazyQuery>;
+export type GetPgpInfoQueryResult = Apollo.QueryResult<GetPgpInfoQuery, GetPgpInfoQueryVariables>;
 export const GetSessionCacheWithCalendarsDocument = /*#__PURE__*/ gql`
     query getSessionCacheWithCalendars {
   sessionCache {
@@ -8336,6 +10773,78 @@ export function useGetIcnsNameLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type GetIcnsNameQueryHookResult = ReturnType<typeof useGetIcnsNameQuery>;
 export type GetIcnsNameLazyQueryHookResult = ReturnType<typeof useGetIcnsNameLazyQuery>;
 export type GetIcnsNameQueryResult = Apollo.QueryResult<GetIcnsNameQuery, GetIcnsNameQueryVariables>;
+export const RefreshTokenDocument = /*#__PURE__*/ gql`
+    query refreshToken {
+  refreshToken
+}
+    `;
+
+/**
+ * __useRefreshTokenQuery__
+ *
+ * To run a query within a React component, call `useRefreshTokenQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRefreshTokenQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRefreshTokenQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRefreshTokenQuery(baseOptions?: Apollo.QueryHookOptions<RefreshTokenQuery, RefreshTokenQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<RefreshTokenQuery, RefreshTokenQueryVariables>(RefreshTokenDocument, options);
+      }
+export function useRefreshTokenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<RefreshTokenQuery, RefreshTokenQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<RefreshTokenQuery, RefreshTokenQueryVariables>(RefreshTokenDocument, options);
+        }
+export type RefreshTokenQueryHookResult = ReturnType<typeof useRefreshTokenQuery>;
+export type RefreshTokenLazyQueryHookResult = ReturnType<typeof useRefreshTokenLazyQuery>;
+export type RefreshTokenQueryResult = Apollo.QueryResult<RefreshTokenQuery, RefreshTokenQueryVariables>;
+export const GetNativeDriveManifestDocument = /*#__PURE__*/ gql`
+    query getNativeDriveManifest {
+  nativeDriveManifest {
+    slimDocuments {
+      docID
+      parentID
+      currentUserPermissionLevel
+      trashedAt
+      updatedAt
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetNativeDriveManifestQuery__
+ *
+ * To run a query within a React component, call `useGetNativeDriveManifestQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetNativeDriveManifestQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetNativeDriveManifestQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetNativeDriveManifestQuery(baseOptions?: Apollo.QueryHookOptions<GetNativeDriveManifestQuery, GetNativeDriveManifestQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetNativeDriveManifestQuery, GetNativeDriveManifestQueryVariables>(GetNativeDriveManifestDocument, options);
+      }
+export function useGetNativeDriveManifestLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetNativeDriveManifestQuery, GetNativeDriveManifestQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetNativeDriveManifestQuery, GetNativeDriveManifestQueryVariables>(GetNativeDriveManifestDocument, options);
+        }
+export type GetNativeDriveManifestQueryHookResult = ReturnType<typeof useGetNativeDriveManifestQuery>;
+export type GetNativeDriveManifestLazyQueryHookResult = ReturnType<typeof useGetNativeDriveManifestLazyQuery>;
+export type GetNativeDriveManifestQueryResult = Apollo.QueryResult<GetNativeDriveManifestQuery, GetNativeDriveManifestQueryVariables>;
 export const GetOrganizationDocument = /*#__PURE__*/ gql`
     query getOrganization($id: String!) {
   organization(id: $id) {
@@ -8884,6 +11393,8 @@ export const GetSubscriptionInfoDocument = /*#__PURE__*/ gql`
     subscriptionInfo {
       subscriptionPlan
       isCryptoSubscription
+      isAppleSubscription
+      isGoogleSubscription
       cancelAtPeriodEnd
       supposedEndDate
       stripeStatus
@@ -9067,6 +11578,127 @@ export function useCurrentUserEmailAliasesLazyQuery(baseOptions?: Apollo.LazyQue
 export type CurrentUserEmailAliasesQueryHookResult = ReturnType<typeof useCurrentUserEmailAliasesQuery>;
 export type CurrentUserEmailAliasesLazyQueryHookResult = ReturnType<typeof useCurrentUserEmailAliasesLazyQuery>;
 export type CurrentUserEmailAliasesQueryResult = Apollo.QueryResult<CurrentUserEmailAliasesQuery, CurrentUserEmailAliasesQueryVariables>;
+export const GetFullAliasInfoDocument = /*#__PURE__*/ gql`
+    query getFullAliasInfo {
+  fullAliasInfo {
+    emailAlias
+    displayName
+    encryptedAliasData
+    encryptedByKey
+    encryptedSessionKey
+    areNotificationsEnabled
+    createdAt
+    displayPictureData {
+      profileIcon
+      profileAccentColor
+      profileCustomURI
+    }
+    decryptedSessionKey @client
+    decryptedData @client {
+      note
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetFullAliasInfoQuery__
+ *
+ * To run a query within a React component, call `useGetFullAliasInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFullAliasInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFullAliasInfoQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetFullAliasInfoQuery(baseOptions?: Apollo.QueryHookOptions<GetFullAliasInfoQuery, GetFullAliasInfoQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetFullAliasInfoQuery, GetFullAliasInfoQueryVariables>(GetFullAliasInfoDocument, options);
+      }
+export function useGetFullAliasInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFullAliasInfoQuery, GetFullAliasInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetFullAliasInfoQuery, GetFullAliasInfoQueryVariables>(GetFullAliasInfoDocument, options);
+        }
+export type GetFullAliasInfoQueryHookResult = ReturnType<typeof useGetFullAliasInfoQuery>;
+export type GetFullAliasInfoLazyQueryHookResult = ReturnType<typeof useGetFullAliasInfoLazyQuery>;
+export type GetFullAliasInfoQueryResult = Apollo.QueryResult<GetFullAliasInfoQuery, GetFullAliasInfoQueryVariables>;
+export const AliasDisplayInfoDocument = /*#__PURE__*/ gql`
+    query aliasDisplayInfo($emailAlias: String!) {
+  aliasDisplayInfo(emailAlias: $emailAlias) {
+    displayName
+    displayPictureData {
+      profileIcon
+      profileAccentColor
+      profileCustomURI
+    }
+  }
+}
+    `;
+
+/**
+ * __useAliasDisplayInfoQuery__
+ *
+ * To run a query within a React component, call `useAliasDisplayInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAliasDisplayInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAliasDisplayInfoQuery({
+ *   variables: {
+ *      emailAlias: // value for 'emailAlias'
+ *   },
+ * });
+ */
+export function useAliasDisplayInfoQuery(baseOptions: Apollo.QueryHookOptions<AliasDisplayInfoQuery, AliasDisplayInfoQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AliasDisplayInfoQuery, AliasDisplayInfoQueryVariables>(AliasDisplayInfoDocument, options);
+      }
+export function useAliasDisplayInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AliasDisplayInfoQuery, AliasDisplayInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AliasDisplayInfoQuery, AliasDisplayInfoQueryVariables>(AliasDisplayInfoDocument, options);
+        }
+export type AliasDisplayInfoQueryHookResult = ReturnType<typeof useAliasDisplayInfoQuery>;
+export type AliasDisplayInfoLazyQueryHookResult = ReturnType<typeof useAliasDisplayInfoLazyQuery>;
+export type AliasDisplayInfoQueryResult = Apollo.QueryResult<AliasDisplayInfoQuery, AliasDisplayInfoQueryVariables>;
+export const GetQuickAliasRootDomainsForUserDocument = /*#__PURE__*/ gql`
+    query getQuickAliasRootDomainsForUser {
+  getQuickAliasRootDomainsForUser
+}
+    `;
+
+/**
+ * __useGetQuickAliasRootDomainsForUserQuery__
+ *
+ * To run a query within a React component, call `useGetQuickAliasRootDomainsForUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetQuickAliasRootDomainsForUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetQuickAliasRootDomainsForUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetQuickAliasRootDomainsForUserQuery(baseOptions?: Apollo.QueryHookOptions<GetQuickAliasRootDomainsForUserQuery, GetQuickAliasRootDomainsForUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetQuickAliasRootDomainsForUserQuery, GetQuickAliasRootDomainsForUserQueryVariables>(GetQuickAliasRootDomainsForUserDocument, options);
+      }
+export function useGetQuickAliasRootDomainsForUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetQuickAliasRootDomainsForUserQuery, GetQuickAliasRootDomainsForUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetQuickAliasRootDomainsForUserQuery, GetQuickAliasRootDomainsForUserQueryVariables>(GetQuickAliasRootDomainsForUserDocument, options);
+        }
+export type GetQuickAliasRootDomainsForUserQueryHookResult = ReturnType<typeof useGetQuickAliasRootDomainsForUserQuery>;
+export type GetQuickAliasRootDomainsForUserLazyQueryHookResult = ReturnType<typeof useGetQuickAliasRootDomainsForUserLazyQuery>;
+export type GetQuickAliasRootDomainsForUserQueryResult = Apollo.QueryResult<GetQuickAliasRootDomainsForUserQuery, GetQuickAliasRootDomainsForUserQueryVariables>;
 export const GetRecoveryPublicKeysAndDataDocument = /*#__PURE__*/ gql`
     query getRecoveryPublicKeysAndData($request: GetRecoveryPublicKeysAndDataRequest!) {
   recoveryPublicKeysAndData(request: $request) {
@@ -9340,6 +11972,40 @@ export function useBrowserPushNotificationsEnabledLazyQuery(baseOptions?: Apollo
 export type BrowserPushNotificationsEnabledQueryHookResult = ReturnType<typeof useBrowserPushNotificationsEnabledQuery>;
 export type BrowserPushNotificationsEnabledLazyQueryHookResult = ReturnType<typeof useBrowserPushNotificationsEnabledLazyQuery>;
 export type BrowserPushNotificationsEnabledQueryResult = Apollo.QueryResult<BrowserPushNotificationsEnabledQuery, BrowserPushNotificationsEnabledQueryVariables>;
+export const SpamListsDocument = /*#__PURE__*/ gql`
+    query spamLists {
+  blockedUsers
+  spamUsers
+  allowedUsers
+}
+    `;
+
+/**
+ * __useSpamListsQuery__
+ *
+ * To run a query within a React component, call `useSpamListsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSpamListsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSpamListsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useSpamListsQuery(baseOptions?: Apollo.QueryHookOptions<SpamListsQuery, SpamListsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SpamListsQuery, SpamListsQueryVariables>(SpamListsDocument, options);
+      }
+export function useSpamListsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SpamListsQuery, SpamListsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SpamListsQuery, SpamListsQueryVariables>(SpamListsDocument, options);
+        }
+export type SpamListsQueryHookResult = ReturnType<typeof useSpamListsQuery>;
+export type SpamListsLazyQueryHookResult = ReturnType<typeof useSpamListsLazyQuery>;
+export type SpamListsQueryResult = Apollo.QueryResult<SpamListsQuery, SpamListsQueryVariables>;
 export const CurrentUserSubscribedToPdDocument = /*#__PURE__*/ gql`
     query currentUserSubscribedToPD {
   currentUser {
@@ -9423,15 +12089,7 @@ export const UsersFromEmailAliasWithCatchallDocument = /*#__PURE__*/ gql`
     query usersFromEmailAliasWithCatchall($emailAliases: [String!]!) {
   usersFromEmailAliasWithCatchall(emailAliases: $emailAliases) {
     userID
-    username
     publicKey
-    publicData {
-      displayPictureData {
-        profileAccentColor
-        profileCustomURI
-        profileIcon
-      }
-    }
   }
 }
     `;
@@ -9728,6 +12386,8 @@ export const GetUserPaidUpStatusDocument = /*#__PURE__*/ gql`
         userLabels
         userFolders
         userMailFilters
+        quickAliases
+        quickAliasSubdomains
       }
     }
   }
@@ -9794,6 +12454,40 @@ export function useCreateUploadContactAvatarLinkMutation(baseOptions?: Apollo.Mu
 export type CreateUploadContactAvatarLinkMutationHookResult = ReturnType<typeof useCreateUploadContactAvatarLinkMutation>;
 export type CreateUploadContactAvatarLinkMutationResult = Apollo.MutationResult<CreateUploadContactAvatarLinkMutation>;
 export type CreateUploadContactAvatarLinkMutationOptions = Apollo.BaseMutationOptions<CreateUploadContactAvatarLinkMutation, CreateUploadContactAvatarLinkMutationVariables>;
+export const CreateUploadAliasAvatarLinkDocument = /*#__PURE__*/ gql`
+    mutation createUploadAliasAvatarLink($emailAlias: String!) {
+  createUploadAliasAvatarLink(emailAlias: $emailAlias) {
+    writeUrl
+    profileCustomURI
+  }
+}
+    `;
+export type CreateUploadAliasAvatarLinkMutationFn = Apollo.MutationFunction<CreateUploadAliasAvatarLinkMutation, CreateUploadAliasAvatarLinkMutationVariables>;
+
+/**
+ * __useCreateUploadAliasAvatarLinkMutation__
+ *
+ * To run a mutation, you first call `useCreateUploadAliasAvatarLinkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUploadAliasAvatarLinkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUploadAliasAvatarLinkMutation, { data, loading, error }] = useCreateUploadAliasAvatarLinkMutation({
+ *   variables: {
+ *      emailAlias: // value for 'emailAlias'
+ *   },
+ * });
+ */
+export function useCreateUploadAliasAvatarLinkMutation(baseOptions?: Apollo.MutationHookOptions<CreateUploadAliasAvatarLinkMutation, CreateUploadAliasAvatarLinkMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateUploadAliasAvatarLinkMutation, CreateUploadAliasAvatarLinkMutationVariables>(CreateUploadAliasAvatarLinkDocument, options);
+      }
+export type CreateUploadAliasAvatarLinkMutationHookResult = ReturnType<typeof useCreateUploadAliasAvatarLinkMutation>;
+export type CreateUploadAliasAvatarLinkMutationResult = Apollo.MutationResult<CreateUploadAliasAvatarLinkMutation>;
+export type CreateUploadAliasAvatarLinkMutationOptions = Apollo.BaseMutationOptions<CreateUploadAliasAvatarLinkMutation, CreateUploadAliasAvatarLinkMutationVariables>;
 export const UpdateUploadContactAvatarLinkDocument = /*#__PURE__*/ gql`
     mutation updateUploadContactAvatarLink($request: UpdateUploadContactAvatarLinkRequest!) {
   updateUploadContactAvatarLink(request: $request) {
@@ -10163,3 +12857,153 @@ export function useGetContactAutoSyncSettingsLazyQuery(baseOptions?: Apollo.Lazy
 export type GetContactAutoSyncSettingsQueryHookResult = ReturnType<typeof useGetContactAutoSyncSettingsQuery>;
 export type GetContactAutoSyncSettingsLazyQueryHookResult = ReturnType<typeof useGetContactAutoSyncSettingsLazyQuery>;
 export type GetContactAutoSyncSettingsQueryResult = Apollo.QueryResult<GetContactAutoSyncSettingsQuery, GetContactAutoSyncSettingsQueryVariables>;
+export const GetUserQuickAliasDomainsDocument = /*#__PURE__*/ gql`
+    query getUserQuickAliasDomains {
+  currentUser {
+    userID
+    anonymousSubdomains {
+      domain
+      domainID
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUserQuickAliasDomainsQuery__
+ *
+ * To run a query within a React component, call `useGetUserQuickAliasDomainsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserQuickAliasDomainsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserQuickAliasDomainsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUserQuickAliasDomainsQuery(baseOptions?: Apollo.QueryHookOptions<GetUserQuickAliasDomainsQuery, GetUserQuickAliasDomainsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserQuickAliasDomainsQuery, GetUserQuickAliasDomainsQueryVariables>(GetUserQuickAliasDomainsDocument, options);
+      }
+export function useGetUserQuickAliasDomainsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserQuickAliasDomainsQuery, GetUserQuickAliasDomainsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserQuickAliasDomainsQuery, GetUserQuickAliasDomainsQueryVariables>(GetUserQuickAliasDomainsDocument, options);
+        }
+export type GetUserQuickAliasDomainsQueryHookResult = ReturnType<typeof useGetUserQuickAliasDomainsQuery>;
+export type GetUserQuickAliasDomainsLazyQueryHookResult = ReturnType<typeof useGetUserQuickAliasDomainsLazyQuery>;
+export type GetUserQuickAliasDomainsQueryResult = Apollo.QueryResult<GetUserQuickAliasDomainsQuery, GetUserQuickAliasDomainsQueryVariables>;
+export const GetNumUserDeactivatedQuickAliasDomainsDocument = /*#__PURE__*/ gql`
+    query getNumUserDeactivatedQuickAliasDomains {
+  currentUser {
+    userID
+    numDeactivatedAnonymousSubdomains
+  }
+}
+    `;
+
+/**
+ * __useGetNumUserDeactivatedQuickAliasDomainsQuery__
+ *
+ * To run a query within a React component, call `useGetNumUserDeactivatedQuickAliasDomainsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetNumUserDeactivatedQuickAliasDomainsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetNumUserDeactivatedQuickAliasDomainsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetNumUserDeactivatedQuickAliasDomainsQuery(baseOptions?: Apollo.QueryHookOptions<GetNumUserDeactivatedQuickAliasDomainsQuery, GetNumUserDeactivatedQuickAliasDomainsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetNumUserDeactivatedQuickAliasDomainsQuery, GetNumUserDeactivatedQuickAliasDomainsQueryVariables>(GetNumUserDeactivatedQuickAliasDomainsDocument, options);
+      }
+export function useGetNumUserDeactivatedQuickAliasDomainsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetNumUserDeactivatedQuickAliasDomainsQuery, GetNumUserDeactivatedQuickAliasDomainsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetNumUserDeactivatedQuickAliasDomainsQuery, GetNumUserDeactivatedQuickAliasDomainsQueryVariables>(GetNumUserDeactivatedQuickAliasDomainsDocument, options);
+        }
+export type GetNumUserDeactivatedQuickAliasDomainsQueryHookResult = ReturnType<typeof useGetNumUserDeactivatedQuickAliasDomainsQuery>;
+export type GetNumUserDeactivatedQuickAliasDomainsLazyQueryHookResult = ReturnType<typeof useGetNumUserDeactivatedQuickAliasDomainsLazyQuery>;
+export type GetNumUserDeactivatedQuickAliasDomainsQueryResult = Apollo.QueryResult<GetNumUserDeactivatedQuickAliasDomainsQuery, GetNumUserDeactivatedQuickAliasDomainsQueryVariables>;
+export const GetUserQuickAliasesDocument = /*#__PURE__*/ gql`
+    query getUserQuickAliases {
+  currentUser {
+    userID
+    quickAliases {
+      alias
+      isSendingAndReceivingEnabled
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUserQuickAliasesQuery__
+ *
+ * To run a query within a React component, call `useGetUserQuickAliasesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserQuickAliasesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserQuickAliasesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUserQuickAliasesQuery(baseOptions?: Apollo.QueryHookOptions<GetUserQuickAliasesQuery, GetUserQuickAliasesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserQuickAliasesQuery, GetUserQuickAliasesQueryVariables>(GetUserQuickAliasesDocument, options);
+      }
+export function useGetUserQuickAliasesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserQuickAliasesQuery, GetUserQuickAliasesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserQuickAliasesQuery, GetUserQuickAliasesQueryVariables>(GetUserQuickAliasesDocument, options);
+        }
+export type GetUserQuickAliasesQueryHookResult = ReturnType<typeof useGetUserQuickAliasesQuery>;
+export type GetUserQuickAliasesLazyQueryHookResult = ReturnType<typeof useGetUserQuickAliasesLazyQuery>;
+export type GetUserQuickAliasesQueryResult = Apollo.QueryResult<GetUserQuickAliasesQuery, GetUserQuickAliasesQueryVariables>;
+export const GetCurrentUserAllOrgDataDocument = /*#__PURE__*/ gql`
+    query getCurrentUserAllOrgData {
+  currentUser {
+    userID
+    userID
+    username
+    rootOrganization {
+      ...OrganizationFullInfo
+    }
+  }
+}
+    ${OrganizationFullInfoFragmentDoc}`;
+
+/**
+ * __useGetCurrentUserAllOrgDataQuery__
+ *
+ * To run a query within a React component, call `useGetCurrentUserAllOrgDataQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCurrentUserAllOrgDataQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCurrentUserAllOrgDataQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCurrentUserAllOrgDataQuery(baseOptions?: Apollo.QueryHookOptions<GetCurrentUserAllOrgDataQuery, GetCurrentUserAllOrgDataQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCurrentUserAllOrgDataQuery, GetCurrentUserAllOrgDataQueryVariables>(GetCurrentUserAllOrgDataDocument, options);
+      }
+export function useGetCurrentUserAllOrgDataLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCurrentUserAllOrgDataQuery, GetCurrentUserAllOrgDataQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCurrentUserAllOrgDataQuery, GetCurrentUserAllOrgDataQueryVariables>(GetCurrentUserAllOrgDataDocument, options);
+        }
+export type GetCurrentUserAllOrgDataQueryHookResult = ReturnType<typeof useGetCurrentUserAllOrgDataQuery>;
+export type GetCurrentUserAllOrgDataLazyQueryHookResult = ReturnType<typeof useGetCurrentUserAllOrgDataLazyQuery>;
+export type GetCurrentUserAllOrgDataQueryResult = Apollo.QueryResult<GetCurrentUserAllOrgDataQuery, GetCurrentUserAllOrgDataQueryVariables>;

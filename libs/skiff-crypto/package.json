@@ -1,20 +1,19 @@
 {
-  "name": "@skiff-org/skiff-crypto",
-  "version": "1.0.3",
+  "name": "skiff-crypto",
+  "version": "0.0.1",
   "description": "Cryptographic related functions and helpers",
   "main": "./dist/cjs/index.js",
   "exports": {
     "import": "./dist/esm/index.js",
     "require": "./dist/cjs/index.js"
   },
-  "author": "Skiff World Inc.",
-  "license": "MIT",
   "sideEffects": false,
   "files": [
     "dist"
   ],
   "types": "dist/src/index.d.ts",
-  "packageManager": "yarn@3.5.0",
+  "packageManager": "yarn@4.0.1",
+  "private": true,
   "scripts": {
     "emit-ts": "yarn tsc --build",
     "clean": "rm -rf dist/",
@@ -24,38 +23,18 @@
     "lint": "yarn run -T eslint ./src --cache --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "yarn lint --fix"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/skiff-org/skiff-apps.git",
-    "directory": "libs/skiff-crypto"
-  },
-  "keywords": [
-    "cryptography",
-    "chacha20poly1305",
-    "poly1305",
-    "utf8",
-    "crypto",
-    "curve25519",
-    "ed25519",
-    "encrypt",
-    "decrypt",
-    "hash",
-    "poly1305",
-    "salsa20",
-    "signatures",
-    "keypair"
-  ],
   "devDependencies": {
     "@types/argon2-browser": "^1",
     "@types/jest": "^28.1.1",
     "@types/lodash": "^4",
-    "@types/node": "17.0.45",
+    "@types/node": "20.9.0",
     "@types/randombytes": "^2",
     "@types/semver": "^7",
     "@types/varint": "^6.0.0",
     "esbuild": "^0.15.6",
     "esbuild-jest": "^0.5.0",
     "esbuild-node-externals": "^1.5.0",
+    "eslint-config-skiff-eslint": "workspace:*",
     "jest": "^28.1.1",
     "typescript": "^5.0.0"
   },
@@ -68,9 +47,11 @@
     "fflate": "^0.7.3",
     "futoin-hkdf": "^1.5.0",
     "lodash": "^4.17.21",
-    "protobufjs": "^6.11.3",
+    "protobufjs": "^7.2.4",
     "randombytes": "^2.1.0",
     "semver": "^7.3.4",
+    "skiff-graphql": "workspace:libs/skiff-graphql",
+    "skiff-utils": "workspace:libs/skiff-utils",
     "tslib": "^2.4.0",
     "tweetnacl": "^1.0.3",
     "varint": "^6.0.0"

@@ -1,4 +1,4 @@
-import { Icon, IconProps, Icons, Size } from '@skiff-org/skiff-ui';
+import { Icon, IconProps, Icons, Size } from 'nightwatch-ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -29,19 +29,37 @@ type CheckboxProps = {
   hover?: boolean;
   indeterminate?: boolean;
   size?: CheckboxSize;
-  // Used to container size and clickable area, without impacting the size of the checkbox icon itself
+  /**
+   * Used to container size and clickable area, without
+   * impacting the size of the checkbox icon itself
+   */
   clickableAreaPadding?: string;
   dataTest?: string;
+  /**
+   * Custom checked color
+   */
+  checkedColor?: IconProps['color'];
 };
 
 function Checkbox(props: CheckboxProps) {
-  const { checked, dataTest, error, hover, indeterminate, onClick, size = Size.MEDIUM, clickableAreaPadding } = props;
+  const {
+    checked,
+    dataTest,
+    error,
+    hover,
+    indeterminate,
+    onClick,
+    size = Size.MEDIUM,
+    clickableAreaPadding,
+    checkedColor
+  } = props;
   // Indeterminate = true takes priority over checked = true, similar to MUI
   const icon = indeterminate ? Icon.CheckboxHalfFilled : checked ? Icon.CheckboxFilled : Icon.CheckboxEmpty;
   const getColor = (): IconProps['color'] => {
-    if (checked) return 'secondary';
+    if (checked) return checkedColor ?? 'secondary';
     if (hover) return 'tertiary';
     if (error) return 'destructive';
+    if (indeterminate) return checkedColor ?? 'secondary';
     return 'disabled';
   };
   const color = getColor();

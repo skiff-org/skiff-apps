@@ -1,5 +1,5 @@
 import '../ui/skiff-editor-menus.css';
-import { ThemeMode, Typography } from '@skiff-org/skiff-ui';
+import { ThemeMode, Typography } from 'nightwatch-ui';
 import { EditorView } from 'prosemirror-view';
 import React, { FunctionComponent, useCallback } from 'react';
 

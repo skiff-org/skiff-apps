@@ -1,13 +1,19 @@
-import { SubscriptionPlan } from 'skiff-graphql';
+import { QueryHookOptions } from '@apollo/client';
+import { Exact, SubscriptionPlan } from 'skiff-graphql';
+import { TierName } from 'skiff-utils';
 
-import { useGetSubscriptionInfoQuery } from '../../generated/graphql';
+import { GetSubscriptionInfoQuery, useGetSubscriptionInfoQuery } from '../../generated/graphql';
 
-export function useSubscriptionPlan() {
-  const res = useGetSubscriptionInfoQuery();
+export function useSubscriptionPlan(
+  baseOptions?: QueryHookOptions<GetSubscriptionInfoQuery, Exact<{ [key: string]: never }>> | undefined
+) {
+  const res = useGetSubscriptionInfoQuery(baseOptions);
 
   const {
-    subscriptionPlan: tierName,
+    subscriptionPlan,
     isCryptoSubscription,
+    isAppleSubscription,
+    isGoogleSubscription,
     cancelAtPeriodEnd,
     supposedEndDate,
     stripeStatus,
@@ -15,15 +21,17 @@ export function useSubscriptionPlan() {
     quantity
   } = res.data?.currentUser?.subscriptionInfo || {};
 
-  const activeSubscription = tierName
-    ? SubscriptionPlan[tierName as keyof typeof SubscriptionPlan]
-    : SubscriptionPlan.Free;
+  const tierName = (subscriptionPlan as TierName) ?? TierName.Free;
+  const activeSubscription = SubscriptionPlan[tierName as keyof typeof SubscriptionPlan];
 
   return {
     ...res,
     data: {
+      tierName,
       activeSubscription,
       isCryptoSubscription,
+      isAppleSubscription,
+      isGoogleSubscription,
       cancelAtPeriodEnd,
       supposedEndDate,
       stripeStatus,

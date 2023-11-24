@@ -1,5 +1,5 @@
-import { ButtonGroup, ButtonGroupItem, Dialog, DialogTypes, Icon, Icons, InputField } from '@skiff-org/skiff-ui';
-import { AddressObject, DisplayPictureData } from 'skiff-graphql';
+import { ButtonGroup, ButtonGroupItem, Dialog, DialogType, Icon, Icons, InputField } from 'nightwatch-ui';
+import { AddressObject, DisplayPictureData, DisplayPictureDataSkemail } from 'skiff-graphql';
 
 import { useToast } from '../../../hooks';
 import { copyToClipboardWebAndMobile } from '../../../utils';
@@ -10,7 +10,9 @@ export interface InviteModalProps {
   contactsList: AddressObject[];
   sendReferralLink: (email: string) => Promise<void>;
   referralLink: string;
-  useDisplayPictureDataFromAddress: (contact: AddressObject) => DisplayPictureData | undefined | null;
+  useDisplayPictureDataFromAddress: (
+    contact: AddressObject
+  ) => DisplayPictureData | undefined | null | DisplayPictureDataSkemail;
 }
 
 const InviteUsersModal = ({ onClose, isOpen, referralLink }: InviteModalProps) => {
@@ -28,12 +30,11 @@ const InviteUsersModal = ({ onClose, isOpen, referralLink }: InviteModalProps) =
   return (
     <Dialog
       customContent
-      hideCloseButton
+      description='Earn $10 of credit when you refer a friend to signup for Skiff'
       onClose={onClose}
       open={isOpen}
       title='Share referral link'
-      description='Earn $10 of credit when you refer a friend to signup for Skiff'
-      type={DialogTypes.Confirm}
+      type={DialogType.CONFIRM}
     >
       <InputField
         endAdornment={<Icons color='secondary' icon={Icon.Copy} onClick={copyReferralLink} />}

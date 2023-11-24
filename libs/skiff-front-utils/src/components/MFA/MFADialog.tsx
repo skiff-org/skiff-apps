@@ -1,4 +1,4 @@
-import { Dialog } from '@skiff-org/skiff-ui';
+import { Dialog } from 'nightwatch-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { WorkspaceEventType } from 'skiff-graphql';

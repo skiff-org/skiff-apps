@@ -5,21 +5,27 @@ import { getEnvironment } from './envUtils';
 export const PLACEHOLDER_CONTENT_URL = '/mail/.well-known/image-shield.svg';
 
 export const getResourceProxyURL = (originUrl: URL, disableRemoteContent: boolean): URL => {
-  // if remote content disabled, return placehodler
+  // if remote content disabled, return placeholder
   if (disableRemoteContent) {
     return new URL(window.location.origin + PLACEHOLDER_CONTENT_URL);
   }
+
+  const proxyURL = getBaseProxyURL(originUrl);
+  return new URL('/image_proxy/?', proxyURL);
+};
+
+export const getBaseProxyURL = (originUrl: URL): URL => {
   const env = getEnvironment(originUrl);
   switch (env) {
     case 'local':
-      return new URL('http://localhost:9999/image_proxy/?');
+      return new URL('http://localhost:9999');
     case 'development':
     case 'vercel':
-      return new URL('https://resource-proxy.skiff.town/image_proxy/?');
+      return new URL('https://resource-proxy.skiff.town');
     case 'staging':
-      return new URL('https://resource-proxy.skiff.city/image_proxy/?');
+      return new URL('https://resource-proxy.skiff.city');
     case 'production':
-      return new URL('https://resource-proxy.skiff.com/image_proxy/?');
+      return new URL('https://resource-proxy.skiff.com');
     default:
       throw Error('Unknown NODE_ENV used');
   }
@@ -42,7 +48,7 @@ const isValidRewriteURL = (link: string): boolean => {
   // TODO: check if malware-y or spoofing site
 };
 
-const getNewLink = (link: string, originUrl: URL, disableRemoteContent: boolean): URL => {
+export const getNewLink = (link: string, originUrl: URL, disableRemoteContent: boolean): URL => {
   const redirHost = getResourceProxyURL(originUrl, disableRemoteContent);
   redirHost.searchParams.set('url', link);
   return redirHost;

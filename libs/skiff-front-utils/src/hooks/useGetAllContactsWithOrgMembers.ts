@@ -30,10 +30,12 @@ const useGetAllContactsWithOrgMembers = (
     loading: contactsLoading,
     error: getContactsError,
     refetch: refetchContacts
-  } = useGetAllCurrentUserContactsQuery(queryOptions);
+  } = useGetAllCurrentUserContactsQuery({
+    fetchPolicy: 'cache-first',
+    ...queryOptions
+  });
 
   const baseContacts = data?.allContacts ?? [];
-
   const { data: orgData, loading: loadingOrg, error: getOrgError, refetch: refetchOrg } = useCurrentOrganization();
 
   if (getOrgError) {
@@ -65,6 +67,7 @@ const useGetAllContactsWithOrgMembers = (
         : undefined;
 
       return {
+        contactID: user.userID,
         emailAddress: defaultEmailAliases[user.userID],
         // Return undefined if they're empty strings
         firstName: !!firstName ? firstName : undefined,

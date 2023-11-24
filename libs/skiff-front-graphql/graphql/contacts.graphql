@@ -1,5 +1,40 @@
 query getAllCurrentUserContacts {
   allContacts {
+    contactID
+    emailAddress
+    firstName
+    lastName
+    displayPictureData {
+      profileAccentColor
+      profileCustomURI
+      profileIcon
+    }
+    encryptedByKey
+    encryptedSessionKey
+    encryptedContactData
+    decryptedSessionKey @client
+    decryptedData @client {
+      decryptedPhoneNumbers {
+        value
+        label
+      }
+      decryptedNotes
+      decryptedBirthday
+      decryptedCompany
+      decryptedJobTitle
+      decryptedAddresses {
+        value
+        label
+      }
+      decryptedNickname
+      decryptedURL
+    }
+  }
+}
+
+query getAllCurrentUserContactsNative {
+  allContacts {
+    contactID
     emailAddress
     firstName
     lastName
@@ -13,6 +48,7 @@ query getAllCurrentUserContacts {
 
 query getContacts($request: GetContactsRequest!) {
   contacts(request: $request) {
+    contactID
     emailAddress
     firstName
     lastName
@@ -20,6 +56,26 @@ query getContacts($request: GetContactsRequest!) {
       profileAccentColor
       profileCustomURI
       profileIcon
+    }
+    encryptedByKey
+    encryptedSessionKey
+    encryptedContactData
+    decryptedSessionKey @client
+    decryptedData @client {
+      decryptedPhoneNumbers {
+        value
+        label
+      }
+      decryptedNotes
+      decryptedBirthday
+      decryptedCompany
+      decryptedJobTitle
+      decryptedAddresses {
+        value
+        label
+      }
+      decryptedNickname
+      decryptedURL
     }
   }
 }
@@ -36,4 +92,8 @@ mutation createOrUpdateContact($request: CreateOrUpdateContactRequest!) {
 
 mutation deleteContact($request: DeleteContactRequest!) {
   deleteContact(request: $request)
+}
+
+mutation deleteContacts($request: DeleteContactsRequest!) {
+  deleteContacts(request: $request)
 }

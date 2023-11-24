@@ -1,6 +1,6 @@
 import '../ui/skiff-editor-menus.css';
 
-import { ThemeMode, Typography } from '@skiff-org/skiff-ui';
+import { ThemeMode, Typography } from 'nightwatch-ui';
 import React, { FunctionComponent } from 'react';
 
 import { SearchPlaceHolder } from '../slashMenu/InterfacesAndEnums';

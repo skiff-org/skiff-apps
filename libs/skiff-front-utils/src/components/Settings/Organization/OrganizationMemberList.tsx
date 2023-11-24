@@ -1,6 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import React, { useState } from 'react';
-import { useDeleteUserOrganizationMembershipMutation, GetOrganizationMembersDocument } from 'skiff-front-graphql';
+import { GetOrganizationMembersDocument, useDeleteUserOrganizationMembershipMutation } from 'skiff-front-graphql';
 import { DocumentCollaborator } from 'skiff-graphql';
 
 import { useCurrentOrganization } from '../../../hooks';

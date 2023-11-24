@@ -1,173 +1,107 @@
 import {
   AccentColor,
-  Button,
   ButtonGroupItem,
   CorrectedColorSelect,
   Dialog,
-  DialogTypes,
+  DialogType,
   Icon,
   IconButton,
-  InputField,
   Size,
+  ThemeMode,
   Type,
-  Typography,
   accentColorToPrimaryColor,
-  stringToColor
-} from '@skiff-org/skiff-ui';
+  getThemedColor
+} from 'nightwatch-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { CreateUploadAvatarLinkResponse, DisplayPictureData, RequestStatus } from 'skiff-graphql';
-import styled, { css } from 'styled-components';
+import { CreateUploadAvatarLinkResponse, DisplayPictureData } from 'skiff-graphql';
+import styled from 'styled-components';
 
 import { useCurrentUserData } from '../../apollo';
 import { useDefaultEmailAlias } from '../../hooks';
 import useObjectURL from '../../hooks/useObjectURL';
 import { uploadFileToS3 } from '../../utils/avatarUtils/avatarUtils';
 import ColorSelector from '../ColorSelector';
-import UserAvatar from '../UserAvatar/UserAvatar';
+import { UserAvatar } from '../UserAvatar';
 
 import { CropDisplayPictureDialog } from './CropDisplayPictureDialog';
 
-const Container = styled.div`
+const Container = styled.div<{ $padding?: number }>`
   display: flex;
   flex-direction: column;
-  gap: 24px;
   width: 100%;
-  min-height: 154px;
+  box-sizing: border-box;
+  padding: ${({ $padding }) => $padding || 0}px;
 `;
 
-const ScaledAvatar = styled.div`
+const ScaledAvatar = styled.div<{ $forceTheme?: ThemeMode }>`
   & > * {
-    border: 6px solid var(--bg-l2-glass);
+    box-shadow: ${({ $forceTheme }) => getThemedColor('var(--l1-shadow)', $forceTheme)};
+
+    border: 2.5px solid ${({ $forceTheme }) => getThemedColor('var(--bg-l2-glass)', $forceTheme)};
   }
 `;
 
+const HoverContainer = styled.div`
+  position: relative;
+`;
+
 const HoverIcon = styled.div`
+  position: absolute;
   margin-top: -34px;
-  margin-left: 96px;
+  margin-left: 56px;
   margin-bottom: -28px;
   z-index: 9;
   & > div {
     width: 32px !important;
     height: 32px !important;
   }
+  border-radius: 100px;
+  overflow: hidden;
 `;
 
-const ColorBackdrop = styled.div<{ $inline: boolean; $compact?: boolean }>`
-  ${(props) =>
-    !props.$inline &&
-    css`
-      width: calc(100% + 50px);
-      height: 190px;
-      position: relative;
-      top: -25px;
-      left: -25px;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-    `}
-  ${(props) =>
-    props.$inline &&
-    css`
-      width: 100%;
-      height: ${!props.$compact ? '100px' : '88px'};
-      ${isMobile &&
-      css`
-        border-radius: 22px 12px 12px 12px;
-      `}
-      ${!isMobile &&
-      css`
-        border-radius: 12px;
-      `}
-    `}
+const ColorBackdrop = styled.div<{
+  $accentColor: AccentColor;
+  $disabled?: boolean;
+  $forceTheme?: ThemeMode;
+}>`
+  background: ${({ $accentColor, $disabled, $forceTheme }) =>
+    $disabled
+      ? getThemedColor('var(--bg-overlay-tertiary)', $forceTheme)
+      : CorrectedColorSelect[accentColorToPrimaryColor[$accentColor]]};
+  width: 100%;
+  height: 64px;
+  border-radius: 8px;
 `;
 
-const AvatarRow = styled.div<{ $inline: boolean; $compact?: boolean }>`
+const AvatarRow = styled.div`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  ${(props) =>
-    !props.$inline &&
-    css`
-      width: 100%;
-      align-items: center;
-      margin-top: -100px;
-    `}
-  ${(props) =>
-    props.$inline &&
-    css`
-      align-items: flex-start;
+  align-items: flex-start;
+  margin: -50px 0 -28px 14px;
 
-      ${isMobile &&
-      css`
-        margin-top: ${!props.$compact ? '-116px' : '-104px'};
-        margin-left: ${!props.$compact ? '12px' : '9px'};
-      `}
-
-      ${!isMobile &&
-      css`
-        margin-top: ${!props.$compact ? '-100px' : '-84px'};
-        margin-left: 36px;
-      `}
-      margin-bottom: ${!props.$compact ? '-42px' : '-66px'};
-    `}
+  ${isMobile && `margin-left: 12px;`}
 `;
 
-const AccentPickerContainer = styled.div<{ $canEditName: boolean; disabled?: boolean; $inline: boolean }>`
-  filter: ${(props) => (props.disabled ? 'grayscale(1)' : '')};
-  opacity: ${(props) => (props.disabled ? 0.6 : 1)};
+const AccentPickerContainer = styled.div<{ $disabled?: boolean }>`
+  width: 234px;
+  align-self: flex-end;
+  z-index: 100;
 
-  ${isMobile &&
-  css`
-    position: relative;
-    top: 34px;
+  ${({ $disabled }) => `
+    filter: ${$disabled ? 'grayscale(1)' : ''};
+    opacity: ${$disabled ? 0.6 : 1};
   `}
-
-  ${(props) =>
-    !props.$inline &&
-    css`
-      width: 280px;
-      margin-top: ${props.$canEditName ? '36px' : ''};
-      align-self: center;
-    `}
-  ${(props) =>
-    props.$inline &&
-    css`
-      width: 234px;
-      align-self: flex-end;
-      z-index: 100;
-
-      ${props.$canEditName && 'margin-top: 14px;'}
-    `}
 `;
 
-const DisplayNameParentContainer = styled.div<{ $canEditDisplayPicture: boolean }>`
-  position: relative;
-
-  ${(props) =>
-    !props.$canEditDisplayPicture &&
-    (!isMobile
-      ? css`
-          top: -8px;
-          left: 180px;
-        `
-      : css`
-          top: -3px;
-          left: 136px;
-        `)}
-`;
-
-const DisplayNameContainer = styled.div<{ $canEditDisplayPicture: boolean }>`
-  position: absolute;
-  ${(props) =>
-    props.$canEditDisplayPicture
-      ? css`
-          top: 21px;
-          left: 180px;
-        `
-      : css`
-          top: 0px;
-          left: 0px;
-        `}
+const NameColor = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: auto;
+  flex-wrap: nowrap;
+  text-overflow: ellipsis;
 `;
 
 export type EditProfileIsContactProp =
@@ -185,13 +119,12 @@ interface EditProfileProps {
   sublabel?: string;
   hideDisplayName?: boolean;
   disabled?: boolean;
-  // is or is not UD signup
-  isUdSignup?: boolean;
-  type?: 'default' | 'inline';
-  setDisplayName?: (displayName: string) => Promise<RequestStatus> | void;
+  /** Runs when the user attempts to update the display picture */
+  onUpdateDisplayPicture?: () => void;
   setDisplayPictureData?: (displayPictureData: DisplayPictureData) => Promise<void> | void;
-  // shorten the height for compact components
-  compact?: boolean;
+  padding?: number;
+  hideUpload?: boolean;
+  forceTheme?: ThemeMode;
 }
 
 /**
@@ -204,22 +137,16 @@ function EditProfile(props: EditProfileProps) {
     displayPictureData,
     createUploadLink,
     label,
-    compact,
-    sublabel,
-    hideDisplayName,
+    padding,
     disabled,
-    isUdSignup,
-    type,
-    setDisplayName,
-    setDisplayPictureData
+    onUpdateDisplayPicture,
+    hideUpload = false,
+    setDisplayPictureData,
+    forceTheme
   } = props;
 
   /** Text content inside text field */
   const [displayNameStateField, setDisplayNameStateField] = useState(displayName || '');
-  /** Request error message */
-  const [errorMsg, setErrorMsg] = useState('');
-  /** Whether user is editing */
-  const [isEditing, setIsEditing] = useState(false);
   /** Open delete photo confirm modal */
   const [confirmDelete, setConfirmDelete] = useState(false);
   /** Currently uploaded image file for cropping */
@@ -227,8 +154,6 @@ function EditProfile(props: EditProfileProps) {
 
   const userData = useCurrentUserData();
   const [defaultEmailAlias] = useDefaultEmailAlias(userData?.userID || '');
-
-  const inputRef = useRef<HTMLInputElement>(null);
 
   // To account for loading from Apollo -- when display name gets filled in,
   // update our local state field
@@ -238,66 +163,59 @@ function EditProfile(props: EditProfileProps) {
     setConfirmDelete(false);
   };
 
-  const save = async () => {
-    if (!setDisplayName) return;
-    const status = await setDisplayName(displayNameStateField);
-    if (inputRef?.current) inputRef.current.blur();
-    setIsEditing(false);
-    if (status !== RequestStatus.Success) setErrorMsg('Invalid character included.');
-  };
-
-  const focus = () => {
-    if (inputRef?.current) inputRef.current.focus();
-  };
-
   const name = displayNameStateField || displayName || defaultEmailAlias || 'A';
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [, , defaultAccentColor] = stringToColor(name);
+  const defaultAccentColor = 'orange';
   const accentColor = (displayPictureData?.profileAccentColor ?? defaultAccentColor) as AccentColor;
   const avatarIsPhoto = !!displayPictureData?.profileCustomURI;
+  const canUploadImage = !hideUpload && !!setDisplayPictureData && !!createUploadLink;
 
   const handleAvatarClick = () => {
-    if (avatarIsPhoto) {
-      setConfirmDelete(true);
-    } else {
-      fileInputRef.current?.click();
+    if (onUpdateDisplayPicture) {
+      onUpdateDisplayPicture();
+      return;
     }
+
+    if (avatarIsPhoto) setConfirmDelete(true);
+    else fileInputRef.current?.click();
   };
 
-  const canUploadImage = !!setDisplayPictureData && !!createUploadLink;
-
-  const isInline = type === 'inline';
   return (
-    <Container>
-      <ColorBackdrop
-        $compact={compact}
-        $inline={isInline}
-        style={{
-          background: disabled
-            ? 'var(--bg-field-default)'
-            : CorrectedColorSelect[accentColorToPrimaryColor[accentColor]]
-        }}
-      />
-      <AvatarRow $compact={compact} $inline={isInline}>
-        <ScaledAvatar>
+    <Container $padding={padding}>
+      <ColorBackdrop $accentColor={accentColor} $disabled={disabled} $forceTheme={forceTheme} />
+      <AvatarRow>
+        <ScaledAvatar $forceTheme={forceTheme}>
           <UserAvatar
             color={disabled ? 'red' : accentColor}
             disabled={disabled}
             displayPictureData={displayPictureData}
-            isUdAvatar={isUdSignup}
+            forceTheme={forceTheme}
             label={label ?? name}
             onClick={canUploadImage ? handleAvatarClick : undefined}
             size={Size.X_LARGE}
           />
         </ScaledAvatar>
         {canUploadImage && (
-          <HoverIcon>
-            <IconButton icon={avatarIsPhoto ? Icon.Trash : Icon.Camera} onClick={handleAvatarClick} size={Size.SMALL} />
-          </HoverIcon>
+          <HoverContainer>
+            <HoverIcon>
+              <IconButton
+                forceTheme={forceTheme}
+                icon={avatarIsPhoto ? Icon.Trash : Icon.Camera}
+                onClick={handleAvatarClick}
+                size={Size.SMALL}
+              />
+            </HoverIcon>
+          </HoverContainer>
         )}
       </AvatarRow>
-      <Dialog onClose={closeConfirmDialog} open={confirmDelete} title='Remove photo' type={DialogTypes.Confirm}>
+      <Dialog
+        forceTheme={forceTheme}
+        onClose={closeConfirmDialog}
+        open={confirmDelete}
+        title='Remove photo'
+        type={DialogType.CONFIRM}
+      >
         <ButtonGroupItem
           label='Delete'
           onClick={(e: React.MouseEvent) => {
@@ -328,72 +246,31 @@ function EditProfile(props: EditProfileProps) {
         type='file'
         value={''}
       />
-      {!setDisplayName && (
-        <DisplayNameParentContainer $canEditDisplayPicture={!!setDisplayPictureData}>
-          <DisplayNameContainer $canEditDisplayPicture={!!setDisplayPictureData}>
-            {/* Conditional rendering here rather than on parents to maintain relative positioning */}
-            {!hideDisplayName && (
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography color={disabled ? 'disabled' : 'primary'} maxWidth={isMobile ? '180px' : undefined}>
-                  {displayName}
-                </Typography>
-                <Typography color={disabled ? 'disabled' : 'secondary'} maxWidth={isMobile ? '180px' : undefined}>
-                  {sublabel}
-                </Typography>
-              </div>
-            )}
-          </DisplayNameContainer>
-        </DisplayNameParentContainer>
-      )}
-      {!!setDisplayPictureData && (
-        <AccentPickerContainer $canEditName={!!setDisplayName} $inline={isInline} disabled={disabled}>
-          <ColorSelector
-            colorToStyling={accentColorToPrimaryColor}
-            disabled={disabled}
-            handleChange={(profileAccentColor) => {
-              if (disabled || !setDisplayPictureData) return;
-              void setDisplayPictureData({
-                ...displayPictureData,
-                profileAccentColor
-              });
-            }}
-            hideSelected={disabled}
-            value={accentColor}
-          />
-        </AccentPickerContainer>
-      )}
-      {!!setDisplayName && !isInline && (
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', width: '100%' }}>
-          <InputField
-            dataTest='change-display-name-input'
-            errorMsg={errorMsg}
-            innerRef={inputRef}
-            onBlur={() => {
-              setTimeout(() => {
-                if (document.activeElement?.id === 'edit-profile-btn') {
-                  return; // ignore save button click
+      <NameColor>
+        {!!setDisplayPictureData && (
+          <AccentPickerContainer $disabled={disabled}>
+            <ColorSelector
+              colorToStyling={accentColorToPrimaryColor}
+              disabled={disabled}
+              handleChange={(profileAccentColor) => {
+                if (disabled || !setDisplayPictureData) return;
+
+                if (onUpdateDisplayPicture) {
+                  onUpdateDisplayPicture();
+                  return;
                 }
-                void save();
-              }, 1);
-            }}
-            onChange={(evt: { target: { value: string } }) => {
-              if (!!errorMsg.length) setErrorMsg('');
-              setDisplayNameStateField(evt.target.value);
-            }}
-            onFocus={() => setIsEditing(true)}
-            onKeyDown={(evt: React.KeyboardEvent) => {
-              if (evt.key === 'Enter') {
-                void save();
-              }
-            }}
-            placeholder={displayNameStateField || 'Display name'}
-            value={displayNameStateField}
-          />
-          <Button id='edit-profile-btn' onClick={isEditing ? save : focus} type={Type.SECONDARY}>
-            {isEditing ? 'Save' : 'Edit'}
-          </Button>
-        </div>
-      )}
+
+                void setDisplayPictureData({
+                  ...displayPictureData,
+                  profileAccentColor
+                });
+              }}
+              hideSelected={disabled}
+              value={accentColor}
+            />
+          </AccentPickerContainer>
+        )}
+      </NameColor>
       {uploadedImageSrc && !!createUploadLink && (
         <CropDisplayPictureDialog
           handleClose={(e?: React.MouseEvent) => {

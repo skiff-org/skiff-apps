@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogTypes, Type, Typography } from '@skiff-org/skiff-ui';
+import { Button, Dialog, DialogType, Type, Typography } from 'nightwatch-ui';
 import React, { useRef, useState } from 'react';
 import ReactCrop, { PercentCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import styled from 'styled-components';
@@ -100,7 +100,7 @@ export function CropDisplayPictureDialog(props: CropDisplayPictureDialogProps) {
   };
 
   return (
-    <Dialog customContent onClose={handleClose} open title='Edit Image' type={DialogTypes.Default}>
+    <Dialog customContent onClose={handleClose} open title='Edit Image' type={DialogType.DEFAULT}>
       <ImageEditArea>
         <CropArea
           aspect={1}

@@ -1,6 +1,7 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import { generateSymmetricKey, stringEncryptAsymmetric } from '@skiff-org/skiff-crypto';
-import { encryptDatagramV2 } from '@skiff-org/skiff-crypto';
+import partition from 'lodash/partition';
+import { generateSymmetricKey, stringEncryptAsymmetric } from 'skiff-crypto';
+import { encryptDatagramV2 } from 'skiff-crypto';
 import {
   PublicKey,
   EncryptedDataInput,
@@ -85,27 +86,41 @@ type RecipientAndKey = {
   publicKey: PublicKey | null;
   recipient: SendAddressRequest;
 };
+
+const COMMON_CONSUMER_MAIL_DOMAINS = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'aol.com'];
+
 const getPublicKeysFromEmailAliases = async (
   recipients: SendAddressRequest[],
   client: ApolloClient<NormalizedCacheObject>
 ): Promise<RecipientAndKey[]> => {
-  const emailAliases = recipients.map((rec) => rec.address);
-  const userFromEmailRes = await client.query<
-    UsersFromEmailAliasWithCatchallQuery,
-    UsersFromEmailAliasWithCatchallQueryVariables
-  >({
-    query: UsersFromEmailAliasWithCatchallDocument,
-    variables: {
-      emailAliases
-    },
-    fetchPolicy: 'no-cache'
-  });
-  return userFromEmailRes.data.usersFromEmailAliasWithCatchall.map(
-    (user, i): RecipientAndKey => ({
-      recipient: recipients[i],
-      publicKey: user?.publicKey || null
-    })
+  const allAddresses = recipients.map((rec) => rec.address);
+  // note - important to have the @, because someone could have an email like @myicloud.com
+  const [consumerEmailsToSkip, emailAliases] = partition(allAddresses, (email: string) =>
+    COMMON_CONSUMER_MAIL_DOMAINS.some((domain) => email.endsWith('@' + domain))
   );
+
+  const userFromEmailRes =
+    emailAliases.length === 0
+      ? undefined
+      : await client.query<UsersFromEmailAliasWithCatchallQuery, UsersFromEmailAliasWithCatchallQueryVariables>({
+          query: UsersFromEmailAliasWithCatchallDocument,
+          variables: {
+            emailAliases
+          },
+          fetchPolicy: 'no-cache'
+        });
+  const returnedData =
+    userFromEmailRes?.data.usersFromEmailAliasWithCatchall.map(
+      (user, i): RecipientAndKey => ({
+        recipient: recipients[allAddresses.indexOf(emailAliases[i])],
+        publicKey: user?.publicKey || null
+      })
+    ) || [];
+  const consumerEmails = consumerEmailsToSkip.map((email) => ({
+    recipient: recipients[allAddresses.indexOf(email)],
+    publicKey: null
+  }));
+  return [...returnedData, ...consumerEmails];
 };
 
 /** Wrapper around the crypto encryptEmailContent */
@@ -115,7 +130,8 @@ export const encryptMessageContent = (
   messageHtmlBody: string,
   attachments: AttachmentPair[],
   sessionKey: string,
-  customAttachmentTransformer?: (data: string, i: number) => Blob | File
+  customAttachmentTransformer?: (data: string, i: number) => Blob | File,
+  messageTextAsHtmlBody?: string
 ) => {
   const encryptedSubject = encryptDatagramV2(MailSubjectDatagram, {}, { subject }, sessionKey);
 
@@ -124,7 +140,8 @@ export const encryptMessageContent = (
   const encryptedTextAsHtml = encryptDatagramV2(
     MailTextAsHTMLDatagram,
     {},
-    { textAsHTML: messageTextBody },
+    // On native we use encryptMessageContent to re-encrypt local skemails that have textAsHtml
+    { textAsHTML: messageTextAsHtmlBody ? messageTextAsHtmlBody : messageTextBody },
     sessionKey
   );
   const encryptedTextSnippet = encryptDatagramV2(
@@ -176,6 +193,7 @@ interface EncryptRecipientSessionKeysParams {
   recipients: SendAddressRequest[];
   externalPublicKey: PublicKey;
   client: ApolloClient<NormalizedCacheObject>;
+  isEncryptingToSelf?: boolean;
 }
 
 interface EncryptRecipientSessionKeysResult {
@@ -194,7 +212,8 @@ export const encryptRecipientSessionKeys = async ({
   myPublicKey,
   recipients,
   externalPublicKey,
-  client
+  client,
+  isEncryptingToSelf
 }: EncryptRecipientSessionKeysParams): Promise<EncryptRecipientSessionKeysResult> => {
   if (recipients.length === 0) {
     return {
@@ -204,7 +223,10 @@ export const encryptRecipientSessionKeys = async ({
   }
 
   // Fetch public key for each recipient
-  const recipientsWithKeys = await getPublicKeysFromEmailAliases(recipients, client);
+  const recipientsWithKeys =
+    isEncryptingToSelf && recipients.length === 1
+      ? [{ publicKey: myPublicKey, recipient: recipients[0] }]
+      : await getPublicKeysFromEmailAliases(recipients, client);
   // Add the external key to the array for skiff -> external
   const hasExternalRecipient = recipientsWithKeys.some((recipient) => !recipient.publicKey);
 
@@ -297,7 +319,11 @@ export const encryptMessage = async (
     ccAddressEncryptionResult,
     bccAddressEncryptionResult
   ] = await Promise.all([
-    encryptRecipientSessionKeys({ ...sharedEncryptRecipientSessionKeysParams, recipients: [fromAddress] }),
+    encryptRecipientSessionKeys({
+      ...sharedEncryptRecipientSessionKeysParams,
+      recipients: [fromAddress],
+      isEncryptingToSelf: true
+    }),
     encryptRecipientSessionKeys({ ...sharedEncryptRecipientSessionKeysParams, recipients: toAddresses }),
     encryptRecipientSessionKeys({ ...sharedEncryptRecipientSessionKeysParams, recipients: ccAddresses }),
     encryptRecipientSessionKeys({ ...sharedEncryptRecipientSessionKeysParams, recipients: bccAddresses })

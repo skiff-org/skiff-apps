@@ -1,5 +1,5 @@
 import crelt from 'crelt';
-import { Icon } from '@skiff-org/skiff-ui';
+import { Icon } from 'nightwatch-ui';
 import { Dropdown } from 'prosemirror-menu';
 import { EditorState } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';

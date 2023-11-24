@@ -1,5 +1,5 @@
 import { Range } from 'semver';
-import { createProtoWrapperDatagramV2 } from '@skiff-org/skiff-crypto';
+import { createProtoWrapperDatagramV2 } from 'skiff-crypto';
 import {
   AttachmentBody,
   AttachmentHeader,

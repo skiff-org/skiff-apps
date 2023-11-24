@@ -1,4 +1,4 @@
-import { ThemeMode } from '@skiff-org/skiff-ui';
+import { ThemeMode } from 'nightwatch-ui';
 import React from 'react';
 import { QRCode as ReactQrCode } from 'react-qrcode-logo';
 

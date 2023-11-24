@@ -1,0 +1,18 @@
+language: node_js
+node_js:
+  - node
+cache: npm
+jobs:
+  include: 
+    - name: "Lint JS Files"
+      script: npm run lint:js
+      stage: test
+    - name: "Lint CSS Files"
+      script: npm run lint:css
+      stage: test
+    - name: "Type Checking" 
+      script: npx flow check
+      stage: test
+    - name: "Check Dist"
+      script: scripts/ci_check_dist.sh
+      stage: test

@@ -23,7 +23,7 @@ export const getMediaURL = async (document?: DocumentWithDecryptedContents) => {
 
   if (uploadedToCache) {
     // cache key is downloadedContents
-    const updatedContents = await getFullFile(genericDocumentContents);
+    const updatedContents = await getFullFile(genericDocumentContents, document.decryptedMetadata.mimeType);
     return URL.createObjectURL(updatedContents);
   } else {
     return documentData;

@@ -79,6 +79,7 @@ export enum AccountRecovery {
 export enum ActionType {
   ApplyLabel = 'APPLY_LABEL',
   ApplySystemLabel = 'APPLY_SYSTEM_LABEL',
+  DontNotify = 'DONT_NOTIFY',
   MarkAsRead = 'MARK_AS_READ'
 }
 
@@ -127,9 +128,27 @@ export type AdjustBusinessPlanResponse = {
   status: RequestStatus;
 };
 
+export type AliasDisplayInfo = {
+  __typename?: 'AliasDisplayInfo';
+  displayName?: Maybe<Scalars['String']>;
+  displayPictureData?: Maybe<DisplayPictureDataSkemail>;
+  emailAlias: Scalars['String'];
+};
+
 export type AliasesOnDomainResponse = {
   __typename?: 'AliasesOnDomainResponse';
   domainAliases: Array<DomainAliasData>;
+};
+
+export type AnonymousSubdomain = {
+  __typename?: 'AnonymousSubdomain';
+  domain: Scalars['String'];
+  domainID: Scalars['String'];
+};
+
+export type AppStoreTestNotificationResponse = {
+  __typename?: 'AppStoreTestNotificationResponse';
+  testNotificationToken?: Maybe<Scalars['String']>;
 };
 
 export enum AscDesc {
@@ -168,6 +187,11 @@ export enum AttendeeStatus {
   Yes = 'YES'
 }
 
+export enum AuthAction {
+  AutoForward = 'AutoForward',
+  Import = 'Import'
+}
+
 export type AutoImportStatus = {
   __typename?: 'AutoImportStatus';
   subscribed: Scalars['Boolean'];
@@ -198,6 +222,70 @@ export enum BottomDrawerModes {
   Closed = 'CLOSED',
   Feedback = 'FEEDBACK',
   Uploads = 'UPLOADS'
+}
+
+export type BulkActionJobStatusRequest = {
+  bulkActionVariant: BulkActionVariant;
+  jobID: Scalars['String'];
+};
+
+export type BulkActionJobStatusResponse = {
+  __typename?: 'BulkActionJobStatusResponse';
+  completed: Scalars['Boolean'];
+  jobStatus: BullMqJobStatus;
+};
+
+export enum BulkActionVariant {
+  ModifyLabels = 'MODIFY_LABELS',
+  PermanentlyDelete = 'PERMANENTLY_DELETE'
+}
+
+export type BulkDeleteTrashedThreadsResponse = {
+  __typename?: 'BulkDeleteTrashedThreadsResponse';
+  jobID: Scalars['String'];
+};
+
+export type BulkModifyLabelsJobStatusResponse = {
+  __typename?: 'BulkModifyLabelsJobStatusResponse';
+  completed: Scalars['Boolean'];
+  jobStatus: BullMqJobStatus;
+};
+
+export type BulkModifyLabelsRequest = {
+  systemLabels?: InputMaybe<Array<SystemLabels>>;
+  targetLabel: Scalars['String'];
+  userLabels?: InputMaybe<Array<Scalars['String']>>;
+};
+
+export type BulkModifyLabelsResponse = {
+  __typename?: 'BulkModifyLabelsResponse';
+  jobID: Scalars['String'];
+};
+
+export type BulkSilenceSuggestions = {
+  __typename?: 'BulkSilenceSuggestions';
+  silenceSenderDomains: Array<SilencedDomainAggregation>;
+  silenceSenderIndividuals: Array<SilenceSenderBulkSuggestion>;
+};
+
+export type BulkTrashRequest = {
+  sender: Scalars['String'];
+};
+
+export type BulkTrashResponse = {
+  __typename?: 'BulkTrashResponse';
+  jobID: Scalars['String'];
+};
+
+export enum BullMqJobStatus {
+  Active = 'ACTIVE',
+  Completed = 'COMPLETED',
+  Delayed = 'DELAYED',
+  Failed = 'FAILED',
+  Prioritized = 'PRIORITIZED',
+  Unknown = 'UNKNOWN',
+  Waiting = 'WAITING',
+  WaitingChildren = 'WAITING_CHILDREN'
 }
 
 export enum CacheControlScope {
@@ -231,6 +319,7 @@ export type CalendarEvent = {
   parentRecurrenceID?: Maybe<Scalars['String']>;
   recurrenceDate?: Maybe<Scalars['Date']>;
   recurrenceRule?: Maybe<RecurrenceRule>;
+  reminders?: Maybe<Array<EventReminder>>;
   sequence: Scalars['Int'];
   startDate: Scalars['Date'];
   updatedAt: Scalars['Date'];
@@ -261,9 +350,15 @@ export type CalendarEventData2 = {
   parentRecurrenceID?: InputMaybe<Scalars['String']>;
   recurrenceDate?: InputMaybe<Scalars['Date']>;
   recurrenceRule?: InputMaybe<RecurrenceRuleInput>;
+  reminders?: InputMaybe<Array<EventReminderInput>>;
   sequence: Scalars['Int'];
   startDate: Scalars['Date'];
 };
+
+export enum CalendarView {
+  Monthly = 'MONTHLY',
+  Weekly = 'WEEKLY'
+}
 
 export type ChangeLinkPermissionRequest = {
   docID: Scalars['String'];
@@ -278,6 +373,12 @@ export type ChangeLinkPermissionResponse = {
 export type CheckIfDomainsAvailableResponse = {
   __typename?: 'CheckIfDomainsAvailableResponse';
   domains?: Maybe<Array<Domain>>;
+};
+
+export type CheckTestNotificationResponse = {
+  __typename?: 'CheckTestNotificationResponse';
+  sendAttempts?: Maybe<Array<Maybe<SendAttemptItem>>>;
+  signedPayload?: Maybe<Scalars['String']>;
 };
 
 export type CheckoutSession = {
@@ -304,10 +405,43 @@ export type ConfirmCacheUploadResponse = {
 
 export type Contact = {
   __typename?: 'Contact';
+  contactID: Scalars['String'];
+  decryptedData?: Maybe<DecryptedContactData>;
+  decryptedSessionKey?: Maybe<Scalars['String']>;
   displayPictureData?: Maybe<DisplayPictureDataSkemail>;
-  emailAddress: Scalars['String'];
+  emailAddress?: Maybe<Scalars['String']>;
+  encryptedByKey?: Maybe<Scalars['String']>;
+  encryptedContactData?: Maybe<Scalars['String']>;
+  encryptedSessionKey?: Maybe<Scalars['String']>;
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
+  pgpKey?: Maybe<ContactPgpKey>;
+};
+
+export type ContactPgpKey = {
+  __typename?: 'ContactPGPKey';
+  publicKey: Scalars['String'];
+  trustLevel?: Maybe<PgpTrustLevel>;
+};
+
+export type ContactPgpKeyRequest = {
+  publicKey: Scalars['String'];
+  trustLevel?: InputMaybe<PgpTrustLevel>;
+};
+
+export type CreateAnonymousSubdomainAliasRequest = {
+  anonymousSubdomain: Scalars['String'];
+  displayEmailAliasLocalPart: Scalars['String'];
+};
+
+export type CreateAnonymousSubdomainAliasResponse = {
+  __typename?: 'CreateAnonymousSubdomainAliasResponse';
+  emailAliases: Array<Scalars['String']>;
+};
+
+export type CreateAnonymousSubdomainInput = {
+  rootDomain: Scalars['String'];
+  subDomain: Scalars['String'];
 };
 
 export type CreateBillingPortalSessionOutput = {
@@ -355,6 +489,12 @@ export type CreateEmailAliasResponse = {
   emailAliases: Array<Scalars['String']>;
 };
 
+export type CreateImportSessionRequest = {
+  client: ImportClients;
+  code: Scalars['String'];
+  state: Scalars['String'];
+};
+
 export type CreateMailFilterInput = {
   actions: Array<FilterActionInput>;
   encryptedByKey: Scalars['String'];
@@ -363,11 +503,21 @@ export type CreateMailFilterInput = {
   name?: InputMaybe<Scalars['String']>;
 };
 
+/**
+ * Note: Either contactID or emailAddress MUST be provided.
+ * contactID for new version. emailAddress for old version.
+ * empty string for contactID is acceptable and represents create contact on new version.
+ */
 export type CreateOrUpdateContactRequest = {
+  contactID?: InputMaybe<Scalars['String']>;
   displayPictureData?: InputMaybe<UpdateDisplayPictureSkemailRequest>;
-  emailAddress: Scalars['String'];
+  emailAddress?: InputMaybe<Scalars['String']>;
+  encryptedByKey?: InputMaybe<Scalars['String']>;
+  encryptedContactData?: InputMaybe<Scalars['String']>;
+  encryptedSessionKey?: InputMaybe<Scalars['String']>;
   firstName?: InputMaybe<Scalars['String']>;
   lastName?: InputMaybe<Scalars['String']>;
+  pgpKey?: InputMaybe<ContactPgpKeyRequest>;
 };
 
 export type CreateOrUpdateDraftRequest = {
@@ -388,7 +538,6 @@ export type CreateSrpMetamaskRequest = {
   signingPublicKey: Scalars['String'];
   userAttributionData: UserAttributionInput;
   verifier: Scalars['String'];
-  walletAddress: Scalars['String'];
 };
 
 export type CreateSrpRequest = {
@@ -426,18 +575,16 @@ export type CreateTeamRequest = {
   rootDocument: NewDocRequest;
 };
 
-export type CreateUdAliasRequest = {
-  udToken: Scalars['String'];
-};
-
 export type CreateUploadAvatarLinkResponse = {
   __typename?: 'CreateUploadAvatarLinkResponse';
   profileCustomURI: Scalars['String'];
   writeUrl: Scalars['String'];
 };
 
+/** Either contactID or contactEmail must be provided, but not both. */
 export type CreateUploadContactAvatarLinkRequest = {
-  contactEmail: Scalars['String'];
+  contactEmail?: InputMaybe<Scalars['String']>;
+  contactID?: InputMaybe<Scalars['String']>;
 };
 
 export type CreateUserLabelRequest = {
@@ -559,10 +706,27 @@ export enum DateFormat {
   YyyyMmDd = 'YYYY_MM_DD'
 }
 
+export type DecryptedAliasData = {
+  __typename?: 'DecryptedAliasData';
+  note?: Maybe<Scalars['String']>;
+};
+
 export type DecryptedAttachment = {
   __typename?: 'DecryptedAttachment';
   attachmentID: Scalars['String'];
   decryptedMetadata?: Maybe<AttachmentMetadata>;
+};
+
+export type DecryptedContactData = {
+  __typename?: 'DecryptedContactData';
+  decryptedAddresses?: Maybe<Array<ValueLabel>>;
+  decryptedBirthday?: Maybe<Scalars['String']>;
+  decryptedCompany?: Maybe<Scalars['String']>;
+  decryptedJobTitle?: Maybe<Scalars['String']>;
+  decryptedNickname?: Maybe<Scalars['String']>;
+  decryptedNotes?: Maybe<Scalars['String']>;
+  decryptedPhoneNumbers?: Maybe<Array<ValueLabel>>;
+  decryptedURL?: Maybe<Scalars['String']>;
 };
 
 export type DefaultDisplayPictureData = {
@@ -581,11 +745,16 @@ export type DeleteAccountResponse = {
 };
 
 export type DeleteContactRequest = {
-  emailAddress: Scalars['String'];
+  contactID?: InputMaybe<Scalars['String']>;
+  emailAddress?: InputMaybe<Scalars['String']>;
+};
+
+export type DeleteContactsRequest = {
+  contactIDs: Array<Scalars['String']>;
 };
 
 export type DeleteCustomDomainAliasRequest = {
-  captchaToken: Scalars['String'];
+  captchaToken?: InputMaybe<Scalars['String']>;
   emailAlias: Scalars['String'];
   userID?: InputMaybe<Scalars['String']>;
 };
@@ -713,6 +882,7 @@ export type DocToDelete = {
 
 export type Document = {
   __typename?: 'Document';
+  cloneDocID?: Maybe<Scalars['String']>;
   collaborators: Array<DocumentCollaborator>;
   contents: EncryptedContentsOutput;
   createdAt?: Maybe<Scalars['Date']>;
@@ -722,6 +892,7 @@ export type Document = {
   decryptedMetadata: DocumentDecryptedMetadata;
   decryptedPrivateHierarchicalKey?: Maybe<Scalars['String']>;
   decryptedSessionKey: Scalars['String'];
+  decryptedThumbnail?: Maybe<Scalars['String']>;
   docID: Scalars['String'];
   documentType: NwContentType;
   hasChildren: Scalars['Boolean'];
@@ -742,6 +913,7 @@ export type Document = {
   publicOrgData?: Maybe<Array<Maybe<PublicOrgData>>>;
   snapshots: Array<DocumentSnapshot>;
   team?: Maybe<Team>;
+  thumbnail?: Maybe<Scalars['String']>;
   trashedAt?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['Date']>;
 };
@@ -857,6 +1029,8 @@ export type DowngradeProgress = {
   currentStorageInMb: Scalars['Int'];
   customDomains: Scalars['Int'];
   emailAliases: Scalars['Int'];
+  quickAliasSubdomains: Scalars['Int'];
+  quickAliases: Scalars['Int'];
   shortAliases: Scalars['Int'];
   userFolders: Scalars['Int'];
   userLabels: Scalars['Int'];
@@ -870,6 +1044,15 @@ export type Draft = {
   encryptedDraft: Scalars['String'];
   encryptedKey: Scalars['String'];
   updatedAt?: Maybe<Scalars['Date']>;
+};
+
+export type DuplicateDocDeepRequest = {
+  docID: Scalars['String'];
+};
+
+export type DuplicateDocDeepResponse = {
+  __typename?: 'DuplicateDocDeepResponse';
+  docID: Scalars['String'];
 };
 
 export type EditOrganizationRequest = {
@@ -919,6 +1102,9 @@ export type Email = {
   encryptedTextSnippet?: Maybe<EncryptedDataOutput>;
   from: AddressObject;
   id: Scalars['String'];
+  notificationsTurnedOffForSender: Scalars['Boolean'];
+  pgpID?: Maybe<Scalars['String']>;
+  pgpKeyIDs?: Maybe<Array<Scalars['String']>>;
   replyTo?: Maybe<AddressObject>;
   scheduleSendAt?: Maybe<Scalars['Date']>;
   threadID?: Maybe<Scalars['String']>;
@@ -942,6 +1128,36 @@ export type EmailAutoForwardingSettings = {
   outlook: EmailAutoForwardingClientSettings;
 };
 
+export type EmailImportCustomDateRange = {
+  end: Scalars['Date'];
+  start: Scalars['Date'];
+};
+
+export type EmailImportDateRange = {
+  clientTimeZone: Scalars['String'];
+  customDateRange?: InputMaybe<EmailImportCustomDateRange>;
+  rangeType: EmailImportDateRangeType;
+};
+
+export enum EmailImportDateRangeType {
+  All = 'ALL',
+  Custom = 'CUSTOM',
+  Last_1Month = 'LAST_1_MONTH',
+  Last_3Months = 'LAST_3_MONTHS',
+  Last_12Months = 'LAST_12_MONTHS'
+}
+
+export type EmailImportMeta = {
+  __typename?: 'EmailImportMeta';
+  estimatedEmailCount: Scalars['Int'];
+};
+
+export type EmailImportMetaRequest = {
+  client: ImportClients;
+  dateRange: EmailImportDateRange;
+  importID: Scalars['String'];
+};
+
 export type EmailsWithUnreadIcsResponse = {
   __typename?: 'EmailsWithUnreadICSResponse';
   emails: Array<Email>;
@@ -951,6 +1167,22 @@ export type EmailsWithUnreadIcsResponse = {
 export type EnableEmailAutoForwardingRequest = {
   client: EmailAutoForwardingClient;
   code: Scalars['String'];
+  state: Scalars['String'];
+};
+
+export type EnableGmailImportRequest = {
+  dateRange: EmailImportDateRange;
+  importID: Scalars['String'];
+  includeGmailLabelIDs?: InputMaybe<Array<Scalars['ID']>>;
+  subscribeToAutoImport: Scalars['Boolean'];
+};
+
+export type EnableOutlookImportRequest = {
+  dateRange: EmailImportDateRange;
+  importID: Scalars['String'];
+  includeOutlookCategoryIDs: Array<Scalars['ID']>;
+  includeOutlookFolderIDs: Array<Scalars['ID']>;
+  subscribeToAutoImport: Scalars['Boolean'];
 };
 
 export type EncryptedAttachmentInput = {
@@ -1048,6 +1280,36 @@ export type EventAroundDateInput = {
   date: Scalars['Date'];
 };
 
+export type EventReminder = {
+  __typename?: 'EventReminder';
+  reminderID: Scalars['String'];
+  timeForAllDay?: Maybe<Scalars['String']>;
+  timeUnit: EventReminderTimeUnit;
+  timeValue: Scalars['Int'];
+  type: EventReminderType;
+};
+
+export type EventReminderInput = {
+  reminderID: Scalars['String'];
+  timeForAllDay?: InputMaybe<Scalars['String']>;
+  timeUnit: EventReminderTimeUnit;
+  timeValue: Scalars['Int'];
+  type: EventReminderType;
+};
+
+export enum EventReminderTimeUnit {
+  Day = 'DAY',
+  Hour = 'HOUR',
+  Minute = 'MINUTE',
+  Week = 'WEEK'
+}
+
+export enum EventReminderType {
+  All = 'ALL',
+  Email = 'EMAIL',
+  Notification = 'NOTIFICATION'
+}
+
 export enum EventType {
   ActiveStatus = 'ACTIVE_STATUS',
   DeleteDocument = 'DELETE_DOCUMENT',
@@ -1065,13 +1327,50 @@ export enum EventType {
 export enum EventUpdateType {
   Content = 'Content',
   Preferences = 'Preferences',
-  Rsvp = 'RSVP'
+  Rsvp = 'RSVP',
+  Reminders = 'Reminders'
 }
 
 export type EventsInput = {
   calendarID: Scalars['String'];
   eventsIDs: Array<Scalars['String']>;
 };
+
+export type ExternalEmailClientLabel = {
+  labelID: Scalars['ID'];
+  labelName: Scalars['String'];
+};
+
+export type ExternalEmailClientSystemLabel = ExternalEmailClientLabel & {
+  __typename?: 'ExternalEmailClientSystemLabel';
+  labelID: Scalars['ID'];
+  labelName: Scalars['String'];
+  /** The corresponding Skiff system label (if one exists). */
+  skiffSystemLabel?: Maybe<SystemLabels>;
+};
+
+export type ExternalEmailClientUserLabel = ExternalEmailClientLabel & {
+  __typename?: 'ExternalEmailClientUserLabel';
+  labelID: Scalars['ID'];
+  labelName: Scalars['String'];
+  /**
+   * The corresponding Skiff user label (if this label corresponds to one of the
+   * user's existing labels in Skiff).
+   */
+  skiffUserLabel?: Maybe<UserLabel>;
+};
+
+export enum FeedbackCategoryEnum {
+  Billing = 'BILLING',
+  Bug = 'BUG',
+  Question = 'QUESTION',
+  Request = 'REQUEST'
+}
+
+export enum FileTableDisplayFormat {
+  Grid = 'GRID',
+  List = 'LIST'
+}
 
 export type FilesystemNode = {
   docID: Scalars['String'];
@@ -1104,6 +1403,33 @@ export enum FilterType {
   Subject = 'SUBJECT',
   To = 'TO'
 }
+
+export type FilteredThreadIDs = {
+  __typename?: 'FilteredThreadIDs';
+  numThreadIDsRemoved: Scalars['Int'];
+  threadIDs: Array<Scalars['String']>;
+};
+
+export type FilteredThreadIDsRequest = {
+  systemLabels?: InputMaybe<Array<SystemLabels>>;
+  threadIDs: Array<Scalars['String']>;
+  userLabelIDs?: InputMaybe<Array<Scalars['String']>>;
+};
+
+export type FullAliasInfo = {
+  __typename?: 'FullAliasInfo';
+  areNotificationsEnabled?: Maybe<Scalars['Boolean']>;
+  createdAt: Scalars['Date'];
+  decryptedData?: Maybe<DecryptedAliasData>;
+  decryptedSessionKey?: Maybe<Scalars['String']>;
+  displayName?: Maybe<Scalars['String']>;
+  displayPictureData?: Maybe<DisplayPictureDataSkemail>;
+  emailAlias: Scalars['String'];
+  encryptedAliasData?: Maybe<Scalars['String']>;
+  encryptedByKey?: Maybe<Scalars['String']>;
+  encryptedSessionKey?: Maybe<Scalars['String']>;
+  isDisabled?: Maybe<Scalars['Boolean']>;
+};
 
 export type GenerateCustomDomainRecordsRequest = {
   domain: Scalars['String'];
@@ -1154,6 +1480,15 @@ export type GenerateWebAuthnRegistrationResponse = {
 
 export type GetAliasValidRequest = {
   alias: Scalars['String'];
+};
+
+export type GetAppleSubscriptionPlansResult = {
+  __typename?: 'GetAppleSubscriptionPlansResult';
+  plans: Array<SubscriptionPlanWithSku>;
+};
+
+export type GetAppleTestNotificationStatusInput = {
+  testNotificationToken: Scalars['String'];
 };
 
 export type GetBillingPortalSessionRequest = {
@@ -1223,6 +1558,11 @@ export type GetDomainSuggestionsResponse = {
   domains?: Maybe<Array<Scalars['String']>>;
 };
 
+export type GetGoogleSubscriptionPlansResult = {
+  __typename?: 'GetGoogleSubscriptionPlansResult';
+  plans: Array<GoogleSubscriptionPlanWithSku>;
+};
+
 export type GetMailFiltersInput = {
   clientside?: InputMaybe<Scalars['Boolean']>;
 };
@@ -1235,6 +1575,11 @@ export type GetMboxImportUrlResponse = {
   __typename?: 'GetMboxImportUrlResponse';
   fileID: Scalars['String'];
   uploadData: Scalars['String'];
+};
+
+export type GetOrCreateStripeCustomerResponse = {
+  __typename?: 'GetOrCreateStripeCustomerResponse';
+  stripeCustomerID: Scalars['String'];
 };
 
 export type GetRecoveryPublicKeysAndDataRequest = {
@@ -1269,6 +1614,23 @@ export type GetValidPaperShareHashRequest = {
   username: Scalars['String'];
 };
 
+export type GmailInboxOrganization = {
+  __typename?: 'GmailInboxOrganization';
+  labels: Array<ExternalEmailClientLabel>;
+};
+
+export type GmailInboxOrganizationRequest = {
+  importID: Scalars['String'];
+};
+
+export type GoogleSubscriptionPlanWithSku = {
+  __typename?: 'GoogleSubscriptionPlanWithSKU';
+  skuAnnualOfferId: Scalars['String'];
+  skuMonthlyOfferId: Scalars['String'];
+  skuName: Scalars['String'];
+  tierName: Scalars['String'];
+};
+
 export type GrantCreditsRequest = {
   creditAmount: CreditAmountInput;
   creditTransactionReason: CreditTransactionReason;
@@ -1293,6 +1655,7 @@ export type HierarchicalPermissionChainLink = {
 
 export enum ImportClients {
   Gmail = 'Gmail',
+  Mbox = 'Mbox',
   Outlook = 'Outlook'
 }
 
@@ -1303,11 +1666,33 @@ export type ImportEmlEmailRequest = {
 
 export type ImportGmailRequest = {
   code: Scalars['String'];
+  state: Scalars['String'];
   subscribeToAutoImport?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type ImportMboxRequest = {
   fileID: Scalars['String'];
+};
+
+export type ImportSession = {
+  __typename?: 'ImportSession';
+  importID: Scalars['String'];
+};
+
+export enum ImportStatus {
+  Completed = 'COMPLETED',
+  Failed = 'FAILED',
+  InProgress = 'IN_PROGRESS',
+  SilencingSuggestionsGenerated = 'SILENCING_SUGGESTIONS_GENERATED',
+  SilencingSuggestionsQuerying = 'SILENCING_SUGGESTIONS_QUERYING',
+  SilencingSuggestionsQueryFailed = 'SILENCING_SUGGESTIONS_QUERY_FAILED'
+}
+
+export type ImportStatusType = {
+  __typename?: 'ImportStatusType';
+  importID: Scalars['String'];
+  importedEmailCount?: Maybe<Scalars['Int']>;
+  status: ImportStatus;
 };
 
 export type IndexableDocument = {
@@ -1355,6 +1740,12 @@ export type Invoice = {
 export type InvoiceHistory = {
   __typename?: 'InvoiceHistory';
   invoiceHistory?: Maybe<Array<Maybe<Invoice>>>;
+};
+
+export type LabelUnreadCount = {
+  __typename?: 'LabelUnreadCount';
+  count: Scalars['Int'];
+  label: Scalars['String'];
 };
 
 export type LastUpdateKeyMap = {
@@ -1510,9 +1901,7 @@ export type MailboxPageInfo = {
 export type MailboxRequest = {
   clientsideFiltersApplied?: InputMaybe<Scalars['Boolean']>;
   cursor?: InputMaybe<MailboxCursor>;
-  /** @deprecated Use lastUpdatedDate instead */
   emailsUpdatedAfterDate?: InputMaybe<Scalars['Date']>;
-  /** @deprecated Use lastUpdatedDate instead */
   emailsUpdatedBeforeDate?: InputMaybe<Scalars['Date']>;
   filters?: InputMaybe<MailboxFilters>;
   isAliasInbox?: InputMaybe<Scalars['Boolean']>;
@@ -1523,8 +1912,10 @@ export type MailboxRequest = {
   platformInfo?: InputMaybe<PlatformInfo>;
   polling?: InputMaybe<Scalars['Boolean']>;
   refetching?: InputMaybe<Scalars['Boolean']>;
+  updatedAtField?: InputMaybe<UpdatedAtField>;
   updatedAtOrderDirection?: InputMaybe<AscDesc>;
   useUpdatedAtField?: InputMaybe<Scalars['Boolean']>;
+  userLabels?: InputMaybe<Array<Scalars['String']>>;
 };
 
 export type ManageOrganizationPaymentDetailsRequest = {
@@ -1539,6 +1930,18 @@ export type ManageOrganizationPaymentDetailsResponse = {
 export type MarkEmailAsReadIcsRequest = {
   emailIDs: Array<Scalars['String']>;
   reason?: InputMaybe<Scalars['String']>;
+};
+
+export type MarkNotSpamMultipleEmailAddressesRequest = {
+  emailAddressesToMarkNotSpam: Array<Scalars['String']>;
+};
+
+export type MarkSpamMultipleEmailAddressesRequest = {
+  emailAddressesToMarkSpam: Array<Scalars['String']>;
+};
+
+export type MarkThreadAsOpenedInput = {
+  threadID: Scalars['String'];
 };
 
 export type MarkThreadsAsClientsideFilteredInput = {
@@ -1574,19 +1977,28 @@ export type MoveDocResponse = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  ValidateAppStoreSubscriptionRequest: Scalars['Boolean'];
   acceptInviteStep1: AcceptInviteStep1Response;
   addEmail: AddEmailResponse;
   addPendingInvite: AddPendingInviteResponse;
   adjustBusinessPlan: AdjustBusinessPlanResponse;
   applyLabels?: Maybe<ModifyLabelsResponse>;
   blockEmailAddress?: Maybe<Scalars['Void']>;
+  bulkApplyLabels?: Maybe<BulkModifyLabelsResponse>;
+  bulkDeleteTrashedThreads?: Maybe<BulkDeleteTrashedThreadsResponse>;
+  bulkRemoveLabels?: Maybe<BulkModifyLabelsResponse>;
+  bulkTrash?: Maybe<BulkTrashResponse>;
   changeLinkPermission: ChangeLinkPermissionResponse;
+  clearPendingStorageWarning?: Maybe<Scalars['Void']>;
   clearSessionCache: ClearSessionCacheResponse;
   confirmCacheUpload: ConfirmCacheUploadResponse;
+  createAnonymousSubdomain?: Maybe<Scalars['Void']>;
+  createAnonymousSubdomainAlias?: Maybe<CreateAnonymousSubdomainAliasResponse>;
   createCacheElement: CreateCacheElementResponse;
   createCalendarUser?: Maybe<Scalars['Void']>;
   createCustomDomainAlias?: Maybe<CreateCustomDomainAliasResponse>;
   createEmailAlias?: Maybe<CreateEmailAliasResponse>;
+  createImportSession: ImportSession;
   createMailFilter?: Maybe<Scalars['Void']>;
   createOrUpdateContact?: Maybe<Scalars['Void']>;
   createOrUpdateDraft?: Maybe<Scalars['Void']>;
@@ -1594,15 +2006,17 @@ export type Mutation = {
   createSrp: CreateSrpResponse;
   createSrpMetamask: CreateSrpResponse;
   createTeam: Team;
-  createUdAlias?: Maybe<CreateEmailAliasResponse>;
+  createUploadAliasAvatarLink: CreateUploadAvatarLinkResponse;
   createUploadAvatarLink: CreateUploadAvatarLinkResponse;
   createUploadContactAvatarLink: CreateUploadAvatarLinkResponse;
   createUserLabel?: Maybe<UserLabel>;
   createWalletChallenge: CreateWalletChallengeResponse;
   createWalletChallengeSkemail: CreateWalletChallengeResponseSkemail;
   deleteAccount: DeleteAccountResponse;
+  deleteAnonymousSubdomain?: Maybe<Scalars['Void']>;
   deleteAutoReply?: Maybe<Scalars['Void']>;
   deleteContact?: Maybe<Scalars['Void']>;
+  deleteContacts?: Maybe<Scalars['Void']>;
   deleteCustomDomain?: Maybe<Scalars['Void']>;
   deleteCustomDomainAlias?: Maybe<Scalars['Void']>;
   deleteDoc: DeleteDocResponse;
@@ -1620,10 +2034,13 @@ export type Mutation = {
   deleteUserSignature?: Maybe<Scalars['Void']>;
   disableEmailAutoForwarding?: Maybe<Scalars['Void']>;
   disableMfa: DisableMfaResponse;
+  duplicateDocDeep: DuplicateDocDeepResponse;
   editOrganization: EditOrganizationResponse;
   editTeam: Team;
   editUserLabel?: Maybe<UserLabel>;
   enableEmailAutoForwarding?: Maybe<Scalars['Void']>;
+  enableGmailImport?: Maybe<Scalars['Void']>;
+  enableOutlookImport?: Maybe<Scalars['Void']>;
   enrollMfa: EnrollMfaResponse;
   generateCustomDomainRecords: GenerateCustomDomainRecordsResponse;
   generateDocPublicLinkAuthTokenStep1: GenerateDocPublicLinkAuthTokenStep1Response;
@@ -1640,9 +2057,13 @@ export type Mutation = {
   manageOrganizationPaymentDetails: ManageOrganizationPaymentDetailsResponse;
   markCurrentUserOnboardedWorkspaceMigration?: Maybe<Scalars['Void']>;
   markEmailAsReadICS?: Maybe<Scalars['Void']>;
+  markNotSpamMultipleEmailAddresses?: Maybe<Scalars['Void']>;
+  markSpamMultipleEmailAddresses?: Maybe<Scalars['Void']>;
+  markThreadAsOpened?: Maybe<Scalars['Void']>;
   markThreadsAsClientsideFiltered?: Maybe<Scalars['Void']>;
   moveDoc: MoveDocResponse;
   moveMultipleDoc: Array<MoveDocResponse>;
+  muteNotificationForSender?: Maybe<Scalars['Void']>;
   newMultipleDocs: Array<NewDocResponse>;
   notificationClicked?: Maybe<Scalars['Boolean']>;
   provisionSrp: Scalars['Boolean'];
@@ -1650,13 +2071,17 @@ export type Mutation = {
   referUser: ReferUserResponse;
   regenerateMfaBackupCodes: RegenerateMfaBackupCodesResponse;
   removeLabels?: Maybe<ModifyLabelsResponse>;
+  renameWebAuthnDevice?: Maybe<Scalars['Void']>;
   replyToMessage?: Maybe<ReplyToEmailResponse>;
   resetAccount?: Maybe<Scalars['Boolean']>;
   restoreTrashDoc: MoveDocResponse;
   saveContents: SaveContentsResponse;
   saveCustomDomainRecords?: Maybe<Scalars['Void']>;
   saveMetadata: SaveMetadataResponse;
+  saveThumbnail: SaveThumbnailResponse;
+  scheduleSkemailer: ScheduleSkemailerResponse;
   sendAccessRequestEmail: Scalars['Boolean'];
+  sendAnonymousSubdomainTutorialEmail?: Maybe<Scalars['Void']>;
   sendDocumentEvent?: Maybe<Scalars['Boolean']>;
   sendFeedback: Scalars['Boolean'];
   sendMessage?: Maybe<SendEmailResponse>;
@@ -1669,6 +2094,7 @@ export type Mutation = {
   setLastViewedReferralCredit: Scalars['Boolean'];
   setNotificationPreferences?: Maybe<Scalars['Boolean']>;
   setPDSubscribeFlag?: Maybe<Scalars['Void']>;
+  setPGPKey?: Maybe<Scalars['Void']>;
   setPushToken?: Maybe<Scalars['Void']>;
   setReadStatus?: Maybe<SetReadStatusResponse>;
   setUseIPFS: SetUseIpfsResponse;
@@ -1679,6 +2105,7 @@ export type Mutation = {
   setupProvisionedUser: LoginSrpResponse;
   shareDoc: ShareDocResponse;
   shareTeamDocWithOtherTeam: Team;
+  silenceMultipleEmailAddresses?: Maybe<Scalars['Void']>;
   storeUnauthenticatedWorkspaceEvent: Scalars['Boolean'];
   storeWorkspaceEvent: Scalars['Boolean'];
   subscribeNotification?: Maybe<Scalars['Void']>;
@@ -1687,18 +2114,24 @@ export type Mutation = {
   sync2?: Maybe<SyncResponse>;
   trashDocs: Array<MoveDocResponse>;
   unblockEmailAddress?: Maybe<Scalars['Void']>;
+  unmuteNotificationForSender?: Maybe<Scalars['Void']>;
   unsendMessage?: Maybe<Email>;
   unsetCalendarPushToken?: Maybe<Scalars['Void']>;
   unsetPushToken?: Maybe<Scalars['Void']>;
   unshareDoc: UnshareDocResponse;
   unshareTeamDocWithOtherTeam: Team;
+  unsilenceMultipleEmailAddresses?: Maybe<Scalars['Void']>;
   unsubscribeFromGmailImport?: Maybe<Scalars['Void']>;
   unsubscribeNotification?: Maybe<Scalars['Void']>;
   updateDisplayName: UpdateDisplayNameResponse;
   updateDisplayPicture: User;
   updateDocumentData: UpdateDocumentDataResponse;
   updateEmailAliasActiveState?: Maybe<UpdateEmailAliasActiveStateResponse>;
+  updateEmailAliasProfile: Scalars['Boolean'];
+  updateEmailAliasSendReceiveEnabledState?: Maybe<Scalars['Void']>;
   updateMailFilter?: Maybe<Scalars['Void']>;
+  updateQuickAliasActiveState?: Maybe<UpdateQuickAliasActiveStateResponse>;
+  updateQuickAliasInfo?: Maybe<Scalars['Void']>;
   updateSrp: UpdateSrpResponse;
   updateUploadContactAvatarLink: UpdateUploadContactAvatarLinkResponse;
   upgradeHierarchicalKeys: UpgradeHierarchicalKeysResponse;
@@ -1708,6 +2141,11 @@ export type Mutation = {
   verifyCustomDomain?: Maybe<Scalars['Void']>;
   verifyWalletAddressCreateAlias: CreateEmailAliasResponse;
   verifyWebAuthnRegistration: VerifyWebAuthnRegistrationResponse;
+};
+
+
+export type MutationValidateAppStoreSubscriptionRequestArgs = {
+  request: ValidateAppStoreSubscriptionRequest;
 };
 
 
@@ -1741,6 +2179,21 @@ export type MutationBlockEmailAddressArgs = {
 };
 
 
+export type MutationBulkApplyLabelsArgs = {
+  request?: InputMaybe<BulkModifyLabelsRequest>;
+};
+
+
+export type MutationBulkRemoveLabelsArgs = {
+  request?: InputMaybe<BulkModifyLabelsRequest>;
+};
+
+
+export type MutationBulkTrashArgs = {
+  request: BulkTrashRequest;
+};
+
+
 export type MutationChangeLinkPermissionArgs = {
   request: ChangeLinkPermissionRequest;
 };
@@ -1748,6 +2201,16 @@ export type MutationChangeLinkPermissionArgs = {
 
 export type MutationConfirmCacheUploadArgs = {
   request: ConfirmCacheUploadRequest;
+};
+
+
+export type MutationCreateAnonymousSubdomainArgs = {
+  request: CreateAnonymousSubdomainInput;
+};
+
+
+export type MutationCreateAnonymousSubdomainAliasArgs = {
+  request?: InputMaybe<CreateAnonymousSubdomainAliasRequest>;
 };
 
 
@@ -1768,6 +2231,11 @@ export type MutationCreateCustomDomainAliasArgs = {
 
 export type MutationCreateEmailAliasArgs = {
   request?: InputMaybe<CreateEmailAliasRequest>;
+};
+
+
+export type MutationCreateImportSessionArgs = {
+  request: CreateImportSessionRequest;
 };
 
 
@@ -1801,8 +2269,8 @@ export type MutationCreateTeamArgs = {
 };
 
 
-export type MutationCreateUdAliasArgs = {
-  request?: InputMaybe<CreateUdAliasRequest>;
+export type MutationCreateUploadAliasAvatarLinkArgs = {
+  emailAlias: Scalars['String'];
 };
 
 
@@ -1831,8 +2299,18 @@ export type MutationDeleteAccountArgs = {
 };
 
 
+export type MutationDeleteAnonymousSubdomainArgs = {
+  userDomainID: Scalars['String'];
+};
+
+
 export type MutationDeleteContactArgs = {
   request: DeleteContactRequest;
+};
+
+
+export type MutationDeleteContactsArgs = {
+  request: DeleteContactsRequest;
 };
 
 
@@ -1911,6 +2389,11 @@ export type MutationDisableMfaArgs = {
 };
 
 
+export type MutationDuplicateDocDeepArgs = {
+  request: DuplicateDocDeepRequest;
+};
+
+
 export type MutationEditOrganizationArgs = {
   request: EditOrganizationRequest;
 };
@@ -1928,6 +2411,16 @@ export type MutationEditUserLabelArgs = {
 
 export type MutationEnableEmailAutoForwardingArgs = {
   request: EnableEmailAutoForwardingRequest;
+};
+
+
+export type MutationEnableGmailImportArgs = {
+  request: EnableGmailImportRequest;
+};
+
+
+export type MutationEnableOutlookImportArgs = {
+  request: EnableOutlookImportRequest;
 };
 
 
@@ -1978,6 +2471,7 @@ export type MutationImportMboxEmailsArgs = {
 
 export type MutationImportOutlookEmailsArgs = {
   code: Scalars['String'];
+  state: Scalars['String'];
 };
 
 
@@ -1996,6 +2490,21 @@ export type MutationMarkEmailAsReadIcsArgs = {
 };
 
 
+export type MutationMarkNotSpamMultipleEmailAddressesArgs = {
+  request?: InputMaybe<MarkNotSpamMultipleEmailAddressesRequest>;
+};
+
+
+export type MutationMarkSpamMultipleEmailAddressesArgs = {
+  request?: InputMaybe<MarkSpamMultipleEmailAddressesRequest>;
+};
+
+
+export type MutationMarkThreadAsOpenedArgs = {
+  request: MarkThreadAsOpenedInput;
+};
+
+
 export type MutationMarkThreadsAsClientsideFilteredArgs = {
   input: MarkThreadsAsClientsideFilteredInput;
 };
@@ -2008,6 +2517,11 @@ export type MutationMoveDocArgs = {
 
 export type MutationMoveMultipleDocArgs = {
   request: Array<MoveDocRequest>;
+};
+
+
+export type MutationMuteNotificationForSenderArgs = {
+  request: MuteNotificationForSenderRequest;
 };
 
 
@@ -2046,6 +2560,11 @@ export type MutationRemoveLabelsArgs = {
 };
 
 
+export type MutationRenameWebAuthnDeviceArgs = {
+  request: RenameWebAuthnDeviceRequest;
+};
+
+
 export type MutationReplyToMessageArgs = {
   message?: InputMaybe<ReplyToEmailRequest>;
 };
@@ -2076,8 +2595,23 @@ export type MutationSaveMetadataArgs = {
 };
 
 
+export type MutationSaveThumbnailArgs = {
+  request: SaveThumbnailRequest;
+};
+
+
+export type MutationScheduleSkemailerArgs = {
+  request: ScheduleSkemailerRequest;
+};
+
+
 export type MutationSendAccessRequestEmailArgs = {
   request: SendAccessRequestEmailRequest;
+};
+
+
+export type MutationSendAnonymousSubdomainTutorialEmailArgs = {
+  email: Scalars['String'];
 };
 
 
@@ -2141,6 +2675,11 @@ export type MutationSetPdSubscribeFlagArgs = {
 };
 
 
+export type MutationSetPgpKeyArgs = {
+  request: SetPgpKey;
+};
+
+
 export type MutationSetPushTokenArgs = {
   request?: InputMaybe<SetPushTokenRequest>;
 };
@@ -2191,6 +2730,11 @@ export type MutationShareTeamDocWithOtherTeamArgs = {
 };
 
 
+export type MutationSilenceMultipleEmailAddressesArgs = {
+  request?: InputMaybe<SilenceMultipleEmailAddressesRequest>;
+};
+
+
 export type MutationStoreUnauthenticatedWorkspaceEventArgs = {
   request: WorkspaceEventRequest;
 };
@@ -2226,6 +2770,11 @@ export type MutationUnblockEmailAddressArgs = {
 };
 
 
+export type MutationUnmuteNotificationForSenderArgs = {
+  request: UnmuteNotificationForSenderRequest;
+};
+
+
 export type MutationUnsendMessageArgs = {
   message?: InputMaybe<UnsendEmailRequest>;
 };
@@ -2251,6 +2800,11 @@ export type MutationUnshareTeamDocWithOtherTeamArgs = {
 };
 
 
+export type MutationUnsilenceMultipleEmailAddressesArgs = {
+  request?: InputMaybe<UnsilenceMultipleEmailAddressesRequest>;
+};
+
+
 export type MutationUpdateDisplayNameArgs = {
   request: UpdateDisplayNameRequest;
 };
@@ -2271,8 +2825,28 @@ export type MutationUpdateEmailAliasActiveStateArgs = {
 };
 
 
+export type MutationUpdateEmailAliasProfileArgs = {
+  request?: InputMaybe<UpdateEmailAliasProfileRequest>;
+};
+
+
+export type MutationUpdateEmailAliasSendReceiveEnabledStateArgs = {
+  request: UpdateEmailAliasEnabledStateRequest;
+};
+
+
 export type MutationUpdateMailFilterArgs = {
   input: UpdateMailFilterInput;
+};
+
+
+export type MutationUpdateQuickAliasActiveStateArgs = {
+  request?: InputMaybe<UpdateQuickAliasActiveStateRequest>;
+};
+
+
+export type MutationUpdateQuickAliasInfoArgs = {
+  request: UpdateQuickAliasInfoInput;
 };
 
 
@@ -2318,6 +2892,15 @@ export type MutationVerifyWalletAddressCreateAliasArgs = {
 
 export type MutationVerifyWebAuthnRegistrationArgs = {
   request: VerifyWebAuthnRegistrationRequest;
+};
+
+export type MuteNotificationForSenderRequest = {
+  emailAddresses: Array<Scalars['String']>;
+};
+
+export type NativeDriveManifestResponse = {
+  __typename?: 'NativeDriveManifestResponse';
+  slimDocuments: Array<SlimDocument>;
 };
 
 export type NativeMailbox = {
@@ -2393,6 +2976,42 @@ export type Organization = {
   teams: Array<Team>;
 };
 
+export type OutlookInboxOrganization = {
+  __typename?: 'OutlookInboxOrganization';
+  categories: Array<ExternalEmailClientUserLabel>;
+  folders: Array<ExternalEmailClientLabel>;
+};
+
+export type OutlookInboxOrganizationRequest = {
+  importID: Scalars['String'];
+};
+
+export type PgpInfo = {
+  __typename?: 'PGPInfo';
+  createdAt: Scalars['Date'];
+  emailAlias: Scalars['String'];
+  encryptedPrivateKey: EncryptedDataOutput;
+  encryptedSessionKey: EncryptedSessionKeyOutput;
+  encryptionFingerprint: Scalars['String'];
+  encryptionKeyID: Scalars['String'];
+  publicKey: Scalars['String'];
+  signingFingerprint: Scalars['String'];
+  signingKeyID: Scalars['String'];
+  status: PgpKeyStatus;
+};
+
+export enum PgpKeyStatus {
+  Disabled = 'DISABLED',
+  Enabled = 'ENABLED'
+}
+
+export enum PgpTrustLevel {
+  FullyTrust = 'FULLY_TRUST',
+  MarginalTrust = 'MARGINAL_TRUST',
+  NoTrust = 'NO_TRUST',
+  Unknown = 'UNKNOWN'
+}
+
 export type PaidUpStatus = {
   __typename?: 'PaidUpStatus';
   downgradeProgress: DowngradeProgress;
@@ -2432,6 +3051,12 @@ export type PendingDocumentKeyUpgradesOutput = {
 
 export type PendingDocumentKeyUpgradesRequest = {
   rootDocumentId: Scalars['String'];
+};
+
+export type PendingStorageWarning = {
+  __typename?: 'PendingStorageWarning';
+  allowanceMbAtWarningTrigger: Scalars['Int'];
+  usageMbAtWarningTrigger: Scalars['Int'];
 };
 
 export type PendingUserInvite = {
@@ -2549,15 +3174,20 @@ export type PushCalendarEventInput2 = {
 
 export type Query = {
   __typename?: 'Query';
+  aliasDisplayInfo?: Maybe<AliasDisplayInfo>;
   aliasValid: Scalars['Boolean'];
   allContacts: Array<Contact>;
   allDrafts: Array<Draft>;
   allFolderDocuments: Array<Document>;
+  allowedUsers: Array<Scalars['String']>;
   apiVersion?: Maybe<Scalars['String']>;
   attachments?: Maybe<Array<Maybe<Attachment>>>;
   autoReply?: Maybe<AutoReplyOutput>;
   billingPortal?: Maybe<CreateBillingPortalSessionOutput>;
+  blockedUsers: Array<Scalars['String']>;
   browserPushNotificationsEnabled: Scalars['Boolean'];
+  bulkActionJobStatus: BulkModifyLabelsJobStatusResponse;
+  bulkModifyLabelsJobStatus: BulkModifyLabelsJobStatusResponse;
   calendar: Calendar;
   checkIfDomainsAvailable: CheckIfDomainsAvailableResponse;
   checkoutPortal: CheckoutSession;
@@ -2566,18 +3196,24 @@ export type Query = {
   currentUser?: Maybe<User>;
   currentUserAlterEgos: Array<UserAlterEgo>;
   customDomainCheckoutPortal: CheckoutSession;
-  customDomains: Array<Scalars['String']>;
   decryptionServicePublicKey?: Maybe<Scalars['PublicKey']>;
   defaultProfilePicture?: Maybe<DefaultDisplayPictureData>;
   document: Document;
   documents: Array<Document>;
   emailAutoForwardingSettings: EmailAutoForwardingSettings;
+  /** Resolves metadata related to importing a user's emails from an external email client. */
+  emailImportMeta: EmailImportMeta;
   /** @deprecated Added pagination, use emailsWithUnreadICS2 instead */
   emailsWithUnreadICS: Array<Email>;
   emailsWithUnreadICS2: EmailsWithUnreadIcsResponse;
   events: Array<CalendarEvent>;
   eventsAroundDate: Array<CalendarEvent>;
+  filteredThreadIDs: FilteredThreadIDs;
+  fullAliasInfo: Array<FullAliasInfo>;
   getAliasesOnDomain: AliasesOnDomainResponse;
+  getAppleSubscriptionPlans: GetAppleSubscriptionPlansResult;
+  getAppleTestNotificationStatus: CheckTestNotificationResponse;
+  getAvailableAnonymousDomains: Array<Scalars['String']>;
   getBonfidaNames: Array<Scalars['String']>;
   getCoinbaseCheckoutID: GetCoinbaseCheckoutIdResponse;
   getCurrentUserCustomDomains: GetCurrentUserCustomDomainsResponse;
@@ -2586,30 +3222,48 @@ export type Query = {
   getENSName?: Maybe<Scalars['String']>;
   getGmailAutoImportStatus: AutoImportStatus;
   getGoogleAuthURL: Scalars['String'];
+  getGoogleSubscriptionPlans: GetGoogleSubscriptionPlansResult;
   getICNSName?: Maybe<Scalars['String']>;
+  getOrCreateStripeCustomer: GetOrCreateStripeCustomerResponse;
   getOutlookAuthUrl: Scalars['String'];
+  getQuickAliasRootDomainsForUser: Array<Scalars['String']>;
   getStargazeName?: Maybe<Scalars['String']>;
+  /** Info about how a user's Gmail inbox is organized */
+  gmailInboxOrganization: GmailInboxOrganization;
+  importStatus: Array<ImportStatusType>;
   isBlocked: Scalars['Boolean'];
   isCustomDomain: Scalars['Boolean'];
   isHolderOfNFT: Scalars['Boolean'];
   lastViewedReferralCredit: LastViewedReferralCreditResponse;
   mailFilters: Array<MailFilter>;
   mailbox?: Maybe<Mailbox>;
+  nativeDriveManifest: NativeDriveManifestResponse;
   nativeMailbox?: Maybe<NativeMailbox>;
+  numMailboxThreads: Scalars['Int'];
   orgMemberDefaultEmailAlias?: Maybe<Scalars['String']>;
   orgMemberEmailAliases: Array<Scalars['String']>;
   organization: Organization;
+  /** Info about how a user's Outlook inbox is organized */
+  outlookInboxOrganization: OutlookInboxOrganization;
   pendingDocumentKeyUpgrades: PendingDocumentKeyUpgradesOutput;
+  pgpInfo: Array<Maybe<PgpInfo>>;
   recoveryPublicKeysAndData?: Maybe<RecoveryPublicKeysAndDataOutput>;
+  refreshToken?: Maybe<Scalars['Void']>;
+  requestAppStoreTestNotification?: Maybe<AppStoreTestNotificationResponse>;
   searchIndexProgress: SearchIndexProgress;
   searchIndexableDocuments: Array<IndexableDocument>;
   sessionCache: SessionCacheOutput;
   sessionCacheChallenge: SessionCacheChallengeResponse;
   sessionCacheMobile?: Maybe<Scalars['Void']>;
+  silenceSenderSuggestions: BulkSilenceSuggestions;
+  silencedSenders: BulkSilenceSuggestions;
+  skemailerStatus?: Maybe<SkemailerStatusResponse>;
+  spamUsers: Array<Scalars['String']>;
   status?: Maybe<Scalars['String']>;
   team: Team;
   templates: Array<Template>;
   unread: Scalars['Int'];
+  unreadAllLabels: Array<LabelUnreadCount>;
   user?: Maybe<User>;
   userCalendar: UserCalendar;
   userLabels: Array<UserLabel>;
@@ -2621,6 +3275,13 @@ export type Query = {
   usersFromEmailAlias: Array<Maybe<User>>;
   usersFromEmailAliasWithCatchall: Array<Maybe<User>>;
   validPaperShareHash: Scalars['Boolean'];
+  validateAnonymousSubdomain: Scalars['Boolean'];
+  validateOriginalTransactionIdMatchesUser: Scalars['Boolean'];
+};
+
+
+export type QueryAliasDisplayInfoArgs = {
+  emailAlias: Scalars['String'];
 };
 
 
@@ -2636,6 +3297,16 @@ export type QueryAttachmentsArgs = {
 
 export type QueryBillingPortalArgs = {
   request?: InputMaybe<GetBillingPortalSessionRequest>;
+};
+
+
+export type QueryBulkActionJobStatusArgs = {
+  request: BulkActionJobStatusRequest;
+};
+
+
+export type QueryBulkModifyLabelsJobStatusArgs = {
+  jobID: Scalars['String'];
 };
 
 
@@ -2684,6 +3355,11 @@ export type QueryDocumentsArgs = {
 };
 
 
+export type QueryEmailImportMetaArgs = {
+  request: EmailImportMetaRequest;
+};
+
+
 export type QueryEventsArgs = {
   request: EventsInput;
 };
@@ -2694,8 +3370,18 @@ export type QueryEventsAroundDateArgs = {
 };
 
 
+export type QueryFilteredThreadIDsArgs = {
+  request: FilteredThreadIDsRequest;
+};
+
+
 export type QueryGetAliasesOnDomainArgs = {
   domainID: Scalars['String'];
+};
+
+
+export type QueryGetAppleTestNotificationStatusArgs = {
+  request: GetAppleTestNotificationStatusInput;
 };
 
 
@@ -2725,13 +3411,28 @@ export type QueryGetEnsNameArgs = {
 };
 
 
+export type QueryGetGoogleAuthUrlArgs = {
+  action?: InputMaybe<AuthAction>;
+};
+
+
 export type QueryGetIcnsNameArgs = {
   cosmosAddress: Scalars['String'];
 };
 
 
+export type QueryGetOutlookAuthUrlArgs = {
+  action?: InputMaybe<AuthAction>;
+};
+
+
 export type QueryGetStargazeNameArgs = {
   cosmosAddress: Scalars['String'];
+};
+
+
+export type QueryGmailInboxOrganizationArgs = {
+  request: GmailInboxOrganizationRequest;
 };
 
 
@@ -2766,6 +3467,11 @@ export type QueryNativeMailboxArgs = {
 };
 
 
+export type QueryNumMailboxThreadsArgs = {
+  label: Scalars['String'];
+};
+
+
 export type QueryOrgMemberDefaultEmailAliasArgs = {
   userID: Scalars['String'];
 };
@@ -2781,8 +3487,19 @@ export type QueryOrganizationArgs = {
 };
 
 
+export type QueryOutlookInboxOrganizationArgs = {
+  request: OutlookInboxOrganizationRequest;
+};
+
+
 export type QueryPendingDocumentKeyUpgradesArgs = {
   request: PendingDocumentKeyUpgradesRequest;
+};
+
+
+export type QueryPgpInfoArgs = {
+  allKeys?: InputMaybe<Scalars['Boolean']>;
+  emailAlias?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -2806,6 +3523,11 @@ export type QuerySessionCacheMobileArgs = {
 };
 
 
+export type QuerySkemailerStatusArgs = {
+  skemailerID: Scalars['String'];
+};
+
+
 export type QueryTeamArgs = {
   id: Scalars['String'];
 };
@@ -2818,6 +3540,11 @@ export type QueryTemplatesArgs = {
 
 export type QueryUnreadArgs = {
   label: Scalars['String'];
+};
+
+
+export type QueryUnreadAllLabelsArgs = {
+  labels: Array<Scalars['String']>;
 };
 
 
@@ -2859,6 +3586,22 @@ export type QueryUsersFromEmailAliasWithCatchallArgs = {
 
 export type QueryValidPaperShareHashArgs = {
   request: GetValidPaperShareHashRequest;
+};
+
+
+export type QueryValidateAnonymousSubdomainArgs = {
+  request: CreateAnonymousSubdomainInput;
+};
+
+
+export type QueryValidateOriginalTransactionIdMatchesUserArgs = {
+  request: ValidateOriginalTransactionIdMatchesUserInput;
+};
+
+export type QuickAlias = {
+  __typename?: 'QuickAlias';
+  alias: Scalars['String'];
+  isSendingAndReceivingEnabled: Scalars['Boolean'];
 };
 
 export type RecoveryPublicKeysAndDataOutput = {
@@ -2936,6 +3679,11 @@ export type RegenerateMfaBackupCodesResponse = {
   status: RequestStatus;
 };
 
+export type RenameWebAuthnDeviceRequest = {
+  credentialID: Scalars['String'];
+  newName: Scalars['String'];
+};
+
 export type RenewalDetails = {
   __typename?: 'RenewalDetails';
   price?: Maybe<Scalars['Float']>;
@@ -2954,6 +3702,7 @@ export type ReplyToEmailRequest = {
   encryptedTextSnippet?: InputMaybe<EncryptedDataInput>;
   externalEncryptedSessionKey?: InputMaybe<EncryptedSessionKeyInput>;
   from: SendAddressRequest;
+  isPGP?: InputMaybe<Scalars['Boolean']>;
   rawSubject: Scalars['String'];
   replyID: Scalars['String'];
   scheduleSendAt?: InputMaybe<Scalars['Date']>;
@@ -3020,6 +3769,32 @@ export type SaveMetadataResponse = {
   document: Document;
 };
 
+export type SaveThumbnailRequest = {
+  docID: Scalars['String'];
+  thumbnail?: InputMaybe<Scalars['String']>;
+};
+
+export type SaveThumbnailResponse = {
+  __typename?: 'SaveThumbnailResponse';
+  document: Document;
+};
+
+export type ScheduleSkemailerRequest = {
+  fromEmail: Scalars['String'];
+  fromName: Scalars['String'];
+  htmlContentFileId: Scalars['String'];
+  scheduleAt: Scalars['String'];
+  subject: Scalars['String'];
+  targetAudience: TargetAudience;
+  textContentFileId: Scalars['String'];
+};
+
+export type ScheduleSkemailerResponse = {
+  __typename?: 'ScheduleSkemailerResponse';
+  skemailerID: Scalars['String'];
+  status: Scalars['String'];
+};
+
 export type SearchIndexProgress = {
   __typename?: 'SearchIndexProgress';
   isIndexComplete: Scalars['Boolean'];
@@ -3036,6 +3811,26 @@ export type SendAddressRequest = {
   encryptedSessionKey?: InputMaybe<EncryptedSessionKeyInput>;
   name?: InputMaybe<Scalars['String']>;
 };
+
+export type SendAttemptItem = {
+  __typename?: 'SendAttemptItem';
+  attemptDate?: Maybe<Scalars['Date']>;
+  sendAttemptResult?: Maybe<SendAttemptResult>;
+};
+
+export enum SendAttemptResult {
+  CircularRedirect = 'CIRCULAR_REDIRECT',
+  InvalidResponse = 'INVALID_RESPONSE',
+  NoResponse = 'NO_RESPONSE',
+  Other = 'OTHER',
+  PrematureClose = 'PREMATURE_CLOSE',
+  SocketIssue = 'SOCKET_ISSUE',
+  Success = 'SUCCESS',
+  TimedOut = 'TIMED_OUT',
+  TlsIssue = 'TLS_ISSUE',
+  UnsuccessfulHttpResponseCode = 'UNSUCCESSFUL_HTTP_RESPONSE_CODE',
+  UnsupportedCharset = 'UNSUPPORTED_CHARSET'
+}
 
 export type SendDocumentEventRequest = {
   audience: Array<Scalars['String']>;
@@ -3057,6 +3852,7 @@ export type SendEmailRequest = {
   encryptedTextSnippet?: InputMaybe<EncryptedDataInput>;
   externalEncryptedSessionKey?: InputMaybe<EncryptedSessionKeyInput>;
   from: SendAddressRequest;
+  isPGP?: InputMaybe<Scalars['Boolean']>;
   rawSubject: Scalars['String'];
   scheduleSendAt?: InputMaybe<Scalars['Date']>;
   to: Array<SendAddressRequest>;
@@ -3070,9 +3866,12 @@ export type SendEmailResponse = {
 
 export type SendFeedbackRequest = {
   feedback: Scalars['String'];
+  feedbackPlatformString?: InputMaybe<Scalars['String']>;
   isMobile: Scalars['Boolean'];
   isNative: Scalars['Boolean'];
+  isUrgent?: InputMaybe<Scalars['Boolean']>;
   origin: Scalars['String'];
+  requestType?: InputMaybe<FeedbackCategoryEnum>;
   zendeskUploadTokens: Array<Scalars['String']>;
 };
 
@@ -3141,6 +3940,16 @@ export type SetPdSubscribeFlagRequest = {
   subscribed: Scalars['Boolean'];
 };
 
+export type SetPgpKey = {
+  disablePreviousKey?: InputMaybe<Scalars['Boolean']>;
+  emailAlias: Scalars['String'];
+  encryptedPrivateKey: EncryptedDataInput;
+  encryptionFingerprint: Scalars['String'];
+  publicKey: Scalars['String'];
+  sessionKey: EncryptedSessionKeyInput;
+  signingFingerprint: Scalars['String'];
+};
+
 export type SetPushTokenRequest = {
   deviceID: Scalars['String'];
   os: Scalars['String'];
@@ -3167,9 +3976,14 @@ export type SetUseIpfsResponse = {
 };
 
 export type SetUserPreferencesRequest = {
+  advanceToNext?: InputMaybe<Scalars['Boolean']>;
+  autoAdvance?: InputMaybe<Scalars['Boolean']>;
   blockRemoteContent?: InputMaybe<Scalars['Boolean']>;
   dateFormat?: InputMaybe<Scalars['String']>;
   defaultCalendarColor?: InputMaybe<Scalars['String']>;
+  defaultCalendarView?: InputMaybe<CalendarView>;
+  defaultCalendarViewMobile?: InputMaybe<CalendarView>;
+  fileTableFormat?: InputMaybe<FileTableDisplayFormat>;
   hideActivationChecklist?: InputMaybe<Scalars['Boolean']>;
   hourFormat?: InputMaybe<Scalars['String']>;
   leftSwipeGesture?: InputMaybe<SwipeSetting>;
@@ -3178,6 +3992,7 @@ export type SetUserPreferencesRequest = {
   showAliasInboxes?: InputMaybe<Scalars['Boolean']>;
   showPageIcon?: InputMaybe<Scalars['Boolean']>;
   startDayOfTheWeek?: InputMaybe<Scalars['Int']>;
+  tableOfContents?: InputMaybe<TableOfContentsSetting>;
   theme?: InputMaybe<Scalars['String']>;
   threadFormat?: InputMaybe<ThreadDisplayFormat>;
 };
@@ -3270,10 +4085,45 @@ export enum SignatureContext {
   UserPublicKey = 'USER_PUBLIC_KEY'
 }
 
+export type SilenceMultipleEmailAddressesRequest = {
+  emailAddressesToSilence: Array<Scalars['String']>;
+};
+
+export type SilenceSenderBulkSuggestion = {
+  __typename?: 'SilenceSenderBulkSuggestion';
+  messageCount: Scalars['Int'];
+  sender: Scalars['String'];
+  totalBytes?: Maybe<Scalars['Int']>;
+};
+
+export type SilencedDomainAggregation = {
+  __typename?: 'SilencedDomainAggregation';
+  domain: Scalars['String'];
+  senders: Array<SilenceSenderBulkSuggestion>;
+};
+
 export type SingleRetrievedRecord = {
   __typename?: 'SingleRetrievedRecord';
   data: Scalars['String'];
   priority?: Maybe<Scalars['String']>;
+};
+
+export type SkemailerStatusResponse = {
+  __typename?: 'SkemailerStatusResponse';
+  checkpoint: Scalars['String'];
+  sendCount: Scalars['Int'];
+  skemailerID: Scalars['String'];
+  status: Scalars['String'];
+  updatedAt?: Maybe<Scalars['String']>;
+};
+
+export type SlimDocument = {
+  __typename?: 'SlimDocument';
+  currentUserPermissionLevel: PermissionLevel;
+  docID: Scalars['String'];
+  parentID?: Maybe<Scalars['String']>;
+  trashedAt?: Maybe<Scalars['String']>;
+  updatedAt: Scalars['String'];
 };
 
 export type SlimUserThread = {
@@ -3303,7 +4153,9 @@ export type SubscriptionInfo = {
   __typename?: 'SubscriptionInfo';
   billingInterval?: Maybe<SubscriptionInterval>;
   cancelAtPeriodEnd: Scalars['Boolean'];
+  isAppleSubscription: Scalars['Boolean'];
   isCryptoSubscription: Scalars['Boolean'];
+  isGoogleSubscription: Scalars['Boolean'];
   quantity?: Maybe<Scalars['Int']>;
   stripeStatus?: Maybe<Scalars['String']>;
   subscriptionPlan: Scalars['String'];
@@ -3321,6 +4173,13 @@ export enum SubscriptionPlan {
   Free = 'FREE',
   Pro = 'PRO'
 }
+
+export type SubscriptionPlanWithSku = {
+  __typename?: 'SubscriptionPlanWithSKU';
+  monthly?: Maybe<Scalars['String']>;
+  tierName: Scalars['String'];
+  yearly?: Maybe<Scalars['String']>;
+};
 
 export enum SwipeSetting {
   Archive = 'ARCHIVE',
@@ -3357,11 +4216,23 @@ export enum SystemLabels {
   Drafts = 'DRAFTS',
   Imports = 'IMPORTS',
   Inbox = 'INBOX',
+  QuickAliases = 'QUICK_ALIASES',
   ScheduleSend = 'SCHEDULE_SEND',
   Sent = 'SENT',
   Spam = 'SPAM',
   Trash = 'TRASH',
   Virus = 'VIRUS'
+}
+
+export enum TableOfContentsSetting {
+  Disabled = 'DISABLED',
+  Enabled = 'ENABLED',
+  ShowIcon = 'SHOW_ICON'
+}
+
+export enum TargetAudience {
+  External = 'EXTERNAL',
+  Internal = 'INTERNAL'
 }
 
 export type Team = {
@@ -3407,6 +4278,7 @@ export type TemplateMetaData = {
 
 export type ThreadAttributes = {
   __typename?: 'ThreadAttributes';
+  clientsideFiltersApplied?: Maybe<Scalars['Boolean']>;
   read: Scalars['Boolean'];
   systemLabels: Array<Scalars['String']>;
   userLabels: Array<UserLabel>;
@@ -3429,6 +4301,10 @@ export type TrashDocRequest = {
 
 export type UnblockEmailAddressRequest = {
   emailAddressToUnblock?: InputMaybe<Scalars['String']>;
+};
+
+export type UnmuteNotificationForSenderRequest = {
+  emailAddresses: Array<Scalars['String']>;
 };
 
 export type UnsendEmailRequest = {
@@ -3465,6 +4341,10 @@ export type UnshareTeamDocWithOtherTeamRequest = {
   targetTeamRootDocumentID: Scalars['String'];
 };
 
+export type UnsilenceMultipleEmailAddressesRequest = {
+  emailAddressesToUnsilence: Array<Scalars['String']>;
+};
+
 export type UpdateDisplayNameRequest = {
   displayName: Scalars['String'];
 };
@@ -3497,7 +4377,7 @@ export type UpdateDocumentDataResponse = {
 };
 
 export type UpdateEmailAliasActiveStateRequest = {
-  captchaToken: Scalars['String'];
+  captchaToken?: InputMaybe<Scalars['String']>;
   emailAlias: Scalars['String'];
   isActive: Scalars['Boolean'];
 };
@@ -3507,6 +4387,20 @@ export type UpdateEmailAliasActiveStateResponse = {
   status: RequestStatus;
 };
 
+export type UpdateEmailAliasEnabledStateRequest = {
+  emailAlias: Scalars['String'];
+  enabled: Scalars['Boolean'];
+};
+
+export type UpdateEmailAliasProfileRequest = {
+  displayName?: InputMaybe<Scalars['String']>;
+  displayPictureData?: InputMaybe<UpdateDisplayPictureSkemailRequest>;
+  emailAlias: Scalars['String'];
+  encryptedAliasData?: InputMaybe<EncryptedDataInput>;
+  encryptedSessionKey?: InputMaybe<EncryptedSessionKeyInput>;
+  notificationsEnabled?: InputMaybe<Scalars['Boolean']>;
+};
+
 export type UpdateMailFilterInput = {
   actions: Array<FilterActionInput>;
   encryptedByKey?: InputMaybe<Scalars['String']>;
@@ -3514,6 +4408,29 @@ export type UpdateMailFilterInput = {
   filter: MailFilterInput;
   mailFilterID: Scalars['String'];
   name?: InputMaybe<Scalars['String']>;
+};
+
+export type UpdateQuickAliasActiveStateRequest = {
+  captchaToken?: InputMaybe<Scalars['String']>;
+  emailAlias: Scalars['String'];
+  isActive: Scalars['Boolean'];
+  userDomainID: Scalars['String'];
+};
+
+export type UpdateQuickAliasActiveStateResponse = {
+  __typename?: 'UpdateQuickAliasActiveStateResponse';
+  status: RequestStatus;
+};
+
+export type UpdateQuickAliasInfoInput = {
+  areNotificationsEnabled?: InputMaybe<Scalars['Boolean']>;
+  displayEmailAlias?: InputMaybe<Scalars['String']>;
+  displayName?: InputMaybe<Scalars['String']>;
+  displayPictureData?: InputMaybe<UpdateDisplayPictureSkemailRequest>;
+  emailAlias: Scalars['String'];
+  encryptedAliasData?: InputMaybe<Scalars['String']>;
+  encryptedByKey?: InputMaybe<Scalars['String']>;
+  encryptedSessionKey?: InputMaybe<Scalars['String']>;
 };
 
 export type UpdateSrpRequest = {
@@ -3541,6 +4458,12 @@ export type UpdateUploadContactAvatarLinkResponse = {
   __typename?: 'UpdateUploadContactAvatarLinkResponse';
   newProfileCustomURI: Scalars['String'];
 };
+
+export enum UpdatedAtField {
+  EmailsUpdatedAt = 'EMAILS_UPDATED_AT',
+  ThreadContentUpdatedAt = 'THREAD_CONTENT_UPDATED_AT',
+  UpdatedAt = 'UPDATED_AT'
+}
 
 export type UpdatedThreadLabels = {
   __typename?: 'UpdatedThreadLabels';
@@ -3631,6 +4554,7 @@ export type UploadSpamReportRequest = {
 export type User = {
   __typename?: 'User';
   accountTags?: Maybe<Array<Scalars['String']>>;
+  anonymousSubdomains?: Maybe<Array<AnonymousSubdomain>>;
   autoSyncContactsSetting?: Maybe<Scalars['Boolean']>;
   calendars?: Maybe<Array<UserCalendar>>;
   canDirectlyUpdateSrp?: Maybe<Scalars['Boolean']>;
@@ -3646,14 +4570,17 @@ export type User = {
   jwt?: Maybe<Scalars['String']>;
   mfa: MfaFactors;
   mfaTypes?: Maybe<Array<Scalars['String']>>;
+  numDeactivatedAnonymousSubdomains?: Maybe<Scalars['Int']>;
   onboardedWorkspaceMigration: Scalars['Boolean'];
   paidUpStatus?: Maybe<PaidUpStatus>;
   passwordDerivedSecret?: Maybe<Scalars['String']>;
+  pendingStorageWarning?: Maybe<PendingStorageWarning>;
   primaryCalendar?: Maybe<Calendar>;
   privateDocumentData?: Maybe<UserPrivateDocumentData>;
   privateUserData?: Maybe<PrivateUserData>;
   publicData: PublicData;
   publicKey: Scalars['PublicKey'];
+  quickAliases?: Maybe<Array<QuickAlias>>;
   recoveryEmail?: Maybe<Scalars['String']>;
   recoveryServerShare?: Maybe<Scalars['String']>;
   recoverySigningPublicKey?: Maybe<Scalars['PublicKey']>;
@@ -3713,14 +4640,21 @@ export type UserLabel = {
 export enum UserLabelVariant {
   Alias = 'ALIAS',
   Folder = 'FOLDER',
-  Plain = 'PLAIN'
+  Import = 'IMPORT',
+  Plain = 'PLAIN',
+  QuickAlias = 'QUICK_ALIAS'
 }
 
 export type UserPreferences = {
   __typename?: 'UserPreferences';
+  advanceToNext?: Maybe<Scalars['Boolean']>;
+  autoAdvance?: Maybe<Scalars['Boolean']>;
   blockRemoteContent?: Maybe<Scalars['Boolean']>;
   dateFormat?: Maybe<Scalars['String']>;
   defaultCalendarColor?: Maybe<Scalars['String']>;
+  defaultCalendarView?: Maybe<CalendarView>;
+  defaultCalendarViewMobile?: Maybe<CalendarView>;
+  fileTableFormat?: Maybe<FileTableDisplayFormat>;
   hideActivationChecklist?: Maybe<Scalars['Boolean']>;
   hourFormat?: Maybe<Scalars['String']>;
   leftSwipeGesture?: Maybe<SwipeSetting>;
@@ -3729,6 +4663,7 @@ export type UserPreferences = {
   showAliasInboxes?: Maybe<Scalars['Boolean']>;
   showPageIcon?: Maybe<Scalars['Boolean']>;
   startDayOfTheWeek?: Maybe<Scalars['Int']>;
+  tableOfContents?: Maybe<TableOfContentsSetting>;
   theme?: Maybe<Scalars['String']>;
   threadFormat?: Maybe<ThreadDisplayFormat>;
 };
@@ -3758,7 +4693,11 @@ export type UserThread = {
   emails: Array<Email>;
   emailsUpdatedAt: Scalars['Date'];
   permanentlyDeleted: Scalars['Boolean'];
+  senderToSilence?: Maybe<Scalars['String']>;
+  senderToSilenceMessageCounter?: Maybe<Scalars['Int']>;
+  senderToSilenceTotalBytes?: Maybe<Scalars['Int']>;
   sentLabelUpdatedAt?: Maybe<Scalars['Date']>;
+  threadContentUpdatedAt: Scalars['Date'];
   threadID: Scalars['String'];
   updatedAt: Scalars['Date'];
   userID: Scalars['String'];
@@ -3768,6 +4707,20 @@ export type UserVerifiedKey = {
   __typename?: 'UserVerifiedKey';
   keys?: Maybe<Scalars['JSON']>;
   lastVerifiedDate?: Maybe<Scalars['Date']>;
+};
+
+export type ValidateAppStoreSubscriptionRequest = {
+  transactionId: Scalars['String'];
+};
+
+export type ValidateOriginalTransactionIdMatchesUserInput = {
+  originalTransactionId: Scalars['String'];
+};
+
+export type ValueLabel = {
+  __typename?: 'ValueLabel';
+  label: Scalars['String'];
+  value: Scalars['String'];
 };
 
 export type VerifyWalletAddressCreateAliasRequest = {
@@ -3821,11 +4774,14 @@ export enum WorkspaceEventType {
   AliasInboxDisabled = 'ALIAS_INBOX_DISABLED',
   AliasInboxEnabled = 'ALIAS_INBOX_ENABLED',
   AliasNext = 'ALIAS_NEXT',
+  AutoForwardingDisabled = 'AUTO_FORWARDING_DISABLED',
+  AutoForwardingEnabled = 'AUTO_FORWARDING_ENABLED',
   BackgroundTaskDuration = 'BACKGROUND_TASK_DURATION',
   BuyCustomDomainClick = 'BUY_CUSTOM_DOMAIN_CLICK',
   BuyCustomDomainWithTrialClick = 'BUY_CUSTOM_DOMAIN_WITH_TRIAL_CLICK',
   CloseBanner = 'CLOSE_BANNER',
   CloseDownloadCalendarMobileBanner = 'CLOSE_DOWNLOAD_CALENDAR_MOBILE_BANNER',
+  CloseNoiseCancelFooter = 'CLOSE_NOISE_CANCEL_FOOTER',
   CloseSkemailBanner = 'CLOSE_SKEMAIL_BANNER',
   CreateMailFilterClicked = 'CREATE_MAIL_FILTER_CLICKED',
   CryptoCheckoutStarted = 'CRYPTO_CHECKOUT_STARTED',
@@ -3855,11 +4811,18 @@ export enum WorkspaceEventType {
   GetStartedChecklistSkipAll = 'GET_STARTED_CHECKLIST_SKIP_ALL',
   GetStartedStepComplete = 'GET_STARTED_STEP_COMPLETE',
   GetStartedStepSkip = 'GET_STARTED_STEP_SKIP',
+  ImportStepContinue = 'IMPORT_STEP_CONTINUE',
+  ImportStepSkip = 'IMPORT_STEP_SKIP',
+  ImportUpgradeModalShown = 'IMPORT_UPGRADE_MODAL_SHOWN',
   IpfsToggle = 'IPFS_TOGGLE',
   JoyrideSkip = 'JOYRIDE_SKIP',
   LoginPage = 'LOGIN_PAGE',
   Logout = 'LOGOUT',
   MailImportOpen = 'MAIL_IMPORT_OPEN',
+  MarkNotNoise = 'MARK_NOT_NOISE',
+  MarkSilence = 'MARK_SILENCE',
+  MarkUnsilence = 'MARK_UNSILENCE',
+  MarkUnsubscribe = 'MARK_UNSUBSCRIBE',
   MobileMailAppError = 'MOBILE_MAIL_APP_ERROR',
   MobileThreadRecovered = 'MOBILE_THREAD_RECOVERED',
   NativeAddAccount = 'NATIVE_ADD_ACCOUNT',
@@ -3880,12 +4843,20 @@ export enum WorkspaceEventType {
   OpenInboxFirstTimeFromOrgSelect = 'OPEN_INBOX_FIRST_TIME_FROM_ORG_SELECT',
   OpenInboxFromBanner = 'OPEN_INBOX_FROM_BANNER',
   OpenInboxFromJoyride = 'OPEN_INBOX_FROM_JOYRIDE',
+  OpenNoiseCancelFooter = 'OPEN_NOISE_CANCEL_FOOTER',
   OpenSkemailAndroidAppFromBanner = 'OPEN_SKEMAIL_ANDROID_APP_FROM_BANNER',
   OpenSkemailIphoneAppFromBanner = 'OPEN_SKEMAIL_IPHONE_APP_FROM_BANNER',
   PerformedBackgroundTask = 'PERFORMED_BACKGROUND_TASK',
   PlanChangeStarted = 'PLAN_CHANGE_STARTED',
   PlanTableShown = 'PLAN_TABLE_SHOWN',
+  PremiumUsernameClaimAttempted = 'PREMIUM_USERNAME_CLAIM_ATTEMPTED',
+  PremiumUsernameModalOpened = 'PREMIUM_USERNAME_MODAL_OPENED',
+  PublicSitePricingPageOnboarding = 'PUBLIC_SITE_PRICING_PAGE_ONBOARDING',
   PwNextBtn = 'PW_NEXT_BTN',
+  QuickAliasSettingsOpened = 'QUICK_ALIAS_SETTINGS_OPENED',
+  QuickAliasWarningBannerClick = 'QUICK_ALIAS_WARNING_BANNER_CLICK',
+  QuickAliasWarningBannerShown = 'QUICK_ALIAS_WARNING_BANNER_SHOWN',
+  RequestedPremiumUsername = 'REQUESTED_PREMIUM_USERNAME',
   Search = 'SEARCH',
   SelectTheme = 'SELECT_THEME',
   SignupConnectWalletStart = 'SIGNUP_CONNECT_WALLET_START',
@@ -3913,7 +4884,8 @@ export enum WorkspaceEventType {
   UserOs = 'USER_OS',
   UserPlatform = 'USER_PLATFORM',
   UserReactNative = 'USER_REACT_NATIVE',
-  UserSkemailApp = 'USER_SKEMAIL_APP'
+  UserSkemailApp = 'USER_SKEMAIL_APP',
+  UserWindowsDesktop = 'USER_WINDOWS_DESKTOP'
 }
 
 export enum Join__Graph {

@@ -1,5 +1,5 @@
 module.exports = {
-  testEnvironment: 'jest-environment-jsdom',
+  testEnvironment: '<rootDir>/testUtils/setupEnv.js',
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest'
   },

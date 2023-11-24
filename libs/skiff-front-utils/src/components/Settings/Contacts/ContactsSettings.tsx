@@ -1,24 +1,30 @@
-import { Icon } from '@skiff-org/skiff-ui';
+import { Icon } from 'nightwatch-ui';
 import { useCallback, useMemo, useState } from 'react';
 import {
   GetContactAutoSyncSettingsDocument,
   useGetContactAutoSyncSettingsQuery,
   useSetContactAutosyncSettingMutation
 } from 'skiff-front-graphql';
-import { insertIf } from 'skiff-utils';
 
 import { useToast } from '../../../hooks';
 import { Setting, SETTINGS_LABELS, SettingType, SettingValue } from '../Settings.types';
 
+import { isMobile } from 'react-device-detect';
+import { insertIf } from '../../../../../skiff-utils/src';
+import { ContactWithoutTypename, PopulateContactContent } from './Contacts.types';
 import ContactsImport from './ContactsImport';
 import ContactsTable from './ContactsTable';
 
-const useContactsSettings = (): Setting[] => {
+const useContactsSettings = (
+  populateContactContent?: PopulateContactContent,
+  clearPopulateContactContent?: () => void,
+  selectedContact?: ContactWithoutTypename
+): Setting[] => {
   // Custom hooks
   const { enqueueToast } = useToast();
 
   // State
-  const [showProfileView, setShowProfileView] = useState<boolean>(false);
+  const [showProfileView, setShowProfileView] = useState<boolean>(!!populateContactContent);
 
   // Graphql
   const { data, loading, error } = useGetContactAutoSyncSettingsQuery();
@@ -45,7 +51,7 @@ const useContactsSettings = (): Setting[] => {
 
   const settings = useMemo<Setting[]>(
     () => [
-      ...insertIf<Setting>(!showProfileView, {
+      ...insertIf<Setting>(isMobile, {
         type: SettingType.Toggle,
         description: 'Automatically save recipients to contact list',
         label: SETTINGS_LABELS[SettingValue.ContactsAutoSync],
@@ -57,7 +63,7 @@ const useContactsSettings = (): Setting[] => {
         loading: loading,
         error: !!error
       }),
-      ...insertIf<Setting>(!showProfileView, {
+      ...insertIf<Setting>(isMobile, {
         type: SettingType.Custom,
         label: SETTINGS_LABELS[SettingValue.ContactsImport],
         value: SettingValue.ContactsImport,
@@ -71,11 +77,27 @@ const useContactsSettings = (): Setting[] => {
         value: SettingValue.Contacts,
         icon: Icon.UserCircle,
         color: 'blue',
-        component: <ContactsTable setShowProfileView={setShowProfileView} showProfileView={showProfileView} />,
+        component: (
+          <ContactsTable
+            clearPopulateContactContent={clearPopulateContactContent}
+            populateContactContent={populateContactContent}
+            defaultSelectedContact={selectedContact}
+            setShowProfileView={setShowProfileView}
+            showProfileView={showProfileView}
+          />
+        ),
         fullHeight: true
       }
     ],
-    [currentAutoSyncContactsSetting, showProfileView, loading, error, updateContactAutosyncSetting]
+    [
+      currentAutoSyncContactsSetting,
+      showProfileView,
+      loading,
+      error,
+      populateContactContent,
+      selectedContact,
+      updateContactAutosyncSetting
+    ]
   );
   return settings;
 };

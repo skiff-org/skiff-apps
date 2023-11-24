@@ -1,5 +1,6 @@
 export enum BannerTypes {
   Mobile = 'MOBILE',
   Notification = 'NOTIFICATION',
-  Delinquency = 'DELINQUENCY'
+  Delinquency = 'DELINQUENCY',
+  QuickAliasWarning = 'QUICK_ALIAS_WARNING'
 }

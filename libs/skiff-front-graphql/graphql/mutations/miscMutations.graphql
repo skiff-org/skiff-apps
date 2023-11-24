@@ -40,3 +40,15 @@ mutation deleteCustomDomainAlias($request: DeleteCustomDomainAliasRequest!) {
 mutation uploadSpamReport($request: UploadSpamReportRequest!) {
   uploadSpamReport(request: $request)
 }
+
+mutation unsilenceMultipleEmailAddresses($request: UnsilenceMultipleEmailAddressesRequest!) {
+  unsilenceMultipleEmailAddresses(request: $request)
+}
+
+mutation markSpamMultipleEmailAddresses($request: MarkSpamMultipleEmailAddressesRequest!) {
+  markSpamMultipleEmailAddresses(request: $request)
+}
+
+mutation markNotSpamMultipleEmailAddresses($request: MarkNotSpamMultipleEmailAddressesRequest!) {
+  markNotSpamMultipleEmailAddresses(request: $request)
+}

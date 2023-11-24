@@ -3,7 +3,7 @@
 import dayjs from 'dayjs';
 import RelativeTimePlugin from 'dayjs/plugin/relativeTime';
 import UpdateLocalePlugin from 'dayjs/plugin/updateLocale';
-import { Typography, TypographySize, Color } from '@skiff-org/skiff-ui';
+import { Typography, TypographySize, Color } from 'nightwatch-ui';
 import React from 'react';
 
 import { DateInputFormats } from '../../constants';

@@ -1,18 +1,22 @@
 import EventEmitter from 'eventemitter3';
-import { useState, useEffect } from 'react';
-import { useGetUserPreferencesQuery } from 'skiff-front-graphql';
+import { useEffect, useState } from 'react';
+import {
+  GetUserPreferencesDocument,
+  useGetUserPreferencesQuery,
+  useSetUserPreferencesMutation
+} from 'skiff-front-graphql';
 
 import {
-  DEFAULT_LOCAL_SETTINGS,
-  DEFAULT_ALL_USER_PREFERENCES,
-  LocalSettings,
-  UserPreferences,
   AllUserPreferences,
+  DEFAULT_ALL_USER_PREFERENCES,
+  DEFAULT_LOCAL_SETTINGS,
   LOCAL_SETTINGS_PARSERS,
   LOCAL_SETTINGS_TO_STRING,
   LOCAL_SETTINGS_VALIDATORS,
+  LocalSettings,
   UserPreferenceKey,
-  UserPreferenceKeys
+  UserPreferenceKeys,
+  UserPreferences
 } from '../constants/userPreferences.constants';
 
 const UserPreferencesEE = new EventEmitter<keyof AllUserPreferences>();
@@ -25,7 +29,10 @@ const isLocalSettingsKey = (key: string): key is keyof LocalSettings => key in L
 const isValidLocalSettingValue = <T extends keyof LocalSettings>(
   key: T,
   value: LocalSettings[keyof LocalSettings]
-): value is LocalSettings[T] => isLocalSettingsKey(key) && LOCAL_SETTINGS_VALIDATORS[key](value);
+): value is LocalSettings[T] => {
+  const proposedValue = LOCAL_SETTINGS_TO_STRING[key](value);
+  return isLocalSettingsKey(key) && LOCAL_SETTINGS_VALIDATORS[key](proposedValue);
+};
 
 const isValidUserPreferenceKey = (preference: string): preference is keyof UserPreferences =>
   UserPreferenceKeys.includes(preference as UserPreferenceKey);
@@ -73,10 +80,11 @@ export const getLocalSettingCurrentValue = <T extends keyof LocalSettings>(setti
  */
 export default function useUserPreference<T extends keyof AllUserPreferences>(
   preference: T
-): [AllUserPreferences[T], (newValue: AllUserPreferences[T]) => void] {
+): [AllUserPreferences[T], (newValue: AllUserPreferences[T]) => void, boolean] {
   const [currentValue, setCurrentValue] = useState<AllUserPreferences[T]>(DEFAULT_ALL_USER_PREFERENCES[preference]);
 
-  const { data } = useGetUserPreferencesQuery();
+  const { data, loading } = useGetUserPreferencesQuery();
+  const [setPreference] = useSetUserPreferencesMutation();
   const preferenceInLocalStorage = isLocalSettingsKey(preference);
 
   /* Define setter functions */
@@ -92,7 +100,14 @@ export default function useUserPreference<T extends keyof AllUserPreferences>(
   };
 
   const setRemoteValue = async (newValue: AllUserPreferences[T]) => {
-    // Note: Remiv out remote setUserPreference
+    await setPreference({
+      variables: {
+        request: {
+          [preference]: newValue
+        }
+      },
+      refetchQueries: [{ query: GetUserPreferencesDocument }]
+    });
     UserPreferencesEE.emit(preference, newValue);
   };
 
@@ -164,5 +179,5 @@ export default function useUserPreference<T extends keyof AllUserPreferences>(
     };
   }, [preference]);
 
-  return [currentValue, setter];
+  return [currentValue, setter, loading];
 }

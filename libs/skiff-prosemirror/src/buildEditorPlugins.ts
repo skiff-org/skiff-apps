@@ -1,6 +1,6 @@
 import { insertMathCmd, mathPlugin } from '@benrbray/prosemirror-math';
 import { setBaseName } from '@skiff-org/prosemirror-tables';
-import { ThemeMode } from '@skiff-org/skiff-ui';
+import { ThemeMode } from 'nightwatch-ui';
 import { gapCursor } from 'prosemirror-gapcursor';
 import { keymap } from 'prosemirror-keymap';
 import { Schema } from 'prosemirror-model';

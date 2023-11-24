@@ -1,10 +1,12 @@
 import { Contact } from 'skiff-graphql';
+import { v4 } from 'uuid';
 
 import { contactToAddressObject, getContactDisplayNameAndSubtitle } from './Contacts.utils';
 
 describe('Contact List utils', () => {
   it('converts a contact list to an address object with display name', () => {
     const TEST_CONTACT: Contact = {
+      contactID: v4(),
       emailAddress: 'test@skiff.com',
       firstName: 'Test',
       lastName: 'User',
@@ -24,6 +26,7 @@ describe('Contact List utils', () => {
 
   it('converts a contact list to an address object without display name', () => {
     const TEST_CONTACT: Contact = {
+      contactID: v4(),
       emailAddress: 'test@skiff.com'
     };
 
@@ -35,11 +38,13 @@ describe('Contact List utils', () => {
 
   it('converts a contact list to an address object with just a first or last name', () => {
     const TEST_CONTACT_1: Contact = {
+      contactID: v4(),
       emailAddress: 'test@skiff.com',
       firstName: 'Test'
     };
 
     const TEST_CONTACT_2: Contact = {
+      contactID: v4(),
       emailAddress: 'test@skiff.com',
       lastName: 'User'
     };
@@ -53,6 +58,7 @@ describe('Contact List utils', () => {
 
   it('correctly gets a display name and subtitle with first and last name', () => {
     const TEST_CONTACT: Contact & { firstName: string; lastName: string } = {
+      contactID: v4(),
       emailAddress: 'test@skiff.com',
       firstName: 'Test',
       lastName: 'User'
@@ -66,6 +72,7 @@ describe('Contact List utils', () => {
 
   it('correctly gets a display name and subtitle with only first name', () => {
     const TEST_CONTACT: Contact = {
+      contactID: v4(),
       emailAddress: 'test@skiff.com',
       firstName: 'Test'
     };
@@ -78,6 +85,7 @@ describe('Contact List utils', () => {
 
   it('correctly gets a display name and subtitle with only last name', () => {
     const TEST_CONTACT: Contact = {
+      contactID: v4(),
       emailAddress: 'test@skiff.com',
       lastName: 'Test'
     };
@@ -90,6 +98,7 @@ describe('Contact List utils', () => {
 
   it('correctly gets a display name with only email address', () => {
     const TEST_CONTACT: Contact = {
+      contactID: v4(),
       emailAddress: 'test@skiff.com'
     };
 

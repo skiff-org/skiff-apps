@@ -1,6 +1,8 @@
-import { ThemeMode } from '@skiff-org/skiff-ui';
+import { ThemeMode } from 'nightwatch-ui';
 import { lazy, Suspense } from 'react';
 import styled from 'styled-components';
+
+import { useTheme } from '../theme/AppThemeProvider';
 
 const bitcoinSymbolSvg = lazy(() => import('./svgs/bitcoin-symbol.svg'));
 const customizeProfileSvg = lazy(() => import('./svgs/customize-profile.svg'));
@@ -23,6 +25,11 @@ const skiffLogoLightSvg = lazy(() => import('./svgs/skiff-logo-light-inset.svg')
 const systemModeSelectSvg = lazy(() => import('./svgs/system-mode.svg'));
 const USDCSymbolSvg = lazy(() => import('./svgs/usdc-symbol.svg'));
 const EmptyTrashSvg = lazy(() => import('./svgs/empty-trash.svg'));
+const openEnvelopeSvg = lazy(() => import('./svgs/open-envelope.svg'));
+const importMailSvg = lazy(() => import('./svgs/import-mail.svg'));
+const introFreeCustomDomainSvg = lazy(() => import('./svgs/intro-free-custom-domain.svg'));
+const whaleSvg = lazy(() => import('./svgs/whale.svg'));
+const lightQuickAliasesEnvelope = lazy(() => import('./svgs/quick-aliases-envelope-light.svg'));
 
 export enum Illustrations {
   bitcoinSymbol,
@@ -41,7 +48,12 @@ export enum Illustrations {
   NoResultsFound,
   CustomizeProfile,
   FilterEmpty,
-  EmptyTrash
+  EmptyTrash,
+  OpenEnvelope,
+  ImportMail,
+  IntroFreeCustomDomain,
+  Whale,
+  QuickAliasesEnvelope
 }
 
 const IllustrationsSvgs = {
@@ -61,7 +73,13 @@ const IllustrationsSvgs = {
   [Illustrations.SkiffLockupIcon]: { light: skiffLogoLightSvg, dark: skiffLogoDarkSvg },
   [Illustrations.NoResultsFound]: { light: noResultsFoundSvg, dark: noResultsFoundSvg },
   [Illustrations.CustomizeProfile]: { light: customizeProfileSvg, dark: customizeProfileSvg },
-  [Illustrations.FilterEmpty]: { light: emptyFilterSvg, dark: emptyFilterSvg }
+  [Illustrations.FilterEmpty]: { light: emptyFilterSvg, dark: emptyFilterSvg },
+  [Illustrations.OpenEnvelope]: { light: openEnvelopeSvg, dark: openEnvelopeSvg },
+  [Illustrations.ImportMail]: { light: importMailSvg, dark: importMailSvg },
+  [Illustrations.IntroFreeCustomDomain]: { light: introFreeCustomDomainSvg, dark: introFreeCustomDomainSvg },
+  [Illustrations.Whale]: { light: whaleSvg, dark: whaleSvg },
+  //TODO: add dark mode svg
+  [Illustrations.QuickAliasesEnvelope]: { light: lightQuickAliasesEnvelope, dark: lightQuickAliasesEnvelope }
 };
 
 const StyledIllustration = styled.span<{ scale: number; includeBorderRadius?: boolean }>`
@@ -75,14 +93,15 @@ const StyledIllustration = styled.span<{ scale: number; includeBorderRadius?: bo
 
 export interface IllustrationProps {
   illustration: Illustrations;
-  theme?: ThemeMode;
+  forceTheme?: ThemeMode;
   scale?: number;
   style?: React.CSSProperties;
   includeBorderRadius?: boolean;
 }
 
-const Illustration = ({ illustration, scale = 1, style, theme, includeBorderRadius }: IllustrationProps) => {
-  const IllustrationComp = IllustrationsSvgs[illustration][theme || ThemeMode.LIGHT];
+const Illustration = ({ illustration, scale = 1, style, forceTheme, includeBorderRadius }: IllustrationProps) => {
+  const { theme } = useTheme();
+  const IllustrationComp = IllustrationsSvgs[illustration][forceTheme || theme];
 
   return (
     <StyledIllustration includeBorderRadius={includeBorderRadius} scale={scale} style={style}>

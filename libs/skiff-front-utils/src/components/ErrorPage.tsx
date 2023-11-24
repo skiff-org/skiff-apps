@@ -8,16 +8,17 @@ import {
   Typography,
   TypographySize,
   TypographyWeight
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { SnackbarProvider } from 'notistack';
 import { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { SendFeedbackDocument, SendFeedbackMutation, SendFeedbackMutationVariables } from 'skiff-front-graphql';
+import { FeedbackCategoryEnum } from 'skiff-graphql';
 import styled from 'styled-components';
 import { SKIFF_PUBLIC_WEBSITE } from '../constants/routes.constants';
-import { getFeedbackTokens } from '../utils';
+import { getFeedbackPlatformString, getFeedbackTokens } from '../utils';
 import { FeedbackModal } from './modals';
 
 const IconTextContainer = styled.div`
@@ -99,12 +100,16 @@ const sendFeedback = async (
   client: ApolloClient<NormalizedCacheObject>,
   origin: string,
   feedbackText: string,
+  isUrgent: boolean,
+  requestType: FeedbackCategoryEnum,
   supportingFiles?: File[]
 ) => {
   const zendeskUploadTokens: string[] = [];
   if (supportingFiles?.length) {
     zendeskUploadTokens.push(...(await getFeedbackTokens(supportingFiles)));
   }
+
+  const feedbackPlatformString = getFeedbackPlatformString();
   if (feedbackText.length) {
     await client.mutate<SendFeedbackMutation, SendFeedbackMutationVariables>({
       mutation: SendFeedbackDocument,
@@ -114,7 +119,10 @@ const sendFeedback = async (
           zendeskUploadTokens,
           isMobile,
           origin,
-          isNative: false
+          isNative: false,
+          isUrgent,
+          requestType,
+          feedbackPlatformString
         }
       }
     });
@@ -191,7 +199,9 @@ function ErrorPage(props: ErrorPageProps) {
         <FeedbackModal
           onClose={() => setShowFeedbackModal(false)}
           open={showFeedbackModal}
-          sendFeedback={(feedbackText, supportingFiles) => sendFeedback(client, origin, feedbackText, supportingFiles)}
+          sendFeedback={(feedbackText, isUrgent, requestType, supportingFiles) =>
+            sendFeedback(client, origin, feedbackText, isUrgent, requestType, supportingFiles)
+          }
         />
       </SnackbarProvider>
     </>

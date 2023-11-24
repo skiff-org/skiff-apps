@@ -1,7 +1,8 @@
-import { Icon, IconProps } from '@skiff-org/skiff-ui';
+import { Icon, IconProps } from 'nightwatch-ui';
 import { MarkType } from 'prosemirror-model';
 import { EditorView } from 'prosemirror-view';
 import { Dispatch } from 'react';
+import { copyToClipboardWebAndMobile } from 'skiff-front-utils';
 
 import { AnchorTypes, createDeepLinkUrl } from '../../utils/deeplink';
 import { activeThreadKey } from '../comment.types';
@@ -28,9 +29,9 @@ export interface Actions {
 
 const copyThreadLink = (triggerToast: (icon: Icon) => void, threadId: string) => () => {
   const url = createDeepLinkUrl(AnchorTypes.Comment, threadId);
-  void navigator.clipboard.writeText(url).then(() => {
-    triggerToast(Icon.Link);
-  });
+
+  copyToClipboardWebAndMobile(url);
+  triggerToast(Icon.Link);
 };
 
 const editComment = (startEditing: () => void) => () => {

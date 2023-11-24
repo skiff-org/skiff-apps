@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FC } from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
 
@@ -19,7 +19,7 @@ const InnerContainerStyle = styled.div`
   `}
 `;
 
-export const InnerContainer: FC<{ children: ReactNode }> = ({ children }) => (
+export const InnerContainer: FC = ({ children }) => (
   <InnerContainerStyle
     onClick={(e) => {
       e.stopPropagation();

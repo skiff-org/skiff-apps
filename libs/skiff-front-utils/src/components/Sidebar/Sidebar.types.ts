@@ -1,4 +1,4 @@
-import { Icon } from '@skiff-org/skiff-ui';
+import { Icon } from 'nightwatch-ui';
 import React from 'react';
 
 export enum SidebarSectionType {
@@ -28,7 +28,7 @@ type NodeSection = {
   defaultIsOpenVal?: boolean;
 };
 
-export type ContentSection = {
+type ContentSection = {
   id: string;
   content: SidebarSectionContent;
   isCustom?: false;
@@ -39,7 +39,6 @@ export type ContentSection = {
 export type SidebarSectionProps = NodeSection | ContentSection;
 
 export interface ActionSidebarItemProps {
-  label: string;
   icon: Icon;
   // whether button should stand out as white
   primaryAction?: boolean;
@@ -49,14 +48,16 @@ export interface ActionSidebarItemProps {
   tooltip?: string;
   color?: 'primary' | 'secondary';
   href?: string;
-  onClick?: (e: React.MouseEvent) => void;
+  onClick?: (e?: React.MouseEvent) => void;
   isMinimized?: boolean;
   endLabel?: string;
   className?: string;
+  label?: string;
 }
 
 export type SidebarProps = {
   AppSwitcher?: React.ReactNode;
+  className?: string;
   primaryActions?: ActionSidebarItemProps[];
   sections: SidebarSectionProps[];
   Footer?: React.ReactNode;

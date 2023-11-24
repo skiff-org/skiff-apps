@@ -5,7 +5,7 @@ export const ALIAS_MAXIMUM_LENGTH = 30;
 // application/octet-stream is the default to include binaries that do not fall into other content types
 export const BANNED_CONTENT_TYPES = new Set<string>([
   'application/x-msdownload',
-  'application/octet-stream',
+  // 'application/octet-stream', TODO: condition on PGP
   'audio/adpcm',
   'application/vnd.android.package-archive',
   'application/vnd.ms-cab-compressed',

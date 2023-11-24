@@ -2,17 +2,20 @@ import {
   IconText,
   Icon,
   IconButton,
+  Icons,
   Dropdown,
   DropdownItem,
+  FilledVariant,
   InputField,
   Size,
   ThemeMode,
   Type
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 import { Node } from 'prosemirror-model';
 import { EditorView } from 'prosemirror-view';
 import React, { LegacyRef } from 'react';
 import ReactDOM from 'react-dom';
+import { copyToClipboardWebAndMobile } from 'skiff-front-utils';
 import styled from 'styled-components';
 
 import { CodeBlockSettings } from '../codeblock';
@@ -154,7 +157,7 @@ class LanguageDropdown extends React.Component<LangDropdownProps, LangDropdownSt
     const copyText = (e: React.MouseEvent) => {
       e?.stopPropagation();
       if (!codeblock || !codeblock.textContent) return;
-      void navigator.clipboard.writeText(codeblock.textContent);
+      copyToClipboardWebAndMobile(codeblock.textContent);
     };
 
     const toggleGutters = (e: React.MouseEvent) => {
@@ -194,12 +197,18 @@ class LanguageDropdown extends React.Component<LangDropdownProps, LangDropdownSt
             />
           </div>
           <div className='select-lang-buttons'>
-            <IconButton type={Type.SECONDARY} icon={Icon.Copy} onClick={copyText} size={Size.SMALL} />
             <IconButton
-              iconColor={this.state.gutterEnabled ? 'secondary' : 'disabled'}
-              icon={Icon.NumberList}
+              type={Type.SECONDARY}
+              icon={Icon.Copy}
+              onClick={copyText}
+              size={Size.SMALL}
+              variant={FilledVariant.UNFILLED}
+            />
+            <IconButton
+              icon={<Icons icon={Icon.NumberList} color={this.state.gutterEnabled ? 'secondary' : 'disabled'} />}
               onClick={toggleGutters}
               size={Size.SMALL}
+              variant={FilledVariant.UNFILLED}
             />
           </div>
         </div>

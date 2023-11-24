@@ -16,6 +16,31 @@ mutation saveMetadata($request: SaveMetadataRequest!) {
   }
 }
 
+mutation saveMetadataNative($request: SaveMetadataRequest!) {
+  saveMetadata(request: $request) {
+    document {
+      ...DocumentNativeInfo
+    }
+  }
+}
+
+mutation saveThumbnail($request: SaveThumbnailRequest!) {
+  saveThumbnail(request: $request) {
+    document {
+      ...DocumentBasicInfo
+      ...DocumentDecryptedMetadata
+    }
+  }
+}
+
+mutation saveThumbnailNative($request: SaveThumbnailRequest!) {
+  saveThumbnail(request: $request) {
+    document {
+      ...DocumentNativeInfo
+    }
+  }
+}
+
 mutation newMultipleDocs($request: [NewDocRequest!]!) {
   newMultipleDocs(request: $request) {
     docID
@@ -120,6 +145,13 @@ mutation moveMultipleDoc($request: [MoveDocRequest!]!) {
   }
 }
 
+mutation moveMultipleDocNative($request: [MoveDocRequest!]!) {
+  moveMultipleDoc(request: $request) {
+    document {
+      ...DocumentNativeInfo
+    }
+  }
+}
 
 mutation createCacheElement($request: CreateCacheElementRequest!) {
   createCacheElement(request: $request) {
@@ -162,11 +194,33 @@ mutation trashDocs($request: [TrashDocRequest!]!) {
   }
 }
 
+mutation trashDocsNative($request: [TrashDocRequest!]!) {
+  trashDocs(request: $request) {
+    document {
+      ...DocumentNativeInfo
+    }
+  }
+}
+
 mutation restoreTrashDoc($request: TrashDocRequest!) {
   restoreTrashDoc(request: $request) {
     document {
       ...DocumentBase
       ...DocumentCollaborators
     }
+  }
+}
+
+mutation restoreTrashDocNative($request: TrashDocRequest!) {
+  restoreTrashDoc(request: $request) {
+    document {
+      ...DocumentNativeInfo
+    }
+  }
+}
+
+mutation duplicateDocDeep($request: DuplicateDocDeepRequest!) {
+  duplicateDocDeep(request: $request) {
+    docID
   }
 }

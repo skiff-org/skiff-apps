@@ -1,16 +1,20 @@
 // Local storage keys
 export enum StorageTypes {
+  AUTO_ADVANCE = 'autoAdvance',
+  ADVANCE_TO_NEXT = 'advanceToNext',
   SESSION_CACHE = 'sessionCache', // shared with mail, userID appended
   SAVED_ACCOUNT = 'savedAccount', // shared with mail, userID appended
   FILE_TABLE_SORT_MODE = 'fileTableSort:mode',
   FILE_TABLE_SORT_ORDER = 'fileTableSort:order',
   SIDEPANEL_OPEN = 'sidepanelOpen',
+  RESIZE_WIDTH = 'resizeWidth',
   ORGANIZATION_EVERYONE_TEAM = 'organizationEveryoneTeam',
   DEFAULT_ALIAS = 'DefaultAlias', // shared with mail,
   DRAFT_MESSAGE = 'DraftMessage',
   SEARCH_INDEX = 'MailSearchIndex',
   NOTIFICATION_BANNER_KEY = 'notificationBannerState',
   THREAD_FORMAT = 'threadFormat',
+  FILE_TABLE_FORMAT = 'fileTableFormat',
   TOGGLE_ITEM = 'toggleNodes',
   LATEST_USER_ID = 'latestUserID',
   REDIRECT_TO_CALENDAR = 'isRedirectToCalendar',
@@ -18,6 +22,9 @@ export enum StorageTypes {
   DATE_FORMAT = 'dateFormat',
   THEME = 'theme',
   START_DAY_OF_THE_WEEK = 'startDayOfTheWeek',
+  DEFAULT_CALENDAR_VIEW = 'defaultCalendarView',
+  DEFAULT_CALENDAR_VIEW_MOBILE = 'defaultCalendarViewMobile',
+  ALL_DAY_ROW_COLLAPSED = 'allDayRowCollapsed',
   TIME_ZONE = 'timeZone',
   DEFAULT_CALENDAR_COLOR = 'defaultCalendarColor',
   HAS_SEEN_CUSTOM_DOMAIN = 'hasSeenCustomDomainPage',
@@ -33,8 +40,15 @@ export enum StorageTypes {
   RIGHT_SWIPE_GESTURE = 'rightSwipeGesture',
   SECURED_BY_SKIFF_SIG_DISABLED = 'securedBySkiffSigDisabled',
   SHOW_PAGE_ICON = 'showPageIcon',
+  SHOW_SILENCE_FOOTER_THRESHOLD = 'showSilenceFooterThreshold',
   SKEMAIL_MOBILE_BANNER_APPEARANCES = 'skemailMobileBannerAppearances',
-  HAS_SEEN_ACTIVATION_CHECKLIST = 'hasSeenActivationChecklist'
+  HAS_SEEN_ACTIVATION_CHECKLIST = 'hasSeenActivationChecklist',
+  INTRO_FREE_CUSTOM_DOMAIN = 'introFreeCustomDomain',
+  THREAD_IDS_TO_HIDE_SILENCE_SUGGESTION = 'threadIDsToHideSilenceSuggestion',
+  CONFIRM_UNSUBSCRIBE_REDIRECT = 'confirmUnsubscribeRedirect',
+  HIDE_IMPORT_COMPLETE = 'hideImportComplete',
+  CONFIRM_TRUST_KEY = 'confirmTrustKey',
+  AUTO_ATTACH_PGP_PUBLIC_KEY = 'autoAttachPgpPublicKey',
 }
 
 export const getStorageKey = (type: StorageTypes): string => `skiff:${type}`;

@@ -51,6 +51,10 @@ export enum InviteErrorMessage {
  * @returns {string} Link URL.
  */
 export function convertLinkDataIntoURL(decryptedLinkKey: string, linkDocID: string) {
+  if (!window.location) {
+    // true in React Native
+    return `https://app.skiff.com/docs/${linkDocID}#${encodeURIComponent(decryptedLinkKey)}`;
+  }
   const linkURL = `${window.location.protocol}//${window.location.host}/docs/${linkDocID}#${encodeURIComponent(
     decryptedLinkKey
   )}`;
@@ -76,13 +80,14 @@ export async function shareDocWithSkiffUser(
   userData: models.User,
   docID: string,
   clientPermissionEntries: Array<ClientPermissionEntry>,
-  refetchDocID?: string
+  refetchDocID?: string,
+  forceCurDecryptedPrivateHierarchicalKey?: string
 ): Promise<boolean | null> {
   return wrapDocumentOperation(client, [docID], async ([document]) => {
     const collaboratorPublicKeys = await fetchPublicKeysFromUserIDs(
       client,
       clientPermissionEntries.map(({ userID }) => userID),
-      userData.privateDocumentData.verifiedKeys.keys
+      userData.privateDocumentData?.verifiedKeys?.keys || {}
     );
     if (!collaboratorPublicKeys) {
       console.error('Attempted share with user whose public key was unfetchable. User may not exist');
@@ -96,7 +101,14 @@ export async function shareDocWithSkiffUser(
     if (!document.hierarchicalPermissionChain[0]?.encryptedSessionKey) {
       // document was created before we introduced encryptedSessionKey in Document, in this case, upgrade the document key first to populate this field
       await upgradeDocKey(client, docID);
-      return shareDocWithSkiffUser(client, userData, docID, clientPermissionEntries);
+      return shareDocWithSkiffUser(
+        client,
+        userData,
+        docID,
+        clientPermissionEntries,
+        refetchDocID,
+        forceCurDecryptedPrivateHierarchicalKey
+      );
     }
 
     // Prepare request for this doc
@@ -106,7 +118,7 @@ export async function shareDocWithSkiffUser(
       const curPermissionEntry = clientPermissionEntries[idx];
       assertExists(collaboratorPublicKey);
       const encryptedPrivateHierarchicalKey = encryptPrivateHierarchicalKeyForUser(
-        decryptedPrivateHierarchicalKey,
+        forceCurDecryptedPrivateHierarchicalKey || decryptedPrivateHierarchicalKey,
         collaboratorPublicKey,
         userData.privateUserData.privateKey
       );
@@ -167,13 +179,14 @@ async function shareDocWithNonSkiffUser(
   docID: string,
   email: string,
   permissionLevel: PermissionLevel,
-  refetchDocID?: string
+  refetchDocID?: string,
+  userObj?: models.User
 ) {
-  const updatedDoc = await downloadDocument(client, docID);
+  const updatedDoc = await downloadDocument(client, docID, undefined, userObj);
   if (!updatedDoc?.link?.decryptedLinkKey) {
-    await setupLink(client, docID, permissionLevel);
+    await setupLink(client, docID, permissionLevel, userObj);
   }
-  const redownloadedDoc = await downloadDocument(client, docID);
+  const redownloadedDoc = await downloadDocument(client, docID, undefined, userObj);
   if (!redownloadedDoc?.link?.decryptedLinkKey) {
     throw new Error('Could not create link');
   }
@@ -290,9 +303,11 @@ export async function shareDocWithUsers(
   shareDocRequests: ShareDocWithUsersRequest[],
   activeDoc: ReturnType<typeof useDocumentWithoutContent>,
   activeOrg: ReturnType<typeof useCurrentOrganization>,
-  refetchDocID?: string
+  refetchDocID?: string,
+  userObj?: models.User,
+  forceCurDecryptedPrivateHierarchicalKey?: string
 ): Promise<ShareDocWithUsersReturn> {
-  const curUserData = requireCurrentUserData();
+  const curUserData = userObj ?? requireCurrentUserData();
 
   if (!activeDoc.data || !activeOrg.data) {
     return {};
@@ -301,9 +316,7 @@ export async function shareDocWithUsers(
   const users = shareDocRequests.map((req) => req.userEmailOrID);
 
   const { externalInviteUsers, internalShareUsers } = await getUsersToShare(client, users, activeDoc, activeOrg);
-
   let shareSucceeded = true;
-
   const skiffUserEntries: ClientPermissionEntry[] = internalShareUsers
     .map(({ uuid, usernameOrEmail }) => {
       const internalUserShareRequest = shareDocRequests.find(
@@ -332,7 +345,14 @@ export async function shareDocWithUsers(
   }
 
   if (skiffUserEntries.length > 0) {
-    const status = await shareDocWithSkiffUser(client, curUserData, docID, skiffUserEntries, refetchDocID);
+    const status = await shareDocWithSkiffUser(
+      client,
+      curUserData,
+      docID,
+      skiffUserEntries,
+      refetchDocID,
+      forceCurDecryptedPrivateHierarchicalKey
+    );
     if (!status) {
       return {};
     }
@@ -349,7 +369,8 @@ export async function shareDocWithUsers(
               docIDToShareExternal,
               userEmail,
               isTeamRoot ? PermissionLevel.Editor : permissionLevel,
-              refetchDocID
+              refetchDocID,
+              userObj
             );
           }
         })

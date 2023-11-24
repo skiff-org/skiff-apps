@@ -1,17 +1,22 @@
-import { MonoTagProps } from '@skiff-org/skiff-ui';
+import { MonoTagProps } from 'nightwatch-ui';
 import { SubscriptionPlan } from 'skiff-graphql';
 import {
+  FreeCustomDomainFeatureFlag,
   PerIntervalPrice,
   PlanPrices,
-  getStorageLimitInMb,
   TierName,
-  getMaxCustomDomains,
   getAllowedNumberShortAliases,
-  getMaxNumberNonWalletAliases,
+  getCatchallAliasEnabled,
+  getMaxCustomDomains,
   getMaxNumLabelsOrFolders,
   getMaxNumberMailFilters,
-  MAXIMUM_STRIPE_PURCHASE_QUANTITY,
+  getMaxNumberNonWalletAliases,
+  getMaxNumberQuickAliasSubdomains,
+  getMaxNumberQuickAliases,
   getMaxUsersPerWorkspace,
+  getReplyFromQuickAliasEnabled,
+  getSendFromQuickAliasEnabled,
+  getStorageLimitInMb,
   getUploadLimitInMb
 } from 'skiff-utils';
 
@@ -24,8 +29,10 @@ export const MAIL_FREE_MAX_STORAGE_MB = 10000;
 
 export const SPOTLIGHT_TEXT = 'Popular'; // tag copy for highlighted tier
 
+const MAX_DISPLAY_QUANTITY = 1_000;
+
 const formatTierAllowance = (allowance: number) => {
-  return allowance >= MAXIMUM_STRIPE_PURCHASE_QUANTITY ? 'Unlimited' : allowance.toString();
+  return allowance >= MAX_DISPLAY_QUANTITY ? 'Unlimited' : allowance.toString();
 };
 
 /**
@@ -156,23 +163,46 @@ const driveFeatures = [
 
 /* ******* MAIL FEATURES ******** */
 
-const customDomainFeature: FeatureItem = {
+const getCustomDomainFeature = (freeCustomDomainFlag: FreeCustomDomainFeatureFlag): FeatureItem => ({
   tiers: {
-    [SubscriptionPlan.Free]: {
-      enabled: false
-    },
+    [SubscriptionPlan.Free]: freeCustomDomainFlag
+      ? {
+          value: `${getMaxCustomDomains(TierName.Free, freeCustomDomainFlag)}`
+        }
+      : {
+          enabled: false
+        },
     [SubscriptionPlan.Essential]: {
-      value: `${getMaxCustomDomains(TierName.Essential)}`
+      value: `${getMaxCustomDomains(TierName.Essential, freeCustomDomainFlag)}`
     },
     [SubscriptionPlan.Pro]: {
-      value: `${getMaxCustomDomains(TierName.Pro)}`
+      value: `${getMaxCustomDomains(TierName.Pro, freeCustomDomainFlag)}`
     },
     [SubscriptionPlan.Business]: {
-      value: `${getMaxCustomDomains(TierName.Business)}`
+      value: `${getMaxCustomDomains(TierName.Business, freeCustomDomainFlag)}`
     }
   },
   label: 'Custom domains',
   hint: 'Choose a domain that fits your business or personal needs.'
+});
+
+const catchallAliasFeature: FeatureItem = {
+  tiers: {
+    [SubscriptionPlan.Free]: {
+      enabled: getCatchallAliasEnabled(TierName.Free)
+    },
+    [SubscriptionPlan.Essential]: {
+      enabled: getCatchallAliasEnabled(TierName.Essential)
+    },
+    [SubscriptionPlan.Pro]: {
+      enabled: getCatchallAliasEnabled(TierName.Pro)
+    },
+    [SubscriptionPlan.Business]: {
+      enabled: getCatchallAliasEnabled(TierName.Business)
+    }
+  },
+  label: 'Catch-all addresses',
+  hint: 'Receive mail sent to any address that includes your custom domain.'
 };
 
 export const shortAliasFeature: FeatureItem = {
@@ -190,8 +220,8 @@ export const shortAliasFeature: FeatureItem = {
       value: `${getAllowedNumberShortAliases(TierName.Business)}`
     }
   },
-  label: 'Short aliases',
-  hint: 'Claim an email alias that`s snappy and memorable.'
+  label: 'Short addresses',
+  hint: 'Claim an email address that`s snappy and memorable.'
 };
 
 export const skiffAliasFeature: FeatureItem = {
@@ -209,9 +239,85 @@ export const skiffAliasFeature: FeatureItem = {
       value: `${getMaxNumberNonWalletAliases(TierName.Business)}`
     }
   },
-  label: 'Skiff.com aliases',
-  shortLabel: 'aliases',
-  hint: 'Associate multiple aliases with a single @skiff.com account.'
+  label: 'Skiff.com addresses',
+  shortLabel: 'addresses',
+  hint: 'Associate multiple addresses with a single @skiff.com account.'
+};
+
+export const quickAliasSubdomainFeature: FeatureItem = {
+  tiers: {
+    [SubscriptionPlan.Free]: {
+      value: `${getMaxNumberQuickAliasSubdomains(TierName.Free)}`
+    },
+    [SubscriptionPlan.Essential]: {
+      value: `${getMaxNumberQuickAliasSubdomains(TierName.Essential)}`
+    },
+    [SubscriptionPlan.Pro]: {
+      value: `${getMaxNumberQuickAliasSubdomains(TierName.Pro)}`
+    },
+    [SubscriptionPlan.Business]: {
+      value: `${getMaxNumberQuickAliasSubdomains(TierName.Business)}`
+    }
+  },
+  label: 'Quick Alias domains',
+  hint: 'Use your Quick Alias domains to create email aliases on the fly'
+};
+
+export const quickAliasFeature: FeatureItem = {
+  tiers: {
+    [SubscriptionPlan.Free]: {
+      value: `${formatTierAllowance(getMaxNumberQuickAliases(TierName.Free))}`
+    },
+    [SubscriptionPlan.Essential]: {
+      value: `${formatTierAllowance(getMaxNumberQuickAliases(TierName.Essential))}`
+    },
+    [SubscriptionPlan.Pro]: {
+      value: `${formatTierAllowance(getMaxNumberQuickAliases(TierName.Pro))}`
+    },
+    [SubscriptionPlan.Business]: {
+      value: `${formatTierAllowance(getMaxNumberQuickAliases(TierName.Business))}`
+    }
+  },
+  label: 'Quick Aliases',
+  hint: 'Quick Aliases are made-to-order email aliases created at the moment of signup'
+};
+
+const quickAliasReplyLimitFeature: FeatureItem = {
+  tiers: {
+    [SubscriptionPlan.Free]: {
+      enabled: getReplyFromQuickAliasEnabled(TierName.Free)
+    },
+    [SubscriptionPlan.Essential]: {
+      enabled: getReplyFromQuickAliasEnabled(TierName.Essential)
+    },
+    [SubscriptionPlan.Pro]: {
+      enabled: getReplyFromQuickAliasEnabled(TierName.Pro)
+    },
+    [SubscriptionPlan.Business]: {
+      enabled: getReplyFromQuickAliasEnabled(TierName.Business)
+    }
+  },
+  label: 'Quick Alias reply',
+  hint: 'Whether you can reply to emails from a Quick alias.'
+};
+
+const quickAliasSendLimitFeature: FeatureItem = {
+  tiers: {
+    [SubscriptionPlan.Free]: {
+      enabled: getSendFromQuickAliasEnabled(TierName.Free)
+    },
+    [SubscriptionPlan.Essential]: {
+      enabled: getSendFromQuickAliasEnabled(TierName.Essential)
+    },
+    [SubscriptionPlan.Pro]: {
+      enabled: getSendFromQuickAliasEnabled(TierName.Pro)
+    },
+    [SubscriptionPlan.Business]: {
+      enabled: getSendFromQuickAliasEnabled(TierName.Business)
+    }
+  },
+  label: 'Quick Alias send',
+  hint: 'Whether you can send emails from a Quick alias.'
 };
 
 const mailFilterFeature: FeatureItem = {
@@ -329,16 +435,21 @@ export const customFoldersLabelsFeature: FeatureItem = {
   hint: 'Keep your inbox organized with color-coded labels and folders.'
 };
 
-const mailFeatures = [
-  customDomainFeature,
+const getMailFeatures = (freeCustomDomainFlag: FreeCustomDomainFeatureFlag) => [
+  getCustomDomainFeature(freeCustomDomainFlag),
   shortAliasFeature,
   skiffAliasFeature,
   mailFilterFeature,
-  customSignatureFeature,
+  quickAliasFeature,
+  quickAliasSubdomainFeature,
+  quickAliasReplyLimitFeature,
+  quickAliasSendLimitFeature,
+  catchallAliasFeature,
   autoReplyFeature,
+  customFoldersLabelsFeature,
+  customSignatureFeature,
   scheduleSendFeature,
-  undoSendFeature,
-  customFoldersLabelsFeature
+  undoSendFeature
 ];
 
 /* ******* PAGES FEATURES ******** */
@@ -418,7 +529,7 @@ const historyFeature: FeatureItem = {
   hint: 'View past versions of your pages.'
 };
 
-const priorityFeature: FeatureItem = {
+export const priorityFeature: FeatureItem = {
   tiers: {
     [SubscriptionPlan.Free]: {
       enabled: false
@@ -494,7 +605,65 @@ const e2eeFeature: FeatureItem = {
   hint: 'Skiff uses Curve25519 and xsalsa20-poly1305 for asymmetric public-key authenticated encryption and secret-key authenticated encryption.'
 };
 
-const pagesFeatures = [
+/* ******* CALENDAR FEATUES ******** */
+const secureVideoCallFeature: FeatureItem = {
+  tiers: {
+    [SubscriptionPlan.Free]: {
+      enabled: true
+    },
+    [SubscriptionPlan.Essential]: {
+      enabled: true
+    },
+    [SubscriptionPlan.Pro]: {
+      enabled: true
+    },
+    [SubscriptionPlan.Business]: {
+      enabled: true
+    }
+  },
+  label: 'Secure video calls',
+  hint: 'Add video calls with Jitsi, an open-source secure video conferencing provider.'
+};
+
+const schedulingLinkFeature: FeatureItem = {
+  tiers: {
+    [SubscriptionPlan.Free]: {
+      enabled: true
+    },
+    [SubscriptionPlan.Essential]: {
+      enabled: true
+    },
+    [SubscriptionPlan.Pro]: {
+      enabled: true
+    },
+    [SubscriptionPlan.Business]: {
+      enabled: true
+    }
+  },
+  label: 'Scheduling links',
+  hint: 'Use Cal.com links to schedule meetings.'
+};
+
+const endToEndEncryptionFeature: FeatureItem = {
+  tiers: {
+    [SubscriptionPlan.Free]: {
+      enabled: true
+    },
+    [SubscriptionPlan.Essential]: {
+      enabled: true
+    },
+    [SubscriptionPlan.Pro]: {
+      enabled: true
+    },
+    [SubscriptionPlan.Business]: {
+      enabled: true
+    }
+  },
+  label: 'End-to-end encryption',
+  hint: 'All calendar event titles, notes, and locations are stored end-to-end encrypted and private only to you.'
+};
+
+const pagesFeatures: FeatureItem[] = [
   workspaceTypeFeature,
   numWorkspacesFeature,
   sharedCollaboratorsFeature,
@@ -505,31 +674,41 @@ const pagesFeatures = [
   e2eeFeature
 ];
 
+const calendarFeatures: FeatureItem[] = [secureVideoCallFeature, schedulingLinkFeature, endToEndEncryptionFeature];
+
 export enum FeatureSections {
   DRIVE = 'Drive',
   MAIL = 'Mail',
-  PAGES = 'Pages'
+  PAGES = 'Pages',
+  CALENDAR = 'Calendar'
 }
 
-export const allFeatures: Array<[FeatureSections, Array<FeatureItem>]> = [
+export interface TierLimitFlags {
+  freeCustomDomainFlag: FreeCustomDomainFeatureFlag;
+}
+
+export const getAllFeatures = ({
+  freeCustomDomainFlag
+}: TierLimitFlags): Array<[FeatureSections, Array<FeatureItem>]> => [
   [FeatureSections.DRIVE, driveFeatures],
-  [FeatureSections.MAIL, mailFeatures],
-  [FeatureSections.PAGES, pagesFeatures]
+  [FeatureSections.MAIL, getMailFeatures(freeCustomDomainFlag)],
+  [FeatureSections.PAGES, pagesFeatures],
+  [FeatureSections.CALENDAR, calendarFeatures]
 ];
 
-export const narrowViewFeatures: Array<FeatureItem> = [
+export const getNarrowViewFeatures = ({ freeCustomDomainFlag }: TierLimitFlags): Array<FeatureItem> => [
   storageFeature,
   uploadFeature,
   sharedCollaboratorsFeature,
   historyFeature,
-  customDomainFeature,
+  getCustomDomainFeature(freeCustomDomainFlag),
   mailFilterFeature,
   priorityFeature
 ];
 
 // high-salience features to be highlighted on abbreviated cards
-export const planCardFeatures: Array<FeatureItem> = [
-  customDomainFeature,
+export const getPlanCardFeatures = (freeCustomDomainFlag: FreeCustomDomainFeatureFlag): Array<FeatureItem> => [
+  getCustomDomainFeature(freeCustomDomainFlag),
   storageFeature,
   skiffAliasFeature,
   customFoldersLabelsFeature

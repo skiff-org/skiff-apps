@@ -1,7 +1,10 @@
-import { Icon, Icons, ThemeMode, Typography, getThemedColor } from '@skiff-org/skiff-ui';
+import { useFlags } from 'launchdarkly-react-client-sdk';
+import { Icon, Icons, ThemeMode, Typography, getThemedColor } from 'nightwatch-ui';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
+import { AccountProvisioning } from 'skiff-utils';
 import styled from 'styled-components';
+import { useGetFF } from '../../..';
 
 const OptionContainer = styled.div`
   box-sizing: border-box;
@@ -38,6 +41,9 @@ interface SelectInviteOptionProps {
 }
 
 const SelectInviteOption: React.FC<SelectInviteOptionProps> = ({ onClickSendInvite, onClickProvisionUser }) => {
+  const flags = useFlags();
+  const isProvisioningEnabled = useGetFF<AccountProvisioning>('accountProvisioning');
+
   return (
     <>
       <OptionContainer onClick={onClickSendInvite}>
@@ -51,17 +57,21 @@ const SelectInviteOption: React.FC<SelectInviteOptionProps> = ({ onClickSendInvi
         </OptionContainerText>
         <Icons color='disabled' forceTheme={isMobile ? ThemeMode.DARK : undefined} icon={Icon.ChevronRight} />
       </OptionContainer>
-      <OptionContainer onClick={onClickProvisionUser}>
-        <OptionContainerText>
-          <Typography color='primary' forceTheme={isMobile ? ThemeMode.DARK : undefined}>
-            Provision an account
-          </Typography>
-          <Typography color='secondary' forceTheme={isMobile ? ThemeMode.DARK : undefined} wrap>
-            Create an alias and password for new member
-          </Typography>
-        </OptionContainerText>
-        <Icons color='disabled' forceTheme={isMobile ? ThemeMode.DARK : undefined} icon={Icon.ChevronRight} />
-      </OptionContainer>
+      {isProvisioningEnabled && (
+        <OptionContainer onClick={onClickProvisionUser}>
+          <OptionContainerText>
+            <Typography color='primary' forceTheme={isMobile ? ThemeMode.DARK : undefined}>
+              Provision an account
+            </Typography>
+
+            <Typography color='secondary' forceTheme={isMobile ? ThemeMode.DARK : undefined} wrap>
+              Create an alias and password for new member
+            </Typography>
+          </OptionContainerText>
+
+          <Icons color='disabled' forceTheme={isMobile ? ThemeMode.DARK : undefined} icon={Icon.ChevronRight} />
+        </OptionContainer>
+      )}
     </>
   );
 };

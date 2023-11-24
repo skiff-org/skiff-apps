@@ -1,5 +1,5 @@
 import { sanitize } from 'dompurify';
-import { Typography } from '@skiff-org/skiff-ui';
+import { Typography } from 'nightwatch-ui';
 import { DOMSerializer, Node } from 'prosemirror-model';
 import { EditorState } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';

@@ -4,8 +4,7 @@
  * in Mixpanel.
  */
 export enum DiscoveryToastType {
-  AliasInbox = 'aliasInbox',
-  CustomDomainWithTrial = 'CustomDomainWithTrial',
-  CustomDomain = 'CustomDomain',
-  Essential = 'essential'
+  FreeCustomDomain = 'freeCustomDomain',
+  NoiseCanceling = 'noiseCanceling',
+  QuickAlias = 'quickAlias',
 }

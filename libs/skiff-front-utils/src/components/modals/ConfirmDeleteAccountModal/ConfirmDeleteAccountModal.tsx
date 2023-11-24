@@ -2,18 +2,18 @@ import {
   ButtonGroup,
   ButtonGroupItem,
   Dialog,
-  DialogTypes,
+  DialogType,
   Divider,
   InputField,
   Layout,
   Typography,
   Size
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 import { FC, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import { PermissionLevel } from 'skiff-graphql';
 import styled from 'styled-components';
 
-import { PermissionLevel } from 'skiff-graphql';
 import { useCurrentOrganization, useCurrentUserIsOrgAdmin } from '../../../hooks';
 import Checkbox from '../../Checkbox/Checkbox';
 import { UserAvatar } from '../../UserAvatar';
@@ -126,7 +126,7 @@ const ConfirmDeleteAccountModal: FC<ConfirmDeleteAccountModalProps> = ({ open, o
       onClose={onClose}
       open={open}
       title='Verify account deletion'
-      type={DialogTypes.Default}
+      type={DialogType.DEFAULT}
     >
       <WorkspaceNameContainer>
         <Typography wrap>To proceed, please type in the following affirmation</Typography>

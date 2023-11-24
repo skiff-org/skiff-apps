@@ -10,19 +10,21 @@ import {
   Size,
   ThemeMode,
   Typography,
+  TypographySize,
   TypographyWeight
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 import { FC, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { useGetOrganizationQuery, useValidateMailAliasLazyQuery } from 'skiff-front-graphql';
+import { useGetOrganizationQuery, useSubscriptionPlan, useValidateMailAliasLazyQuery } from 'skiff-front-graphql';
 import { getPaywallErrorCode } from 'skiff-graphql';
-import { PaywallErrorCode, insertIf } from 'skiff-utils';
+import { insertIf } from 'skiff-utils';
 import styled from 'styled-components';
 import isEmail from 'validator/lib/isEmail';
 
 import { useRequiredCurrentUserData } from '../../../apollo';
 import { useAvailableCustomDomains, useToast } from '../../../hooks';
 import { MAIL_DOMAIN, formatUsernameAndCheckExists, generateRandomPassword, provisionNewUser } from '../../../utils';
+import { getPaywallDescription, getPaywallTitle } from '../../../utils/paywallUtils';
 import InputFieldEndAction from '../../InputFieldEndAction';
 import { NewEmailAliasInput } from '../../NewEmailAliasInput';
 
@@ -63,6 +65,14 @@ const InputFieldDivider = styled(Divider)`
   margin: 2px 0 !important;
 `;
 
+const HeaderInput = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 2px;
+  box-sizing: border-box;
+`;
+
 // the score required for a password to be strong enough
 const PASSING_SCORE = 2;
 interface ProvisionAccountProps {
@@ -72,7 +82,6 @@ interface ProvisionAccountProps {
   onBack: () => void;
   onConfirm: () => void;
   onClose: () => void;
-  setPaywallErrorCode: (paywallErrorCode: PaywallErrorCode) => void;
 }
 
 const ProvisionAccount: FC<ProvisionAccountProps> = ({
@@ -81,18 +90,20 @@ const ProvisionAccount: FC<ProvisionAccountProps> = ({
   onConfirm,
   onBack,
   onClose,
-  showConfirmProvision,
-  setPaywallErrorCode
+  showConfirmProvision
 }: ProvisionAccountProps) => {
   const [alias, setAlias] = useState('');
-  const [aliasErrorMsg, setAliasErrorMsg] = useState('');
-  const [didSubmit, setDidSubmit] = useState(false);
+  const [aliasErrorMsg, setAliasErrorMsg] = useState<string | undefined>(undefined);
   const [customDomain, setCustomDomain] = useState<string>();
   const [password, setPassword] = useState(generateRandomPassword());
   const [passwordErrorMsg, setPasswordErrorMsg] = useState('');
   const [deliveryEmail, setDeliveryEmail] = useState('');
   const [deliveryEmailErrorMsg, setDeliveryEmailErrorMsg] = useState('');
   const [checkAliasExists] = useValidateMailAliasLazyQuery();
+  const [loadingConfirm, setLoadingConfirm] = useState(false);
+  const {
+    data: { activeSubscription }
+  } = useSubscriptionPlan();
 
   const availableCustomDomains = useAvailableCustomDomains();
   const newEmailAddress = `${alias}@${customDomain ?? MAIL_DOMAIN}`;
@@ -151,18 +162,21 @@ const ProvisionAccount: FC<ProvisionAccountProps> = ({
   };
 
   const onClickConfirm = async () => {
+    setLoadingConfirm(true);
     const inputsValid = await validateInputs();
     if (!inputsValid) {
+      setLoadingConfirm(false);
       return;
     }
     // If delivery email is entered and we need to confirm, go to confirm screen;
     // otherwise, submit directly
     if (deliveryEmail && !showConfirmProvision) {
       onConfirm();
+      setLoadingConfirm(false);
     } else {
       try {
         const captchaToken = 'invalid';
-        await provisionNewUser(
+        const res = await provisionNewUser(
           client,
           captchaToken,
           newEmailAddress,
@@ -171,17 +185,31 @@ const ProvisionAccount: FC<ProvisionAccountProps> = ({
           everyoneTeamRootDoc,
           deliveryEmail
         );
-      } catch (e) {
-        const paywallErrorCode = getPaywallErrorCode([e] as any[]);
+        setLoadingConfirm(false);
+
+        const paywallErrorCode = getPaywallErrorCode(res.errors ?? []);
         if (paywallErrorCode) {
-          setPaywallErrorCode(paywallErrorCode);
+          enqueueToast({
+            title: getPaywallTitle(paywallErrorCode),
+            body: getPaywallDescription(paywallErrorCode, activeSubscription)
+          });
         } else {
-          setAliasErrorMsg('Failed to provision user. Please contact support@skiff.org.');
-          // leave modal open
-          return;
+          enqueueToast({
+            title: 'Account provisioned',
+            body: `The new account has been provisioned.${
+              !!deliveryEmail ? ` Login credentials have been sent to ${deliveryEmail}.` : ''
+            }`
+          });
+          onClose();
         }
+      } catch (e) {
+        console.error('Failed to provision user');
+        console.error(e);
+        setLoadingConfirm(false);
+        setAliasErrorMsg('Failed to provision user. Please contact support@skiff.org.');
+        // leave modal open
+        return;
       }
-      onClose();
     }
   };
 
@@ -197,9 +225,8 @@ const ProvisionAccount: FC<ProvisionAccountProps> = ({
   const copyCredentialsButton = (
     <CopyCredentialsButton>
       <IconText
-        color='disabled'
+        color='secondary'
         endIcon={Icon.Copy}
-        iconColor='secondary'
         label='Copy credentials'
         onClick={onCopy}
         weight={TypographyWeight.REGULAR}
@@ -209,87 +236,102 @@ const ProvisionAccount: FC<ProvisionAccountProps> = ({
 
   const footerButtonGroupItems = [
     {
-      label: showConfirmProvision ? 'Send invite' : 'Confirm',
+      label: showConfirmProvision ? 'Send invite' : 'Create',
       onClick: () => void onClickConfirm(),
-      forceTheme: isMobile ? ThemeMode.DARK : undefined
+      loading: loadingConfirm
     },
     {
       label: 'Back',
       onClick: showConfirmProvision ? onBack : onCancel,
-      forceTheme: isMobile ? ThemeMode.DARK : undefined
+      loading: false
     },
     ...insertIf(!showConfirmProvision && isMobile, {
       label: 'Copy credentials',
       onClick: onCopy,
-      forceTheme: isMobile ? ThemeMode.DARK : undefined
+      loading: false
     })
   ];
 
   return (
     <>
       {showConfirmProvision && (
-        <AccountContainer>
-          <Typography forceTheme={isMobile ? ThemeMode.DARK : undefined}>{deliveryEmail}</Typography>
-          <IconText
-            color='secondary'
-            forceTheme={isMobile ? ThemeMode.DARK : undefined}
-            label={newEmailAddress}
-            size={Size.SMALL}
-            startIcon={Icon.User}
-            weight={TypographyWeight.REGULAR}
-          />
-          <IconText
-            color='secondary'
-            forceTheme={isMobile ? ThemeMode.DARK : undefined}
-            label={password}
-            size={Size.SMALL}
-            startIcon={Icon.Key}
-            weight={TypographyWeight.REGULAR}
-          />
-        </AccountContainer>
+        <>
+          <AccountContainer>
+            <Typography forceTheme={isMobile ? ThemeMode.DARK : undefined}>{deliveryEmail}</Typography>
+            <IconText
+              color='secondary'
+              forceTheme={isMobile ? ThemeMode.DARK : undefined}
+              label={newEmailAddress}
+              size={Size.SMALL}
+              startIcon={Icon.User}
+              weight={TypographyWeight.REGULAR}
+            />
+            <IconText
+              color='secondary'
+              forceTheme={isMobile ? ThemeMode.DARK : undefined}
+              label={password}
+              size={Size.SMALL}
+              startIcon={Icon.Key}
+              weight={TypographyWeight.REGULAR}
+            />
+          </AccountContainer>
+          {aliasErrorMsg && (
+            <Typography color='destructive' size={TypographySize.SMALL}>
+              {aliasErrorMsg}
+            </Typography>
+          )}
+        </>
       )}
       {!showConfirmProvision && (
         <>
-          <EmailAliasContainer>
-            <NewEmailAliasInput
-              customDomains={availableCustomDomains}
-              didSubmit={didSubmit}
-              newAlias={alias}
-              postSubmitError={aliasErrorMsg}
-              preSubmitError={aliasErrorMsg}
-              selectedCustomDomain={customDomain}
-              setAlias={setAlias}
-              setCustomDomain={setCustomDomain}
-              setDidSubmit={setDidSubmit}
-              setPostSubmitError={setAliasErrorMsg}
-              setPreSubmitError={setAliasErrorMsg}
-              username={alias}
-              forceTheme={ThemeMode.DARK}
-            />
-            {isMobile && <div style={{ marginBottom: '16px' }} />}
-          </EmailAliasContainer>
-          <InputField
-            endAdornment={
-              <InputFieldEndAction
-                icon={Icon.Reload}
+          <HeaderInput>
+            <Typography color='secondary' size={TypographySize.CAPTION} uppercase>
+              New email
+            </Typography>
+            <EmailAliasContainer>
+              <NewEmailAliasInput
+                customDomains={availableCustomDomains}
                 forceTheme={isMobile ? ThemeMode.DARK : undefined}
-                onClick={() => {
-                  setPassword(generateRandomPassword());
-                }}
+                newAlias={alias}
+                postSubmitError={aliasErrorMsg}
+                preSubmitError={aliasErrorMsg}
+                selectedCustomDomain={customDomain}
+                setAlias={setAlias}
+                setCustomDomain={setCustomDomain}
+                setPostSubmitError={setAliasErrorMsg}
+                setPreSubmitError={setAliasErrorMsg}
+                username={alias}
               />
-            }
-            errorMsg={passwordErrorMsg}
-            forceTheme={isMobile ? ThemeMode.DARK : undefined}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setPasswordErrorMsg('');
-              setPassword(e.target.value);
-            }}
-            placeholder='Temporary password'
-            value={password}
-          />
+              {isMobile && <div style={{ marginBottom: '16px' }} />}
+            </EmailAliasContainer>
+          </HeaderInput>
+          <HeaderInput>
+            <Typography color='secondary' size={TypographySize.CAPTION} uppercase>
+              Temporary password
+            </Typography>
+            <InputField
+              endAdornment={
+                <InputFieldEndAction
+                  forceTheme={isMobile ? ThemeMode.DARK : undefined}
+                  icon={Icon.Reload}
+                  onClick={() => {
+                    setPassword(generateRandomPassword());
+                  }}
+                />
+              }
+              error={passwordErrorMsg}
+              forceTheme={isMobile ? ThemeMode.DARK : undefined}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setPasswordErrorMsg('');
+                setPassword(e.target.value);
+              }}
+              placeholder='Temporary password'
+              value={password}
+            />
+          </HeaderInput>
           {!isMobile && <InputFieldDivider />}
           <InputField
-            errorMsg={deliveryEmailErrorMsg}
+            error={deliveryEmailErrorMsg}
             forceTheme={isMobile ? ThemeMode.DARK : undefined}
             helperText={isMobile ? undefined : 'Login credentials will be sent to this email'}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -303,12 +345,14 @@ const ProvisionAccount: FC<ProvisionAccountProps> = ({
       )}
       <Footer>
         {!showConfirmProvision && !isMobile && <>{copyCredentialsButton}</>}
-        <ButtonGroup fullWidth={isMobile} layout={isMobile ? Layout.STACKED : Layout.INLINE}>
-          {footerButtonGroupItems.map((item, index) => {
-            return (
-              <ButtonGroupItem forceTheme={item.forceTheme} key={index} label={item.label} onClick={item.onClick} />
-            );
-          })}
+        <ButtonGroup
+          forceTheme={isMobile ? ThemeMode.DARK : undefined}
+          fullWidth={isMobile}
+          layout={isMobile ? Layout.STACKED : Layout.INLINE}
+        >
+          {footerButtonGroupItems.map((item, index) => (
+            <ButtonGroupItem key={index} label={item.label} loading={item.loading} onClick={item.onClick} />
+          ))}
         </ButtonGroup>
       </Footer>
     </>

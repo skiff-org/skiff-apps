@@ -1,5 +1,5 @@
 import crelt from 'crelt';
-import { Icon, IconProps } from '@skiff-org/skiff-ui';
+import { Icon, IconProps } from 'nightwatch-ui';
 import { EditorState, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import { EditorHighlightColorIds, EditorTextColorIds, HIGHLIGHT_COLORS, TEXT_COLORS } from 'skiff-front-utils';
@@ -310,7 +310,7 @@ export const commentItem = new SkiffMenuItem({
       return true;
     });
 
-    return itemsMap[toolbarType].includes(ToolbarItemsIds.COMMENT) && textContent.length > 1; // enable comments on selection with two chars ot more
+    return itemsMap[toolbarType].includes(ToolbarItemsIds.COMMENT) && textContent.length > 0; // enable comments on selection with two chars ot more
   },
   enable: (state: EditorState) => COMMENT.isEnabled(state),
   render: () =>

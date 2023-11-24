@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Typography, TypographySize, TypographyWeight } from '@skiff-org/skiff-ui';
+import { Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 export interface DescriptionItem {
@@ -80,7 +80,7 @@ export const Stepper = ({ descriptionList }: CarouselProps) => {
             left: currentView
           }}
           dragElastic={0.5}
-          onDragEnd={(_, info) => {
+          onDragEnd={(e, info) => {
             if (info.offset.x + SWIPE_VELOCITY_FACTOR * info.velocity.x < -SWIPE_DISTANCE) {
               swipeLeft();
             } else if (info.offset.x + SWIPE_VELOCITY_FACTOR * info.velocity.x > SWIPE_DISTANCE) {

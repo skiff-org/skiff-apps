@@ -1,5 +1,5 @@
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import { Icon } from '@skiff-org/skiff-ui';
+import { Icon } from 'nightwatch-ui';
 import { useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
 import { insertIf } from 'skiff-utils';

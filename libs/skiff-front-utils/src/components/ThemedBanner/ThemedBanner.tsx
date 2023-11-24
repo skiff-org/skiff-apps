@@ -1,4 +1,4 @@
-import { Banner, BannerProps, ThemeMode } from '@skiff-org/skiff-ui';
+import { Banner, BannerProps, ThemeMode } from 'nightwatch-ui';
 import React from 'react';
 
 import { useTheme } from '../../theme/AppThemeProvider';

@@ -1,7 +1,8 @@
-import { FilledVariant, Icon, IconButton, Size, Type, Typography, TypographyWeight } from '@skiff-org/skiff-ui';
+import { Icon, IconText, Size, Typography, TypographySize, TypographyWeight } from 'nightwatch-ui';
 import React from 'react';
+import { isMobile } from 'react-device-detect';
 import { bytesToHumanReadable } from 'skiff-utils';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 interface FileListProps {
   /**
@@ -17,43 +18,53 @@ interface FileListProps {
 
 const Files = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
   max-height: 27vh;
-  overflow: auto;
+  flex-flow: wrap;
+  ${isMobile &&
+  css`
+    overflow: auto;
+  `}
+  ${!isMobile &&
+  css`
+    overflow: hidden;
+    :hover {
+      overflow: auto;
+    }
+  `}
 `;
 
 const FileRow = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 4px 12px 4px 4px;
+  padding: 2px 2px 2px 6px;
+  gap: 8px;
   box-sizing: border-box;
   justify-content: space-between;
-  width: 100%;
-  background: var(--bg-l2-solid);
-  border: 1px solid var(--border-secondary);
+  background: var(--bg-overlay-tertiary);
+  border: 1px solid var(--border-tertiary);
   border-radius: 8px;
 `;
 
 const LabelContainer = styled.div`
   display: flex;
-  flex-direction: column;
   max-width: 100%;
+  gap: 4px;
+  align-items: center;
 `;
 
 const ImageText = styled.div`
   display: flex;
-  flex-direction: row;
   align-items: center;
   gap: 8px;
-  max-width: 80%;
+  height: 20px;
 `;
 
 const IconContainer = styled.img`
-  width: 40px;
-  height: 40px;
+  width: 16px;
+  height: 16px;
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -67,19 +78,15 @@ const FileList: React.FC<FileListProps> = ({ files, onFileRemoved }) => (
         <ImageText>
           <IconContainer src={URL.createObjectURL(file)} />
           <LabelContainer>
-            <Typography weight={TypographyWeight.MEDIUM}>{file.name.split('.')[0]}</Typography>
-            <Typography color='secondary'>
-              {file.type.split('/')[1].toUpperCase()} / {bytesToHumanReadable(file.size)}
+            <Typography color='secondary' weight={TypographyWeight.MEDIUM}>
+              {file.name.split('.')[0]}
+            </Typography>
+            <Typography color='disabled' mono size={TypographySize.SMALL}>
+              {bytesToHumanReadable(file.size)}
             </Typography>
           </LabelContainer>
         </ImageText>
-        <IconButton
-          icon={Icon.Close}
-          onClick={() => onFileRemoved(fileID)}
-          size={Size.SMALL}
-          type={Type.SECONDARY}
-          variant={FilledVariant.UNFILLED}
-        />
+        <IconText color='disabled' onClick={() => onFileRemoved(fileID)} size={Size.SMALL} startIcon={Icon.Close} />
       </FileRow>
     ))}
   </Files>

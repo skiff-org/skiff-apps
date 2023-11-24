@@ -2,37 +2,49 @@ import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import isNumber from 'lodash/isNumber';
-import * as React from 'react';
-import styled from 'styled-components';
-
 import {
   DRAWER_CLASSNAME,
   Divider,
   FilledVariant,
-  getThemedColor,
   Icon,
   IconButton,
   IconText,
   Size,
   ThemeMode,
   Typography,
-  TypographySize
-} from '@skiff-org/skiff-ui';
+  TypographySize,
+  getThemedColor
+} from 'nightwatch-ui';
+import * as React from 'react';
+import { upperCaseFirstLetter } from 'skiff-utils';
+import styled, { css } from 'styled-components';
 
-import { ANCHOR, DRAWER_PADDING_LEFT_RIGHT, DrawerProps } from './Drawer.constants';
+import { ANCHOR, DRAWER_PADDING_LEFT_RIGHT } from './Drawer.constants';
 import { DRAWER_PAPER_CSS, TITLE_CSS } from './Drawer.styles';
-import { upperCaseFirstLetter } from './Drawer.utils';
+import { DrawerProps } from './Drawer.types';
+export { DrawerProps } from './Drawer.types';
+
+const KEYBOARD_POS_CSS = (keyboardHeight: number) => css`
+  transform: translateY(-${keyboardHeight}px) !important;
+  transition: transform 0.25s cubic-bezier(0.17, 0.59, 0.4, 0.77) !important;
+`;
 
 const StyledMuiDrawer = styled(MuiDrawer)<{
   $forceTheme: ThemeMode;
   $verticalScroll: boolean;
   $borderRadius?: string | number;
   $maxHeight?: string | number;
+  $keyboardHeight?: number;
 }>`
   max-height: ${(props) => {
     if (!props.$maxHeight) return '100%';
     return isNumber(props.$maxHeight) ? `${props.$maxHeight}px` : props.$maxHeight;
   }};
+
+  .MuiPaper-root {
+    ${(props) => props.$keyboardHeight && KEYBOARD_POS_CSS(props.$keyboardHeight)}
+  }
+
   .MuiDrawer-paper {
     ${DRAWER_PAPER_CSS}
   }
@@ -58,7 +70,6 @@ const StyledBox = styled(Box)<{ $extraSpacer: boolean; $borderRadius?: string | 
   padding: 0px ${DRAWER_PADDING_LEFT_RIGHT}px;
   box-sizing: border-box;
   overflow: auto;
-
   ${(props) => props.$extraSpacer && 'margin-bottom: 48px;'};
 `;
 
@@ -100,6 +111,9 @@ export const DrawerGroup = styled.div`
   background: ${getThemedColor('var(--bg-overlay-tertiary)', ThemeMode.DARK)};
 `;
 
+// Sometimes the keyboard height hook throws false values, so we need to set a minimum height
+const MIN_REGISTERED_KEYBOARD_HEIGHT = 250;
+
 const Drawer: React.FC<DrawerProps> = ({
   show,
   hideDrawer,
@@ -118,30 +132,31 @@ const Drawer: React.FC<DrawerProps> = ({
   maxHeight,
   wrapTitle,
   borderRadius,
-  stickHandleOnTop = false
+  stickHandleOnTop = false,
+  keyboardHeight = 0
 }) => {
   const renderTitle = (formattedTitle: string) => {
     const iconAndTypographyColor = 'disabled';
     return titleIcon ? (
       <IconTitle>
         <IconText
-          label={formattedTitle}
           color={iconAndTypographyColor}
+          forceTheme={forceTheme}
+          label={formattedTitle}
+          mono
           size={Size.SMALL}
           startIcon={titleIcon}
-          forceTheme={forceTheme}
           wrap={wrapTitle}
-          mono
         />
       </IconTitle>
     ) : (
       <Typography
-        wrap={wrapTitle}
-        size={TypographySize.SMALL}
-        selectable={selectable}
         color={iconAndTypographyColor}
         forceTheme={forceTheme}
         mono
+        selectable={selectable}
+        size={TypographySize.SMALL}
+        wrap={wrapTitle}
       >
         <Title>{formattedTitle}</Title>
       </Typography>
@@ -155,7 +170,7 @@ const Drawer: React.FC<DrawerProps> = ({
       <Header>
         {renderTitle(formattedTitle)}
         {showClose && (
-          <IconButton icon={Icon.Close} onClick={hideDrawer} forceTheme={forceTheme} variant={FilledVariant.UNFILLED} />
+          <IconButton forceTheme={forceTheme} icon={Icon.Close} onClick={hideDrawer} variant={FilledVariant.UNFILLED} />
         )}
       </Header>
     );
@@ -166,17 +181,21 @@ const Drawer: React.FC<DrawerProps> = ({
       <DrawerHandleContainer $selectable={!!selectable} $stickHandle={stickHandleOnTop}>
         <Divider forceTheme={forceTheme} height='4px' width='18%' />
       </DrawerHandleContainer>
-      <StyledBox id={scrollBoxId} $extraSpacer={!!extraSpacer} $borderRadius={borderRadius}>
+      <StyledBox $borderRadius={borderRadius} $extraSpacer={!!extraSpacer} id={scrollBoxId}>
         {renderHeader()}
         {children}
       </StyledBox>
     </>
   );
-
   return (
     <React.Fragment key={ANCHOR}>
       {scrollable && (
         <StyledMuiDrawer
+          $borderRadius={borderRadius}
+          $forceTheme={forceTheme}
+          $keyboardHeight={keyboardHeight > MIN_REGISTERED_KEYBOARD_HEIGHT ? keyboardHeight : 0}
+          $maxHeight={maxHeight}
+          $verticalScroll={verticalScroll}
           PaperProps={{
             id: paperId
           }}
@@ -184,30 +203,26 @@ const Drawer: React.FC<DrawerProps> = ({
           className={DRAWER_CLASSNAME}
           onClose={hideDrawer}
           open={show}
-          $forceTheme={forceTheme}
-          $verticalScroll={verticalScroll}
-          $maxHeight={maxHeight}
-          $borderRadius={borderRadius}
         >
           {renderContent()}
         </StyledMuiDrawer>
       )}
       {!scrollable && (
         <StyledSwipeableDrawer
+          $borderRadius={borderRadius}
+          $forceTheme={forceTheme}
+          $maxHeight={maxHeight}
+          $verticalScroll={verticalScroll}
           PaperProps={{
             id: paperId
           }}
           anchor={ANCHOR}
-          disableDiscovery
           className={DRAWER_CLASSNAME}
+          disableDiscovery
           disableSwipeToOpen
           onClose={hideDrawer}
           onOpen={() => {}}
           open={show}
-          $forceTheme={forceTheme}
-          $verticalScroll={verticalScroll}
-          $maxHeight={maxHeight}
-          $borderRadius={borderRadius}
         >
           {renderContent()}
         </StyledSwipeableDrawer>

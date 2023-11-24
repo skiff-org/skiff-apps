@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Dropdown, DropdownItem, FilledVariant, Icon, Icons, IconButton } from '@skiff-org/skiff-ui';
+import { Dropdown, DropdownItem, FilledVariant, Icon, Icons, IconButton } from 'nightwatch-ui';
 import { useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useGetBillingPortalSessionUrlLazyQuery } from 'skiff-front-graphql';
@@ -27,8 +27,7 @@ function DomainSubscriptionItem(props: DomainSubscriptionItemProps) {
           icon={Icon.Reload}
           key='update-auto-renew'
           label={`${cancelAtPeriodEnd ? 'Turn on' : 'Turn off'} auto-renew`}
-          onClick={async (e: React.MouseEvent) => {
-            e.stopPropagation();
+          onClick={async () => {
             // Open Stripe portal to set subscription to cancel at period end
             // or un-cancel subscription previously set to cancel
             const { data } = await getBillingPortalSessionUrl({

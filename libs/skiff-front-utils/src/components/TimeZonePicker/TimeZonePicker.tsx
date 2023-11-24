@@ -1,36 +1,87 @@
-import { getTimeZones, TimeZone } from '@vvo/tzdb';
-import { Typography, ThemeMode, themeNames } from '@skiff-org/skiff-ui';
+import { Dropdown, DropdownItem, InputField, REMOVE_SCROLLBAR_CSS } from 'nightwatch-ui';
+import { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-export const TimeDiffContainer = styled.span`
-  font-size: 14px;
-  font-family: 'Skiff Mono', system-ui;
-  color: ${themeNames.dark['--text-secondary']};
-  margin-right: 8px;
-  font-variant-numeric: tabular-nums lining-nums;
+import { TIME_ZONE_PICKER_MAX_HEIGHT, TIME_ZONE_PICKER_WIDTH } from './TimeZonePicker.constants';
+import { TimeZonePickerProps } from './TimeZonePicker.types';
+import { renderCustomLabel, stringifyTimeZone, timeZoneIncludesQuery, uniqueTimezones } from './TimeZonePicker.utils';
+
+const ScrollContainer = styled.div<{ $fixedHeight: boolean }>`
+  width: 100%;
+  overflow-y: auto;
+  max-height: ${TIME_ZONE_PICKER_MAX_HEIGHT}px;
+  ${({ $fixedHeight }) => $fixedHeight && `height: ${TIME_ZONE_PICKER_MAX_HEIGHT}px;`}
+  ${REMOVE_SCROLLBAR_CSS}
 `;
 
-export const CityName = styled.span`
-  color: ${themeNames.dark['--text-secondary']};
-  margin-left: 8px;
-`;
+const TimeZonePicker: React.FC<TimeZonePickerProps> = ({
+  buttonRef,
+  isOpen,
+  timeZone,
+  onSelectTimeZone,
+  setIsOpen,
+  fixedHeight = false,
+  ...dropdownProps
+}: TimeZonePickerProps) => {
+  const [searchValue, setSearchValue] = useState('');
+  const [highlightedIdx, setHighlightedIdx] = useState<number>(0);
 
-export const uniqueTimezones = getTimeZones();
+  const filteredTimeZones = useMemo(
+    () =>
+      uniqueTimezones.filter(
+        (tz) =>
+          timeZoneIncludesQuery(tz, searchValue) ||
+          stringifyTimeZone(tz).toLowerCase().includes(searchValue.toLowerCase())
+      ),
+    [searchValue]
+  );
 
-const getCityNameFotTZ = (tz: TimeZone) => tz.name.split('/')[1].replace(/\_/g, ' ');
+  useEffect(() => {
+    if (isOpen) {
+      // Highlight active item on opening the dropdown
+      const activeIndex = uniqueTimezones.findIndex((tz) => tz.name === timeZone);
+      if (activeIndex === highlightedIdx) return;
+      setHighlightedIdx(activeIndex);
+    } else {
+      // Reset search value on closing the dropdown
+      if (!!searchValue.length) setSearchValue('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
-// GMT-XX:XX City abbrev
-export const stringifyTimeZone = (currTimeZone: TimeZone) =>
-  `GMT${currTimeZone.currentTimeFormat.split(' ')[0]} / ${currTimeZone.alternativeName} / ${getCityNameFotTZ(
-    currTimeZone
-  )}`;
-
-export const renderCustomLabel = (currTimeZone: TimeZone) => {
   return (
-    <Typography forceTheme={ThemeMode.DARK}>
-      <TimeDiffContainer>GMT{currTimeZone.currentTimeFormat.split(' ')[0]}</TimeDiffContainer>
-      <span>{currTimeZone.alternativeName}</span>
-      <CityName>{getCityNameFotTZ(currTimeZone)}</CityName>
-    </Typography>
+    <Dropdown
+      buttonRef={buttonRef}
+      inputField={<InputField onChange={(e) => setSearchValue(e.target.value)} value={searchValue} />}
+      keyboardNavControls={{
+        idx: highlightedIdx,
+        setIdx: setHighlightedIdx,
+        numItems: filteredTimeZones.length
+      }}
+      portal
+      setShowDropdown={setIsOpen}
+      showDropdown={isOpen}
+      width={TIME_ZONE_PICKER_WIDTH}
+      {...dropdownProps}
+    >
+      <ScrollContainer $fixedHeight={fixedHeight}>
+        {filteredTimeZones.map((tz, index) => (
+          <DropdownItem
+            active={timeZone === tz.name}
+            customLabel={renderCustomLabel(tz)}
+            highlight={highlightedIdx === index}
+            key={tz.name}
+            label={stringifyTimeZone(tz)}
+            onClick={() => {
+              onSelectTimeZone(tz.name);
+              setIsOpen(false);
+            }}
+            onHover={() => setHighlightedIdx(index)}
+          />
+        ))}
+      </ScrollContainer>
+    </Dropdown>
   );
 };
+
+export default TimeZonePicker;

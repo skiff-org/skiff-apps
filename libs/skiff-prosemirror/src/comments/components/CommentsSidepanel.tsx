@@ -2,18 +2,19 @@ import {
   Alignment,
   Divider,
   DropdownItem,
+  FilledVariant,
   Icon,
   IconButton,
-  Select,
   Size,
   Skeleton,
   Typography,
   TypographyWeight,
   useOnClickOutside
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 import { MarkType } from 'prosemirror-model';
 import { EditorView } from 'prosemirror-view';
 import React, { FC, MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react'; // eslint-disable-line
+import { SelectField } from 'skiff-front-utils';
 import styled from 'styled-components';
 
 import { getCustomState } from '../..';
@@ -35,6 +36,12 @@ import Thread from './Thread';
 
 const DividerContainer = styled.div`
   margin-bottom: 1px;
+`;
+
+const SelectContainer = styled.div`
+  position: relative;
+  margin-left: auto;
+  width: 184px;
 `;
 
 interface SidepanelThreadProps {
@@ -259,29 +266,31 @@ export const CommentsSidepanel: FC<CommentsSidepanelProps> = ({
             setCommentsSidepanel(false);
           }}
           icon={Icon.DoubleRight}
+          variant={FilledVariant.UNFILLED}
         />
         <IconButton
           onClick={() => {
             setOrderDesc((o) => !o);
           }}
           icon={orderDesc ? Icon.SortDescending : Icon.SortAscending}
+          variant={FilledVariant.UNFILLED}
         />
-        <div style={{ position: 'relative', marginLeft: 'auto', width: '184px' }}>
-          <Select
-            onChange={(value: string) => {
+        <SelectContainer>
+          <SelectField
+            onChange={(value) => {
               const filterOption = filters.find((filter) => filter.label === value);
               if (filterOption?.onClick) filterOption.onClick(view);
               if (filterOption) setCurrentFilter(filterOption);
             }}
-            filled
+            variant={FilledVariant.FILLED}
             size={Size.SMALL}
             value={currentFilter.label}
           >
             {filters.map((filterOption) => (
               <DropdownItem value={filterOption.label} key={filterOption.label} label={filterOption.label} />
             ))}
-          </Select>
-        </div>
+          </SelectField>
+        </SelectContainer>
       </div>
       <DividerContainer>
         <Divider />

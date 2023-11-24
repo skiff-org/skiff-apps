@@ -8,7 +8,7 @@ import {
   Type,
   Typography,
   TypographyWeight
-} from '@skiff-org/skiff-ui';
+} from 'nightwatch-ui';
 import { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useAdjustBusinessPlanMutation } from 'skiff-front-graphql';
@@ -87,7 +87,7 @@ const AdjustButtons = styled.div`
   gap: 12px;
 `;
 
-const AdjustSeatsModal: React.FC<AdjustSeatsModalProps> = (props) => {
+const AdjustSeatsModal: React.FC<AdjustSeatsModalProps> = (props: AdjustSeatsModalProps) => {
   const { open, onClose, activeSubscriptionBillingInterval, allocatedSeats, refetch } = props;
   const maxSeatCount = getMaxUsersPerWorkspace(TierName.Business);
   const [confirmLoading, setConfirmLoading] = useState(false);

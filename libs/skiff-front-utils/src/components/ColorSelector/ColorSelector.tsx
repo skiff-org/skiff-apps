@@ -1,12 +1,15 @@
-import { AccentColor, CorrectedColorSelect, getThemedColor, ThemeMode } from '@skiff-org/skiff-ui';
+import { AccentColor, CorrectedColorSelect, getThemedColor, ThemeMode, useOnClickOutside } from 'nightwatch-ui';
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 
+import { useRef, useState } from 'react';
 import { useTheme } from '../../theme/AppThemeProvider';
+import ColorPicker from './ColorPicker';
 
 const ColorList = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
 `;
 
@@ -82,26 +85,81 @@ export const ColorCircle = styled.div<{
   `}
 `;
 
+const CustomColorContainer = styled.div`
+  width: 28px;
+  height: 28px;
+  border-radius: 28px;
+  margin: 2px;
+  display: flex;
+  aspect-ratio: 1;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  box-sizing: border-box;
+  cursor: pointer;
+`;
+
+const CustomColor = styled.div`
+  background: conic-gradient(
+    rgb(235, 87, 87),
+    rgb(242, 201, 76),
+    rgb(76, 183, 130),
+    rgb(78, 167, 252),
+    rgb(250, 96, 122)
+  );
+  box-sizing: border-box;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  aspect-ratio: 1;
+`;
+
 interface ColorSelectorProps {
   colorToStyling: Record<AccentColor, string>;
   value: string;
-  handleChange: (newValue: AccentColor, evt?: React.MouseEvent) => void;
+  handleChange: (newValue: AccentColor | string, evt?: React.MouseEvent) => void;
+  handlePickerChange?: (newValue: string) => void;
+  pickerColorContainerRef?: React.RefObject<HTMLDivElement>;
   disabled?: boolean;
   hideSelected?: boolean;
   showHover?: boolean;
   isHighlight?: boolean;
+  pickerLeftOffset?: number;
+  pickerTopOffset?: number;
 }
 
 const ColorSelector: React.FC<ColorSelectorProps> = ({
   colorToStyling,
   value,
   handleChange,
+  handlePickerChange,
+  pickerColorContainerRef,
   disabled,
   hideSelected,
   showHover,
-  isHighlight
+  isHighlight,
+  pickerLeftOffset = -100,
+  pickerTopOffset = 30
 }) => {
   const { theme } = useTheme();
+  const [openPicker, setOpenPicker] = useState<boolean>(false);
+  const customColorButtonRef = useRef<HTMLDivElement>(null);
+  const fallbackRef = useRef<HTMLDivElement>(null);
+
+  const closeColorPicker = (e: MouseEvent | TouchEvent) => {
+    e.stopPropagation();
+    if (openPicker) {
+      setOpenPicker(false);
+    }
+  };
+
+  const colorContainerRef = pickerColorContainerRef ?? fallbackRef;
+
+  useOnClickOutside(colorContainerRef, closeColorPicker);
+
   return (
     <ColorList>
       {Object.entries(colorToStyling).map(([colorValue, colorStyling]) => {
@@ -131,6 +189,24 @@ const ColorSelector: React.FC<ColorSelectorProps> = ({
           </Fragment>
         );
       })}
+      {!!handlePickerChange && (
+        <>
+          <CustomColorContainer ref={customColorButtonRef}>
+            <CustomColor onClick={() => setOpenPicker(true)} />
+          </CustomColorContainer>
+          <ColorPicker
+            handleColorChange={(color: string) => {
+              handlePickerChange(color);
+            }}
+            colorContainerRef={colorContainerRef}
+            buttonRef={customColorButtonRef}
+            open={openPicker}
+            value={value}
+            leftOffset={pickerLeftOffset}
+            topOffset={pickerTopOffset}
+          />
+        </>
+      )}
     </ColorList>
   );
 };

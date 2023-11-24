@@ -1,9 +1,10 @@
-import { ButtonGroup, ButtonGroupItem, Dialog, DialogTypes, InputField, Layout, ThemeMode } from '@skiff-org/skiff-ui';
-import Drawer from '../../Drawer';
+import { ButtonGroup, ButtonGroupItem, Dialog, DialogType, InputField, Layout, ThemeMode } from 'nightwatch-ui';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { RequestStatus } from 'skiff-graphql';
 import styled from 'styled-components';
+
+import Drawer from '../../Drawer';
 
 const MobileButtonContainer = styled.div`
   margin-top: 16px;
@@ -64,8 +65,7 @@ function AddEmailModal({ closeDialog, error, loading, runAddEmail, setError, onS
     <InputField
       autoFocus
       disabled={loading}
-      error={!!error}
-      errorMsg={error}
+      error={error}
       forceTheme={forceTheme}
       onChange={onChange}
       onKeyPress={(e: React.KeyboardEvent) => {
@@ -76,15 +76,9 @@ function AddEmailModal({ closeDialog, error, loading, runAddEmail, setError, onS
     />
   );
   const renderAddEmailButtons = (forceTheme?: ThemeMode) => (
-    <ButtonGroup fullWidth layout={isMobile ? Layout.STACKED : Layout.INLINE}>
-      <ButtonGroupItem
-        forceTheme={forceTheme}
-        key='submit'
-        label='Send confirmation'
-        loading={loading}
-        onClick={() => void addEmail()}
-      />
-      <ButtonGroupItem forceTheme={forceTheme} key='cancel' label='Cancel' onClick={onClose} />
+    <ButtonGroup forceTheme={forceTheme} fullWidth layout={isMobile ? Layout.STACKED : Layout.INLINE}>
+      <ButtonGroupItem key='submit' label='Send confirmation' loading={loading} onClick={() => void addEmail()} />
+      <ButtonGroupItem key='cancel' label='Cancel' onClick={onClose} />
     </ButtonGroup>
   );
 
@@ -103,7 +97,7 @@ function AddEmailModal({ closeDialog, error, loading, runAddEmail, setError, onS
       onClose={onClose}
       open
       title='Add email address'
-      type={DialogTypes.Input}
+      type={DialogType.INPUT}
     >
       {renderAddEmailButtons()}
     </Dialog>

@@ -1,4 +1,7 @@
 import dayjs from 'dayjs';
+
+import { TwelveHourPeriod } from '../../types';
+
 import { getInitialDateObject } from './hourPickerUtils';
 
 describe('hour picker', () => {
@@ -6,7 +9,7 @@ describe('hour picker', () => {
     const initialDateObject = getInitialDateObject(true, dayjs('01-01-2022 01:30'), 'h:mm A');
     expect(initialDateObject.hour).toBe('1');
     expect(initialDateObject.minute).toBe('30');
-    expect(initialDateObject.timeDivider).toBe('AM');
+    expect(initialDateObject.timeDivider).toBe(TwelveHourPeriod.AM);
   });
 
   it('getInitialDateObject hour set to 12:30 should be 12:30 PM', () => {

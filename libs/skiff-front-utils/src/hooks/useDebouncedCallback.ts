@@ -76,3 +76,79 @@ export function useDebouncedAsyncCallback<T extends (...args: any) => Promise<an
 
   return [debouncedFunction, flush];
 }
+
+export function useDebouncedAsyncCallbackWithMaxTimeout<T extends (...args: any) => Promise<any>>(
+  callback: T,
+  waitMs: number,
+  maxWaitMs: number
+): [
+  (...args: Parameters<T>) => Promise<void>, // debounced function
+  (...args: Parameters<T>) => Promise<void> // flush debounced
+] {
+  const callbackRef = useRef<T>(callback);
+  callbackRef.current = callback;
+
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const maxTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const pendingPromise = useRef<Promise<any> | null>(null);
+
+  const executeCallback = async (...args: Parameters<T>) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    if (maxTimeoutRef.current) {
+      clearTimeout(maxTimeoutRef.current);
+      maxTimeoutRef.current = null;
+    }
+    try {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      pendingPromise.current = callbackRef.current(...args);
+      await pendingPromise.current;
+    } finally {
+      pendingPromise.current = null;
+    }
+  };
+
+  const debouncedFunction = useMemo(
+    () =>
+      async (...args: Parameters<T>) => {
+        if (pendingPromise.current) {
+          try {
+            await pendingPromise.current;
+          } catch {}
+        }
+
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+
+        timeoutRef.current = setTimeout(() => void executeCallback(...args), waitMs);
+
+        if (maxWaitMs && !maxTimeoutRef.current) {
+          maxTimeoutRef.current = setTimeout(() => void executeCallback(...args), maxWaitMs);
+        }
+      },
+    [waitMs, maxWaitMs]
+  );
+
+  const flush = useMemo(
+    () =>
+      async (...args: Parameters<T>) => {
+        if (pendingPromise.current) {
+          try {
+            await pendingPromise.current;
+          } catch {}
+        }
+
+        if (timeoutRef.current || maxTimeoutRef.current) {
+          void executeCallback(...args);
+        }
+      },
+    []
+  );
+
+  return [debouncedFunction, flush];
+}

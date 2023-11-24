@@ -58,7 +58,7 @@ function getFileSortOrderCurrentValue<T extends keyof FileSortOrder>(setting: T)
  */
 export default function useFileSortOrder<T extends keyof FileSortOrder>(
   setting: T
-): [FileSortOrder[T], (newValue: FileSortOrder[T]) => any] {
+): [FileSortOrder[T], (newValue: FileSortOrder[T]) => void] {
   const [currentValue, setCurrentValue] = useState<FileSortOrder[T]>(getFileSortOrderCurrentValue(setting));
   const setter = (newValue: FileSortOrder[T]) => {
     const storageKey =

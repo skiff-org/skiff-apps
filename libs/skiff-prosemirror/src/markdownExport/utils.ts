@@ -11,7 +11,12 @@ export const renderTodoList = (state: MarkdownSerializerState, node: PMNode) => 
   node.content.forEach((item) => {
     const checked = item.attrs.checked as boolean;
     const checkMark = checked ? 'X' : ' ';
-    const text = findTextNodes(item, true)[0].node.text;
+    let text = '';
+    try {
+      text = findTextNodes(item, true)[0].node.text || '';
+    } catch (error) {
+      console.error('renderTodoList error', error);
+    }
     const space = state.repeat(' ', indent * 4);
     state.write(`${space}- [${checkMark}] ${text}`);
     state.write('\n');
@@ -20,35 +25,28 @@ export const renderTodoList = (state: MarkdownSerializerState, node: PMNode) => 
 
 export const renderOrderedList = (state: MarkdownSerializerState, node: PMNode) => {
   const { start, indent } = node.attrs as { start: number; indent: number };
-  node.content.forEach((child, _, index) => {
-    const textNodes = findTextNodes(child, true);
-    const text = textNodes.length > 0 ? textNodes[0].node.text : '';
+  let count = start;
+  node.content.forEach((child) => {
     const space = state.repeat(' ', indent * 4);
-    state.write(`${space} ${start + index}. ${text || ''}`);
-    state.write('\n');
+    state.write(`${space}${count}. `);
+    state.renderInline(child);
+    state.ensureNewLine(); // Ensure there's exactly one newline after each list item
+    count++;
   });
 };
 
 export const renderBulletList = (state: MarkdownSerializerState, node: PMNode) => {
   const indent = node.attrs.indent as number;
   node.content.forEach((item) => {
-    const textNodes = findTextNodes(item, true);
-    const text = textNodes.length > 0 ? textNodes[0].node.text : '';
     const space = state.repeat(' ', indent * 4);
-    state.write(`${space} - ${text}\n`);
-  });
-};
-export const renderToggleList = (state: MarkdownSerializerState, node: PMNode) => {
-  node.content.forEach((child) => {
-    const textNodes = findTextNodes(child, true);
-    const text = textNodes.length > 0 ? textNodes[0].node.text : '';
-    state.write(` - ${text}\n`);
-    child.content.forEach(() => {
-      const childTextNodes = findTextNodes(child, true);
-      const text = childTextNodes.length > 0 ? childTextNodes[0].node.text : '';
-      const space = state.repeat(' ', 4);
-      state.write(`${space} - ${text || ''}\n`);
+    state.write(`${space} - `);
+
+    // Iterate over the item's content and render inline
+    item.content.forEach((child) => {
+      state.renderInline(child);
     });
+
+    state.write('\n');
   });
 };
 
@@ -100,11 +98,33 @@ const renderTextNode = (state: MarkdownSerializerState, node: PMNode) => {
   if (!textNode) {
     return;
   }
+
   if (textNode.text) {
-    state.write(textNode.text);
+    let outputText = textNode.text;
+
+    textNode.marks.forEach((mark) => {
+      switch (mark.type.name) {
+        case 'strong':
+          outputText = `**${outputText}**`; // bold
+          break;
+        case 'em':
+          outputText = `*${outputText}*`; // italic
+          break;
+        case 'link':
+          outputText = `[${outputText}](${(mark.attrs.href as string | undefined) ?? ''})`; // link
+          break;
+        case 'code':
+          outputText = `\`${outputText}\``; // inline code
+          break;
+        // Add more cases for other marks as necessary.
+      }
+    });
+
+    state.write(outputText);
     state.write('<br>');
   }
 };
+
 // For each cell it will check what kind of node is in it and renders it accordingly
 export const renderCellRow = (state: MarkdownSerializerState, row: PMNode) => {
   // opening row
@@ -121,7 +141,10 @@ export const renderCellRow = (state: MarkdownSerializerState, row: PMNode) => {
           renderTextNode(state, node);
           break;
         case TableNodeNames.LABEL:
-          const labels: Array<{ title: string; color: string }> = node.attrs.labels;
+          const labels: Array<{ title: string; color: string }> = node.attrs.labels as Array<{
+            title: string;
+            color: string;
+          }>;
           labels.forEach((label) => {
             state.write(`${label.title};`);
           });
@@ -151,5 +174,5 @@ export const renderCellRow = (state: MarkdownSerializerState, row: PMNode) => {
 };
 
 export const renderMention = (state: MarkdownSerializerState, node: PMNode) => {
-  state.write(`@${node.attrs.name}`);
+  state.write(`@${node.attrs.name as string}`);
 };

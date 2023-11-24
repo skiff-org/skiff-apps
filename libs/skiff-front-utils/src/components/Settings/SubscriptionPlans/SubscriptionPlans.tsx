@@ -1,10 +1,10 @@
 import React, { Suspense, useEffect, useState } from 'react';
-import { isMobile } from 'react-device-detect';
 import { SubscriptionInterval, SubscriptionPlan } from 'skiff-graphql';
+import styled from 'styled-components';
 
 import usePrevious from '../../../hooks/usePrevious';
+import { isReactNativeDesktopApp } from '../../../utils';
 
-import styled from 'styled-components';
 import FeatureTable from './FeatureTable/FeatureTable';
 
 const CryptoBanner = React.lazy(() => import('../CryptoBanner/CryptoBanner'));
@@ -38,7 +38,8 @@ function SubscriptionPlans({
   const [isUpdatingPlan, setIsUpdatingPlan] = useState(false);
   const previousActiveSubscription = usePrevious(subscription);
 
-  const showCryptoBanner = subscription === SubscriptionPlan.Free && !isMobile;
+  const showCryptoBanner =
+    subscription === SubscriptionPlan.Free && !window.ReactNativeWebView && !isReactNativeDesktopApp();
 
   useEffect(() => {
     if (isUpdatingPlan && subscription !== previousActiveSubscription) {
@@ -63,10 +64,10 @@ function SubscriptionPlans({
       <FeatureTable
         activeSubscriptionBillingInterval={activeSubscriptionBillingInterval}
         isUpdatingPlan={isUpdatingPlan}
+        openBillingPage={openBillingPage}
         setIsUpdatingPlan={setIsUpdatingPlan}
         startPolling={startPolling}
         subscription={subscription}
-        openBillingPage={openBillingPage}
       />
     </>
   );

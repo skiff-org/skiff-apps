@@ -1,6 +1,6 @@
 import Portal from '@mui/material/Portal';
 import { AnimatePresence } from 'framer-motion';
-import { BANNER_HEIGHT, useOnClickOutside } from '@skiff-org/skiff-ui';
+import { BANNER_HEIGHT, useOnClickOutside } from 'nightwatch-ui';
 import React, { useState, useRef } from 'react';
 import { isMobile } from 'react-device-detect';
 

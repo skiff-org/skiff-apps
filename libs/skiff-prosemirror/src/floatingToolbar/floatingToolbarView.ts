@@ -2,11 +2,12 @@ import crelt from 'crelt';
 import { renderGrouped } from 'prosemirror-menu';
 import { EditorState, Selection } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import { TEXT_COLORS } from 'skiff-front-utils';
+import { EditorHighlightColorIds, HIGHLIGHT_COLORS, TEXT_COLORS } from 'skiff-front-utils';
 
 import { commentPluginKey } from '../comments/comment.types';
 import { H1, H2, H3, OL, TEXT_COLOR, TO_DO, TOGGLE_LIST_INSERT, UL } from '../EditorCommands';
 
+import { isCellColorActive } from '@skiff-org/prosemirror-tables';
 import { toolbarItems } from './toolbarItems';
 import AnimatedDropdown from './toolbarItems/customMenu/AnimatedDropdown';
 import SkiffMenuItem from './toolbarItems/customMenu/SkiffMenuItem';
@@ -123,21 +124,42 @@ class FloatingToolbarView {
     return 'var(--text-primary)';
   }
 
+
+  getBgCellColor(state: EditorState): string {
+    const activeColors = Object.keys(HIGHLIGHT_COLORS).filter((color: string) =>
+      isCellColorActive(state, HIGHLIGHT_COLORS[color] as string)
+    );
+
+    if (activeColors.length === 1) return HIGHLIGHT_COLORS[activeColors[0]] as string;
+    return HIGHLIGHT_COLORS[EditorHighlightColorIds.TRANSPARENT];
+  }
+
   updateToolbarItems(state: EditorState) {
     this.items.updateItems(state);
     const toolbarLabel = document.getElementsByClassName('text-item-dropdown')[0];
     const toolbarColor = document.getElementsByClassName('text-color-dropdown')[0];
+    const toolbarCellBgColor = document.getElementsByClassName('cell-background-color-dropdown')[0];
+
     const newContent = document.createTextNode(this.getLabel(state));
     const icon = crelt('span', { class: `text-color-item-icon-toolbar` });
     icon.style.background = getSpecialBackgrounds(this.getColor(state) as string);
 
     const colorTooltip = crelt('span', { class: 'menu-tooltip' }, 'Color');
     const newColor = crelt('div', { class: `text-color-item-toolbar` }, icon, colorTooltip);
+
+    const bgColorIcon = crelt('span', { class: `text-color-item-icon-toolbar` });
+    bgColorIcon.style.background = getSpecialBackgrounds(this.getBgCellColor(state));
+    const bgColorTooltip = crelt('span', { class: 'menu-tooltip' }, 'Cell background');
+    const newBgCellColor = crelt('div', { class: `text-color-item-toolbar` }, bgColorIcon, bgColorTooltip);
+
     if (toolbarLabel?.firstChild) {
       toolbarLabel.replaceChild(newContent, toolbarLabel.firstChild);
     }
     if (toolbarColor?.firstChild) {
       toolbarColor.replaceChild(newColor, toolbarColor.firstChild);
+    }
+    if (toolbarCellBgColor?.firstChild) {
+      toolbarCellBgColor.replaceChild(newBgCellColor, toolbarCellBgColor.firstChild);
     }
   }
 
@@ -204,7 +226,7 @@ class FloatingToolbarView {
     };
   }
 
-  destroy() {}
+  destroy() { }
 }
 
 export default FloatingToolbarView;

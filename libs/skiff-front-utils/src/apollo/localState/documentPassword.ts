@@ -1,5 +1,5 @@
 import { makeVar } from '@apollo/client';
-import { createKeyFromSecret } from '@skiff-org/skiff-crypto';
+import { createKeyFromSecret } from 'skiff-crypto';
 
 /**
  * This stores the key derived from the password for each document.
@@ -9,8 +9,12 @@ import { createKeyFromSecret } from '@skiff-org/skiff-crypto';
  */
 const documentDerivedPasswords = makeVar<{ [docID: string]: string }>({});
 
-export const registerDocumentPassword = async (docID: string, docPassword: string) => {
-  const derivedPassword = await createKeyFromSecret(docPassword, docID);
+export const registerDocumentPassword = async (
+  docID: string,
+  docPassword: string,
+  clonedDocID?: string | undefined
+) => {
+  const derivedPassword = await createKeyFromSecret(docPassword, clonedDocID ?? docID);
   const existingDerivedPassword = documentDerivedPasswords();
   documentDerivedPasswords({
     ...existingDerivedPassword,

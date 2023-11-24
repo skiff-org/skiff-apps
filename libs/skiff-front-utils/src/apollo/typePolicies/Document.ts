@@ -1,6 +1,6 @@
 import { FieldReadFunction, TypePolicy } from '@apollo/client';
-import { decryptSymmetric } from '@skiff-org/skiff-crypto';
-import { Document, LinkLinkKeyDatagram } from 'skiff-front-graphql';
+import { decryptDatagramV2, decryptSymmetric } from 'skiff-crypto';
+import { Document, LinkLinkKeyDatagram, ThumbnailDatagram } from 'skiff-front-graphql';
 import { assertExists } from 'skiff-utils';
 
 import { memoizeFieldReadFunction } from '../../helpers';
@@ -91,7 +91,7 @@ const readDecryptedMetadata: FieldReadFunction<Document['decryptedMetadata']> = 
     const teamName = team ? options.readField<string>('name', team) : 'NAME_NOT_FOUND';
     const teamIcon = team ? options.readField<string>('icon', team) : 'ICON_NOT_FOUND';
     const teamRootDoc = team ? options.readField<Document>('rootDocument', team) : undefined;
-    const teamRootDocID = team ? options.readField<Document['docID']>('docID', teamRootDoc) : undefined;
+    const teamRootDocID = team ? options.readField<Document>('docID', teamRootDoc) : undefined;
     assertExists(teamName);
     return { encryptedMetadata, sessionKey, docID, teamName, teamIcon, teamRootDocID };
   },
@@ -193,6 +193,30 @@ const readDecryptedContents: FieldReadFunction<Document['decryptedContents']> = 
   }
 );
 
+const readDecryptedThumbnail: FieldReadFunction<Document['decryptedThumbnail']> = memoizeFieldReadFunction(
+  (_, options) => {
+    const docID = options.readField<Document['docID']>('docID') as string;
+    const sessionKey = options.readField<Document['decryptedSessionKey']>('decryptedSessionKey');
+    const encryptedThumbnail = options.readField<Document['thumbnail']>('thumbnail');
+    return {
+      sessionKey,
+      encryptedThumbnail,
+      docID
+    };
+  },
+  ({ sessionKey, encryptedThumbnail, docID }) => {
+    if (!encryptedThumbnail || !sessionKey) {
+      return '';
+    }
+    try {
+      return decryptDatagramV2(ThumbnailDatagram, sessionKey, encryptedThumbnail).body.decryptedThumbnail;
+    } catch (e) {
+      console.error(`Could not decrypt encryptedThumbnail for doc ${docID}`, e);
+      return '';
+    }
+  }
+);
+
 export const documentTypePolicy: TypePolicy = {
   keyFields: ['docID'],
   fields: {
@@ -226,6 +250,9 @@ export const documentTypePolicy: TypePolicy = {
     },
     createdAt: {
       read: parseAsMemoizedDate
+    },
+    decryptedThumbnail: {
+      read: readDecryptedThumbnail
     }
   }
 };

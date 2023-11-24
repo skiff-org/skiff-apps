@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Button, CircularProgress, Icon, Icons, RelativelyCentered, Size, Type } from '@skiff-org/skiff-ui';
-import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
+import { Button, CircularProgress, Icon, Icons, RelativelyCentered, Size, Type } from 'nightwatch-ui';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { FileRejection, useDropzone } from 'react-dropzone';
 import { MB_SCALE_FACTOR } from 'skiff-utils';
 import styled from 'styled-components';
@@ -58,23 +58,9 @@ const DropzoneActiveOverlay = styled.div`
 const selectVariantContainerStyle = {
   display: 'flex',
   flexDirection: 'column',
+  width: 'fit-content !important',
   gap: 'inherit'
 };
-
-/**
- * Possible ways that file import can fail.
- * Error codes from @see https://github.com/react-dropzone/react-dropzone.
- */
-export enum FileImportFailures {
-  TOO_LARGE = 'file-too-large',
-  TOO_SMALL = 'file-too-small',
-  TOO_MANY = 'too-many-files',
-  INVALID_TYPE = 'file-invalid-type',
-  UNKNOWN_ERROR = 'unknown-error',
-  PERMISSION_ERROR = 'permission-error',
-  GOOGLE_USAGE_LIMIT_ERROR = 'google-usage-limit-error',
-  NETWORK_ERROR = 'network-error'
-}
 
 type FileImportProps = {
   /**
@@ -140,10 +126,6 @@ type FileImportProps = {
    * How to display the file import select row
    */
   compact?: boolean;
-  /**
-   * React JSX children
-   */
-  children?: ReactNode;
 };
 
 // TODO: Dedup others
@@ -233,7 +215,6 @@ const FileImport: React.FC<FileImportProps> = ({
   const baseContainerStyle = { overflow: 'auto', width: '100%' };
   const containerStyle =
     variant === 'SELECT' ? { ...baseContainerStyle, ...selectVariantContainerStyle } : baseContainerStyle;
-
   return (
     <div style={containerStyle}>
       <input {...fileInputProps} />
@@ -252,7 +233,8 @@ const FileImport: React.FC<FileImportProps> = ({
             iconColor='secondary'
             label={label || 'Upload files'}
             onClick={openFileInput}
-            sublabel={sublabel}
+            onClickLabel='Upload'
+            subLabel={sublabel}
           />
           {foldersUpload && (
             <ImportSelect
@@ -261,7 +243,8 @@ const FileImport: React.FC<FileImportProps> = ({
               iconColor='secondary'
               label='Upload folder'
               onClick={openFolderInput}
-              sublabel='Upload from your local computer'
+              onClickLabel='Upload'
+              subLabel='Upload from your local computer'
             />
           )}
         </>

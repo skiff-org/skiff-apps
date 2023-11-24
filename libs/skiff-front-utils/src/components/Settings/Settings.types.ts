@@ -1,4 +1,4 @@
-import { AccentColor, Icon } from '@skiff-org/skiff-ui';
+import { AccentColor, Icon } from 'nightwatch-ui';
 import React, { ReactElement } from 'react';
 
 export enum SettingsSection {
@@ -11,44 +11,54 @@ export enum SettingsSection {
 export enum TabPage {
   Empty = ' ',
   Account = 'account',
-  Aliases = 'aliases',
+  Addresses = 'addresses',
   Appearance = 'appearance',
   AutoReply = 'auto-reply',
   Billing = 'billing',
   Credit = 'credits',
   CustomDomains = 'custom domains',
   Import = 'import',
+  Inbox = 'inbox',
+  Forwarding = 'forwarding',
   Notifications = 'notifications',
   Org = 'organization',
   Team = 'teams',
   Plans = 'plans',
+  Responses = 'responses',
   Security = 'security',
   Signature = 'signature',
+  Silence = 'silence',
   Storage = 'storage',
   Format = 'format',
   Contacts = 'contacts',
-  Filters = 'filters'
+  Filters = 'filters',
+  QuickAliases = 'quick aliases'
 }
 
 export const SETTINGS_TABS_LABELS: Record<Exclude<TabPage, TabPage.Empty>, string> = {
   [TabPage.Account]: 'Account',
-  [TabPage.Aliases]: 'Aliases',
+  [TabPage.Addresses]: 'Addresses',
   [TabPage.Appearance]: 'Appearance',
   [TabPage.AutoReply]: 'Auto reply',
   [TabPage.Billing]: 'Billing',
-  [TabPage.Credit]: 'Credit',
   [TabPage.CustomDomains]: 'Custom domains',
   [TabPage.Import]: 'Import',
+  [TabPage.Inbox]: 'Inbox',
+  [TabPage.Forwarding]: 'Forwarding',
   [TabPage.Notifications]: 'Notifications',
   [TabPage.Org]: 'Organization',
   [TabPage.Team]: 'Teams',
   [TabPage.Plans]: 'Plans',
+  [TabPage.Responses]: 'Compose & reply',
+  [TabPage.QuickAliases]: 'Quick Aliases',
+  [TabPage.Silence]: 'Noise canceling',
   [TabPage.Security]: 'Security',
   [TabPage.Signature]: 'Signature',
+  [TabPage.Credit]: 'Credits',
   [TabPage.Storage]: 'Storage',
   [TabPage.Format]: 'Format',
   [TabPage.Contacts]: 'Contacts',
-  [TabPage.Filters]: 'Filters'
+  [TabPage.Filters]: 'Filters & spam'
 };
 
 export enum SettingValue {
@@ -56,6 +66,8 @@ export enum SettingValue {
   AccountRecovery = 'account-recovery',
   AddEmail = 'add-email',
   AddEmailAlias = 'add-email-alias',
+  AutoAdvance = 'auto-advance',
+  AliasTagList = 'alias-tag-list',
   DefaultEmail = 'default-email',
   RecoveryEmail = 'recovery-email',
   AddWalletAlias = 'add-wallet-alias',
@@ -79,9 +91,15 @@ export enum SettingValue {
   Contacts = 'contacts',
   ContactsImport = 'contacts-import',
   ContactsAutoSync = 'auto-sync-contacts',
+  ContactsDeviceSync = 'device-sync-contacts',
   PaymentDetails = 'payment-details',
   InvoiceHistory = 'invoice-history',
   CurrentSubscriptions = 'current-subscriptions',
+  QuickAlias = 'quick-alias',
+  QuickAliasSubdomain = 'quick-alias-subdomain',
+  QuickAliasBanner = 'quick-alias-banner',
+  PgpKeys = 'pgp-keys',
+  AttachPgp = 'attach-pgp',
   // Skiff mail
   AutoForwarding = 'auto-forwarding',
   AutoReply = 'auto-reply',
@@ -89,12 +107,20 @@ export enum SettingValue {
   PrivacyDigest = 'privacy-digest',
   ImportMail = 'import-mail',
   InAppNotifications = 'in-app-notifications',
+  BiometricAuthentication = 'biometric-authentication',
   LoadRemoteContent = 'load-remote-content',
   SignatureManager = 'signature-manager',
   SwipeSettings = 'swipe-settings',
   AliasInboxes = 'alias-inboxes',
   Filters = 'filters',
+  SpamList = 'spam-list',
   BrowserNotifications = 'web-push-notifications',
+  BuyDomain = 'buy-domain',
+  Profile = 'profile',
+  AlreadySilenced = 'already-silenced',
+  SuggestedSilence = 'suggested-silence',
+  MetricSilence = 'metric-silence',
+  MailtoHandler = 'mailto-handler',
   // Skiff pages
   ImportFiles = 'import-files',
   OrganizationName = 'organization-name',
@@ -102,6 +128,7 @@ export enum SettingValue {
   StorageManagement = 'storage-management',
   StorageFormat = 'storage-format',
   IconFormat = 'icon-format',
+  TableOfContents = 'table-of-contents',
   StorageUsage = 'storage-usage',
   TeamList = 'team-list',
   Logout = 'logout',
@@ -109,52 +136,69 @@ export enum SettingValue {
   // Skiff Calendar
   ImportCalendar = 'import-event',
   ImportGoogleCalendar = 'import-google-calendar',
+  CalendarView = 'calendar-view',
   StartDayOfTheWeek = 'start-day-of-the-week',
   TimeZone = 'time-zone',
   DefaultColor = 'default-color'
 }
 
 export const SETTINGS_LABELS: Record<Exclude<SettingValue, SettingValue.EmptySetting>, string> = {
+  [SettingValue.Profile]: 'Profile',
   [SettingValue.AccountRecovery]: 'Account recovery',
+  [SettingValue.AutoAdvance]: 'Auto-advance',
   [SettingValue.AddEmail]: 'Add recovery email',
-  [SettingValue.AddEmailAlias]: 'Email aliases',
+  [SettingValue.AddEmailAlias]: 'Email addresses',
+  [SettingValue.AliasTagList]: 'Quick Alias domains',
   [SettingValue.DefaultEmail]: 'Default email address',
   [SettingValue.RecoveryEmail]: 'Recovery email',
-  [SettingValue.AddWalletAlias]: 'Wallet aliases',
+  [SettingValue.AddWalletAlias]: 'Wallet addresses',
   [SettingValue.DeleteRecoveryEmail]: 'Delete recovery email',
-  [SettingValue.ChangePassword]: 'Change password',
-  [SettingValue.CreditManagement]: 'Credit management',
-  [SettingValue.CryptoBanner]: 'Crypto banner',
   [SettingValue.CustomDomainSetup]: 'Setup domain',
   [SettingValue.CustomDomainManage]: 'Manage domains',
   [SettingValue.DateHourFormat]: 'Date and hour format',
   [SettingValue.DeleteAccount]: 'Delete account',
   [SettingValue.EditProfile]: 'Edit profile',
-  [SettingValue.ENSAlias]: 'ENS alias',
+  [SettingValue.ENSAlias]: 'ENS address',
   [SettingValue.LastVerifiedDate]: 'Last verified date',
   [SettingValue.MailboxLayout]: 'Mailbox layout',
   [SettingValue.Notifications]: 'Notifications',
   [SettingValue.SetupMFA]: 'Two-factor authentication',
+  [SettingValue.ChangePassword]: 'Change password',
+  [SettingValue.CryptoBanner]: 'Pay with Crypto',
   [SettingValue.SubscriptionPlans]: 'Subscription plans',
+  [SettingValue.CreditManagement]: 'Skiff credits',
   [SettingValue.Theme]: 'Theme',
   [SettingValue.VerificationPhrase]: 'View verification phrase',
   [SettingValue.Contacts]: 'Contacts',
   [SettingValue.ContactsImport]: 'Import contacts',
-  [SettingValue.ContactsAutoSync]: 'Auto-sync contacts',
+  [SettingValue.ContactsAutoSync]: 'Auto-add email contacts',
+  [SettingValue.ContactsDeviceSync]: 'Auto-add device contacts',
   [SettingValue.PaymentDetails]: 'Payment details',
   [SettingValue.InvoiceHistory]: 'Invoice history',
   [SettingValue.CurrentSubscriptions]: 'Current subscriptions',
+  [SettingValue.QuickAlias]: 'Quick Alias',
+  [SettingValue.QuickAliasBanner]: 'Quick Alias banner',
+  [SettingValue.PgpKeys]: 'Encryption keys',
+  [SettingValue.AttachPgp]: 'Always attach public key',
+  [SettingValue.QuickAliasSubdomain]: 'Alias subdomain',
   // Skiff mail
-  [SettingValue.AutoForwarding]: 'Auto forwarding',
+  [SettingValue.AutoForwarding]: 'Auto-forwarding',
   [SettingValue.AutoReply]: 'Auto reply',
   [SettingValue.EmailNotifications]: 'Email comment notifications',
   [SettingValue.PrivacyDigest]: 'Privacy Digest newsletter',
   [SettingValue.ImportMail]: 'Import mail',
+  [SettingValue.BiometricAuthentication]: 'Biometric authentication',
   [SettingValue.LoadRemoteContent]: 'Block remote content',
   [SettingValue.SignatureManager]: 'Signature manager',
-  [SettingValue.AliasInboxes]: 'Alias inboxes',
+  [SettingValue.AliasInboxes]: 'Address inboxes',
   [SettingValue.Filters]: 'Filters',
+  [SettingValue.SpamList]: 'Spam list',
   [SettingValue.BrowserNotifications]: 'Browser notifications',
+  [SettingValue.BuyDomain]: 'Buy a domain',
+  [SettingValue.AlreadySilenced]: 'Already silenced',
+  [SettingValue.SuggestedSilence]: 'Silence suggestions',
+  [SettingValue.MetricSilence]: 'Silence metrics',
+  [SettingValue.MailtoHandler]: 'Handle mailto: links',
   // Skiff pages
   [SettingValue.ImportFiles]: 'Import files',
   [SettingValue.OrganizationMemberList]: 'Member list',
@@ -163,6 +207,7 @@ export const SETTINGS_LABELS: Record<Exclude<SettingValue, SettingValue.EmptySet
   [SettingValue.StorageManagement]: 'Storage management',
   [SettingValue.StorageFormat]: 'Storage format',
   [SettingValue.IconFormat]: 'Page icons',
+  [SettingValue.TableOfContents]: 'Table of contents',
   [SettingValue.StorageUsage]: 'Storage usage',
   [SettingValue.InAppNotifications]: 'In-app notifications',
   [SettingValue.Logout]: 'Logout',
@@ -171,6 +216,7 @@ export const SETTINGS_LABELS: Record<Exclude<SettingValue, SettingValue.EmptySet
   // Skiff calendar
   [SettingValue.ImportCalendar]: 'Import calendar',
   [SettingValue.ImportGoogleCalendar]: 'Import google calendar',
+  [SettingValue.CalendarView]: 'Calendar view',
   [SettingValue.StartDayOfTheWeek]: 'Start week on',
   [SettingValue.TimeZone]: 'Time zone',
   [SettingValue.DefaultColor]: 'Default color'
@@ -222,6 +268,7 @@ export interface CustomSetting extends BaseSetting {
   component: ReactElement;
   type: SettingType.Custom;
   fullHeight?: boolean;
+  hasInnerPage?: boolean;
 }
 
 /**
