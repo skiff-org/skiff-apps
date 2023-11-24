@@ -1,0 +1,61 @@
+mutation createCalendarUser($request: CreateCalendarUserRequest!) {
+  createCalendarUser(request: $request)
+}
+
+query getUsersProfileData($request: GetUsersRequest!) {
+  users(request: $request) {
+    ...UserProfileDataWithCalendars
+  }
+}
+
+fragment UserFromEmailAlias on User {
+  userID
+  primaryCalendar {
+    calendarID
+    publicKey
+  }
+}
+
+query usersFromEmailAlias($emailAliases: [String!]!) {
+  usersFromEmailAlias(emailAliases: $emailAliases) {
+    ...UserFromEmailAlias
+  }
+}
+
+fragment UserProfileDataWithCalendars on User {
+  userID
+  username
+  publicData {
+    displayName
+    displayPictureData {
+      profileAccentColor
+      profileCustomURI
+      profileIcon
+    }
+  }
+  publicKey
+  signingPublicKey
+  primaryCalendar {
+    calendarID
+  }
+  calendars {
+    calendarID
+    publicKey
+    encryptedPrivateKey
+    encryptedByKey
+  }
+}
+
+query currentUser {
+  currentUser {
+    ...UserProfileDataWithCalendars
+  }
+}
+
+mutation unsetCalendarPushToken($request: UnsetCalendarPushTokenRequest!) {
+  unsetCalendarPushToken(request: $request)
+}
+
+mutation setCalendarPushToken($request: SetCalendarPushTokenRequest!) {
+  setCalendarPushToken(request: $request)
+}

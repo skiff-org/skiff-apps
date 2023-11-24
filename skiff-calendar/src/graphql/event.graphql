@@ -1,0 +1,106 @@
+input SyncRequest {
+  events: [PushCalendarEventInput!]!
+  calendarID: String!
+  checkpoint: Date
+}
+
+union Attendee = InternalAttendee
+
+fragment PulledCalendarEvents on CalendarEvent {
+  creatorCalendarID
+  calendarEventID
+  parentEventID
+  externalID
+  startDate
+  endDate
+  sequence
+  updatedAt
+  encryptedContent
+  encryptedSessionKey
+  encryptedByKey
+  externalCreator
+  internalAttendeeList {
+    permission
+    status
+    calendarID
+    displayName
+    email
+    optional
+    updatedAt
+    deleted
+    encryptedSessionKey
+    encryptedByKey
+  }
+  deleted
+  lastUpdateKeyMap {
+    deleted
+    endDate
+    parentRecurrenceID
+    recurrenceDate
+    recurrenceRule
+    sequence
+    startDate
+  }
+
+  recurrenceDate
+  parentRecurrenceID
+  recurrenceRule {
+    frequency
+    interval
+    count
+    until
+    byDays
+    startDate
+    excludeDates
+    timezone
+    isAllDay
+  }
+
+  encryptedPreferences
+  encryptedPreferencesSessionKey
+  reminders {
+    reminderID
+    timeUnit
+    type
+    timeValue
+    timeForAllDay
+  }
+}
+
+query getPublicKeyForCalendar($calendarID: String!) {
+  calendar(calendarID: $calendarID) {
+    publicKey
+  }
+}
+
+mutation sync($request: SyncRequest!) {
+  sync(request: $request) {
+    checkpoint
+    events {
+      ...PulledCalendarEvents
+    }
+    state
+  }
+}
+
+mutation sync2($request: SyncRequest2!) {
+  sync2(request: $request) {
+    checkpoint
+    events {
+      ...PulledCalendarEvents
+    }
+    state
+  }
+}
+
+query getEventsAroundDate($request: EventAroundDateInput!) {
+  eventsAroundDate(request: $request) {
+    ...PulledCalendarEvents
+  }
+}
+
+query getEvents($request: EventsInput!) {
+  events(request: $request) {
+    ...PulledCalendarEvents
+  }
+}
