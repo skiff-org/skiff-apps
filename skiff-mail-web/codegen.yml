@@ -1,0 +1,24 @@
+overwrite: true
+schema: ../../libs/skiff-graphql/src/completeSchema.graphql
+generates:
+  ./generated/graphql.tsx:
+    documents: ./src/graphql/**.graphql
+    plugins:
+      - add:
+          content: |
+            import * as Types from 'skiff-graphql';
+            export * from 'skiff-graphql';
+      - "typescript-operations"
+      - "typescript-react-apollo"
+
+    config:
+      withComponent: false
+      withHOC: false
+      withHooks: true
+      federation: true
+      pureMagicComment: true
+      namespacedImportName: 'Types'
+      scalars:
+        PublicKey: '{ key: string }'
+        # till custom scalars will be supported https://github.com/apollographql/apollo-client/issues/8857
+        Date: 'number'
