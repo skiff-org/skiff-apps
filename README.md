@@ -4,9 +4,9 @@ Skiff is a privacy-first, end-to-end encrypted workspace with Mail, Calendar, Pa
 
 ![skiff-mail-header](https://github.com/skiff-org/skiff-mail/assets/3527315/9b8b7ee9-9daa-4e4c-b6bc-9a869d574757)
 
-## Welcome to Skiff Mail!
+## Welcome to Skiff!
 
-Skiff Mail empowers free and more effective communication through private, end-to-end encrypted email. All messages sent between Skiff users are end-to-end encrypted. Additionally, Skiff never stores unencrypted access to messages sent or received from external mail providers.
+Skiff empowers free and more effective communication through private, end-to-end encrypted email. All messages sent between Skiff Mail users are end-to-end encrypted. Additionally, Skiff never stores unencrypted access to messages sent or received from external mail providers. Skiff Calendar, Pages, and Drive are also end-to-end encrypted, including all event details, files, text, and titles. Read more [here](https://skiff.com/security-model).
 
 ### Reusable components and UI
 
@@ -35,6 +35,10 @@ Skiff Mail is designed to be highly compatible with native and web mobile client
 To start, check out our [deployed CodeSandbox instance](https://codesandbox.io/p/github/skiff-org/skiff-apps/main).
 
 Instructions for local development can be found in [skiff-mail-web/README.md](skiff-mail-web/README.md). Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for ways to get involved with Skiff open-source development.
+
+## Using Skiff Calendar
+
+Local development of Skiff Calendar is currently being improved to support development of more views and calendar features. Stay tuned or open an issue.
 
 ## Questions?
 
