@@ -1,0 +1,51 @@
+query getEmailsWithUnreadICS {
+  emailsWithUnreadICS2 {
+    emails {
+      id
+      from {
+        address
+      }
+      attachmentMetadata {
+        attachmentID
+        encryptedData {
+          encryptedData
+        }
+      }
+      encryptedSessionKey {
+        encryptedSessionKey
+        encryptedBy
+      }
+    }
+    hasMore
+  }
+}
+
+fragment CalendarAttachment on Attachment {
+  attachmentID
+  downloadLink
+  encryptedSessionKey {
+    encryptedSessionKey
+    encryptedBy
+  }
+}
+
+query getAttachments($ids: [String]!) {
+  attachments(ids: $ids) {
+    ...CalendarAttachment
+  }
+}
+
+mutation markEmailAsReadICS($request: MarkEmailAsReadICSRequest!) {
+  markEmailAsReadICS(request: $request)
+}
+
+mutation sendMessage($request: SendEmailRequest!) {
+  sendMessage(message: $request) {
+    messageID
+    threadID
+  }
+}
+
+query decryptionServicePublicKey {
+  decryptionServicePublicKey
+}
