@@ -19,9 +19,10 @@ import { OrderedList } from '../OrderedList';
 
 import { EditorExtensionsOptions } from './ExtensionsOptions';
 
-export { BulletList, Document, Heading, ListItem, OrderedList, Paragraph, Text, Blockquote, Image };
+export { HorizontalRule, BulletList, Document, Heading, ListItem, OrderedList, Paragraph, Text, Blockquote, Image };
 
 export const buildEditorNodes = (options?: EditorExtensionsOptions) => [
+  HorizontalRule,
   Document,
   BlockquoteEditor,
   Paragraph.configure({
