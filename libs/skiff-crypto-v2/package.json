@@ -1,0 +1,58 @@
+{
+  "name": "skiff-crypto-v2",
+  "version": "2.0.0",
+  "description": "Cryptographic related functions and helpers v2",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": "20.9.0"
+  },
+  "types": "dist/src/index.d.ts",
+  "packageManager": "yarn@4.0.1",
+  "private": true,
+  "scripts": {
+    "emit-ts": "yarn tsc --build",
+    "clean": "rm -rf dist/",
+    "build": "yarn node build.js",
+    "watch": "WATCH=1 yarn build",
+    "test": "yarn jest --passWithNoTests",
+    "lint": "yarn run -T eslint ./src --cache --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "yarn lint --fix"
+  },
+  "dependencies": {
+    "@stablelib/base64": "^1.0.1",
+    "@stablelib/chacha20poly1305": "^1.0.1",
+    "long": "^5.2.0",
+    "openpgp": "^5.11.0",
+    "protobufjs": "^7.2.4",
+    "semver": "^7.3.5",
+    "skiff-crypto": "workspace:libs/skiff-crypto",
+    "skiff-graphql": "workspace:libs/skiff-graphql",
+    "skiff-utils": "workspace:libs/skiff-utils",
+    "tslib": "^2.4.0",
+    "validator": "^13.7.0",
+    "varint": "^6.0.0",
+    "zbase32": "^2.0.3"
+  },
+  "devDependencies": {
+    "@openpgp/web-stream-tools": "^0.0.14",
+    "@types/node": "20.9.0",
+    "@types/semver": "^7",
+    "@types/validator": "13.7.3",
+    "@types/varint": "^6.0.0",
+    "esbuild": "^0.14.39",
+    "esbuild-jest": "^0.5.0",
+    "esbuild-node-externals": "^1.5.0",
+    "eslint-config-skiff-eslint": "workspace:*",
+    "jest": "^28.1.1",
+    "typescript": "^5.0.0"
+  }
+}
