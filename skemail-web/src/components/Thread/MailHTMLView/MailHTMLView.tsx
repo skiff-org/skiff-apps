@@ -11,6 +11,7 @@ import {
   isReactNativeDesktopApp,
   PLACEHOLDER_CONTENT_URL,
   proxyAttributes,
+  removeTrackingTags,
   rewriteCSSAttribute,
   useTheme,
   useUserPreference
@@ -120,6 +121,8 @@ const MailHTMLView: FC<MailViewProps> = ({ email, attachments, shouldBlockRemote
 `;
   // this key and useEffect are necessary when enabling remote content for the iframe to be fully rerendered
   const [iframeKey, setIframeKey] = useState(0);
+  // urls
+  const [rewrittenURLs, setRewrittenURLS] = useState<string[]>(0);
 
   // Create Iframe document to render mail
   const iframeSrcDoc = useMemo(() => {
@@ -129,6 +132,8 @@ const MailHTMLView: FC<MailViewProps> = ({ email, attachments, shouldBlockRemote
 
     const dom = new DOMParser().parseFromString(bodyContent, 'text/html');
     proxyAttributes(dom, shouldBlockRemoteContent);
+    const rewrittenURLs = removeTrackingTags(dom)
+    setRewrittenURLS(rewrittenURLs)
     const originUrl: URL = new URL(window.location.origin);
     rewriteCSSAttribute(dom, originUrl, shouldBlockRemoteContent);
 

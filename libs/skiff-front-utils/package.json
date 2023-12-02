@@ -151,6 +151,7 @@
     "skiff-utils": "workspace:libs/skiff-utils",
     "style-to-object": "^0.3.0",
     "styled-components": "5.3.3",
+    "tidy-url": "^1.10.1",
     "tslib": "^2.4.0",
     "uuid": "^8.3.2",
     "validator": "^13.7.0",

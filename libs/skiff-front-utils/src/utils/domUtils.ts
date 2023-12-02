@@ -1,4 +1,5 @@
 import parse from 'style-to-object';
+import { TidyURL } from 'tidy-url';
 
 import { getEnvironment } from './envUtils';
 
@@ -124,6 +125,30 @@ const getUrlMatches = (text: string): string[] => {
     urls.push(link);
   }
   return urls;
+};
+
+/**
+ * Removes tracking tags from <a /> and <img /> tags
+ * @param dom
+ */
+export const removeTrackingTags = (dom: Document): number => {
+  const tags = dom.querySelectorAll('a, img');
+  let modifiedUrlsCount = 0;
+  tags.forEach((tag) => {
+    const href = tag.getAttribute('href') || tag.getAttribute('src');
+    if (href) {
+      const link = TidyURL.clean(href);
+      if (link.url !== href) {
+        modifiedUrlsCount++;
+      }
+      if (tag.tagName === 'A') {
+        tag.setAttribute('href', link.url);
+      } else if (tag.tagName === 'IMG') {
+        tag.setAttribute('src', link.url);
+      }
+    }
+  });
+  return modifiedUrlsCount;
 };
 
 /**

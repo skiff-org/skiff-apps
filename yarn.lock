@@ -31923,6 +31923,7 @@ __metadata:
     style-to-object: ^0.3.0
     styled-components: 5.3.3
     svgo: ^2.8.0
+    tidy-url: ^1.10.1
     tslib: ^2.4.0
     typescript: ^5.0.0
     uuid: ^8.3.2
@@ -33277,6 +33278,13 @@ __metadata:
   version: 1.1.0
   resolution: "thunky@npm:1.1.0"
   checksum: 993096c472b6b8f30e29dc777a8d17720e4cab448375041f20c0cb802a09a7fb2217f2a3e8cdc11851faa71c957e2db309357367fc9d7af3cb7a4d00f4b66034
+  languageName: node
+  linkType: hard
+
+"tidy-url@npm:^1.10.1":
+  version: 1.10.1
+  resolution: "tidy-url@npm:1.10.1"
+  checksum: 1f759924104ea400af02c1a589c5efd67e98f5efd54ccd51356cc51c7c264dd3b4b0e684ac67a77380c287c46a584ee664889c7ce386ccc5f2734fbbe7dd0b81
   languageName: node
   linkType: hard
 
