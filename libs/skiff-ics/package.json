@@ -1,0 +1,55 @@
+{
+  "name": "skiff-ics",
+  "version": "0.0.1",
+  "description": "ICS attachments parsing and generating",
+  "main": "./dist/cjs/index.js",
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "types": "dist/src/index.d.ts",
+  "packageManager": "yarn@4.0.1",
+  "private": true,
+  "scripts": {
+    "emit-ts": "yarn tsc --build",
+    "clean": "rm -rf dist/",
+    "build": "yarn node build.js",
+    "watch": "concurrently \"tsc -p ./tsconfig.json --watch\" \"tsc -p ./tsconfig.esm.json --watch\"",
+    "lint": "yarn run -T eslint . --cache --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "yarn lint --fix",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/ical": "^0",
+    "@types/jest": "^29.5.5",
+    "@types/node": "20.9.0",
+    "@types/rrule": "^2.2.9",
+    "@types/uuid": "^9",
+    "@types/validator": "13.7.1",
+    "concurrently": "^7.1.0",
+    "esbuild": "^0.14.39",
+    "esbuild-jest": "^0.5.0",
+    "esbuild-node-externals": "^1.5.0",
+    "eslint-config-skiff-eslint": "workspace:*",
+    "jest": "^29.6.4",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.5",
+    "fp-ts": "^2.12.2",
+    "ical": "0.8.0",
+    "ical-generator": "^3.6.0",
+    "io-ts": "^2.2.19",
+    "rrule": "^2.7.1",
+    "skiff-graphql": "workspace:libs/skiff-graphql",
+    "skiff-utils": "workspace:libs/skiff-utils",
+    "uuid": "^9.0.1",
+    "validator": "^13.7.0",
+    "windows-iana": "^5.1.0",
+    "zod": "^3.22.4"
+  }
+}

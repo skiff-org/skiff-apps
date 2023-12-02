@@ -1,0 +1,5 @@
+// give an element equal height and width
+@mixin square($height, $width: $height) {
+  height: $height;
+  width: $width;
+}

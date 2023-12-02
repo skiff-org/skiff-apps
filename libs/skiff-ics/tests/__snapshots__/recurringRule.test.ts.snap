@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test Recurrence Rule class recurrences rule snapshots 1`] = `"{"frequency":"DAILY","startDate":1577757600000,"interval":3,"count":5000}"`;
+
+exports[`test Recurrence Rule class recurrences rule snapshots 2`] = `"{"frequency":"MONTHLY","startDate":1577757600000,"until":1609380000000}"`;
+
+exports[`test Recurrence Rule class recurrences rule snapshots 3`] = `"{"frequency":"WEEKLY","startDate":1577757600000,"byDays":["SUNDAY","WEDNESDAY","THURSDAY"]}"`;

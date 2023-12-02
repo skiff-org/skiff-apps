@@ -1,0 +1,78 @@
+{
+  "name": "nightwatch-ui",
+  "version": "1.0.0",
+  "description": "",
+  "prepublish": "tsc",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "packageManager": "yarn@4.0.1",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./dist/esm/index.css": {
+      "import": "./dist/esm/index.css",
+      "require": "./dist/cjs/index.css"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "types": "dist/src/index.d.ts",
+  "author": "Nightwatch Inc.",
+  "license": "Confidential and proprietary",
+  "scripts": {
+    "emit-ts": "yarn tsc --build",
+    "lint": "yarn run -T eslint . --cache --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "yarn lint --fix",
+    "build": "yarn node build.js",
+    "watch": "WATCH=1 yarn build",
+    "clean": "rm -rf dist",
+    "optimize:svg": "echo \"disabled until svg id issue is fixed (see PROD-341)\""
+  },
+  "engines": {
+    "node": "20.9.0"
+  },
+  "dependencies": {
+    "@floating-ui/react-dom": "^1.0.1",
+    "@floating-ui/react-dom-interactions": "^0.11.0",
+    "@mui/material": "^5.10.0",
+    "@mui/styles": "^5.9.3",
+    "@mui/system": "^5.10.8",
+    "emotion": "^11.0.0",
+    "framer-motion": "^6.3.3",
+    "lodash": "^4.17.21",
+    "notistack": "^2.0.3",
+    "react-device-detect": "^2.2.3",
+    "styled-components": "^5.3.3"
+  },
+  "peerDependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/styled-components": "^5.1.24",
+    "@types/svgo": "^2",
+    "css-loader": "^5.2.6",
+    "esbuild": "^0.15.6",
+    "esbuild-node-externals": "^1.5.0",
+    "esbuild-plugin-svgr": "^1.0.1",
+    "esbuild-sass-plugin": "^2.2.6",
+    "eslint-config-skiff-eslint": "workspace:*",
+    "identity-obj-proxy": "^3.0.0",
+    "prettier": "^2.*",
+    "sass": "^1.53.0",
+    "svgo": "^2.8.0",
+    "typescript": "^5.0.0"
+  },
+  "installConfig": {
+    "hoistingLimits": "none"
+  }
+}

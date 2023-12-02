@@ -1,0 +1,34 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART:20220922T130000Z
+DTEND:20220922T140000Z
+DTSTAMP:20220921T125617Z
+ORGANIZER;CN=noam.golani@gmail.com:mailto:noam.golani@gmail.com
+UID:65qq3t0ji5u0bl8q37b7uqkmdj@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
+ ;CN=noam.golani@gmail.com;X-NUM-GUESTS=0:mailto:noam.golani@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=noam.golani@skiff.com;X-NUM-GUESTS=0:mailto:noam.golani@skiff.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/imc-mzkh-zim
+X-MICROSOFT-CDO-OWNERAPPTID:820412958
+CREATED:20220921T125441Z
+DESCRIPTION:This is a description\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
+ ~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nJoin: https://meet.googl
+ e.com/imc-mzkh-zim\n\nView your event at https://calendar.google.com/calend
+ ar/event?action=VIEW&eid=NjVxcTN0MGppNXUwYmw4cTM3Yjd1cWttZGogbm9hbS5nb2xhbm
+ lAc2tpZmYuY29t&tok=MjEjbm9hbS5nb2xhbmlAZ21haWwuY29tMGZlOTg1ZTRlMDgzYTA2ZTZk
+ NGU5NGFjMDE1MjZmNjY1YmVlYTdkOQ&ctz=Asia%2FJerusalem&hl=en_GB&es=1.\n\nPleas
+ e do not edit this section.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
+ ~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
+LAST-MODIFIED:20220921T125615Z
+LOCATION:
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Example event
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
