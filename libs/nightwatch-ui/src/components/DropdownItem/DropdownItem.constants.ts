@@ -1,0 +1,1 @@
+export const INITIAL_SCROLL_INTO_VIEW_TIMEOUT = 10;

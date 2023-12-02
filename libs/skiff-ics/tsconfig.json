@@ -1,0 +1,15 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "outDir": "dist/cjs",
+        "declarationDir": "dist/",
+        "target": "ES6",
+        "module": "CommonJS",
+        "tsBuildInfoFile": "dist/.tsbuildinfo",
+        "noUncheckedIndexedAccess": true
+    },
+    "references": [
+        { "path" : "../skiff-graphql"},
+        { "path" : "../skiff-utils"}
+    ]
+}

@@ -1,0 +1,30 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Skiff//Skiff Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+UID:jgfgcv8le3i3vddbmes84nmkln@google.com
+SEQUENCE:0
+DTSTAMP:20221130T221031Z
+DTSTART:20221201T213000Z
+DTEND:20221201T220000Z
+SUMMARY:Chai / Jason Weekly 1:1
+TRANSP:OPAQUE
+DESCRIPTION:-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
+ ~:~:~:~:~:~:~:~:~::~:~::-\nJoin with Google Meet: https://meet.google.com/
+ qev-pzop-rru\nOr dial: (US) +1 443-776-0789 PIN: 491417490#\nMore phone nu
+ mbers: https://tel.meet/qev-pzop-rru?pin=4873632422306&hs=7\n\nLearn more 
+ about Meet at: https://support.google.com/a/users/answer/9282720\n\nPlease
+  do not edit this section.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
+ ~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
+ORGANIZER;CN="Jason":mailto:jjthejetplane@skiff.town
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN="Jason":M
+ AILTO:jjthejetplane@skiff.town
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE;CN="cpedada@skif
+ f.org":MAILTO:cpedada@skiff.org
+STATUS:CONFIRMED
+CREATED:20221130T221031Z
+LAST-MODIFIED:20221130T221029Z
+END:VEVENT
+END:VCALENDAR

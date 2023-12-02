@@ -1,0 +1,13 @@
+.scrim {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background: var(--bg-scrim);
+  height: 100vh;
+  width: 100vw;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  transition: background 330ms;
+  z-index: 99999999;
+}
