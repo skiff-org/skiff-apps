@@ -1,14 +1,14 @@
 {
   "workspaces": [
     "libs",
-    "skiff-mail-web",
+    "skemail-web",
+    "calendar-web",
     "skiff-pages-drive",
     "skiff-calendar"
   ],
   "packageManager": "yarn@3.6.1",
   "scripts": {
-    "postinstall": "yarn workspace @skiff-org/skiff-crypto install",
     "build:lib": "yarn workspace libs build",
-    "dev": "yarn workspace skiff-mail-web dev"
+    "dev": "yarn workspace skemail-web dev"
   }
 }
