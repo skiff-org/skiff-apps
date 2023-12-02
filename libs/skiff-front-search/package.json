@@ -1,0 +1,49 @@
+{
+  "name": "skiff-front-search",
+  "version": "0.0.1",
+  "description": "Search related features for skemail and editor",
+  "main": "./dist/cjs/index.js",
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "types": "dist/src/index.d.ts",
+  "packageManager": "yarn@4.0.1",
+  "private": true,
+  "scripts": {
+    "emit-ts": "yarn tsc --build",
+    "clean": "rm -rf dist/",
+    "build": "yarn node build.js",
+    "watch": "WATCH=1 yarn build",
+    "lint": "yarn run -T eslint ./src --cache --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "yarn lint --fix"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4",
+    "@types/semver": "^7",
+    "@types/validator": "13.7.1",
+    "concurrently": "^7.1.0",
+    "esbuild": "^0.15.6",
+    "esbuild-node-externals": "^1.5.0",
+    "eslint-config-skiff-eslint": "workspace:*",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "comlink": "^4.3.1",
+    "dayjs": "^1.10.7",
+    "graphql": "16.8.1",
+    "idb-keyval": "^6.1.0",
+    "lodash": "^4.17.21",
+    "minisearch": "^6.0.1",
+    "semver": "^7.3.7",
+    "skiff-crypto": "workspace:libs/skiff-crypto",
+    "skiff-graphql": "workspace:libs/skiff-graphql",
+    "skiff-utils": "workspace:libs/skiff-utils",
+    "stemmer": "^2.0.1",
+    "validator": "^13.7.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+      "declarationDir": "dist/",
+      "tsBuildInfoFile": "dist/.tsbuildinfo",
+      "module": "ES2022"
+  },
+  "references": [
+    { "path" : "../skiff-crypto"},
+    { "path" : "../skiff-graphql"},
+    { "path" : "../skiff-utils"}
+  ]
+}
