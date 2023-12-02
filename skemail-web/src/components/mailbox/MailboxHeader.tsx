@@ -139,6 +139,8 @@ const MailBoxSelector = styled.div`
 export const MAIL_LIST_HEADER_ID = 'mailListHeader';
 export const MOBILE_HEADER_HEIGHT = 160;
 
+const FAVICON_URL = '/favicon.ico';
+
 let mailListHeaderElement;
 const setMailListElementCache = () => {
   mailListHeaderElement = document.getElementById(MAIL_LIST_HEADER_ID);
@@ -417,6 +419,58 @@ export const MailboxHeader = ({
     </Helmet>
   );
 
+  const updateFavicon = (countUnread: string) => {
+    if (countUnread === "0") return; // SKIP update if no unread
+    const canvas = document.createElement("canvas");
+    canvas.width = 48;
+    canvas.height = 48;
+    const ctx = canvas.getContext("2d");
+    const image = new Image();
+
+    image.onload = () => {
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+  
+      // Set text styles
+      ctx.textAlign = "right";
+      ctx.fillStyle = "white";
+      let fontSize = 28;
+      ctx.font = `${fontSize}px Arial`;
+  
+      // Calculate maximum text width
+      const maxWidth = canvas.width - 4; // padding
+  
+      // Reduce font size until the text fits
+      let textWidth = ctx.measureText(countUnread).width;
+      while (textWidth > maxWidth && fontSize > 1) {
+        fontSize--;
+        ctx.font = `${fontSize}px Arial`;
+        textWidth = ctx.measureText(countUnread).width;
+      }
+  
+      // Determine position to start drawing text
+      const textX = canvas.width;
+      const textY = canvas.height - 4; // Bottom padding
+  
+      // Draw the count
+      ctx.fillText(countUnread, textX, textY);
+  
+      // Update favicon
+      const favicon: HTMLLinkElement = document.querySelector('link[rel="icon"]');
+      if (favicon) {
+        favicon.href = canvas.toDataURL("image/png");
+      }
+    };
+    
+    image.src = FAVICON_URL;
+  }
+
+  const resetFavicon = () => {
+    const favicon: HTMLLinkElement = document.querySelector('link[rel="icon"]');
+    if (favicon) {
+      favicon.href = FAVICON_URL;
+    }
+  }
+
   useEffect(() => {
     const sendUnreadToWindowsApp = () => {
       if (!isWindowsDesktopApp()) {
@@ -447,8 +501,15 @@ export const MailboxHeader = ({
       sendRNWebviewMsg('unreadMailCount', { numUnread });
       sendUnreadToWindowsApp();
     }, POLL_INTERVAL_IN_MS);
+
+    // update favicon
+    updateFavicon(numUnread.toString());
+
+    // clean up
     return () => {
       clearInterval(interval);
+      // reset favicon
+      resetFavicon();
     };
   }, [numUnread]);
 
