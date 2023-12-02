@@ -75,7 +75,7 @@ function AliasProfileModal({
   const dataForThisAlias = aliasData?.fullAliasInfo?.find((aliasInfo) => aliasInfo?.emailAlias === alias);
   // Current, unedited alias display name and display picture data
   const { displayName: currDisplayName, displayPictureData: currDisplayPictureData } = dataForThisAlias || {};
-  // For recording Mixpanel events
+  // For recording events
   const [storeWorkspaceEvent] = useStoreWorkspaceEventMutation();
 
   // We prioritize edited values over current values
