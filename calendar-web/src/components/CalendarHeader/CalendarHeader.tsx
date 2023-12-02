@@ -76,10 +76,45 @@ export const CalendarHeader: React.FC = () => {
 
   const [localStartDay] = useUserPreference(StorageTypes.START_DAY_OF_THE_WEEK);
   const { weekStartDate, weekEndDate } = getWeekStartAndEndDates(selectedViewDate, localStartDay, timeZone);
+  const CALENDAR_URL = './calendar.png'
 
   useEffect(() => {
     void Promise.all([SyncStateBadge.preload()]);
+    updateFavicon()
   }, []);
+
+  const updateFavicon = () => {
+    const date = new Date();
+    const dayOfMonth = date.getDate().toString();
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 48;
+    canvas.height = 48;
+  
+    const ctx = canvas.getContext("2d");
+    const image = new Image();
+  
+    image.onload = () => {
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+  
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#C279A0";
+      ctx.font = `30px Arial`;
+  
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2 + 10; 
+  
+      ctx.fillText(dayOfMonth, centerX, centerY);
+  
+      const favicon: HTMLLinkElement = document.querySelector('link[rel="icon"]');
+      if (favicon) {
+        favicon.href = canvas.toDataURL("image/png");
+      }
+    };
+  
+    image.src = CALENDAR_URL;
+  }
 
   const renderMonthAndYearHeaderText = (): JSX.Element => {
     // If view overlaps multiple months, show an abbreviate version of both
