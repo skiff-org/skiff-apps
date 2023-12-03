@@ -22,10 +22,14 @@ export const useMailLogout = () => {
 
   const skemailLogout = useCallback(async () => {
     try {
-      await storeWorkspaceEvent(WorkspaceEventType.Logout, '', DEFAULT_WORKSPACE_EVENT_VERSION);
+      storeWorkspaceEvent(WorkspaceEventType.Logout, '', DEFAULT_WORKSPACE_EVENT_VERSION);
     } catch (error) {
-      // proceed
+      console.error(error);
     }
+
+    clearSessionCache().catch((error) => {
+      console.error(error);
+    });
 
     const clearCacheAsync = async () => {
       try {

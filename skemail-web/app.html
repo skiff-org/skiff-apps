@@ -1,22 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>Skiff</title>
-    <script>
-      (() => {
-        if (
-          typeof process !== 'object' ||
-          (typeof process === 'object' && !process.env.START_HOT)
-        ) {
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = './dist/style.css';
-          // HACK: Writing the script path should be done with webpack
-          document.getElementsByTagName('head')[0].appendChild(link);
-        }
-      })();
-    </script>
+    <link rel="stylesheet" href="./dist/style.css" media="all" />
   </head>
   <body>
     <div id="root"></div>
@@ -33,11 +20,12 @@
         }
 
         if (scripts.length) {
-          document.write(
-            scripts
-              .map((script) => `<script defer src="${script}"><\/script>`)
-              .join('')
-          );
+          scripts.forEach((script) => {
+            const scriptElement = document.createElement('script');
+            scriptElement.defer = true;
+            scriptElement.src = script;
+            document.body.appendChild(scriptElement); // appendChild dynamically creates script elements versus document.write
+          });
         }
       }
     </script>
