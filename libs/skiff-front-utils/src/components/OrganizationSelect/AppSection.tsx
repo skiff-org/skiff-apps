@@ -56,7 +56,7 @@ export const AppSection = (props: AppSectionProps) => {
       <AppButtons>
         {Object.values(SKIFF_APPS).map((app: AppIconInfo) => {
           if (app.label.toLowerCase().includes('calendar')) {
-            DynamicIcon(app.icon, 260, 260)
+            DynamicIcon(app.icon, true)
               .then((base64Image) => {
                 app.icon = base64Image;
               })
