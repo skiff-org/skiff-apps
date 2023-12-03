@@ -1,4 +1,3 @@
-import {i18next as i18n} from './i18n';
-import * as reactI18n from 'react-i18next';
+import i18n from './i18n';
 
-export default { i18n, reactI18n };
+export default { i18n };
