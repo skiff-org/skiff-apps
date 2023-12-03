@@ -22,7 +22,7 @@ export const useMailLogout = () => {
 
   const skemailLogout = useCallback(async () => {
     try {
-      storeWorkspaceEvent(WorkspaceEventType.Logout, '', DEFAULT_WORKSPACE_EVENT_VERSION);
+      await storeWorkspaceEvent(WorkspaceEventType.Logout, '', DEFAULT_WORKSPACE_EVENT_VERSION);
     } catch (error) {
       console.error(error);
     }
