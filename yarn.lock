@@ -16962,6 +16962,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cross-fetch@npm:4.0.0":
+  version: 4.0.0
+  resolution: "cross-fetch@npm:4.0.0"
+  dependencies:
+    node-fetch: ^2.6.12
+  checksum: ecca4f37ffa0e8283e7a8a590926b66713a7ef7892757aa36c2d20ffa27b0ac5c60dcf453119c809abe5923fc0bae3702a4d896bfb406ef1077b0d0018213e24
+  languageName: node
+  linkType: hard
+
 "cross-fetch@npm:^3.1.5":
   version: 3.1.6
   resolution: "cross-fetch@npm:3.1.6"
@@ -21962,6 +21971,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"html-parse-stringify@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "html-parse-stringify@npm:3.0.1"
+  dependencies:
+    void-elements: 3.1.0
+  checksum: 334fdebd4b5c355dba8e95284cead6f62bf865a2359da2759b039db58c805646350016d2017875718bc3c4b9bf81a0d11be5ee0cf4774a3a5a7b97cde21cfd67
+  languageName: node
+  linkType: hard
+
 "html-to-text@npm:^9.0.5":
   version: 9.0.5
   resolution: "html-to-text@npm:9.0.5"
@@ -22215,6 +22233,24 @@ __metadata:
   version: 1.0.4
   resolution: "hyphenate-style-name@npm:1.0.4"
   checksum: 4f5bf4b055089754924babebaa23c17845937bcca6aee95d5d015f8fa1e6814279002bd6a9e541e3fac2cd02519fc76305396727066c57c8e21a7e73e7a12137
+  languageName: node
+  linkType: hard
+
+"i18next-http-backend@npm:^2.4.2":
+  version: 2.4.2
+  resolution: "i18next-http-backend@npm:2.4.2"
+  dependencies:
+    cross-fetch: 4.0.0
+  checksum: 90b71a024691988ae98781cfa9a6e1c25ee63b0206027939df85c55f46b91c41faaacea6f8a9f868a484bea9ee85377e1aae21a889b2dd970af9ac825120579c
+  languageName: node
+  linkType: hard
+
+"i18next@npm:^23.7.7":
+  version: 23.7.7
+  resolution: "i18next@npm:23.7.7"
+  dependencies:
+    "@babel/runtime": ^7.23.2
+  checksum: f063140c8b38fd51b673200693ddc5f697ba9c4a87c5c7ca4b9233dd2cf8ada53e76e14af9659db5b3a5b0f4c3acb517ebaf28863116068e7d6bdacfaf7f0b09
   languageName: node
   linkType: hard
 
@@ -29371,6 +29407,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-i18next@npm:^13.5.0":
+  version: 13.5.0
+  resolution: "react-i18next@npm:13.5.0"
+  dependencies:
+    "@babel/runtime": ^7.22.5
+    html-parse-stringify: ^3.0.1
+  peerDependencies:
+    i18next: ">= 23.2.3"
+    react: ">= 16.8.0"
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: 2f68ccd24daf72ddd2d11a526fb3c2b66c11ea4fcd2e24ac7aed42bf57ec7bffa7455ad1dc93679968ff629e9b1896465cdf6d1a61c29b92138ef88098e8dcba
+  languageName: node
+  linkType: hard
+
 "react-image-crop@npm:^10.0.4":
   version: 10.1.4
   resolution: "react-image-crop@npm:10.1.4"
@@ -30583,6 +30637,8 @@ __metadata:
     graphql: 16.8.1
     haraka-constants: ^1.0.6
     husky: ^7.0.4
+    i18next: ^23.7.7
+    i18next-http-backend: ^2.4.2
     idb-keyval: ^6.1.0
     immer: ^9.0.12
     ini: ^3.0.0
@@ -30616,6 +30672,7 @@ __metadata:
     react-dnd-html5-backend: ^15.1.2
     react-dom: 17.0.2
     react-hotkeys: ^2.0.0
+    react-i18next: ^13.5.0
     react-is: 17.0.2
     react-pdf: ^5.7.2
     react-redux: ^7.2.7
@@ -34644,6 +34701,13 @@ __metadata:
     vc: dist/index.js
     vercel: dist/index.js
   checksum: 7479b038e023d3d0616c9435e47f78935f8d2a4b392f830d52d40ff22f38010cd4a26d14684b13ed3eff3cb50f9f390b401f09bf5ee436ec0dde0deebde33b11
+  languageName: node
+  linkType: hard
+
+"void-elements@npm:3.1.0":
+  version: 3.1.0
+  resolution: "void-elements@npm:3.1.0"
+  checksum: 0390f818107fa8fce55bb0a5c3f661056001c1d5a2a48c28d582d4d847347c2ab5b7f8272314cac58acf62345126b6b09bea623a185935f6b1c3bbce0dfd7f7f
   languageName: node
   linkType: hard
 
