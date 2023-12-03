@@ -37,39 +37,37 @@ export const useUpdateNextAndPrevActiveIDs = (threadIDs: string[]) => {
     [activeThreadID, selectedThreadIDs, threadIDs]
   );
 
+  // Helper function to conditionally dispatch updates.
+  const dispatchUpdate = (action, newID) => {
+    if (action !== newID) {
+      dispatch(action(newID));
+    }
+  };
+
   // Update next/prev active thread IDs when the active thread changes.
   useEffect(() => {
-    let newNextThreadID: string | undefined = undefined;
-    let newPrevThreadID: string | undefined = undefined;
-
-    // Only assign next and previous active thread IDs if an active thread exists and the number of threads > 1.
-    // Otherwise, they default to undefined.
-    if (activeThreadID !== undefined && numThreads > 1) {
-      const activeThreadIndex = threadIDs.indexOf(activeThreadID);
-
-      // If the curr active thread is the last thread in the mailbox,
-      // the next thread should be the thread preceding the curr active thread in order not to wrap around
-      const nextThreadOffset = activeThreadIndex === numThreads - 1 ? -1 : 1;
-      newNextThreadID = getThreadIDFromOffset(activeThreadIndex, nextThreadOffset);
-      // If the curr active thread is the first thread in the mailbox,
-      // the next thread should be the thread following the curr active thread in order not to wrap around
-      const newPrevThreadOffset = activeThreadIndex === 0 ? 1 : -1;
-      newPrevThreadID = getThreadIDFromOffset(activeThreadIndex, newPrevThreadOffset);
+    if (activeThreadID === undefined || numThreads <= 1) {
+      // No need to proceed if there is no active thread or only one thread.
+      return;
     }
 
+    const activeThreadIndex = threadIDs.indexOf(activeThreadID);
+
+    // Calculate next and previous thread IDs.
+    const nextThreadOffset = activeThreadIndex === numThreads - 1 ? -1 : 1;
+    const newNextThreadID = getThreadIDFromOffset(activeThreadIndex, nextThreadOffset);
+
+    const newPrevThreadOffset = activeThreadIndex === 0 ? 1 : -1;
+    const newPrevThreadID = getThreadIDFromOffset(activeThreadIndex, newPrevThreadOffset);
+
     // Dispatch updates only if IDs have changed.
-    if (nextActiveThreadID !== newNextThreadID)
-      dispatch(skemailMailboxReducer.actions.setNextActiveThreadID(newNextThreadID));
-    if (prevActiveThreadID !== newPrevThreadID)
-      dispatch(skemailMailboxReducer.actions.setPrevActiveThreadID(newPrevThreadID));
-  }, [
-    activeThreadID,
-    dispatch,
-    getThreadIDFromOffset,
-    nextActiveThreadID,
-    numThreads,
-    prevActiveThreadID,
-    selectedThreadIDs,
-    threadIDs
-  ]);
+    dispatchUpdate(skemailMailboxReducer.actions.setNextActiveThreadID, newNextThreadID);
+    dispatchUpdate(skemailMailboxReducer.actions.setPrevActiveThreadID, newPrevThreadID);
+  }, [activeThreadID, 
+      dispatch, 
+      getThreadIDFromOffset, 
+      numThreads, 
+      selectedThreadIDs, 
+      threadIDs
+    ]);
 };

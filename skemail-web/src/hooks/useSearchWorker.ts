@@ -26,7 +26,8 @@ import { ThreadDetailInfo } from '../models/thread';
 
 import { useDrafts } from './useDrafts';
 
-let worker: Awaited<ReturnType<typeof createWorkerizedSkemailSearchIndex>> | null = null;
+let worker = null;
+
 export const getSearchWorker = () => worker?.searchIndex;
 
 /** Time to sleep per skemail background indexing */
@@ -54,8 +55,7 @@ const htmlToPlainText = compile({
  *
  * @param {Array<MailboxThreadInfo>} threads threads to add to the search index
  */
-
-function decryptEmailContent(email: EmailFragment) {
+function decryptEmailContent(email) {
   const currentUser = requireCurrentUserData();
   const { privateKey } = currentUser.privateUserData;
 
@@ -67,8 +67,6 @@ function decryptEmailContent(email: EmailFragment) {
   );
   const plainText = decryptDatagramV2(MailTextDatagram, sessionKey, email.encryptedText.encryptedData).body.text || '';
   const html = decryptDatagramV2(MailHtmlDatagram, sessionKey, email.encryptedHtml.encryptedData).body.html || '';
-  // ensure we cover pure-html emails and parse emails to ignore content irrelevant to search, such as links, images,
-  // and previous emails nested under "Show previous content"
   const text = html ? htmlToPlainText(html) : plainText;
   const subject =
     decryptDatagramV2(MailSubjectDatagram, sessionKey, email.encryptedSubject.encryptedData).body.subject || '';
@@ -80,7 +78,8 @@ function decryptEmailContent(email: EmailFragment) {
   });
   return { text, subject, attachments };
 }
-function getDraftContent(draft: ThreadViewEmailInfo) {
+
+function getDraftContent(draft) {
   return {
     text: draft.decryptedText,
     subject: draft.decryptedSubject,
@@ -95,22 +94,17 @@ function getDraftContent(draft: ThreadViewEmailInfo) {
   };
 }
 
-async function addThreadsToSearchIndex(threads: Array<ThreadFragment | ThreadDetailInfo>) {
+async function addThreadsToSearchIndex(threads) {
   for (const thread of threads) {
     const { emails, attributes, threadID } = thread;
     for (const email of emails) {
-      // Draft emails will already have decrypted data, but emails downloaded
-      // will only have encrypted data (because no-cache is set and type policies are not run).
       const decryptedContent = 'encryptedText' in email ? decryptEmailContent(email) : getDraftContent(email);
-      // Search on parent threads system/user labels since messages don't have their own labels
       const { systemLabels, userLabels } = attributes;
       const { to, cc, bcc, from, createdAt, id } = email;
-      const searchMail: IndexedSkemail = {
+      const searchMail = {
         id,
         threadID,
         content: isMobile ? '' : decryptedContent.text || '',
-        // Draft emails will already have a date object, but emails downloaded will have a number (because no-cache is set).
-        // we conceptualize email's 'createdAt' as 'updatedAt' even though it won't change, to conform to assumptions of search logic
         updatedAt: new Date(createdAt).getTime(),
         subject: decryptedContent.subject || '',
         to,
@@ -137,19 +131,13 @@ async function addThreadsToSearchIndex(threads: Array<ThreadFragment | ThreadDet
 /**
  * Index inbox in search index.
  */
-const indexSkemails = async (currentUserID: string, indexOnThreadContentUpdatedAt?: boolean) => {
-  // return if current user data hasn't loaded
+const indexSkemails = async (currentUserID, indexOnThreadContentUpdatedAt) => {
   if (!currentUserID) {
     return;
   }
 
-  // The search index contains the dates of the newest and oldest of indexed thread. From there we need to go in both direction:
-  // - get threads older than oldestThreadUpdatedAt in updatedAt desc order (going from most recent to oldest)
-  //     : happens if we did not finished the full indexation last browsing session
-  // - get thread more recent than mostRecentThreadUpdatedAt in updatedAt asc order (going from oldest to most recent)
-  //     : happens if there have been new skemails since we last indexed
-  const indexInDirection = async (direction: 'asc' | 'desc') => {
-    let cursor: MailboxCursor | undefined;
+  const indexInDirection = async (direction) => {
+    let cursor;
     const isDescending = direction === 'desc';
 
     while (true) {
@@ -159,23 +147,15 @@ const indexSkemails = async (currentUserID: string, indexOnThreadContentUpdatedA
 
       const paginateWithCursor = !!cursor && indexOnThreadContentUpdatedAt;
 
-      const { data } = await client.query<MailboxWithContentQuery, MailboxWithContentQueryVariables>({
+      const { data } = await client.query({
         query: MailboxWithContentDocument,
         variables: {
           request: {
             limit: SEARCH_PAGINATION_LIMIT,
             lastUpdatedDate: threadUpdatedAtCutoff && !paginateWithCursor ? new Date(threadUpdatedAtCutoff) : undefined,
-            // using 'threadContentUpdatedAt' to describe the bounds of the index ensures we cover two edge cases
-            // relating to threads whose 'emailsUpdatedAt' date is *earlier* than their time of creation:
-            // 1. if a user imports new mail, and some of the imported threads have a most-recent email
-            // whose 'createdAt' date falls within the timespan that the index has already covered, we would miss it
-            // 2. if we merge two threads together, the newly created thread could be exposed to the same edge case
             updatedAtField: indexOnThreadContentUpdatedAt ? UpdatedAtField.ThreadContentUpdatedAt : undefined,
             updatedAtOrderDirection: isDescending ? AscDesc.Desc : AscDesc.Asc,
             noExcludedLabel: true,
-            // following the first query, we use a cursor, because it's possible that more than SEARCH_PAGINATION_LIMIT
-            // threads have the same 'threadContentUpdatedAt' date (e.g. when an import happens, all imported threads will have the same date),
-            // meaning that if we did not use the cursor, we could loop through the same page of threads repeatedly
             cursor: paginateWithCursor ? cursor : undefined
           }
         },
@@ -209,7 +189,6 @@ const indexSkemails = async (currentUserID: string, indexOnThreadContentUpdatedA
       if (!pageInfo.hasNextPage) {
         break;
       }
-      // set the cursor for subsequent loops
       cursor = pageInfo.cursor
         ? {
             threadID: pageInfo.cursor.threadID,
@@ -229,17 +208,16 @@ const indexSkemails = async (currentUserID: string, indexOnThreadContentUpdatedA
  * logs out, it also tears down the worker
  */
 export function useInitializeSearchWorker() {
-  // if undefined, stops after initialization
   const userData = useCurrentUserData();
   const { draftThreads } = useDrafts();
   const indexOnThreadContentUpdatedAt = useGetFF<IndexThreadContentUpdatedAtFlag>('indexThreadContentUpdatedAt');
 
-  const draftRef = useRef<typeof draftThreads>(draftThreads); // used to always keep the latest version of draftThread for addThreadsToSearchIndex
+  const draftRef = useRef(draftThreads); // Removed type annotation
   draftRef.current = draftThreads;
 
   useEffect(() => {
     if (!userData?.userID) return;
-    let stopped = false; // used to stop setup() if the effect unloads while setup is still running
+    let stopped = false;
 
     const setup = async () => {
       worker = await createWorkerizedSkemailSearchIndex(userData.userID, {
@@ -247,15 +225,10 @@ export function useInitializeSearchWorker() {
         publicKey: userData.publicKey.key
       });
       if (stopped) {
-        // can happen if useEffect teardown function has been called before createWorkerizedSkemailSearchIndex returned
         worker.terminate();
         worker = null;
       }
       while (!stopped) {
-        // temporarily disable indexing of drafts
-        // if (draftThreads) {
-        //   await addThreadsToSearchIndex(draftThreads);
-        // }
         await indexSkemails(userData.userID, indexOnThreadContentUpdatedAt);
         await sleep(SEARCH_INDEX_SKEMAILS_INTERVAL_MS);
       }
@@ -279,15 +252,11 @@ interface SearchIndexProgressWithError {
 }
 
 export function useGetSearchIndexProgress(): SearchIndexProgressWithError {
-  // initialize both progress and error as undefined
   const [searchIndexProgress, setSearchIndexProgress] = useState<SearchIndexProgressWithError>({});
-  // check progress until the index is confirmed to be complete
   const [shouldGetProgress, setShouldGetProgress] = useState<boolean>(true);
   const [getSearchIndexProgress] = useGetSearchIndexProgressLazyQuery();
 
-  const stopQueryingOnError = (e: unknown) => {
-    // this is non-critical logic whose failure does not need to be communicated to the user,
-    // so if it fails, we stop querying and report the error to the caller
+  const stopQueryingOnError = (e) => {
     setSearchIndexProgress({ progressRetrievalError: true });
     setShouldGetProgress(false);
     console.error('Error in retrieving search index progress', e);
@@ -314,7 +283,6 @@ export function useGetSearchIndexProgress(): SearchIndexProgressWithError {
         }
         if (!data?.searchIndexProgress) return;
         const { numIndexableThreads, numThreadsIndexed, isIndexComplete } = data.searchIndexProgress;
-        // stop getting the progress after the index is complete
         if (isIndexComplete) setShouldGetProgress(false);
         setSearchIndexProgress({ progress: { numIndexableThreads, numThreadsIndexed, isIndexComplete } });
       } catch (e) {
@@ -324,10 +292,8 @@ export function useGetSearchIndexProgress(): SearchIndexProgressWithError {
 
     void updateProgress();
 
-    // check the search worker on an interval to see if the newest and oldest threads have changed
     const interval = setInterval(() => void updateProgress(), INDEX_PROGRESS_UPDATE_INTERVAL);
 
-    // clear the interval on cleanup
     return () => clearInterval(interval);
   }, [shouldGetProgress, getSearchIndexProgress]);
 

@@ -66,50 +66,16 @@ export const useQuickActions = (query: string): Array<SearchAction> => {
   );
 
   // Cache so that we don't have infinite re-render on useSearch deps array
-  const actions = React.useMemo(() => {
-    const composeAction = createAction(
-      'Compose message',
-      () => {
-        void openCompose();
-        composeNewDraft();
-      },
-      { icon: Icon.Compose },
-      'C'
-    );
-    const addLabelAction = createAction(
-      'Create label',
-      () => void addLabel(),
-      { icon: Icon.Tag },
-      undefined // no shortcut
-    );
-    const addFolderAction = createAction(
-      'Create folder',
-      () => void addFolder(),
-      { icon: Icon.Folder },
-      undefined // no shortcut
-    );
-    const toggleThreadFormatAction = createAction(
-      `Switch to ${threadFormat === ThreadDisplayFormat.Full ? 'split' : 'full'} view`,
-      () => void toggleThreadFormat(),
-      { icon: threadFormat === ThreadDisplayFormat.Full ? Icon.FullView : Icon.SplitView },
-      'T'
-    );
-    const importMailAction = createAction(
-      'Import mail',
-      () => void importMail(),
-      { icon: Icon.MoveMailbox },
-      undefined // no shortcut
-    );
-    return [
-      composeAction,
-      addLabelAction,
-      addFolderAction,
-      toggleThreadFormatAction,
-      markInboxReadAction,
-      importMailAction
-    ];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openCompose, addLabel, importMail, addFolder, threadFormat]);
+  
+  // Removed useMemo - Directly creates the array
+  const actions = [
+    createAction('Compose message', () => { void openCompose(); composeNewDraft(); }, { icon: Icon.Compose }, 'C'),
+    createAction('Create label', () => void addLabel(), { icon: Icon.Tag }, undefined),
+    createAction('Create folder', () => void addFolder(), { icon: Icon.Folder }, undefined),
+    createAction(`Switch to ${threadFormat === ThreadDisplayFormat.Full ? 'split' : 'full'} view`, () => void toggleThreadFormat(), { icon: threadFormat === ThreadDisplayFormat.Full ? Icon.FullView : Icon.SplitView }, 'T'),
+    createAction('Mark inbox as read', () => void markAllReadClick(), { icon: Icon.EnvelopeRead }, undefined),
+    createAction('Import mail', () => void importMail(), { icon: Icon.MoveMailbox }, undefined)
+  ];
 
   useEffect(() => {
     const actionsMatchingQuery = query.length
