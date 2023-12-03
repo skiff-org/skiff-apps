@@ -1,5 +1,4 @@
-import i18next from './i18n';
-const i18n = i18next
+import {i18next as i18n} from './i18n';
+import * as reactI18n from 'react-i18next';
 
-// TODO: also export react-i18n
-export default i18n;
+export default { i18n, reactI18n };

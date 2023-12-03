@@ -11,7 +11,8 @@
     "incremental": true,
     "isolatedModules": true,
     "composite": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "moduleResolution": "NodeNext"
   },
   "include": ["**/*.ts", "**/*.svg", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
   "exclude": ["node_modules", "dist"],
