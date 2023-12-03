@@ -21,6 +21,7 @@
     { "path": "../../libs/skiff-front-utils" },
     { "path": "../../libs/skiff-graphql" },
     { "path": "../../libs/skiff-front-graphql" },
-    { "path": "../../libs/skiff-utils" }
+    { "path": "../../libs/skiff-utils" },
+    { "path": "../../libs/skiff-i18n" }
   ]
 }

@@ -87,6 +87,7 @@
     "prettier": "^2.*",
     "react-pdf": "^5.7.2",
     "skiff-front-utils": "workspace:libs/skiff-front-utils",
+    "skiff-i18n": "workspace:libs/skiff-i18n",
     "skiff-ics": "workspace:libs/skiff-ics",
     "skiff-utils": "workspace:libs/skiff-utils",
     "source-map-support": "^0.5.21",

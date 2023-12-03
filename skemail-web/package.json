@@ -147,6 +147,7 @@
     "skiff-front-search": "workspace:libs/skiff-front-search",
     "skiff-front-utils": "workspace:libs/skiff-front-utils",
     "skiff-graphql": "workspace:libs/skiff-graphql",
+    "skiff-i18n": "workspace:libs/skiff-i18n",
     "skiff-mail-protos": "workspace:libs/skiff-mail-protos",
     "skiff-utils": "workspace:libs/skiff-utils",
     "stream-browserify": "^3.0.0",
