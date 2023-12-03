@@ -1,3 +1,5 @@
-import i18n from './i18n';
+import i18next from './i18n';
+const i18n = i18next
 
+// TODO: also export react-i18n
 export default i18n;
