@@ -139,7 +139,7 @@ const MailBoxSelector = styled.div`
 export const MAIL_LIST_HEADER_ID = 'mailListHeader';
 export const MOBILE_HEADER_HEIGHT = 160;
 
-const FAVICON_URL = '/favicon.ico';
+const FAVICON_URL = '/mail/assets/favicon.ico';
 
 let mailListHeaderElement;
 const setMailListElementCache = () => {
