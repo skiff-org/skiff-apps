@@ -34,3 +34,7 @@ coverage
 # typescript
 *.tsbuildinfo
 **/*.map
+
+# rss
+rss/node_modules/
+rss/.yarn/*
