@@ -12,6 +12,8 @@ import styled from 'styled-components';
 
 import { ClientAttachment } from '../../../../components/Attachments';
 
+import { useTranslation } from 'react-i18next';
+
 const TopAppBarContainer = styled.div`
   width: 100%;
   padding: 16px 12px;
@@ -37,6 +39,7 @@ interface TopAppBarProps {
 }
 
 export default function TopAppBar({ onLeftItemClick, title, currentAttachment, downloadAttachment }: TopAppBarProps) {
+  const { t } = useTranslation();
   return (
     <TopAppBarContainer>
       <TopRow>
@@ -47,7 +50,7 @@ export default function TopAppBar({ onLeftItemClick, title, currentAttachment, d
           size={TypographySize.LARGE}
           weight={TypographyWeight.MEDIUM}
         >
-          Done
+          { t('done') }
         </Typography>
         <IconButton
           icon={Icon.Download}

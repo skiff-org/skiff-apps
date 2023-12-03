@@ -1,0 +1,17 @@
+{
+    "labels": {
+        "inbox": "Inbox",
+        "trash": "Trash",
+        "sent": "Sent",
+        "spam": "Spam",
+        "drafts": "Drafts",
+        "archive": "Archive",
+        "imports": "Imports",
+        "search": "Search",
+        "send-later": "Send later",
+        "files": "Files",
+        "folder": "Folder",
+        "none": "None",
+        "quick-aliases": "Quick Aliases"
+    }
+}

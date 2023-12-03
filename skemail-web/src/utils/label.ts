@@ -11,6 +11,9 @@ import { isWalletAddress } from 'skiff-utils';
 
 import { MailAppRoutes } from '../constants/route.constants';
 
+// used outside of react components
+import i18n from 'skiff-i18n'
+
 export const FOLDER_URL_PARAM = 'folder';
 export const ALIAS_LABEL_URL_PARAM = 'alias';
 
@@ -39,14 +42,14 @@ export enum ModifyLabelsActions {
 
 export const FILES_LABEL: SystemLabel = {
   icon: Icon.Image,
-  name: 'Files',
+  name: i18n.t('labels.files', {ns: 'email'}),
   type: LabelType.SYSTEM,
   value: 'FILES'
 };
 
 export const NONE_LABEL: NoneLabel = {
   icon: Icon.Remove,
-  name: 'None',
+  name: i18n.t('labels.none', {ns: 'email'}),
   type: LabelType.HIDDEN,
   value: 'None'
 };
@@ -181,62 +184,62 @@ export const splitUserLabelsByVariant = (allLabels: UserLabelTypes[]) => {
  */
 export const SYSTEM_LABELS: SystemLabel[] = [
   {
-    name: 'Inbox',
+    name: i18n.t('labels.inbox', {ns: 'email'}),
     icon: Icon.Inbox,
     value: SystemLabels.Inbox,
     type: LabelType.SYSTEM,
     dataTest: 'inbox-mailbox-selector'
   },
   {
-    name: 'Sent',
+    name: i18n.t('labels.sent', {ns: 'email'}),
     icon: Icon.Send,
     value: SystemLabels.Sent,
     type: LabelType.SYSTEM,
     dataTest: 'sent-mailbox-selector'
   },
   {
-    name: 'Send later',
+    name: i18n.t('labels.send-later', {ns: 'email'}),
     icon: Icon.Calendar,
     value: SystemLabels.ScheduleSend,
     type: LabelType.SYSTEM,
     dataTest: 'send-later-mailbox-selector'
   },
   {
-    name: 'Drafts',
+    name: i18n.t('labels.drafts', {ns: 'email'}),
     icon: Icon.FileEmpty,
     value: SystemLabels.Drafts,
     type: LabelType.SYSTEM,
     dataTest: 'draft-mailbox-selector'
   },
   {
-    name: 'Imports',
+    name: i18n.t('labels.imports', {ns: 'email'}),
     icon: Icon.MoveMailbox,
     value: SystemLabels.Imports,
     type: LabelType.SYSTEM,
     dataTest: 'imported-mailbox-selector'
   },
   {
-    name: 'Quick Aliases',
+    name: i18n.t('labels.quick-aliases', {ns: 'email'}),
     icon: Icon.Bolt,
     value: SystemLabels.QuickAliases,
     type: LabelType.SYSTEM
   },
   {
-    name: 'Spam',
+    name: i18n.t('labels.spam', {ns: 'email'}),
     icon: Icon.Spam,
     value: SystemLabels.Spam,
     type: LabelType.SYSTEM,
     dataTest: 'spam-mailbox-selector'
   },
   {
-    name: 'Archive',
+    name: i18n.t('labels.archive', {ns: 'email'}),
     icon: Icon.Archive,
     value: SystemLabels.Archive,
     type: LabelType.SYSTEM,
     dataTest: 'archive-mailbox-selector'
   },
   {
-    name: 'Trash',
+    name: i18n.t('labels.trash', {ns: 'email'}),
     icon: Icon.Trash,
     value: SystemLabels.Trash,
     type: LabelType.SYSTEM,
@@ -246,7 +249,7 @@ export const SYSTEM_LABELS: SystemLabel[] = [
 
 export const HIDDEN_LABELS: HiddenLabel[] = [
   {
-    name: 'Search',
+    name: i18n.t('labels.search', {ns: 'email'}),
     value: HiddenLabels.Search,
     icon: Icon.Search,
     type: LabelType.HIDDEN,
