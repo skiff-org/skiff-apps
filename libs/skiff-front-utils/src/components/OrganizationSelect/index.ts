@@ -6,3 +6,4 @@ export {
   INBOX_WORKSPACE_ID,
   WorkspaceOptionItem
 } from './OrganizationSelect.constants';
+export { DynamicIcon } from './DynamicIcon'

@@ -13,7 +13,8 @@ import {
   EncryptionBadge,
   EncryptionBadgeTypes,
   useUserPreference,
-  lazyWithPreload
+  lazyWithPreload,
+  DynamicIcon
 } from 'skiff-front-utils';
 import { CalendarView } from 'skiff-graphql';
 import { StorageTypes } from 'skiff-utils';
@@ -84,36 +85,14 @@ export const CalendarHeader: React.FC = () => {
   }, []);
 
   const updateFavicon = () => {
-    const date = new Date();
-    const dayOfMonth = date.getDate().toString();
-
-    const canvas = document.createElement("canvas");
-    canvas.width = 48;
-    canvas.height = 48;
-  
-    const ctx = canvas.getContext("2d");
-    const image = new Image();
-  
-    image.onload = () => {
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-  
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = "#C279A0";
-      ctx.font = `30px Arial`;
-  
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2 + 10; 
-  
-      ctx.fillText(dayOfMonth, centerX, centerY);
-  
+    DynamicIcon(CALENDAR_URL).then((base64Image) => {
       const favicon: HTMLLinkElement = document.querySelector('link[rel="icon"]');
       if (favicon) {
-        favicon.href = canvas.toDataURL("image/png");
+        favicon.href = base64Image;
       }
-    };
-  
-    image.src = CALENDAR_URL;
+    }).catch((err) => {
+      console.error('Error updating favicon:', err);
+    });
   }
 
   const renderMonthAndYearHeaderText = (): JSX.Element => {

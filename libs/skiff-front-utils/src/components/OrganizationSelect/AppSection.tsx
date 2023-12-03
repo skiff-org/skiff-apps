@@ -6,6 +6,7 @@ import { useToast } from '../../hooks';
 
 import { AppItem } from './AppItem';
 import { AppButtons, AppIconInfo, AppSectionContainer, NameSection, SKIFF_APPS } from './OrganizationSelect.constants';
+import { DynamicIcon } from './DynamicIcon';
 
 interface AppSectionProps {
   activeApp: ProductApp;
@@ -54,6 +55,15 @@ export const AppSection = (props: AppSectionProps) => {
       </NameSection>
       <AppButtons>
         {Object.values(SKIFF_APPS).map((app: AppIconInfo) => {
+          if (app.label.toLowerCase().includes('calendar')) {
+            DynamicIcon(app.icon, 260, 260)
+              .then((base64Image) => {
+                app.icon = base64Image;
+              })
+              .catch((err) => {
+                console.error('Error updating icon:', err);
+              });
+          }
           return (
             <AppItem
               activeApp={activeApp}
