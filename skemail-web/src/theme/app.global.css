@@ -321,6 +321,13 @@ a {
   background: var(--bg-overlay-tertiary);
 }
 
+.ProseMirror hr {
+  margin: 16px auto;
+  background: #7d7d7d;
+  border: none;
+  height: 1px;
+}
+
 .ProseMirror ol ol ol ol ol,
 .ProseMirror ol ol ol ol ol ol ol ol,
 .ProseMirror ol ol {
