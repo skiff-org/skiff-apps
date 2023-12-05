@@ -31,6 +31,18 @@ export const AppSection = (props: AppSectionProps) => {
     });
   };
 
+  const SKIFF_APPS_UPDATED = Object.values(SKIFF_APPS).map(async (app) => {
+    if (app.label.toLowerCase().includes('calendar')) {
+      try {
+        const base64Image = await DynamicIcon(app.icon, true);
+        app.icon = base64Image;
+      } catch (err) {
+        console.error('Error updating icon:', err);
+      }
+    }
+    return app;
+  });
+
   return (
     <AppSectionContainer>
       <NameSection
@@ -54,23 +66,15 @@ export const AppSection = (props: AppSectionProps) => {
         />
       </NameSection>
       <AppButtons>
-        {Object.values(SKIFF_APPS).map((app: AppIconInfo) => {
-          if (app.label.toLowerCase().includes('calendar')) {
-            DynamicIcon(app.icon, true)
-              .then((base64Image) => {
-                app.icon = base64Image;
-              })
-              .catch((err) => {
-                console.error('Error updating icon:', err);
-              });
-          }
+        {SKIFF_APPS_UPDATED.map(async (app) => {
+          const updatedApp = await app;
           return (
             <AppItem
               activeApp={activeApp}
-              app={app}
+              app={updatedApp}
               closeDropdown={closeDropdown}
               customOnClick={customOnClicks?.[activeApp]}
-              key={app.label}
+              key={updatedApp.label}
               numUnread={numUnread}
               storeWorkspaceEvent={storeWorkspaceEvent}
             />

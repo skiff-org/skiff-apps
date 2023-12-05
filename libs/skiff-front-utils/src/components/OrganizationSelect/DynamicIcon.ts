@@ -23,8 +23,8 @@ const DynamicIcon = (imageURL: string, showMonth = false): Promise<string> => {
         ctx!.fillText(month, canvas.width / 2, 42);
       }
 
-      ctx!.fillStyle = '#C279A0';
-      ctx!.font = `Bold 175px Arial`;
+      ctx!.fillStyle = '#af5883';
+      ctx!.font = `Bold 175px Skiff Sans Text`;
 
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2 + 44;
