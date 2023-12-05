@@ -34,7 +34,7 @@ Skiff Mail is designed to be highly compatible with native and web mobile client
 
 To start, check out our [deployed CodeSandbox instance](https://codesandbox.io/p/github/skiff-org/skiff-apps/main).
 
-Instructions for local development can be found in [skiff-mail-web/README.md](skiff-mail-web/README.md). Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for ways to get involved with Skiff open-source development.
+Instructions for local development can be found in [skemail-web/README.md](skemail-web/README.md). Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for ways to get involved with Skiff open-source development.
 
 ## Using Skiff Calendar
 
