@@ -9,13 +9,13 @@ import {
   IconColor,
   IconText,
   Icons,
+  InputFieldVariant,
   Size,
   TextArea,
   Type,
   Typography,
   TypographySize,
-  TypographyWeight,
-  InputFieldVariant
+  TypographyWeight
 } from 'nightwatch-ui';
 import React, { useReducer, useState } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -457,16 +457,6 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
   const renderRequestButtons = () => {
     return (
       <RequestButtons>
-        <RequestButton onClick={openCanny}>
-          <RequestIconContainer $bgColor='#555CF0'>
-            <Icons color='white' icon={Icon.CommentPlus} />
-          </RequestIconContainer>
-          <RequestButtonText>
-            <Typography>Submit roadmap proposal (recommended)</Typography>
-            <Typography color='secondary'>Request a new feature via Canny</Typography>
-          </RequestButtonText>
-          <Icons color='disabled' icon={Icon.ChevronRight} />
-        </RequestButton>
         <RequestButton onClick={showRequestText}>
           <RequestIconContainer>
             <Icons color='secondary' icon={Icon.Send} />
