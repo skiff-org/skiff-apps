@@ -9,13 +9,13 @@ import {
   IconColor,
   IconText,
   Icons,
+  InputFieldVariant,
   Size,
   TextArea,
   Type,
   Typography,
   TypographySize,
-  TypographyWeight,
-  InputFieldVariant
+  TypographyWeight
 } from 'nightwatch-ui';
 import React, { useReducer, useState } from 'react';
 import { isMobile } from 'react-device-detect';
