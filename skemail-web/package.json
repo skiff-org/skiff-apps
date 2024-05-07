@@ -126,7 +126,7 @@
     "react-hotkeys": "^2.0.0",
     "react-image-crop": "^10.0.4",
     "react-joyride": "^2.5.5",
-    "react-pdf": "^5.7.2",
+    "react-pdf": "^7.7.3",
     "react-redux": "^7.2.7",
     "react-resize-detector": "^7.0.0",
     "react-router-dom": "^5.1.2",

@@ -85,7 +85,7 @@
     "jest": "^28.1.1",
     "onchange": "^7.1.0",
     "prettier": "^2.*",
-    "react-pdf": "^5.7.2",
+    "react-pdf": "^7.7.3",
     "skiff-front-utils": "workspace:libs/skiff-front-utils",
     "skiff-ics": "workspace:libs/skiff-ics",
     "skiff-utils": "workspace:libs/skiff-utils",
