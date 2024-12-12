@@ -135,7 +135,7 @@ function mergeListItemUp(tr: Transaction, schema: Schema): Transaction {
   }
 
   if (from !== pos + 2) {
-    // Selection is not at the begining of the list item.
+    // Selection is not at the beginning of the list item.
     return tr;
   }
 
