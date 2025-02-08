@@ -170,7 +170,7 @@
     "dotenv-cli": "^5.1.0",
     "esbuild": "^0.17.5",
     "eslint-config-skiff-eslint": "workspace:*",
-    "express": "^4.18.1",
+    "express": "^4.19.2",
     "fake-indexeddb": "^4.0.0",
     "favicons": "^7.1.0",
     "favicons-webpack-plugin": "^6.0.0",
