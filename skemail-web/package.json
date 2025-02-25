@@ -70,7 +70,7 @@
     "@tiptap/react": "^2.0.0-beta.108",
     "apollo-upload-client": "^17.0.0",
     "argon2-browser": "^1.18.0",
-    "axios": "^0.27.2",
+    "axios": "^0.28.0",
     "base64-js": "^1.5.1",
     "base64-loader": "^1.0.0",
     "buffer": "^6.0.3",
